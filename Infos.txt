@@ -1,0 +1,15 @@
+Accessing Edgar Data
+-------------------
+https://www.sec.gov/edgar/searchedgar/accessing-edgar-data.htm
+
+nützlich? sehr alt -> 6 Jahre
+https://www.xmlaficionado.com/blog/2014/09/how-to-download-and-process-sec-xbrl.html
+https://www.xmlaficionado.com/blog/2014/09/how-to-download-and-process-sec-xbrl.html
+
+
+im crawler index gibt es firm, form, cick u nd edgar http link direkt
+
+
+--> als erstes anschauen
+https://github.com/robren/sec_edgar_download -> hat im readme so was wit xml ausgabe -> evtl. besser?
+
