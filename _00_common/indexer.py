@@ -9,18 +9,19 @@ import os
 import os.path
 import sqlite3 as sqlite3
 import logging
-import re
 import pandas as pd
 from lxml import etree
 import requests
 from bs4 import BeautifulSoup
 import re
+from multiprocessing import Pool
+from time import sleep
+
 
 # listet alle filenamen sauber
 files = re.compile(r"\"name\":\"(.*?)\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
 namespace = "https://www.sec.gov/Archives/edgar"
-
 
 def get_cik(ticker):
     """ Query the edgar site for the cik corresponding to a ticker.
@@ -46,11 +47,18 @@ def _find_main_file(path:str):
         logging.exception("RequestException:%s", err)
 
     marks  = files.finditer(response.text)
+    response.close()
     for mark in marks:
         if mark.groups()[0].endswith("htm.xml"):
+            print("found for: " + path)
             return path + mark.groups()[0]
     return None
 
+def _find_main_func(mytuple):
+    sleep(0.05) # sleep for 50 millisecs, so that we don't send too many requests to sec
+    pre_url = mytuple[2]
+    new_url = _find_main_file(pre_url[0:pre_url.rfind("/")+1])
+    return new_url, mytuple[0]
 
 def _parse_xbrlfiles(edgar_sub_elem, edgar_ns, item):
 
@@ -307,13 +315,6 @@ class SecIndexer():
                 for key in self.edgar_all_keys:
                     edgar_dict[key].append(temp_dict[key])
 
-                if (temp_dict['xbrl_files'] is None) & (temp_dict['xbrl_pre_url'] is not None):
-
-                    xbrl_ins_url = _find_main_file(temp_dict['xbrl_pre_url'][0:temp_dict['xbrl_pre_url'].rfind("/")+1])
-                    if xbrl_ins_url is None:
-                        item_title = item.find('title')
-                        logging.warning('No EX-101 or EX-100 xml files found for  %s', item_title.text)
-
         return edgar_dict
 
     def _prep_directories(self):
@@ -378,3 +379,18 @@ class SecIndexer():
         db_df.to_sql("feeds", conn, if_exists="replace", chunksize=1000)
         logging.info('%d items parsed', len(db_df))
         logging.info('Saved feed details to %s\n', self.database)
+
+    def _find_missing_urls(self):
+        conn = sqlite3.connect(self.database)
+        result = conn.execute("SELECT accession_number, xbrl_files, xbrl_pre_url FROM feeds WHERE xbrl_files is NULL").fetchall()
+
+        # limit sec: 10 requests per second
+        pool = Pool(2)
+        update_data = pool.map(_find_main_func, result)
+        print(len(result))
+
+        conn.executemany("UPDATE feeds SET xbrl_files = ? WHERE accession_number = ?", update_data)
+        conn.commit()
+        conn.close()
+
+        

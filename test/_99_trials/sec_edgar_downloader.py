@@ -3,8 +3,11 @@ work_dir = 'd:/edgar'
 from_year = 2021
 to_year = 2021
 
-indexer = ix.SecIndexer(work_dir)
-indexer.download_sec_feeds(from_year, to_year, from_month=1, to_month=2)
+if __name__ == '__main__':
+    indexer = ix.SecIndexer(work_dir)
+    indexer.download_sec_feeds(from_year, to_year, from_month=1, to_month=2)
+    indexer._find_missing_urls()
+
 
 #cik = ix.get_cik('AAPL')
 #indexer.download_xbrl_data(cik, from_year, to_year, 'All')
