@@ -15,7 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from multiprocessing import Pool
-from time import sleep
+from time import sleep, time
 
 
 # listet alle filenamen sauber
@@ -55,9 +55,11 @@ def _find_main_file(path:str):
     return None
 
 def _find_main_func(mytuple):
-    sleep(0.05) # sleep for 50 millisecs, so that we don't send too many requests to sec
+    start = time()
     pre_url = mytuple[2]
     new_url = _find_main_file(pre_url[0:pre_url.rfind("/")+1])
+    end = time()
+    sleep((1000-(end - start)) / 1000)
     return new_url, mytuple[0]
 
 def _parse_xbrlfiles(edgar_sub_elem, edgar_ns, item):
@@ -383,11 +385,12 @@ class SecIndexer():
     def _find_missing_urls(self):
         conn = sqlite3.connect(self.database)
         result = conn.execute("SELECT accession_number, xbrl_files, xbrl_pre_url FROM feeds WHERE xbrl_files is NULL").fetchall()
+        print(len(result))
 
         # limit sec: 10 requests per second
-        pool = Pool(2)
+        pool = Pool(9)
         update_data = pool.map(_find_main_func, result)
-        print(len(result))
+
 
         conn.executemany("UPDATE feeds SET xbrl_files = ? WHERE accession_number = ?", update_data)
         conn.commit()

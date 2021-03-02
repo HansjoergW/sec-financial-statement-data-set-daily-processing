@@ -5,7 +5,7 @@ to_year = 2021
 
 if __name__ == '__main__':
     indexer = ix.SecIndexer(work_dir)
-    indexer.download_sec_feeds(from_year, to_year, from_month=1, to_month=2)
+    #indexer.download_sec_feeds(from_year, to_year, from_month=1, to_month=2)
     indexer._find_missing_urls()
 
 
