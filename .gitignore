@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 /.idea/
 /sec_processing.iml
+/test/_00_common/data/sec_data.db
