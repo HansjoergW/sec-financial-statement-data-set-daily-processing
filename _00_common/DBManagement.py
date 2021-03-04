@@ -9,7 +9,7 @@ SEC_FEED_TBL_COLS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',
     'accessionNumber', 'fileNumber', 'acceptanceDatetime',
     'period', 'assistantDirector', 'assignedSic', 'fiscalYearEnd',
-    'xbrl_ins_url', 'xbrl_cal_url', 'xbrl_def_url', 'xbrl_lab_url', 'xbrl_pre_url'
+    'xbrlInsUrl', 'xbrlCalUrl', 'xbrlDefUrl', 'xbrlLabUrl', 'xbrlPreUrl'
 )
 
 

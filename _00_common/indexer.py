@@ -21,7 +21,7 @@ from time import sleep, time
 # listet alle filenamen sauber
 files = re.compile(r"\"name\":\"(.*?)\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
-namespace = "https://www.sec.gov/Archives/edgar"
+
 
 def get_cik(ticker):
     """ Query the edgar site for the cik corresponding to a ticker.

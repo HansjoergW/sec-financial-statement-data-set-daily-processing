@@ -5,8 +5,8 @@ to_year = 2021
 
 if __name__ == '__main__':
     indexer = ix.SecIndexer(work_dir)
-    #indexer.download_sec_feeds(from_year, to_year, from_month=1, to_month=2)
-    indexer._find_missing_urls()
+    indexer.download_sec_feeds(from_year, to_year, from_month=3, to_month=3)
+    #indexer._find_missing_urls()
 
 
 #cik = ix.get_cik('AAPL')
