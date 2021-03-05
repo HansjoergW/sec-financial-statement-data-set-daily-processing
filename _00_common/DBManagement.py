@@ -2,6 +2,7 @@ import os
 import sqlite3
 import re
 from typing import List, Tuple
+import pandas as pd
 
 SEC_FEED_TBL_NAME = "sec_feeds"
 
@@ -44,6 +45,13 @@ class DBManager():
         conn.commit()
         conn.close()
 
+    def insert_feed_info(self, df: pd.DataFrame):
+        conn = self._get_connection()
+        try:
+            df.to_sql(SEC_FEED_TBL_NAME, conn, if_exists="replace", chunksize=1000)
+        finally:
+            conn.close()
+
     def find_missing_xbrl_ins_urls(self) -> List[Tuple[str]]:
         conn = self._get_connection()
         try:
@@ -52,3 +60,13 @@ class DBManager():
             return conn.execute(sql).fetchall()
         finally:
             conn.close()
+
+    def update_xbrl_ins_urls(self, update_data: List[(str, str)]):
+        conn = self._get_connection()
+        try:
+            sql = '''UPDATE {} SET xbrl_ins_url = ? WHERE accession_number = ?'''.format(SEC_FEED_TBL_NAME)
+            conn.executemany(sql, update_data)
+            conn.commit()
+        finally:
+            conn.close()
+

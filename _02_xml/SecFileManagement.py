@@ -140,6 +140,7 @@ class SecIndexFile():
                 entries.append(temp_dict)
 
         df = pd.DataFrame(entries)
+        df.set_index('accession_number', inplace=True)
 
         len_before = len(df)
         df.drop_duplicates('accessionNumber', inplace=True)
