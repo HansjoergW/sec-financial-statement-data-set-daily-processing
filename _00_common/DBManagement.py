@@ -45,6 +45,14 @@ class DBManager():
         conn.commit()
         conn.close()
 
+    def read_all(self) -> pd.DataFrame:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT * FROM {}'''.format(SEC_FEED_TBL_NAME)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self._get_connection()
         try:
@@ -61,7 +69,7 @@ class DBManager():
         finally:
             conn.close()
 
-    def update_xbrl_ins_urls(self, update_data: List[(str, str)]):
+    def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):
         conn = self._get_connection()
         try:
             sql = '''UPDATE {} SET xbrl_ins_url = ? WHERE accession_number = ?'''.format(SEC_FEED_TBL_NAME)

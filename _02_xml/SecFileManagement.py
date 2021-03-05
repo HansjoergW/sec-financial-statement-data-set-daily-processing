@@ -140,10 +140,10 @@ class SecIndexFile():
                 entries.append(temp_dict)
 
         df = pd.DataFrame(entries)
-        df.set_index('accession_number', inplace=True)
 
         len_before = len(df)
         df.drop_duplicates('accessionNumber', inplace=True)
+        df.set_index('accessionNumber', inplace=True)
         len_after = len(df)
         dropped = len_before - len_after
         if dropped:
