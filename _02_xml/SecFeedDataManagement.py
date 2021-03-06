@@ -42,6 +42,7 @@ class SecFeedDataManager():
 
     @staticmethod
     def _find_main_file_throttle(data_tuple: Tuple[str]) -> (str, str):
+        # ensures that only one request per second is send
         start = time()
         new_url, accession_nr = SecFeedDataManager._find_main_file(data_tuple)
         end = time()

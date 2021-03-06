@@ -7,7 +7,7 @@ import pytest
 folder = "./tmp"
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.fixture(scope="module")
 def dbmgr():
     new_dbmgr = DBManager(work_dir=folder)
     yield new_dbmgr

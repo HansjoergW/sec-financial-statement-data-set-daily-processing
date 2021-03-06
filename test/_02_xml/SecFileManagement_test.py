@@ -6,7 +6,7 @@ import pytest
 folder = "./tmp"
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.fixture(scope="module")
 def file():
     new_sec_file = SecIndexFile(2020, 12, folder)
     yield new_sec_file
