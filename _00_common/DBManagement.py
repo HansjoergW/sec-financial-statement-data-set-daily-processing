@@ -56,7 +56,7 @@ class DBManager():
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self._get_connection()
         try:
-            df.to_sql(SEC_FEED_TBL_NAME, conn, if_exists="replace", chunksize=1000)
+            df.to_sql(SEC_FEED_TBL_NAME, conn, if_exists="append", chunksize=1000)
         finally:
             conn.close()
 

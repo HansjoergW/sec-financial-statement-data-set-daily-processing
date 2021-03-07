@@ -2,6 +2,7 @@ from _00_common.DBManagement import DBManager
 from _02_xml.SecFilesProcessing import  SecFilesProcessor
 from _02_xml.SecFeedDataManagement import SecFeedDataManager
 
+import logging
 
 class SecProcessingOrchestrator():
 
@@ -10,6 +11,9 @@ class SecProcessingOrchestrator():
         self.feeddir = workdir + "feed/"
         self.dbmanager = DBManager(work_dir=workdir)
         self.secfeeddatamgr = SecFeedDataManager(self.dbmanager)
+
+        # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
 
     def process_sec_feed_data(self):
         secfilesprocessor = SecFilesProcessor(self.dbmanager, 2020, 2021, 10, 2, self.feeddir)

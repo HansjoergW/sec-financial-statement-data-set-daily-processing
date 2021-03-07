@@ -1,6 +1,8 @@
 from _00_common.DBManagement import DBManager
 from _02_xml.SecFileManagement import SecIndexFile
 
+import logging
+
 
 class SecFilesProcessor:
     """
@@ -24,7 +26,9 @@ class SecFilesProcessor:
 
     def download_sec_feeds(self):
         for year, month in self._month_year_iter():
+            logging.info("processing year: {} / month: {}".format(year, month))
             sec_file = SecIndexFile(year, month, feed_dir=self.feed_dir)
             sec_file.download_sec_feed()
             df = sec_file.parse_sec_rss_feeds()
+            logging.info("   read entries: {}".format(len(df)))
             self.dbmanager.insert_feed_info(df)

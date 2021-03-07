@@ -1,15 +1,31 @@
-Accessing Edgar Data
--------------------
-https://www.sec.gov/edgar/searchedgar/accessing-edgar-data.htm
+Num Text erstellen:
 
-nützlich? sehr alt -> 6 Jahre
-https://www.xmlaficionado.com/blog/2014/09/how-to-download-and-process-sec-xbrl.html
-https://www.xmlaficionado.com/blog/2014/09/how-to-download-and-process-sec-xbrl.html
+aus numxml
+<context id="i5085fb79a9a14a9aae9b909beb32bce2_D20180930-20190928">
+	<entity>
+		<identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+	</entity>
+	<period>
+		<startDate>2018-09-30</startDate>
+		<endDate>2019-09-28</endDate>
+	</period>
+</context>
+
+<us-gaap:PaymentsRelatedToTaxWithholdingForShareBasedCompensation
+  contextRef="i5085fb79a9a14a9aae9b909beb32bce2_D20180930-20190928"
+  decimals="-6"
+  id="id3VybDovL2RvY3MudjEvZG9jOmVmNzgxYWI1OGU0ZjRmY2FhODcyZGRiZDMwZGE0MGUxL3NlYzplZjc4MWFiNThlNGY0ZmNhYTg3MmRkYmQzMGRhNDBlMV8xMDAvZnJhZzo4MzkyYTcxNGE4YTg0MzQxOWZlMmRiNDZjNTU3NDQ5Mi90YWJsZTo2MjhhZWYwODc3NTI0ZWYxODNhMGU5ZDU5YTZlM2YxNy90YWJsZXJhbmdlOjYyOGFlZjA4Nzc1MjRlZjE4M2EwZTlkNTlhNmUzZjE3XzMxLTMtMS0xLTA_9544e94c-23b2-4601-9fc7-09082bfa94e7"
+  unitRef="usd">2817000000</us-gaap:PaymentsRelatedToTaxWithholdingForShareBasedCompensation>
 
 
-im crawler index gibt es firm, form, cick u nd edgar http link direkt
+Im num.txt
+0000320193-20-000096	PaymentsRelatedToTaxWithholdingForShareBasedCompensation	us-gaap/2020		20190930	4	USD	2817000000.0000
 
-
---> als erstes anschauen
-https://github.com/robren/sec_edgar_download -> hat im readme so was wit xml ausgabe -> evtl. besser?
-
+Was ist zu tun:
+- Runden des EndDates
+- Quarters, vermutlich aufgrund der Periode
+- Kommastellen? einfach 3?
+- was hat decimals zu bedeuten
+    -> -3 -> in tausender / -6 in Millionen / 2 -> zweistellen nachdem Komma
+- es gibt auch TextInfos!
+  -> diese haben keine unitRef einheit
