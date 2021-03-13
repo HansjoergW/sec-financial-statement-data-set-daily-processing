@@ -15,6 +15,7 @@ textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNO
 xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 clean_tag_regex = re.compile(r"[{].*?[}]")
+remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
 def strip_num_xml(pathtofile: str):
     with open(pathtofile, encoding="utf8") as f:
@@ -26,6 +27,7 @@ def strip_num_xml(pathtofile: str):
         data = textblock_regex.sub("", data)
         data = xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
         data = link_regex.sub("", data)
+        data = remove_wspace_regex.sub("><", data)
 
     return data
 
@@ -104,6 +106,7 @@ def get_contexts(root: etree._Element):
 
 def parse_cleanfile(filename) -> pd.DataFrame:
     root = etree.parse(filename).getroot()
+
     us_gaap_ns = root.nsmap['us-gaap']
     pos = us_gaap_ns.rfind("/") + 1
     versionyear = us_gaap_ns[pos:pos+4]
@@ -146,10 +149,11 @@ def parse_cleanfile(filename) -> pd.DataFrame:
     return pd.DataFrame(entries)
 
 
-#data = strip_num_xml(file)
-#write_to_file(target_num_clean_xml, data)
-content = parse_cleanfile(target_num_clean_xml)
-print(len(content))
+data = strip_num_xml(file)
+write_to_file(target_num_clean_xml, data)
+#content = parse_cleanfile(target_num_clean_xml)
+#print(len(content))
+#print(sum(~content['segments'].isnull()))
 
 # print(find_last_day_of_month("2019-11-25"))
 # print(find_last_day_of_month("2019-02-5"))

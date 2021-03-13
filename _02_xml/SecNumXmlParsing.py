@@ -1,0 +1,153 @@
+import re
+import calendar
+import pandas as pd
+
+from lxml import etree
+from typing import Dict, List, Tuple, Optional
+
+
+class SecNumXmlParser():
+    """ Parses the data of an Num.Xml file and delivers the data in a similar format as dataframe than the num.txt
+       contained in the financial statments dataset of the sec."""
+
+    period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    identifier_regex = re.compile(r"(<identifier).*?(</identifier>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    id_decimals_regex = re.compile(r"decimals[^>]*?id=\"[^<]*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    clean_tag_regex = re.compile(r"[{].*?[}]")
+    remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    def __init__(self):
+        pass
+
+    def _strip_file(self, data: str) -> str:
+        """removes unneeded content from the datastring, so that xml parsing will be faster"""
+        data = self.identifier_regex.sub("", data)
+        data = self.period_regex.sub("", data)
+        data = self.entity_regex.sub("", data)
+        data = self.id_decimals_regex.sub("", data)
+        data = self.textblock_regex.sub("", data)
+        data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
+        data = self.link_regex.sub("", data)
+        data = self.remove_wspace_regex.sub("><", data)
+        data = self.remove_unicode_tag_regex.sub("", data)
+
+        return data
+
+    def _find_last_day_of_month(self, datastr:str) -> str:
+        """finds the last day of the month in the datestring with format yyyy-mm-dd
+        and returns it as yyyymmdd """
+        yearstr  = datastr[0:4]
+        monthstr = datastr[5:7]
+        daystr = datastr[8:]
+
+        year = int(yearstr)
+        month = int(monthstr)
+
+        last_day_of_month = calendar.monthrange(year, month)[1]
+        return yearstr + monthstr + str(last_day_of_month).zfill(2)
+
+    def _calculate_qtrs(self, year_start_s: str, month_start_s: str, year_end_s: str, month_end_s: str) -> int:
+        """calculates the number of quartes between the start year/month and the end year/month"""
+        year_start = int(year_start_s)
+        year_end = int(year_end_s)
+        month_start = int(month_start_s)
+        month_end = int(month_end_s) + (year_end - year_start) * 12
+
+        return int(round(float(month_end - month_start) / 3))
+
+    def _read_contexts(self, root: etree._Element) -> Dict[str, Tuple[str,int,Optional[list]]]:
+        contexts = list(root.iter('context'))
+        context_map:  Dict[str, Tuple[str,int,Optional[list]]] = {}
+
+        for context in contexts:
+            instanttxt = None
+            startdatetxt = None
+            enddatetxt = None
+
+            # generally, we are mainly interested in the contexts without a segment
+            # however, the segment might be deliver interesting inside in future analysis
+            segments = list(context.findall('.//*[@dimension]'))
+            segments_list = []
+            for segment in segments:
+                segment_label = segment.text
+                segment_dim = segment.get("dimension")
+                segments_list.append(segment_dim + "/" + segment_label)
+
+            if len(segments_list) == 0:
+                segments_list = None
+
+            id = context.get("id")
+            instant = context.find('instant')
+            if instant is not None:
+                instanttxt = instant.text
+
+            startdate = context.find('startDate')
+            if startdate is not None:
+                startdatetxt = startdate.text
+
+            enddate = context.find('endDate')
+            if enddate is not None:
+                enddatetxt = enddate.text
+
+            if instant is None:
+                enddate = self._find_last_day_of_month(enddatetxt)
+                qtrs = self._calculate_qtrs(startdatetxt[0:4], startdatetxt[5:7], enddatetxt[0:4], enddatetxt[5:7])
+
+                context_map[id] = (enddate, qtrs, segments_list)
+            else:
+                enddate = self._find_last_day_of_month(instanttxt)
+                context_map[id] = (enddate, 0, segments_list)
+
+        return context_map
+
+    def _read_tags(self, root: etree._Element) -> pd.DataFrame:
+        us_gaap_ns = root.nsmap['us-gaap']
+        pos = us_gaap_ns.rfind("/") + 1
+        versionyear = us_gaap_ns[pos:pos+4]
+
+        context_map = self._read_contexts(root)
+
+        tags = list(root.findall('.//*[@unitRef]'))
+
+        entries = []
+
+        for tag in tags:
+            temp_dict = {}
+
+            value_text = tag.text
+            ctxtRef = tag.get("contextRef")
+            unitRef = tag.get("unitRef").lower()
+            tagname = self.clean_tag_regex.sub("", tag.tag)
+            version = tag.prefix + "/" + versionyear
+            context_entry = context_map[ctxtRef]
+            ddate = context_entry[0]
+            qtrs = context_entry[1]
+            segments = context_entry[2]
+
+            if unitRef in ["usd","usdpershare"]:
+                unitRef = "USD"
+
+            temp_dict['adsh']    = ''
+            temp_dict['tag']     = tagname
+            temp_dict['version'] = version
+            temp_dict['coreg']   = ''
+            temp_dict['ddate']   = ddate
+            temp_dict['qtrs']    = qtrs
+            temp_dict['uom']     = unitRef
+            temp_dict['value']   = value_text
+            temp_dict['footnote'] = ''
+            temp_dict['segments'] = segments
+
+            entries.append(temp_dict)
+
+        return pd.DataFrame(entries)
+
+    def parse(self, data: str) -> pd.DataFrame:
+        data = self._strip_file(data)
+        root = etree.fromstring(data)
+        return self._read_tags(root)
