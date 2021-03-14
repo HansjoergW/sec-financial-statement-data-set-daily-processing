@@ -18,7 +18,7 @@ class SecNumXmlParser():
     xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     clean_tag_regex = re.compile(r"[{].*?[}]")
-    remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    # remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
     def __init__(self):
@@ -33,7 +33,7 @@ class SecNumXmlParser():
         data = self.textblock_regex.sub("", data)
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
         data = self.link_regex.sub("", data)
-        data = self.remove_wspace_regex.sub("><", data)
+        # data = self.remove_wspace_regex.sub("><", data)
         data = self.remove_unicode_tag_regex.sub("", data)
 
         return data
@@ -105,7 +105,17 @@ class SecNumXmlParser():
 
         return context_map
 
+    def _find_company_namespaces(self, root: etree._Element) -> List[str]:
+        official = ['xbrl.org', 'sec.gov','fasb.org','w3.org']
+        company_namespaces = []
+        for key, value in root.nsmap.items():
+            if not any(x in value for x in official):
+                company_namespaces.append(key)
+        return company_namespaces
+
     def _read_tags(self, root: etree._Element) -> pd.DataFrame:
+        company_namespaces = self._find_company_namespaces(root)
+
         us_gaap_ns = root.nsmap['us-gaap']
         pos = us_gaap_ns.rfind("/") + 1
         versionyear = us_gaap_ns[pos:pos+4]
@@ -123,7 +133,12 @@ class SecNumXmlParser():
             ctxtRef = tag.get("contextRef")
             unitRef = tag.get("unitRef").lower()
             tagname = self.clean_tag_regex.sub("", tag.tag)
-            version = tag.prefix + "/" + versionyear
+
+            if tag.prefix in company_namespaces:
+                version = 'company'
+            else:
+                version = tag.prefix + "/" + versionyear
+
             context_entry = context_map[ctxtRef]
             ddate = context_entry[0]
             qtrs = context_entry[1]

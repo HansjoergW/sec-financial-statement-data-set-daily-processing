@@ -126,12 +126,29 @@ def test_read_contexts():
     assert len(content) == 3
 
 
+def test_find_company_namespaces():
+    parser = SecNumXmlParser()
+    root = etree.fromstring(xml_expected_stripped)
+    company_namespaces = parser._find_company_namespaces(root)
+
+    assert len(company_namespaces) == 1
+    assert company_namespaces[0] == 'aapl'
+
+
 def test_parse():
     parser = SecNumXmlParser()
     df = parser.parse(xml_test_data)
     print(len(df))
 
 
+def test_complete_file_parse():
+    xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm.xml"
+    parser = SecNumXmlParser()
+
+    with open(xml_file, "r", encoding="utf-8") as f:
+        xml_content = f.read()
+        df = parser.parse(xml_content)
+        print(len(df))
 
 
 
