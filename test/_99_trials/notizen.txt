@@ -1,0 +1,16 @@
+Notizen für Pre xml:
+<link:presentationLink> definieren die Statements
+
+darin gibt es immer <xlink:loc und xlink:presentationArc
+
+presentationArc besitzt
+ -order und  linkfrom und linkto, sowie ein preferredLabel mit verschiedenen Rollen (terseLabel, totalLabel, verboselabel
+ -xlink:arcrole type -> oft parent-child -> danach mit xlinkfrom (ein loc) zu anderem loc
+
+
+
+
+ man könnte sowas versuchen, wie eine
+ liste von liste zu bilden
+
+ die grosse Frage ist, wo negating herkommt

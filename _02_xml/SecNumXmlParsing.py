@@ -146,6 +146,8 @@ class SecNumXmlParser():
 
             if unitRef in ["usd","usdpershare"]:
                 unitRef = "USD"
+            if unitRef == 'number':
+                unitRef = 'pure'
 
             temp_dict['adsh']    = ''
             temp_dict['tag']     = tagname
@@ -165,4 +167,16 @@ class SecNumXmlParser():
     def parse(self, data: str) -> pd.DataFrame:
         data = self._strip_file(data)
         root = etree.fromstring(data)
-        return self._read_tags(root)
+        df = self._read_tags(root)
+        return df
+
+    def clean_for_pure_num(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+        df = (df[df.segments.isnull()]).copy()
+
+        df['qtrs']  = df.qtrs.apply(int)
+        df['value'] = pd.to_numeric(df['value'], errors='coerce')
+        df['adsh'] = adsh
+        df.loc[df.version == 'company', 'version'] = adsh
+        df.drop(['segments'], axis=1, inplace=True)
+        df.drop_duplicates(inplace=True)
+        return df
