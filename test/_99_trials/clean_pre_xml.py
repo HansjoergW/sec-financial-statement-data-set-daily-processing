@@ -37,9 +37,66 @@ def write_to_file(filename, data):
         f.close()
 
 
+def create_loc_map(presentation: etree._Element) -> Tuple[str,Dict[str, Tuple[str, str, List[str]]]]:
+    locs  = list(presentation.iter('loc'))
+    loc_dict = {}
+    first_key = None
+    for loc in locs:
+        key = loc.get("label")
+        if not first_key:
+            first_key = key
+        tag_info = loc.get("href").split("_")
+        tag_prefix = tag_info[0]
+        tag = tag_info[1]
+        loc_dict[key] = (tag_prefix, tag, [])
+
+    return first_key, loc_dict
+
+
+def fill_parent_child(presentation: etree._Element, locmap: Dict[str, Tuple[str, str, List[str]]]):
+    arcs = list(presentation.iter('presentationArc'))
+
+    for arc in arcs:
+        order = arc.get('order')
+        parent = arc.get('from')
+        child = arc.get('to')
+        plabel = arc.get('preferredLabel')
+        locmap[parent][2].append((child, order, plabel))
+
+
+def simple_list(presentation: etree._Element) -> List[Dict[str, str]]:
+    locs  = list(presentation.iter('loc'))
+    result_list = []
+    line = 0
+    for loc in locs:
+        key = loc.get("label")
+        tag_info = loc.get("href").split("_")
+        tag_prefix = tag_info[0]
+        tag = tag_info[1]
+        entry = {"line": line, "version": tag_prefix, "tag": tag, "key": key}
+        result_list.append(entry)
+        line += 1
+
+    return result_list
+
+# CP CoverPage, EQ Equity, IS IncomeStatement, CI ComprehensiveIncome, BS BalanceSheet, CF CashFlow
+
+def process_presentation(presentation: etree._Element):
+    # first_key, loc_map = create_loc_map(presentation)
+    # fill_parent_child(presentation, loc_map)
+    entries = simple_list(presentation)
+    if len(entries) > 0:
+        print(entries[0]['tag'])
+    else:
+        print("---")
+
+
 def find_presentation_links(root: etree._Element):
     presentation_links = list(root.iter('presentationLink'))
     print(len(presentation_links))
+
+    for presentation in presentation_links:
+        process_presentation(presentation)
 
 
 with open(file, "r", encoding="utf-8") as f:

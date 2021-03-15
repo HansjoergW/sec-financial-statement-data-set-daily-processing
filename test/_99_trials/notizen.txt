@@ -24,6 +24,7 @@ wie kommen wir zu BS, etc.. definition?
 
 
  die grosse Frage ist, wo negating herkommt
+  > im aapl-20200926_lab.xml gibt es entsprechende Namespaces
 
 
  inpth:  Value was presented “parenthetically” instead of in columns within the financial statements. For example:
