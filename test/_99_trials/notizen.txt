@@ -11,6 +11,25 @@ presentationArc besitzt
 
 
  man könnte sowas versuchen, wie eine
- liste von liste zu bilden
+ liste von liste zu bilden, vlt. gepaart mit Map für Detail Infos
+
+
+
+
+
+
+wie kommen wir zu BS, etc.. definition?
+- als erste loc gibt es für href definierte typen -> href="us-gaap_IncomeStatementAbstract"
+  -> Evtl. kann man darüber entscheiden, um was für ein typ es sich handelt
+
 
  die grosse Frage ist, wo negating herkommt
+
+
+ inpth:  Value was presented “parenthetically” instead of in columns within the financial statements. For example:
+  Receivables (net of allowance for bad debts of $200 in 2012) $700.
+  BOOLEAN (1 if true and 0 if false)
+
+ rfile:  The type of interactive data file rendered on the EDGAR web site, H = .htm file, X = .xml file.
+
+ plabel:  The text presented on the line item, also known as a “preferred” label.
