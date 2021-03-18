@@ -28,7 +28,6 @@ stmt_map:Dict[str,str] = {'Cover': 'CP',
                           }
 
 
-
 def _strip_file(data: str) -> str:
     """removes unneeded content from the datastring, so that xml file is easier to understand and xml parsing will be faster"""
     data = remove_unicode_tag_regex.sub("", data)
@@ -38,7 +37,7 @@ def _strip_file(data: str) -> str:
     data = arcrole_regex.sub("", data)
     data = role2003_regex.sub("", data)
     data = role2009_regex.sub("", data)
-    data = href_regex.sub(" href=\"", data)
+    # data = href_regex.sub(" href=\"", data)
     data = type_clean_regex.sub("", data)
     data = arcrole_parent_child_regex.sub("", data)
     return data
@@ -58,10 +57,20 @@ def create_loc_map(presentation: etree._Element) -> Tuple[str,Dict[str, Tuple[st
         key = loc.get("label")
         if not first_key:
             first_key = key
-        tag_info = loc.get("href").split("_")
+
+        href_parts = loc.get("href").split('#')
+        version = None
+        if href_parts[0].startswith('http'):
+            ns_parts = href_parts[0].split('/')
+            version = ns_parts[3] + '/' + ns_parts[4]
+        else:
+            version = 'company'
+
+        tag_info = href_parts[1].split("_")
         tag_prefix = tag_info[0]
         tag = tag_info[1]
-        loc_dict[key] = (tag_prefix, tag, [])
+        # loc_dict[key] = (tag_prefix, tag, [])
+        loc_dict[key] = (version, tag, [])
 
     return first_key, loc_dict
 
@@ -99,7 +108,16 @@ def simple_list(presentation: etree._Element) -> List[Dict[str, str]]:
     for loc in locs:
         key = loc.get("label")
 
-        tag_info = loc.get("href").split("_")
+
+        href_parts = loc.get("href").split('#')
+        version = None
+        if href_parts[0].startswith('http'):
+            ns_parts = href_parts[0].split('/')
+            version = ns_parts[3] + '/' + ns_parts[4]
+        else:
+            version = 'company'
+
+        tag_info = href_parts[1].split("_")
         tag_prefix = tag_info[0]
         tag = tag_info[1]
 
@@ -108,7 +126,7 @@ def simple_list(presentation: etree._Element) -> List[Dict[str, str]]:
         if prefered_label:
             negated = "negated" in prefered_label
 
-        entry = {"line": line, "version": tag_prefix, "tag": tag, "negated": negated, "plabel": prefered_label, "key": key}
+        entry = {"line": line, "version": version, "tag": tag, "negated": negated, "plabel": prefered_label, "key": key}
         result_list.append(entry)
         line += 1
 
@@ -145,7 +163,6 @@ def process_presentations(root: etree._Element) -> List[Dict[str, str]]:
 
     return all_entries
 
-
 with open(file, "r", encoding="utf-8") as f:
     xml_content = f.read()
     data = _strip_file(xml_content)
@@ -153,4 +170,6 @@ with open(file, "r", encoding="utf-8") as f:
     root = etree.fromstring(data)
     entries = process_presentations(root)
     df = pd.DataFrame(entries)
+    df = df[~df.stmt.isnull()]
+
     print(len(df))

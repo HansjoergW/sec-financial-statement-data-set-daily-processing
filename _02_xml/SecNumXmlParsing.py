@@ -7,8 +7,8 @@ from typing import Dict, List, Tuple, Optional
 
 
 class SecNumXmlParser():
-    """ Parses the data of an Num.Xml file and delivers the data in a similar format as dataframe than the num.txt
-       contained in the financial statments dataset of the sec."""
+    """ Parses the data of an Num.Xml file and delivers the data in a similar format than the num.txt
+       contained in the financial statements dataset of the sec."""
 
     period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)

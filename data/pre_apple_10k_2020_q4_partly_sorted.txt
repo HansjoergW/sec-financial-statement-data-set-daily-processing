@@ -76,6 +76,7 @@ adsh	report	line	stmt	inpth	rfile	tag	version	plabel	negating
 0000320193-20-000096	4	33	BS	0	H	AccumulatedOtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	Accumulated other comprehensive income/(loss)	0
 0000320193-20-000096	4	34	BS	0	H	StockholdersEquity	us-gaap/2020	Total shareholders equity	0
 0000320193-20-000096	4	35	BS	0	H	LiabilitiesAndStockholdersEquity	us-gaap/2020	Total liabilities and shareholders equity	0
+
 0000320193-20-000096	5	1	BS	1	H	CommonStockParOrStatedValuePerShare	us-gaap/2020	Common stock, par value (in dollars per share)	0
 0000320193-20-000096	5	2	BS	1	H	CommonStockSharesAuthorized	us-gaap/2020	Common stock, shares authorized (in shares)	0
 0000320193-20-000096	5	3	BS	1	H	CommonStockSharesIssued	us-gaap/2020	Common stock, shares issued (in shares)	0
