@@ -84,7 +84,7 @@ class SecPreXmlParser():
             if prefered_label:
                 negated = "negated" in prefered_label
 
-            entry = {"line": line, "version": version, "tag": tag, "negated": negated, "plabel": prefered_label, "key": key}
+            entry = {"line": line, "version": version, "tag": tag, "negating": negated, "plabel": prefered_label, "key": key}
             result_list.append(entry)
             line += 1
 
@@ -94,7 +94,7 @@ class SecPreXmlParser():
         entries = self._simple_list(presentation)
 
         inpth = 0
-        presentation_role = presentation.get('role',"")
+        presentation_role = presentation.get('role',"").lower()
         if "parenthetical" in presentation_role:
             inpth = 1
 
@@ -134,5 +134,8 @@ class SecPreXmlParser():
 
     def clean_for_pure_pre(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         df = df[~df.stmt.isnull()]
+        df = df[df.line != 0].copy()
+        df.drop(['plabel', 'key'], axis=1, inplace=True)
+        df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
         return df
