@@ -8,9 +8,6 @@ presentationArc besitzt
 das Jahr der Tag Version ist in diesen Daten nicht vorhanden und müsste  hinzugefügt werden
 
 
-die grosse Frage ist, wo negating herkommt
-  > im aapl-20200926_lab.xml gibt es entsprechende Namespaces
-
 
 inpth:  Value was presented “parenthetically” instead of in columns within the financial statements. For example:
 Receivables (net of allowance for bad debts of $200 in 2012) $700.

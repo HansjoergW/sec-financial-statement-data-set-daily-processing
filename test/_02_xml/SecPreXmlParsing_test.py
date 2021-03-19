@@ -1,0 +1,24 @@
+from _02_xml.SecPreXmlParsing import SecPreXmlParser
+
+from typing import Dict, List, Tuple, Optional
+from lxml import etree
+import os
+
+xml_test_data_file = './data/test_pre.xml'
+
+xml_expected_stripped_file = './data/test_pre_exp.xml'
+
+
+def test_strip_file():
+    print(os.getcwd())
+    with open(xml_test_data_file, "r", encoding="utf-8") as f:
+        xml_content = f.read()
+        f.close()
+
+        parser = SecPreXmlParser()
+        content = parser._strip_file(xml_content)
+
+        with open(xml_expected_stripped_file, "r", encoding="utf-8") as f:
+            xml_exp_content = f.read()
+            f.close()
+            assert content == xml_exp_content

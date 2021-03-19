@@ -137,6 +137,12 @@ def process_presentation(reportnr: int, presentation: etree._Element) -> List[Di
     # first_key, loc_map = create_loc_map(presentation)
     # fill_parent_child(presentation, loc_map)
     entries = simple_list(presentation)
+    presentation_role = presentation.get('role',"")
+
+    inpth = 0
+    if "parenthetical" in presentation_role:
+        inpth = 1
+
     if len(entries) > 0:
         first_tag = entries[0]['tag']
         stmt = None
@@ -146,7 +152,8 @@ def process_presentation(reportnr: int, presentation: etree._Element) -> List[Di
                 stmt = v
         for entry in entries:
             entry['report'] = reportnr
-            entry['stmt'] = stmt
+            entry['stmt']   = stmt
+            entry['inpth']  = inpth
 
     return entries
 
@@ -155,13 +162,14 @@ def process_presentations(root: etree._Element) -> List[Dict[str, str]]:
     presentation_links = list(root.iter('presentationLink'))
     print(len(presentation_links))
     report = 1
-    all_entries:List[Dict[str, str]] = []
+    all_entries: List[Dict[str, str]] = []
     for presentation in presentation_links:
         entries = process_presentation(report, presentation)
         all_entries.extend(entries)
         report += 1
 
     return all_entries
+
 
 with open(file, "r", encoding="utf-8") as f:
     xml_content = f.read()

@@ -67,7 +67,6 @@ class SecPreXmlParser():
         for loc in locs:
             key = loc.get("label")
 
-
             href_parts = loc.get("href").split('#')
             version = None
             if href_parts[0].startswith('http'):
@@ -93,6 +92,12 @@ class SecPreXmlParser():
 
     def process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
         entries = self._simple_list(presentation)
+
+        inpth = 0
+        presentation_role = presentation.get('role',"")
+        if "parenthetical" in presentation_role:
+            inpth = 1
+
         if len(entries) > 0:
             first_tag = entries[0]['tag']
             stmt = None
@@ -103,25 +108,28 @@ class SecPreXmlParser():
             for entry in entries:
                 entry['report'] = reportnr
                 entry['stmt'] = stmt
+                entry['inpth']  = inpth
 
         return entries
 
-    def _process_presentations(self, root: etree._Element) -> pd.DataFrame:
+    def _process_presentations(self, root: etree._Element, rfile: str) -> pd.DataFrame:
         presentation_links = list(root.iter('presentationLink'))
         print(len(presentation_links))
         report = 1
-        all_entries:List[Dict[str, str]] = []
+        all_entries: List[Dict[str, str]] = []
         for presentation in presentation_links:
             entries = self.process_presentation(report, presentation)
             all_entries.extend(entries)
             report += 1
 
-        return pd.DataFrame(all_entries)
+        df = pd.DataFrame(all_entries)
+        df['rfile'] = rfile # filetype X for xml or H for html file
+        return df
 
-    def parse(self, data: str) -> pd.DataFrame:
+    def parse(self, data: str, rfile: str) -> pd.DataFrame:
         data = self._strip_file(data)
         root = etree.fromstring(data)
-        df = self._process_presentations(root)
+        df = self._process_presentations(root, rfile)
         return df
 
     def clean_for_pure_pre(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
