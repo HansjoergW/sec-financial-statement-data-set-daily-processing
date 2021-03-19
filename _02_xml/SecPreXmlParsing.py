@@ -90,7 +90,7 @@ class SecPreXmlParser():
 
         return result_list
 
-    def process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
+    def _process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
         entries = self._simple_list(presentation)
 
         inpth = 0
@@ -114,11 +114,11 @@ class SecPreXmlParser():
 
     def _process_presentations(self, root: etree._Element, rfile: str) -> pd.DataFrame:
         presentation_links = list(root.iter('presentationLink'))
-        print(len(presentation_links))
+
         report = 1
         all_entries: List[Dict[str, str]] = []
         for presentation in presentation_links:
-            entries = self.process_presentation(report, presentation)
+            entries = self._process_presentation(report, presentation)
             all_entries.extend(entries)
             report += 1
 
