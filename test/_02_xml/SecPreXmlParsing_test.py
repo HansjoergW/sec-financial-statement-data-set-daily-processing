@@ -102,3 +102,13 @@ def test_clean_for_pure_pre():
     df_clean = parser.clean_for_pure_pre(df, "an_adsh")
 
     assert 52 == len(df_clean)
+
+
+def test_complete_file_parse():
+    xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre.xml"
+    parser = SecPreXmlParser()
+
+    with open(xml_file, "r", encoding="utf-8") as f:
+        xml_content = f.read()
+        df = parser.parse(xml_content, "H")
+        print(len(df))

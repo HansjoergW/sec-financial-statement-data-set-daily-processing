@@ -1,7 +1,7 @@
 from _02_xml.SecNumXmlParsing import SecNumXmlParser
 
 from typing import Dict, List, Tuple, Optional
-from lxml import etree
+from lxml import etree, objectify
 
 
 xml_test_data = """<?xml version="1.0" encoding="utf-8"?>
@@ -83,13 +83,16 @@ xml_expected_stripped = """<?xml version="1.0"?><xbrl
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><context id="i223bd574caab4f739f73936be6065c72_D20190929-20200926"><startDate>2019-09-29</startDate><endDate>2020-09-26</endDate></context><context id="i9f9a068454cf45bc8dabe3edf6e6b899_D20190929-20200926"><segment><xbrldi:explicitMember dimension="us-gaap:StatementClassOfStockAxis">us-gaap:CommonStockMember</xbrldi:explicitMember></segment><startDate>2019-09-29</startDate><endDate>2020-09-26</endDate></context><context id="ic9b02aa81ea048e3b2d21ff1ff5ee96d_D20190929-20200926"><segment><xbrldi:explicitMember dimension="us-gaap:StatementClassOfStockAxis">aapl:A1.000NotesDue2022Member</xbrldi:explicitMember></segment><startDate>2019-09-29</startDate><endDate>2020-09-26</endDate></context><us-gaap:ResearchAndDevelopmentExpense
       contextRef="i223bd574caab4f739f73936be6065c72_D20190929-20200926"
-      
+      decimals="-6"
+      id="id3VybDovL2RvY3MudjEvZG9jOmVmNzgxYWI1OGU0ZjRmY2FhODcyZGRiZDMwZGE0MGUxL3NlYzplZjc4MWFiNThlNGY0ZmNhYTg3MmRkYmQzMGRhNDBlMV84NS9mcmFnOjlhZmQ0ZDY0MDMwNjRjMmE5NDAxMWI4ZjFjMmE2Zjc1L3RhYmxlOjZjMTBjOWQ2ZjgzMTRhMGVhYjQ4NzAxNjQ2OTRkOWE2L3RhYmxlcmFuZ2U6NmMxMGM5ZDZmODMxNGEwZWFiNDg3MDE2NDY5NGQ5YTZfMTQtMS0xLTEtMA_4dc5e576-b829-4c9d-aa17-2472a6530aaa"
       unitRef="usd">18752000000</us-gaap:ResearchAndDevelopmentExpense><us-gaap:SellingGeneralAndAdministrativeExpense
       contextRef="i223bd574caab4f739f73936be6065c72_D20190929-20200926"
-      
+      decimals="-6"
+      id="id3VybDovL2RvY3MudjEvZG9jOmVmNzgxYWI1OGU0ZjRmY2FhODcyZGRiZDMwZGE0MGUxL3NlYzplZjc4MWFiNThlNGY0ZmNhYTg3MmRkYmQzMGRhNDBlMV84NS9mcmFnOjlhZmQ0ZDY0MDMwNjRjMmE5NDAxMWI4ZjFjMmE2Zjc1L3RhYmxlOjZjMTBjOWQ2ZjgzMTRhMGVhYjQ4NzAxNjQ2OTRkOWE2L3RhYmxlcmFuZ2U6NmMxMGM5ZDZmODMxNGEwZWFiNDg3MDE2NDY5NGQ5YTZfMTUtMS0xLTEtMA_d280f5de-ad11-460b-8898-ed13acbfb1a0"
       unitRef="usd">19916000000</us-gaap:SellingGeneralAndAdministrativeExpense><us-gaap:NonoperatingIncomeExpense
       contextRef="i223bd574caab4f739f73936be6065c72_D20190929-20200926"
-      
+      decimals="-6"
+      id="id3VybDovL2RvY3MudjEvZG9jOmVmNzgxYWI1OGU0ZjRmY2FhODcyZGRiZDMwZGE0MGUxL3NlYzplZjc4MWFiNThlNGY0ZmNhYTg3MmRkYmQzMGRhNDBlMV84NS9mcmFnOjlhZmQ0ZDY0MDMwNjRjMmE5NDAxMWI4ZjFjMmE2Zjc1L3RhYmxlOjZjMTBjOWQ2ZjgzMTRhMGVhYjQ4NzAxNjQ2OTRkOWE2L3RhYmxlcmFuZ2U6NmMxMGM5ZDZmODMxNGEwZWFiNDg3MDE2NDY5NGQ5YTZfMTktMS0xLTEtMA_c50c169e-f577-41b3-a704-fcfe7505b0eb"
       unitRef="usd">803000000</us-gaap:NonoperatingIncomeExpense></xbrl>"""
 
 
@@ -115,7 +118,14 @@ def test_strip_file():
     parser = SecNumXmlParser()
 
     content = parser._strip_file(xml_test_data)
-    assert content == xml_expected_stripped
+
+    result = objectify.fromstring(content)
+    expected = objectify.fromstring(xml_expected_stripped)
+
+    result_str = etree.tostring(result)
+    expected_str = etree.tostring(expected)
+
+    assert result_str == expected_str
 
 
 def test_read_contexts():

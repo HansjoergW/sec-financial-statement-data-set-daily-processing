@@ -13,7 +13,7 @@ class SecNumXmlParser():
     period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     identifier_regex = re.compile(r"(<identifier).*?(</identifier>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-    id_decimals_regex = re.compile(r"decimals[^>]*?id=\"[^<]*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    # id_regex = re.compile(r"id=\"[^<]*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -29,7 +29,7 @@ class SecNumXmlParser():
         data = self.identifier_regex.sub("", data)
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
-        data = self.id_decimals_regex.sub("", data)
+        # data = self.id_regex.sub("", data)
         data = self.textblock_regex.sub("", data)
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
         data = self.link_regex.sub("", data)
@@ -130,6 +130,7 @@ class SecNumXmlParser():
             temp_dict = {}
 
             value_text = tag.text
+            decimals = tag.get("decimals")
             ctxtRef = tag.get("contextRef")
             unitRef = tag.get("unitRef").lower()
             tagname = self.clean_tag_regex.sub("", tag.tag)
@@ -159,6 +160,7 @@ class SecNumXmlParser():
             temp_dict['value']   = value_text
             temp_dict['footnote'] = ''
             temp_dict['segments'] = segments
+            temp_dict['decimals'] = decimals
 
             entries.append(temp_dict)
 

@@ -35,7 +35,11 @@ def compare():
     df_xml.set_index(['adsh', 'tag','version','ddate','qtrs'], inplace=True)
     df_xml.rename(columns = lambda x: x + '_xml', inplace=True)
 
-    df_merge = pd.merge(df_txt, df_xml, how="outer", left_index=True, right_index=True)
+    df_xml.sort_values('decimals_xml', inplace=True)
+    df_double_index_mask = df_xml.index.duplicated(keep='first')
+    df_xml_no_duplicated = df_xml[~df_double_index_mask]
+
+    df_merge = pd.merge(df_txt, df_xml_no_duplicated, how="outer", left_index=True, right_index=True)
 
     # diff muss noch erweitert werden
     df_diff = df_merge[(df_merge.uom_xml != df_merge.uom_txt)|(df_merge.value_xml != df_merge.value_txt)]
