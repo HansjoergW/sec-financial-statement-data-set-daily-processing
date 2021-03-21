@@ -32,17 +32,18 @@ def compare():
     df_txt.set_index(['adsh', 'tag','version','ddate','qtrs'], inplace=True)
     df_txt.rename(columns = lambda x: x + '_txt', inplace=True)
 
-    df_xml.set_index(['adsh', 'tag','version','ddate','qtrs'], inplace=True)
     df_xml.rename(columns = lambda x: x + '_xml', inplace=True)
 
-    df_xml.sort_values('decimals_xml', inplace=True)
-    df_double_index_mask = df_xml.index.duplicated(keep='first')
-    df_xml_no_duplicated = df_xml[~df_double_index_mask]
 
-    df_merge = pd.merge(df_txt, df_xml_no_duplicated, how="outer", left_index=True, right_index=True)
+    df_merge = pd.merge(df_xml, df_txt, how="outer", left_index=True, right_index=True)
 
-    # diff muss noch erweitert werden
     df_diff = df_merge[(df_merge.uom_xml != df_merge.uom_txt)|(df_merge.value_xml != df_merge.value_txt)]
+    # filtern von value spalten mit null
+    df_diff = df_diff[~((df_merge.uom_xml == df_merge.uom_txt) & df_diff.value_xml.isnull() & df_diff.value_txt.isnull())]
+
+    # wrongs = df_merge.iloc[df_merge.index.get_level_values('tag') == 'EffectiveIncomeTaxRateReconciliationAtFederalStatutoryIncomeTaxRate']
+    # in case of apple, it looks as if there is an additional entry in the xml
+
 
     print("len xml: ", len(df_xml))
     print("len txt: ", len(df_txt))

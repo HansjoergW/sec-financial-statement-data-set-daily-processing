@@ -177,8 +177,25 @@ class SecNumXmlParser():
 
         df['qtrs']  = df.qtrs.apply(int)
         df['value'] = pd.to_numeric(df['value'], errors='coerce')
+
+        # die 'values' in den txt files haben maximal 4 nachkommastellen...
+        df['value'] = df.value.round(4)
+
         df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
+
         df.drop(['segments'], axis=1, inplace=True)
         df.drop_duplicates(inplace=True)
+
+        # set the indexes
+        df.set_index(['adsh', 'tag','version','ddate','qtrs'], inplace=True)
+
+        # and sort by the precision
+        # it can happen that the same tag is represented in the reports multiple times with different precision
+        # and it looks as if the "txt" data of the sec is then produced with the lower precision
+        df.sort_values('decimals', inplace=True)
+        df_double_index_mask = df.index.duplicated(keep='first')
+
+        df = df[~df_double_index_mask]
+
         return df
