@@ -2,6 +2,10 @@ from _02_xml.SecNumXmlParsing import SecNumXmlParser
 
 import pandas as pd
 
+# An example of a test which compares the content of the num-xml with the data of the same company contained in the
+# quarterly num-txt file
+
+
 text_file = "c:/ieu/projects/sec_processing/data/num_apple_10k_2020_q4.txt"
 xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm.xml"
 

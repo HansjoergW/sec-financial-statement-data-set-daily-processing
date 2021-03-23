@@ -1,8 +1,8 @@
 Parsing XML
 -----------
+
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datein
 
-- prüfen, wie in num.txt mit verschiedenen Genauigkeiten umgegangen werden soll
 - IFRS Standard Beispiel finden und prüfen
 
 - Automatisierung des Downloads und aufbereiten der Daten

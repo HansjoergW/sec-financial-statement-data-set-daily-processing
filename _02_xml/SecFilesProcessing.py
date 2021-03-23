@@ -1,5 +1,5 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFileManagement import SecIndexFile
+from _02_xml.SecIndexFileManagement import SecIndexFile
 
 import logging
 

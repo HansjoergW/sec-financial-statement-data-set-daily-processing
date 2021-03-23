@@ -2,6 +2,10 @@ from _02_xml.SecPreXmlParsing import SecPreXmlParser
 
 import pandas as pd
 
+
+# An example of a test which compares the content of the prex-xml with the data of the same company contained in the
+# quarterly pre-txt file
+
 text_file = "c:/ieu/projects/sec_processing/data/pre_apple_10k_2020_q4.txt"
 xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre.xml"
 
@@ -20,7 +24,6 @@ def read_xml() -> pd.DataFrame:
         xml_content = f.read()
         df_xml = parser.parse(xml_content, "H")
         df_xml = parser.clean_for_pure_pre(df_xml, '0000320193-20-000096')
-        # df_xml.drop(['plabel', 'key'], axis=1, inplace=True)
         return df_xml
 
 
@@ -31,7 +34,6 @@ def compare():
     df_txt.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
     df_txt.rename(columns = lambda x: x + '_txt', inplace=True)
 
-    df_xml.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
     df_xml.rename(columns = lambda x: x + '_xml', inplace=True)
 
     df_merge = pd.merge(df_txt, df_xml, how="outer", left_index=True, right_index=True)

@@ -1,5 +1,5 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFilesProcessing import  SecFilesProcessor
+from _02_xml.SecFilesProcessing import SecFilesProcessor
 from _02_xml.SecFeedDataManagement import SecFeedDataManager
 
 import logging

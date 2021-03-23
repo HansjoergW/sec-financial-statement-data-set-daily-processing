@@ -138,4 +138,5 @@ class SecPreXmlParser():
         df.drop(['plabel', 'key'], axis=1, inplace=True)
         df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
+        df.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
         return df
