@@ -5,7 +5,13 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 - IFRS Standard Beispiel finden und prüfen
 
+- Anlegen der DB über Flyway?
+
+
 - Automatisierung des Downloads und aufbereiten der Daten
+-- in die DB soll auch der Name des SecFeedFiles aufgenommen werdenm, aus welchem die Daten stammen
+-- vor dem Laden der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
+--- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
 -- Die Daten werden laufend nachgeladen und aufbereitet
 -- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag folder geschrieben, evtl. in Zip
 

@@ -2,6 +2,26 @@ https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 # Overview
 ![overview](Class-Overview.png)
 
+## Data
+### FeedFiles xbrlrss-yyyy-mm.xml
+Enthalten items, welche edgar:xbrlFiling infos enthalten.
+- companyName
+- formType
+- filingDate
+- cikNumber
+- accessionNumber
+- fileNumber
+- acceptanceDtetime
+- period
+- assistantDirector
+- assignedSic
+- fiscalYearEnd
+- List: xbrlFiles
+ 
+Wichtig: Es können noch die letzten Einträge des vorherigen Monats vorhanden sein.
+
+
+
 ## DB
 ### "sec_feeds"
 |column|description|
