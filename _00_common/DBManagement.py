@@ -18,7 +18,7 @@ class DBManager():
 
     def __init__(self, work_dir="edgar/"):
         self.work_dir = work_dir
-        self.database = os.path.join(self.work_dir, 'sec_data.db')
+        self.database = os.path.join(self.work_dir, 'sec_processing.db')
         # self._create_db()
 
     def _get_connection(self):

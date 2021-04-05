@@ -1,17 +1,20 @@
-Parsing XML
------------
+Next
+====
+- Automatisierung des Downloads und aufbereiten der Daten
+-- in die DB soll auch der Name des SecFeedFiles aufgenommen werden, aus welchem die Daten stammen
+-- vor dem Inserten der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
+--- Spalte mit SecFeedFilenamen füllen
+--- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
+
+
+Later
+=====
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datein
 
 - IFRS Standard Beispiel finden und prüfen
 
-- Anlegen der DB über Flyway?
-
-
 - Automatisierung des Downloads und aufbereiten der Daten
--- in die DB soll auch der Name des SecFeedFiles aufgenommen werdenm, aus welchem die Daten stammen
--- vor dem Laden der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
---- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
 -- Die Daten werden laufend nachgeladen und aufbereitet
 -- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag folder geschrieben, evtl. in Zip
 
@@ -22,3 +25,9 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Alle Reports (10-K/Q) müssen vorhanden sein
 --- Die txt-Dateien dürfen keine Zeilen enthalten, die nicht in den XML Daten vorhanden sind
 --- Prüfen ob
+
+
+
+Done
+====
+05.04.2021  Flywayconfig  und installation
