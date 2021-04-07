@@ -54,9 +54,6 @@ class SecIndexer():
             'xbrlFiles'
         )
 
-
-        # FIXME, need to use a private logger not the root one.
-        # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
 
         self._prep_directories()

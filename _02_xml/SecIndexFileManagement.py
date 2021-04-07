@@ -149,4 +149,5 @@ class SecIndexFile():
         if dropped:
             logging.info('Dropped %d duplicates', dropped)
 
+        df['sec_feed_file'] = self.feed_filename
         return df

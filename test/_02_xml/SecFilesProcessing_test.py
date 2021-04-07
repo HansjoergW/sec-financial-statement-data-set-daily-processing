@@ -10,6 +10,7 @@ folder = "./tmp"
 @pytest.fixture(scope="module")
 def dbmgr():
     new_dbmgr = DBManager(work_dir=folder)
+    new_dbmgr._create_db()
     yield new_dbmgr
     shutil.rmtree(folder)
 

@@ -101,7 +101,7 @@ def test_clean_for_pure_pre():
     df = parser.parse(xml_exp_content, "H")
     df_clean = parser.clean_for_pure_pre(df, "an_adsh")
 
-    assert 52 == len(df_clean)
+    assert 45 == len(df_clean)
 
 
 def test_complete_file_parse():
