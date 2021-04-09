@@ -1,10 +1,7 @@
 Next
 ====
-- Automatisierung des Downloads und aufbereiten der Daten
--- in die DB soll auch der Name des SecFeedFiles aufgenommen werden, aus welchem die Daten stammen
--- vor dem Inserten der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
---- Spalte mit SecFeedFilenamen füllen
---- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
+
+
 
 
 Later
@@ -30,4 +27,13 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+09.04.2021  - Automatisierung des Downloads und aufbereiten der Daten
+            -- in die DB soll auch der Name des SecFeedFiles aufgenommen werden, aus welchem die Daten stammen
+            -- vor dem Inserten der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
+            --- Spalte mit SecFeedFilenamen füllen
+            --- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
+09.04.2021  - Sicherstellen, dass das Ergänzen der Informationen funktioniert.
+              kleinere Pakete sichern, nicht alles auf einmal
+09.04.2021  - Duplicate Check hinzufügen -> sicherstellen, dass jede ADSH nur einmal vorhanden ist.
+              Offenbar gibt es mit den März Daten Probleme, entweder doppelt in der Datei, oder aber bereits im Februar vorhanden
 05.04.2021  Flywayconfig  und installation

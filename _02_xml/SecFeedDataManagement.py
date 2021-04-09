@@ -35,7 +35,7 @@ class SecFeedDataManager():
             except requests.exceptions.RequestException as err:
                 if current_try >= 4:
                     logging.exception("RequestException:%s", err)
-                    return
+                    return None, data_tuple[0]
                 else:
                     logging.info("failed try " + str(current_try))
                     sleep(1)
@@ -60,13 +60,26 @@ class SecFeedDataManager():
         return new_url, accession_nr
 
     def add_missing_xbrlinsurl(self):
-        missing: List[Tuple[str]] = self.dbmanager.find_missing_xbrl_ins_urls()
-
-        logging.info("missing entries " + str(len(missing)))
-
         pool = Pool(8)
-        update_data: List[Tuple[str]] = pool.map(SecFeedDataManager._find_main_file_throttle, missing)
-        self.dbmanager.update_xbrl_ins_urls(update_data)
+
+        last_missing:int = None
+        missing: List[Tuple[str]] = self.dbmanager.find_missing_xbrl_ins_urls()
+        while (last_missing is None) or (last_missing > len(missing)):
+            last_missing = len(missing)
+            logging.info("missing entries " + str(len(missing)))
+
+            for i in range(0, len(missing), 100):
+                chunk = missing[i:i + 100]
+                update_data: List[Tuple[str]] = pool.map(SecFeedDataManager._find_main_file_throttle, chunk)
+                self.dbmanager.update_xbrl_ins_urls(update_data)
+                logging.info("commited chunk: " + str(i))
+
+            missing = self.dbmanager.find_missing_xbrl_ins_urls()
+
+        if len(missing) > 0:
+            logging.info("Failed to addmissing for " + str(len(missing)))
+
+
 
 
 

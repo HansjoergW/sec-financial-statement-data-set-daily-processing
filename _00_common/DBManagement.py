@@ -70,6 +70,8 @@ class DBManager():
         finally:
             conn.close()
 
+
+    # todo: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):
         conn = self._get_connection()
         try:
@@ -87,6 +89,31 @@ class DBManager():
             return set([x[0] for x in result])
         finally:
             conn.close()
+
+    def find_duplicated_adsh(self) -> List[str]:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM sec_feeds WHERE status is null GROUP BY accessionNumber'''
+            duplicated_df = pd.read_sql_query(sql, conn)
+
+            duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
+            return duplicated_df.accessionNumber.tolist()
+
+        finally:
+            conn.close()
+
+    def mark_duplicated_adsh(self, adsh: str):
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, sec_feed_file FROM sec_feeds WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(adsh)
+            result: List[Tuple[str]] = conn.execute(sql).fetchall()
+
+            update_sql =  '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(SEC_FEED_TBL_NAME)
+            conn.executemany(update_sql, result[1:])
+            conn.commit()
+        finally:
+            conn.close()
+
 
     def create_test_data(self):
         inserts = [

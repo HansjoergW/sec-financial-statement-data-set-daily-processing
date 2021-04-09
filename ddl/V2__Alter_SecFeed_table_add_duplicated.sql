@@ -1,0 +1,1 @@
+ALTER TABLE sec_feeds ADD status VARCHAR;

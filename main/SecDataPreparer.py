@@ -4,6 +4,7 @@ from _02_xml.SecFeedDataManagement import SecFeedDataManager
 
 import logging
 from datetime import datetime
+from typing import List
 import dateutil
 
 
@@ -34,14 +35,20 @@ class SecProcessingOrchestrator():
     def _complete_sec_feed_data(self):
         self.secfeeddatamgr.add_missing_xbrlinsurl()
 
+    def _check_for_duplicated(self):
+        duplicated_adshs: List[str] = self.dbmanager.find_duplicated_adsh()
+        for duplicated in duplicated_adshs:
+            logging.info("Found duplicated: " + duplicated)
+            self.dbmanager.mark_duplicated_adsh(duplicated)
+
     def get_filing_information(self):
         self._process_sec_feed_data()
-        # -> Schritt bereinigen von doppelten einträgen
-
         self._complete_sec_feed_data()
-
+        self._check_for_duplicated()
+        # -> Schritt bereinigen von doppelten einträgen
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecProcessingOrchestrator(workdir_default)
-    orchestrator.get_filing_information()
+    #orchestrator.get_filing_information()
+    orchestrator._complete_sec_feed_data()
