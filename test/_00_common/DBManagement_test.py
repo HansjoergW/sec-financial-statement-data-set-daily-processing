@@ -14,8 +14,10 @@ def dbm():
     yield new_dbmgr
     shutil.rmtree(folder)
 
+
 def test_create_db(dbm: DBManager):
     dbm.find_missing_xbrl_ins_urls()
+
 
 def test_get_adsh_by_feed_file(dbm: DBManager):
     result = dbm.get_adsh_by_feed_file('file1.xml')

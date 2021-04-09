@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS sec_feeds
 (
-    accessionNumber PRIMARY KEY,
+    accessionNumber,
     sec_feed_file,
     companyName,
     formType,
@@ -16,5 +16,6 @@ CREATE TABLE IF NOT EXISTS sec_feeds
     xbrlCalUrl,
     xbrlDefUrl,
     xbrlLabUrl,
-    xbrlPreUrl
+    xbrlPreUrl,
+    PRIMARY KEY (accessionNumber, sec_feed_file)
 )

@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 from lxml import etree
 from typing import List, Dict
+from time import sleep
 
 
 FEED_FIELDS = (
@@ -55,12 +56,21 @@ class SecIndexFile():
         logging.debug('Edgar Filings Feed = %s', edgar_filings_feed)
 
         response = None
-        try:
-            response = requests.get(edgar_filings_feed, timeout=4)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as err:
-            logging.exception("RequestException:%s", err)
-            return
+        current_try = 0
+        while current_try < 4:
+            current_try += 1
+            try:
+                response = requests.get(edgar_filings_feed, timeout=10)
+                response.raise_for_status()
+                break
+            except requests.exceptions.RequestException as err:
+                if current_try >= 4:
+                    logging.exception("RequestException:%s", err)
+                    raise err
+                else:
+                    logging.info("failed try " + str(current_try))
+                    sleep(1)
+
 
         with open(self.feed_file, 'w') as file:
             file.write(response.text)

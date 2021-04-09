@@ -25,11 +25,21 @@ class SecFeedDataManager():
 
         json_file = path + "index.json"
         response = None
-        try:
-            response = requests.get(json_file, timeout=4)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as err:
-            logging.exception("RequestException:%s", err)
+        current_try = 0
+        while current_try < 4:
+            current_try += 1
+            try:
+                response = requests.get(json_file, timeout=10)
+                response.raise_for_status()
+                break
+            except requests.exceptions.RequestException as err:
+                if current_try >= 4:
+                    logging.exception("RequestException:%s", err)
+                    return
+                else:
+                    logging.info("failed try " + str(current_try))
+                    sleep(1)
+
 
         marks  = files.finditer(response.text)
         response.close()
@@ -52,7 +62,9 @@ class SecFeedDataManager():
     def add_missing_xbrlinsurl(self):
         missing: List[Tuple[str]] = self.dbmanager.find_missing_xbrl_ins_urls()
 
-        pool = Pool(9)
+        logging.info("missing entries " + str(len(missing)))
+
+        pool = Pool(8)
         update_data: List[Tuple[str]] = pool.map(SecFeedDataManager._find_main_file_throttle, missing)
         self.dbmanager.update_xbrl_ins_urls(update_data)
 

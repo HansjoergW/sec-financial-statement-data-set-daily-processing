@@ -36,6 +36,8 @@ class SecProcessingOrchestrator():
 
     def get_filing_information(self):
         self._process_sec_feed_data()
+        # -> Schritt bereinigen von doppelten einträgen
+
         self._complete_sec_feed_data()
 
 

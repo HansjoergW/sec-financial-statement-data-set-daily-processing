@@ -30,5 +30,10 @@ class SecFilesProcessor:
             sec_file = SecIndexFile(year, month, feed_dir=self.feed_dir)
             sec_file.download_sec_feed()
             df = sec_file.parse_sec_rss_feeds()
+
+            existing_adshs = self.dbmanager.get_adsh_by_feed_file(sec_file.feed_filename)
+            df = df[~df.index.isin(existing_adshs)]
+            duplicated = sum(df.index.duplicated())
+            logging.info("   duplicated: {}".format(duplicated))
             logging.info("   read entries: {}".format(len(df)))
             self.dbmanager.insert_feed_info(df)
