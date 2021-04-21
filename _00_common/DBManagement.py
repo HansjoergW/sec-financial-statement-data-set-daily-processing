@@ -6,6 +6,7 @@ import pandas as pd
 import glob
 
 SEC_FEED_TBL_NAME = "sec_feeds"
+SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
 
 SEC_FEED_TBL_COLS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',
@@ -43,6 +44,34 @@ class DBManager():
             curr.execute(script)
             conn.commit()
         conn.close()
+
+    def read_all_index_files(self) -> pd.DataFrame:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT * FROM {}'''.format(SEC_INDEX_FILE_TBL_NAME)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
+    def insert_index_file(self, name:str, processdate:str):
+        conn = self._get_connection()
+        try:
+            sql = '''INSERT INTO {} ('sec_feed_file','status', 'processdate') VALUES('{}','progress','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
+            conn.execute(sql)
+            update_sql = '''UPDATE {} SET status = 'done' WHERE status == 'progress' and sec_feed_file != '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, name)
+            conn.execute(update_sql)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def update_index_file(self, name:str, processdate:str):
+        conn = self._get_connection()
+        try:
+            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
 
     def read_all(self) -> pd.DataFrame:
         conn = self._get_connection()

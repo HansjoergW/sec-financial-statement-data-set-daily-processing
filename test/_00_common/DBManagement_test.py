@@ -23,3 +23,26 @@ def test_get_adsh_by_feed_file(dbm: DBManager):
     result = dbm.get_adsh_by_feed_file('file1.xml')
 
     assert len(result) == 7
+
+
+def test_sec_index_file(dbm: DBManager):
+    dbm.insert_index_file("first.xml","2021-01-01")
+    df = dbm.read_all_index_files()
+
+    assert len(df) == 1
+    assert df[df.sec_feed_file == 'first.xml'].status.values[0] == "progress"
+    assert df[df.sec_feed_file == 'first.xml'].processdate.values[0] == "2021-01-01"
+
+    dbm.insert_index_file("second.xml","2021-01-01")
+    df = dbm.read_all_index_files()
+
+    assert len(df) == 2
+    assert df[df.sec_feed_file == 'first.xml'].status.values[0] == "done"
+    assert df[df.sec_feed_file == 'second.xml'].status.values[0] == "progress"
+
+    dbm.update_index_file('second.xml','2021-01-02')
+    df = dbm.read_all_index_files()
+
+    assert len(df) == 2
+    assert df[df.sec_feed_file == 'first.xml'].status.values[0] == "done"
+    assert df[df.sec_feed_file == 'second.xml'].processdate.values[0] == "2021-01-02"
