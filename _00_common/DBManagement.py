@@ -3,6 +3,7 @@ import sqlite3
 import re
 from typing import List, Tuple, Set
 import pandas as pd
+import glob
 
 SEC_FEED_TBL_NAME = "sec_feeds"
 
@@ -28,21 +29,19 @@ class DBManager():
         """
 
         """
+        ddl_folder = os.path.realpath(__file__ + "/../../ddl")
+        sqlfiles = list(glob.glob(ddl_folder + "/*.sql"))
+        sorted(sqlfiles)
+
         if not os.path.isdir(self.work_dir):
             os.makedirs(self.work_dir)
 
-        columns = ','.join(SEC_FEED_TBL_COLS)
-        columns = re.sub('accessionNumber',
-                         'accessionNumber PRIMARY KEY',
-                         columns)
-
-        table_parms = ('''CREATE TABLE IF NOT EXISTS {} ({})'''
-                       .format(SEC_FEED_TBL_NAME, columns))
-
         conn = self._get_connection()
         curr = conn.cursor()
-        curr.execute(table_parms)
-        conn.commit()
+        for sqlfile in sqlfiles:
+            script = open(sqlfile, 'r').read()
+            curr.execute(script)
+            conn.commit()
         conn.close()
 
     def read_all(self) -> pd.DataFrame:

@@ -4,13 +4,18 @@ from typing import Dict, List, Tuple, Optional
 from lxml import etree
 import os
 
-xml_test_data_file = './data/test_pre.xml'
 
-xml_expected_stripped_file = './data/test_pre_exp.xml'
+scriptpath = os.path.realpath(__file__ + "/..")
+
+xml_test_data_file = scriptpath + '/data/test_pre.xml'
+
+xml_expected_stripped_file = scriptpath + './data/test_pre_exp.xml'
 
 
 def test_strip_file():
     print(os.getcwd())
+    print(scriptpath)
+
     with open(xml_test_data_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
         f.close()

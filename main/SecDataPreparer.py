@@ -45,7 +45,7 @@ class SecProcessingOrchestrator():
         self._process_sec_feed_data()
         self._complete_sec_feed_data()
         self._check_for_duplicated()
-        # -> Schritt bereinigen von doppelten einträgen
+
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
