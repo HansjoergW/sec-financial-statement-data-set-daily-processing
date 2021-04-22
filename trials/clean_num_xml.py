@@ -4,7 +4,7 @@ import calendar
 import pandas as pd
 from typing import Dict, List, Tuple
 
-file = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm.xml"
+file = "/data/aapl-20200926_htm.xml"
 target_num_clean_xml = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm-clean.xml"
 
 period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)

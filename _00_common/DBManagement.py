@@ -99,7 +99,7 @@ class DBManager():
             conn.close()
 
 
-    # todo: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
+    # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):
         conn = self._get_connection()
         try:

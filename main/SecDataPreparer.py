@@ -50,5 +50,5 @@ class SecProcessingOrchestrator():
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecProcessingOrchestrator(workdir_default)
-    #orchestrator.get_filing_information()
-    orchestrator._complete_sec_feed_data()
+    orchestrator.get_filing_information()
+    #orchestrator._complete_sec_feed_data()

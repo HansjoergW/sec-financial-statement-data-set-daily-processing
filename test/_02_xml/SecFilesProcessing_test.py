@@ -1,11 +1,10 @@
 from _00_common.DBManagement import DBManager
 from _02_xml.SecFilesProcessing import SecFilesProcessor
 import shutil
-import os
 import pytest
+import logging
 
 folder = "./tmp"
-
 
 @pytest.fixture(scope="module")
 def dbmgr():
