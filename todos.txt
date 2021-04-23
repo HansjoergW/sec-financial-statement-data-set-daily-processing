@@ -10,16 +10,12 @@ Later
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
 
-- Verwaltung Index Files
-  - bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished
-  - finished wird erreicht wenn neues File vorhanden ist
-
 
 - IFRS Standard Beispiel finden und prüfen
 
 - Automatisierung des Downloads und aufbereiten der Daten
 -- Die Daten werden laufend nachgeladen und aufbereitet
--- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag (processingDay) folder geschrieben, evtl. in Zip
+-- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag (processingDay?) folder geschrieben, evtl. in Zip
 
 
 - Massentest über ganzes Quartal
@@ -33,6 +29,9 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+22.04.2021  - Verwaltung Index Files
+             -- bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished
+             -- finished wird erreicht wenn neues File vorhanden ist
 09.04.2021  - Automatisierung des Downloads und aufbereiten der Daten
             -- in die DB soll auch der Name des SecFeedFiles aufgenommen werden, aus welchem die Daten stammen
             -- vor dem Inserten der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind

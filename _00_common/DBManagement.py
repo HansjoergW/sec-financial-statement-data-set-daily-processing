@@ -7,6 +7,7 @@ import glob
 
 SEC_FEED_TBL_NAME = "sec_feeds"
 SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
+SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
 
 SEC_FEED_TBL_COLS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',
@@ -64,6 +65,14 @@ class DBManager():
         finally:
             conn.close()
 
+    def read_all_processing(self) -> pd.DataFrame:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT * FROM {}'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
     def update_index_file(self, name:str, processdate:str):
         conn = self._get_connection()
         try:
@@ -115,6 +124,24 @@ class DBManager():
             sql = '''SELECT accessionNumber FROM sec_feeds where sec_feed_file == '{}' '''.format(feed_file_name)
             result: List[Tuple[str]] = conn.execute(sql).fetchall()
             return set([x[0] for x in result])
+        finally:
+            conn.close()
+
+    def copy_uncopied_entries(self) -> int:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null'''
+            to_copy_df =  pd.read_sql_query(sql, conn)
+            to_copy_df.to_sql(SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
+
+            update_sql =  '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(SEC_FEED_TBL_NAME)
+            adshs = to_copy_df.accessionNumber.values.tolist()
+            tupleslist = [tuple(x.split()) for x in adshs]
+
+            conn.executemany(update_sql, tupleslist)
+
+            conn.commit()
+            return len(to_copy_df)
         finally:
             conn.close()
 

@@ -46,3 +46,14 @@ def test_sec_index_file(dbm: DBManager):
     assert len(df) == 2
     assert df[df.sec_feed_file == 'first.xml'].status.values[0] == "done"
     assert df[df.sec_feed_file == 'second.xml'].processdate.values[0] == "2021-01-02"
+
+
+def test_copy_uncopied_entries(dbm: DBManager):
+    copied_entries = dbm.copy_uncopied_entries()
+
+    df_feeds = dbm.read_all()
+    df_processing = dbm.read_all_processing()
+
+    assert sum(df_feeds.status.isnull()) == 0
+    assert len(df_processing) == copied_entries
+
