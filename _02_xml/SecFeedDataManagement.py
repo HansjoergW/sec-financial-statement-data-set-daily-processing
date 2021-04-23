@@ -24,6 +24,7 @@ class SecFeedDataManager():
         path = pre_url[0:pre_url.rfind("/")+1]
 
         json_file = path + "index.json"
+
         response = None
         current_try = 0
         while current_try < 4:

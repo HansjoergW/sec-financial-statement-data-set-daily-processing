@@ -65,6 +65,15 @@ class DBManager():
         finally:
             conn.close()
 
+    def update_index_file(self, name:str, processdate:str):
+        conn = self._get_connection()
+        try:
+            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
+
     def read_all_processing(self) -> pd.DataFrame:
         conn = self._get_connection()
         try:
@@ -73,12 +82,21 @@ class DBManager():
         finally:
             conn.close()
 
-    def update_index_file(self, name:str, processdate:str):
+    def find_missing_xmlNumFiles(self) -> List[Tuple[str]]:
         conn = self._get_connection()
         try:
-            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
-            conn.execute(sql)
-            conn.commit()
+            sql = '''SELECT accessionNumber, xbrlInsUrl FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def find_missing_xmlPreFiles(self) -> List[Tuple[str]]:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, xbrlPreUrl FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+
+            return conn.execute(sql).fetchall()
         finally:
             conn.close()
 
@@ -106,7 +124,6 @@ class DBManager():
             return conn.execute(sql).fetchall()
         finally:
             conn.close()
-
 
     # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):

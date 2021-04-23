@@ -5,6 +5,7 @@ import pandas as pd
 from lxml import etree
 from typing import List, Dict
 from time import sleep
+from _00_common.SecFileUtils import download_url_to_file
 
 
 FEED_FIELDS = (
@@ -49,31 +50,33 @@ class SecIndexFile():
         """
         logging.debug('download_sec_feed: year = %d, month = %d', self.year, self.month)
 
-        if not os.path.isdir(self.feed_dir):
-            os.makedirs(self.feed_dir)
-
         edgar_filings_feed = (self.namespace + '/monthly/' + self.feed_filename)
         logging.debug('Edgar Filings Feed = %s', edgar_filings_feed)
 
-        response = None
-        current_try = 0
-        while current_try < 4:
-            current_try += 1
-            try:
-                response = requests.get(edgar_filings_feed, timeout=10)
-                response.raise_for_status()
-                break
-            except requests.exceptions.RequestException as err:
-                if current_try >= 4:
-                    logging.exception("RequestException:%s", err)
-                    raise err
-                else:
-                    logging.info("failed try " + str(current_try))
-                    sleep(1)
+        if not os.path.isdir(self.feed_dir):
+            os.makedirs(self.feed_dir)
 
+        download_url_to_file(edgar_filings_feed, self.feed_file)
 
-        with open(self.feed_file, 'w') as file:
-            file.write(response.text)
+        # response = None
+        # current_try = 0
+        # while current_try < 4:
+        #     current_try += 1
+        #     try:
+        #         response = requests.get(edgar_filings_feed, timeout=10)
+        #         response.raise_for_status()
+        #         break
+        #     except requests.exceptions.RequestException as err:
+        #         if current_try >= 4:
+        #             logging.exception("RequestException:%s", err)
+        #             raise err
+        #         else:
+        #             logging.info("failed try " + str(current_try))
+        #             sleep(1)
+        #
+        #
+        # with open(self.feed_file, 'w') as file:
+        #     file.write(response.text)
 
         logging.info('Downloaded RSS feed: %s', self.feed_file)
 
