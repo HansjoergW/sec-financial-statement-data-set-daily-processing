@@ -1,5 +1,5 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFilesProcessing import SecIndexFilesProcessor
+from _02_xml.SecFilesProcessing import SecIndexFilesProcessor, SecXmlFilesProcessor
 from _02_xml.SecFeedDataManagement import SecFeedDataManager
 
 import logging
@@ -11,8 +11,13 @@ import dateutil
 class SecXMLProcessingOrchestrator():
 
     def __init__(self, workdir: str):
+        if workdir[-1] != '/':
+            workdir = workdir + '/'
+
         self.workdir = workdir
         self.feeddir = workdir + "feed/"
+        self.xmldir = workdir + "xml/"
+
         self.dbmanager = DBManager(work_dir=workdir)
         self.secfeeddatamgr = SecFeedDataManager(self.dbmanager)
 
@@ -51,10 +56,9 @@ class SecXMLProcessingOrchestrator():
         entries = self.dbmanager.copy_uncopied_entries()
         logging.info("{} entries copied into processing table".format(entries))
 
-        # download xml num files
-        # download xml pre files
-
-
+        secxmlfilesprocessor = SecXmlFilesProcessor(self.dbmanager, self.xmldir)
+        secxmlfilesprocessor.downloadNumFiles()
+        secxmlfilesprocessor.downloadPreFiles()
 
 
 if __name__ == '__main__':
