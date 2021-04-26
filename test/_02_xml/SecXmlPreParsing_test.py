@@ -1,4 +1,4 @@
-from _02_xml.SecPreXmlParsing import SecPreXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 
 from typing import Dict, List, Tuple, Optional
 from lxml import etree

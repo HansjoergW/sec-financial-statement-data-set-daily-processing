@@ -1,4 +1,4 @@
-from _02_xml.SecPreXmlParsing import SecPreXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 
 import pandas as pd
 

@@ -1,6 +1,7 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFilesProcessing import SecIndexFilesProcessor, SecXmlFilesProcessor
-from _02_xml.SecFeedDataManagement import SecFeedDataManager
+from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
+from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
+from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
 
 import logging
 from datetime import datetime
@@ -19,7 +20,6 @@ class SecXMLProcessingOrchestrator():
         self.xmldir = workdir + "xml/"
 
         self.dbmanager = DBManager(work_dir=workdir)
-        self.secfeeddatamgr = SecFeedDataManager(self.dbmanager)
 
         self.today = datetime.today()
         self.current_month = self.today.month
@@ -33,30 +33,25 @@ class SecXMLProcessingOrchestrator():
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
 
-    def _process_sec_feed_data(self):
-        secfilesprocessor = SecIndexFilesProcessor(self.dbmanager, self.start_year, self.current_year, self.start_month, self.current_month, self.feeddir)
-        secfilesprocessor.download_sec_feeds()
+    def _process_sec_index_files(self):
+        secindexprocessor = SecIndexFileProcessor(self.dbmanager, self.start_year, self.current_year, self.start_month, self.current_month, self.feeddir)
+        secindexprocessor.download_sec_feeds()
 
-    def _complete_sec_feed_data(self):
-        self.secfeeddatamgr.add_missing_xbrlinsurl()
+    def _postprocess_sec_index_files(self):
+        secindexpostprocessor = SecIndexFilePostProcessor(self.dbmanager)
+        secindexpostprocessor.add_missing_xbrlinsurl()
+        secindexpostprocessor.check_for_duplicated()
 
-    def _check_for_duplicated(self):
-        duplicated_adshs: List[str] = self.dbmanager.find_duplicated_adsh()
-        for duplicated in duplicated_adshs:
-            logging.info("Found duplicated: " + duplicated)
-            self.dbmanager.mark_duplicated_adsh(duplicated)
-
-    def get_and_prepare_filing_information(self):
-        self._process_sec_feed_data()
-        self._complete_sec_feed_data()
-        self._check_for_duplicated()
+    def process_index_data(self):
+        self._process_sec_index_files()
+        self._postprocess_sec_index_files()
 
     def process_xml_data(self):
         # move new entries in sec_feeds to sec_processing
         entries = self.dbmanager.copy_uncopied_entries()
         logging.info("{} entries copied into processing table".format(entries))
 
-        secxmlfilesprocessor = SecXmlFilesProcessor(self.dbmanager, self.xmldir)
+        secxmlfilesprocessor = SecXmlFileProcessor(self.dbmanager, self.xmldir)
         secxmlfilesprocessor.downloadNumFiles()
         secxmlfilesprocessor.downloadPreFiles()
 
@@ -64,6 +59,6 @@ class SecXMLProcessingOrchestrator():
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecXMLProcessingOrchestrator(workdir_default)
-    orchestrator.get_and_prepare_filing_information()
+    orchestrator.process_index_data()
     orchestrator.process_xml_data()
     #orchestrator._complete_sec_feed_data()

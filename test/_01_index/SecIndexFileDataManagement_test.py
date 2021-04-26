@@ -1,7 +1,6 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFeedDataManagement import SecFeedDataManager
+from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
 import shutil
-import os
 import pytest
 
 folder = "./tmp"
@@ -17,5 +16,5 @@ def dbmgr():
 
 
 def test_add_missing_xbrlinsurl(dbmgr: DBManager):
-    sut = SecFeedDataManager(dbmgr)
+    sut = SecIndexFilePostProcessor(dbmgr)
     sut.add_missing_xbrlinsurl()

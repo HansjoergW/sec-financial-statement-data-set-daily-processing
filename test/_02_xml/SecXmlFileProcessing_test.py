@@ -1,30 +1,22 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecFilesProcessing import SecIndexFilesProcessor, SecXmlFilesProcessor
+from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
 import shutil
 import pytest
-import logging
 
 folder = "./tmp"
 
 @pytest.fixture(scope="module")
 def dbmgr():
+    shutil.rmtree(folder)
     new_dbmgr = DBManager(work_dir=folder)
     new_dbmgr._create_db()
+    new_dbmgr.create_test_data()
+    new_dbmgr.copy_uncopied_entries()
     yield new_dbmgr
     shutil.rmtree(folder)
 
-
-def test_multidownload(dbmgr: DBManager):
-    processor = SecIndexFilesProcessor(dbmgr, 2021, 2021, 1, 2, feed_dir=folder)
-    processor.download_sec_feeds()
-    data = dbmgr.read_all()
-    assert len(data) > 0
-
-
 def test_download_num_xml(dbmgr: DBManager):
-    processor = SecXmlFilesProcessor(dbmgr, folder)
-    dbmgr.create_test_data()
-    dbmgr.copy_uncopied_entries()
+    processor = SecXmlFileProcessor(dbmgr, folder)
 
     processor.downloadNumFiles()
 
@@ -33,9 +25,7 @@ def test_download_num_xml(dbmgr: DBManager):
 
 
 def test_download_pre_xml(dbmgr: DBManager):
-    processor = SecXmlFilesProcessor(dbmgr, folder)
-    dbmgr.create_test_data()
-    dbmgr.copy_uncopied_entries()
+    processor = SecXmlFileProcessor(dbmgr, folder)
 
     processor.downloadPreFiles()
 

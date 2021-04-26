@@ -1,5 +1,4 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecIndexFileManagement import SecIndexFile
 from _00_common.SecFileUtils import download_url_to_file
 
 import logging
@@ -10,60 +9,7 @@ from typing import List,Tuple,Callable
 from time import time, sleep
 from multiprocessing import Pool
 
-class SecIndexFilesProcessor:
-    """
-    - downloads the desired sec files, parses them and adds the information into the db.
-    """
-
-    def __init__(self, dbmanager: DBManager, start_year:int, end_year: int, start_month: int = 1, end_month:int = 12, feed_dir: str = "./tmp/"):
-        self.dbmanager = dbmanager
-        self.start_year = start_year
-        self.end_year = end_year
-        self.start_month = start_month
-        self.end_month = end_month
-        self.feed_dir = feed_dir
-        self.processdate = datetime.date.today().isoformat()
-
-    def _month_year_iter(self):
-        ym_from = 12 * self.start_year + self.start_month - 1
-        ym_to = 12 * self.end_year + self.end_month
-        for yearm in range(ym_from, ym_to):
-            year, month = divmod(yearm, 12)
-            yield year, month + 1
-
-    def download_sec_feeds(self):
-        for year, month in self._month_year_iter():
-            logging.info("processing year: {} / month: {}".format(year, month))
-            sec_file = SecIndexFile(year, month, feed_dir=self.feed_dir)
-
-            indexfiles_df = self.dbmanager.read_all_index_files()
-            status_ser = indexfiles_df[indexfiles_df.sec_feed_file == sec_file.feed_filename].status
-
-            # first time to process file
-            if len(status_ser) == 0:
-                logging.info("- first processing of {}".format(sec_file.feed_filename))
-                self.dbmanager.insert_index_file(sec_file.feed_filename, self.processdate)
-            else:
-                status = status_ser.values[0]
-                if status == 'done':
-                    logging.info("- already processed {} -> skip ".format(sec_file.feed_filename))
-                    continue
-                else:
-                    logging.info("- continue {} ".format(sec_file.feed_filename))
-                    self.dbmanager.update_index_file(sec_file.feed_filename, self.processdate)
-
-            sec_file.download_sec_feed()
-            df = sec_file.parse_sec_rss_feeds()
-
-            existing_adshs = self.dbmanager.get_adsh_by_feed_file(sec_file.feed_filename)
-            df = df[~df.index.isin(existing_adshs)]
-            duplicated = sum(df.index.duplicated())
-            logging.info("   duplicated: {}".format(duplicated))
-            logging.info("   read entries: {}".format(len(df)))
-            self.dbmanager.insert_feed_info(df)
-
-
-class SecXmlFilesProcessor:
+class SecXmlFileProcessor:
     """
     - downloads the desired sec files, parses them and adds the information into the db.
     """
@@ -101,7 +47,7 @@ class SecXmlFilesProcessor:
     def _download_file_throttle(data_tuple: Tuple[str]) -> (str, str):
         # ensures that only one request per second is send
         start = time()
-        accession_nr, filename = SecXmlFilesProcessor._download_file(data_tuple)
+        accession_nr, filename = SecXmlFileProcessor._download_file(data_tuple)
         end = time()
         sleep((1000-(end - start)) / 1000)
         return accession_nr, filename
@@ -123,7 +69,7 @@ class SecXmlFilesProcessor:
             for i in range(0, len(missing), 100):
                 chunk = missing[i:i + 100]
 
-                update_data: List[Tuple[str]] = pool.map(SecXmlFilesProcessor._download_file_throttle, chunk)
+                update_data: List[Tuple[str]] = pool.map(SecXmlFileProcessor._download_file_throttle, chunk)
                 update_funct(update_data)
 
                 logging.info("commited chunk: " + str(i))

@@ -1,7 +1,10 @@
 Next
 ====
 
+- tests laufen nicht alle durch, wenn via test folder gestartet -> pfad stimmt so nicht in sexcmlfileprocessing_test
 - pre und num files erzeugen..
+- organistaion directory
+  -https://docs.python-guide.org/writing/structure/
 
 
 
@@ -29,6 +32,7 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+26.04.2021  - aufteilen code für index und xml files
 22.04.2021  - Verwaltung Index Files
              -- bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished
              -- finished wird erreicht wenn neues File vorhanden ist

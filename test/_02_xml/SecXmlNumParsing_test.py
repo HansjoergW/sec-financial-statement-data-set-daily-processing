@@ -1,4 +1,4 @@
-from _02_xml.SecNumXmlParsing import SecNumXmlParser
+from _02_xml.SecXmlNumParsing import SecNumXmlParser
 
 from typing import Dict, List, Tuple, Optional
 from lxml import etree, objectify

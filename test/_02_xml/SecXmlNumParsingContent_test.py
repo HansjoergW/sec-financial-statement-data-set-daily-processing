@@ -1,4 +1,4 @@
-from _02_xml.SecNumXmlParsing import SecNumXmlParser
+from _02_xml.SecXmlNumParsing import SecNumXmlParser
 
 import pandas as pd
 

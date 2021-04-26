@@ -1,12 +1,10 @@
+from _00_common.SecFileUtils import download_url_to_file
+
 import os
 import logging
-import requests
 import pandas as pd
 from lxml import etree
 from typing import List, Dict
-from time import sleep
-from _00_common.SecFileUtils import download_url_to_file
-
 
 FEED_FIELDS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',
@@ -15,12 +13,8 @@ FEED_FIELDS = (
 
 XBRL_FILE_FIELDS = ('xbrlInsUrl', 'xbrlCalUrl', 'xbrlDefUrl', 'xbrlLabUrl', 'xbrlPreUrl')
 
-# DATA_COLS = list(FEED_FIELDS + XBRL_FILE_FIELDS)
-# DATA_COLS.remove('xbrlFiles')
-# DATA_COLS = tuple(DATA_COLS)
 
-
-class SecIndexFile():
+class SecIndexFileParser():
     """ inspired from # https://github.com/robren/sec_edgar_download/blob/master/sec_edgar_download/indexer.py
     downloads the file for the configured year and month
     parses the data and returns a pandas dataframe with all 10-K and 10-Q entries in this year/month
@@ -57,26 +51,6 @@ class SecIndexFile():
             os.makedirs(self.feed_dir)
 
         download_url_to_file(edgar_filings_feed, self.feed_file)
-
-        # response = None
-        # current_try = 0
-        # while current_try < 4:
-        #     current_try += 1
-        #     try:
-        #         response = requests.get(edgar_filings_feed, timeout=10)
-        #         response.raise_for_status()
-        #         break
-        #     except requests.exceptions.RequestException as err:
-        #         if current_try >= 4:
-        #             logging.exception("RequestException:%s", err)
-        #             raise err
-        #         else:
-        #             logging.info("failed try " + str(current_try))
-        #             sleep(1)
-        #
-        #
-        # with open(self.feed_file, 'w') as file:
-        #     file.write(response.text)
 
         logging.info('Downloaded RSS feed: %s', self.feed_file)
 

@@ -13,7 +13,7 @@ from multiprocessing import Pool
 files = re.compile(r"\"name\":\"(.*?)\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
 
-class SecFeedDataManager():
+class SecIndexFilePostProcessor():
 
     def __init__(self, dbmanager: DBManager):
         self.dbmanager = dbmanager
@@ -55,7 +55,7 @@ class SecFeedDataManager():
     def _find_main_file_throttle(data_tuple: Tuple[str]) -> (str, str):
         # ensures that only one request per second is send
         start = time()
-        new_url, accession_nr = SecFeedDataManager._find_main_file(data_tuple)
+        new_url, accession_nr = SecIndexFilePostProcessor._find_main_file(data_tuple)
         end = time()
         sleep((1000-(end - start)) / 1000)
         return new_url, accession_nr
@@ -71,7 +71,7 @@ class SecFeedDataManager():
 
             for i in range(0, len(missing), 100):
                 chunk = missing[i:i + 100]
-                update_data: List[Tuple[str]] = pool.map(SecFeedDataManager._find_main_file_throttle, chunk)
+                update_data: List[Tuple[str]] = pool.map(SecIndexFilePostProcessor._find_main_file_throttle, chunk)
                 self.dbmanager.update_xbrl_ins_urls(update_data)
                 logging.info("commited chunk: " + str(i))
 
@@ -80,7 +80,11 @@ class SecFeedDataManager():
         if len(missing) > 0:
             logging.info("Failed to addmissing for " + str(len(missing)))
 
-
+    def check_for_duplicated(self):
+        duplicated_adshs: List[str] = self.dbmanager.find_duplicated_adsh()
+        for duplicated in duplicated_adshs:
+            logging.info("Found duplicated: " + duplicated)
+            self.dbmanager.mark_duplicated_adsh(duplicated)
 
 
 
