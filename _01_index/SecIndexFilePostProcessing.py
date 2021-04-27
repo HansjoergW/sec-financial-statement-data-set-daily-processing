@@ -41,7 +41,6 @@ class SecIndexFilePostProcessor():
                     logging.info("failed try " + str(current_try))
                     sleep(1)
 
-
         marks  = files.finditer(response.text)
         response.close()
         for mark in marks:

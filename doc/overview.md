@@ -3,7 +3,7 @@ https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 ![overview](Class-Overview.png)
 
 ## Data
-### FeedFiles xbrlrss-yyyy-mm.xml
+### FeedFiles xbrlrss-<yyyy>-<mm>.xml
 Enthalten items, welche edgar:xbrlFiling infos enthalten.
 - companyName
 - formType
@@ -18,11 +18,15 @@ Enthalten items, welche edgar:xbrlFiling infos enthalten.
 - fiscalYearEnd
 - List: xbrlFiles
  
-Wichtig: Es können noch die letzten Einträge des vorherigen Monats vorhanden sein.
-
+Wichtig: 
+- Es können noch die letzten Einträge des vorherigen Monats vorhanden sein.
+- selten ist ein Eintrag in 2 Monaten vorhanden
 
 
 ## DB
+### "sec_index_files"
+Behält die Übersicht, welche monatlichen Index Files verarbeitet worden sind und welches File das aktuelle ist.
+
 ### "sec_feeds"
 |column|description|
 |---|---|
@@ -45,6 +49,10 @@ Wichtig: Es können noch die letzten Einträge des vorherigen Monats vorhanden s
 
 - Es gibt Tage, an denen werden massiv mehr Reports angereicht, als an anderen
 SELECT "filingDate", COUNT(*) FROM sec_feeds GROUP BY "filingDate";
+
+### "sec_report_processing"
+Verfolgt die Verarbeitung der einzelnen xml-daten Files. 
+
 
 ## Classes
 ### SecProcessingOrchestrator

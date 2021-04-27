@@ -11,7 +11,7 @@ from multiprocessing import Pool
 
 class SecXmlFileProcessor:
     """
-    - downloads the desired sec files, parses them and adds the information into the db.
+    - downloads the desired sec xml files, stores them and updates the sec-processing table
     """
 
     def __init__(self, dbmanager: DBManager, xml_dir: str = "./tmp/xml/"):
@@ -32,6 +32,9 @@ class SecXmlFileProcessor:
         accessionnr = data_tuple[0]
         url = data_tuple[1]
         xml_dir = data_tuple[2]
+        if url == None:
+            logging.warning("url is null:  / " + accessionnr)
+
         filename = url.rsplit('/', 1)[-1]
 
         filepath = xml_dir + filename
@@ -40,7 +43,6 @@ class SecXmlFileProcessor:
             return (filepath, accessionnr)
         except:
             logging.warning("failed to download from: " + url)
-            print("failed download: ", url)
             return (None, accessionnr)
 
     @staticmethod
@@ -64,7 +66,7 @@ class SecXmlFileProcessor:
         # or no new files could be downloaded
         while (last_missing is None) or (last_missing > len(missing)):
             last_missing = len(missing)
-            logging.info("missing entries " + str(len(missing)))
+            logging.info("   missing entries " + str(len(missing)))
 
             for i in range(0, len(missing), 100):
                 chunk = missing[i:i + 100]
@@ -72,16 +74,18 @@ class SecXmlFileProcessor:
                 update_data: List[Tuple[str]] = pool.map(SecXmlFileProcessor._download_file_throttle, chunk)
                 update_funct(update_data)
 
-                logging.info("commited chunk: " + str(i))
+                logging.info("   commited chunk: " + str(i))
 
             missing = select_funct()
             missing = [(*entry, self.xml_dir) for entry in missing]
 
         if len(missing) > 0:
-            logging.info("Failed to add missing for " + str(len(missing)))
+            logging.info("   Failed to add missing for " + str(len(missing)))
 
     def downloadNumFiles(self):
+        logging.info("processing Num Files")
         self._download(self.dbmanager.find_missing_xmlNumFiles, self.dbmanager.update_processing_xml_num_file)
 
     def downloadPreFiles(self):
+        logging.info("processing Pre Files")
         self._download(self.dbmanager.find_missing_xmlPreFiles, self.dbmanager.update_processing_xml_pre_file)

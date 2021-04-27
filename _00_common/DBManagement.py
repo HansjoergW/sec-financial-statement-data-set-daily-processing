@@ -165,24 +165,6 @@ class DBManager():
         finally:
             conn.close()
 
-    def copy_uncopied_entries(self) -> int:
-        conn = self._get_connection()
-        try:
-            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null'''
-            to_copy_df =  pd.read_sql_query(sql, conn)
-            to_copy_df.to_sql(SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
-
-            update_sql =  '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(SEC_FEED_TBL_NAME)
-            adshs = to_copy_df.accessionNumber.values.tolist()
-            tupleslist = [tuple(x.split()) for x in adshs]
-
-            conn.executemany(update_sql, tupleslist)
-
-            conn.commit()
-            return len(to_copy_df)
-        finally:
-            conn.close()
-
     def find_duplicated_adsh(self) -> List[str]:
         conn = self._get_connection()
         try:
@@ -207,6 +189,24 @@ class DBManager():
         finally:
             conn.close()
 
+    # copies entries from the feed table to the processing table if they are not already present
+    def copy_uncopied_entries(self) -> int:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
+            to_copy_df =  pd.read_sql_query(sql, conn)
+            to_copy_df.to_sql(SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
+
+            update_sql =  '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(SEC_FEED_TBL_NAME)
+            adshs = to_copy_df.accessionNumber.values.tolist()
+            tupleslist = [tuple(x.split()) for x in adshs]
+
+            conn.executemany(update_sql, tupleslist)
+
+            conn.commit()
+            return len(to_copy_df)
+        finally:
+            conn.close()
 
     def create_test_data(self):
         inserts = [
