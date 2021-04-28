@@ -1,6 +1,7 @@
 import requests
 import logging
 from time import sleep
+import io
 
 # downloads the content of a url and stores it into a file
 # tries to download the file multiple times, if the download fails
@@ -23,5 +24,5 @@ def download_url_to_file(file_url:str, target_file:str):
                 logging.info("failed try " + str(current_try))
                 sleep(1)
 
-    with open(target_file, 'w') as file:
+    with io.open(target_file, 'w', newline="\n") as file:
         file.write(response.text)

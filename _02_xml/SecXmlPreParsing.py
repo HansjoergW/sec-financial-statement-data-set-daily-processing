@@ -1,3 +1,5 @@
+from _02_xml.SecXmlParsingBase import SecXmlParserBase
+
 import re
 import pandas as pd
 
@@ -5,7 +7,7 @@ from lxml import etree
 from typing import Dict, List, Tuple, Optional
 
 
-class SecPreXmlParser():
+class SecPreXmlXmlParser(SecXmlParserBase):
     """Parses the data of an Pre.Xml file and delivers the data in a similar format than the pre.txt
        contained in the financial statements dataset of the sex."""
 
@@ -29,6 +31,7 @@ class SecPreXmlParser():
                               }
 
     def __init__(self):
+        super(SecPreXmlXmlParser, self).__init__()
         pass
 
     def _strip_file(self, data: str) -> str:
@@ -126,13 +129,13 @@ class SecPreXmlParser():
         df['rfile'] = rfile # filetype X for xml or H for html file
         return df
 
-    def parse(self, data: str, rfile: str) -> pd.DataFrame:
+    def parse(self, data: str) -> pd.DataFrame:
         data = self._strip_file(data)
         root = etree.fromstring(data)
-        df = self._process_presentations(root, rfile)
+        df = self._process_presentations(root, "-")
         return df
 
-    def clean_for_pure_pre(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         df = df[~df.stmt.isnull()]
         df = df[df.line != 0].copy()
         df.drop(['plabel', 'key'], axis=1, inplace=True)

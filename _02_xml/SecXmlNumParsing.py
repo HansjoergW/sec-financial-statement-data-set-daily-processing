@@ -1,3 +1,5 @@
+from _02_xml.SecXmlParsingBase import SecXmlParserBase
+
 import re
 import calendar
 import pandas as pd
@@ -6,7 +8,7 @@ from lxml import etree
 from typing import Dict, List, Tuple, Optional
 
 
-class SecNumXmlParser():
+class SecNumXmlParser(SecXmlParserBase):
     """ Parses the data of an Num.Xml file and delivers the data in a similar format than the num.txt
        contained in the financial statements dataset of the sec."""
 
@@ -17,11 +19,13 @@ class SecNumXmlParser():
     textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    link_end_regex = re.compile(r"</link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     clean_tag_regex = re.compile(r"[{].*?[}]")
     # remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
     def __init__(self):
+        super(SecNumXmlParser, self).__init__()
         pass
 
     def _strip_file(self, data: str) -> str:
@@ -33,6 +37,7 @@ class SecNumXmlParser():
         data = self.textblock_regex.sub("", data)
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
         data = self.link_regex.sub("", data)
+        data = self.link_end_regex.sub("", data)
         # data = self.remove_wspace_regex.sub("><", data)
         data = self.remove_unicode_tag_regex.sub("", data)
 
@@ -172,7 +177,7 @@ class SecNumXmlParser():
         df = self._read_tags(root)
         return df
 
-    def clean_for_pure_num(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         df = (df[df.segments.isnull()]).copy()
 
         df['qtrs']  = df.qtrs.apply(int)

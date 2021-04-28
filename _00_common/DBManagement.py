@@ -42,7 +42,7 @@ class DBManager():
         curr = conn.cursor()
         for sqlfile in sqlfiles:
             script = open(sqlfile, 'r').read()
-            curr.execute(script)
+            curr.executescript(script)
             conn.commit()
         conn.close()
 

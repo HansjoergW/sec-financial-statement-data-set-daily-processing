@@ -7,7 +7,7 @@ folder = "./tmp"
 
 @pytest.fixture(scope="module")
 def dbmgr():
-    shutil.rmtree(folder)
+    shutil.rmtree(folder, ignore_errors=True)
     new_dbmgr = DBManager(work_dir=folder)
     new_dbmgr._create_db()
     new_dbmgr.create_test_data()

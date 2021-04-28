@@ -1,6 +1,7 @@
 # coordinates the parsing of donwloaded xml files and stores the data in a new folder
 from _02_xml.SecXmlNumParsing import SecNumXmlParser
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlXmlParser
+from _02_xml.SecXmlParsingBase import SecXmlParserBase
 from _00_common.DBManagement import DBManager
 
 import logging
@@ -10,7 +11,6 @@ import pandas as pd
 
 from typing import List,Tuple,Callable
 from multiprocessing import Pool
-
 
 
 class SecXmlParser:
@@ -27,11 +27,8 @@ class SecXmlParser:
         if not os.path.isdir(self.data_dir):
             os.makedirs(self.data_dir)
 
-        # todo: superklasse für Paser -> mit parse und clean_for_pure Methoden
-        # problem: pre parse hat andere p arameter -> flag für html oder xml ->
-        # war im 2020 Q4 aber immer nur H -> evtl. auf neutralen Wert setzen und beim Vergleichen ignorieren
         self.numparser = SecNumXmlParser()
-        self.preparser = SecPreXmlParser()
+        self.preparser = SecPreXmlXmlParser()
 
 
     @staticmethod
@@ -39,23 +36,25 @@ class SecXmlParser:
         accessionnr: str = data_tuple[0]
         xml_file: str = data_tuple[1]
         data_dir: str = data_tuple[2]
-        parser = data_tuple[3]
+        parser: SecXmlParserBase = data_tuple[3]
 
         filename = xml_file.rsplit('/', 1)[-1]
-        filename = filename.rsplit('.', 1)[-1] + "csv" # remove xml at end and add csv instead
+        filename = filename.rsplit('.', 1)[0] + ".csv" # remove xml at end and add csv instead
         targetfilepath = data_dir + filename
 
         with open(xml_file, "r", encoding="utf-8") as f:
             xml_content = f.read()
             try:
-                parser.parse(xml_content)
-                return (filepath, accessionnr)
-            except:
-                logging.warning("failed to download from: " + xml_file)
+                df = parser.parse(xml_content)
+                df = parser.clean_for_financial_statement_dataset(df, accessionnr)
+                df.to_csv(targetfilepath, header=True)
+
+                return (targetfilepath, accessionnr)
+            except Exception as e:
+                logging.exception("failed to parse data: " + xml_file, e)
                 return (None, accessionnr)
 
-
-    def _parse(self, parser, select_funct: Callable, update_funct: Callable):
+    def _parse(self, parser: SecXmlParserBase, select_funct: Callable, update_funct: Callable):
         pool = Pool(8)
 
         missing:List[Tuple[str]] = select_funct()
@@ -64,8 +63,11 @@ class SecXmlParser:
         for i in range(0, len(missing), 100):
             chunk = missing[i:i + 100]
 
-            update_data: List[Tuple[str]] = pool.map(SecXmlFileProcessor._download_file_throttle, chunk)
-            update_funct(update_data)
+            update_data: List[Tuple[str]] = pool.map(SecXmlParser._parse_file, chunk)
+
+            #todo update logic
+            # add additional infos, ignore None values in update_data
+            #update_funct(update_data)
 
             logging.info("   commited chunk: " + str(i))
 
