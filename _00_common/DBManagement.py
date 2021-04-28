@@ -120,6 +120,42 @@ class DBManager():
         finally:
             conn.close()
 
+    def find_unparsed_numFiles(self) -> List[Tuple[str]]:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is null'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def find_unparsed_preFiles(self) -> List[Tuple[str]]:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is null'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def update_parsed_num_file(self, update_data: List[Tuple[str]]):
+        conn = self._get_connection()
+        try:
+            sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            conn.executemany(sql, update_data)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def update_parsed_pre_file(self, update_data: List[Tuple[str]]):
+        conn = self._get_connection()
+        try:
+            sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            conn.executemany(sql, update_data)
+            conn.commit()
+        finally:
+            conn.close()
+
     # - report metadata / sec-feed table
     def read_all(self) -> pd.DataFrame:
         conn = self._get_connection()
