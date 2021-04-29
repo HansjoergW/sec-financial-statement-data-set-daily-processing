@@ -7,7 +7,7 @@ from lxml import etree
 from typing import Dict, List, Tuple, Optional
 
 
-class SecPreXmlXmlParser(SecXmlParserBase):
+class SecPreXmlParser(SecXmlParserBase):
     """Parses the data of an Pre.Xml file and delivers the data in a similar format than the pre.txt
        contained in the financial statements dataset of the sex."""
 
@@ -31,7 +31,7 @@ class SecPreXmlXmlParser(SecXmlParserBase):
                               }
 
     def __init__(self):
-        super(SecPreXmlXmlParser, self).__init__()
+        super(SecPreXmlParser, self).__init__()
         pass
 
     def _strip_file(self, data: str) -> str:

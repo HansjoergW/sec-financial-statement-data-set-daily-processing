@@ -16,6 +16,11 @@ class SecNumXmlParser(SecXmlParserBase):
     entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     identifier_regex = re.compile(r"(<identifier).*?(</identifier>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     # id_regex = re.compile(r"id=\"[^<]*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    # single textblock tags like <xyTextBlock .. />
+    textblock_single_regex = re.compile(r"<[^/]*?TextBlock[^<]*?/>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    # textblock with ending tag like <xyTextBlock...>...</xyTextBlock>
     textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -34,6 +39,7 @@ class SecNumXmlParser(SecXmlParserBase):
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
         # data = self.id_regex.sub("", data)
+        data = self.textblock_single_regex.sub("", data)
         data = self.textblock_regex.sub("", data)
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
         data = self.link_regex.sub("", data)
@@ -150,7 +156,7 @@ class SecNumXmlParser(SecXmlParserBase):
             qtrs = context_entry[1]
             segments = context_entry[2]
 
-            if unitRef in ["usd","usdpershare"]:
+            if unitRef in ["usd","usdpershare","u_iso4217usd"]:
                 unitRef = "USD"
             if unitRef == 'number':
                 unitRef = 'pure'

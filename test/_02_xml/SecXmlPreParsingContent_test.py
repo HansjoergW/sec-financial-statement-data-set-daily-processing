@@ -1,4 +1,4 @@
-from _02_xml.SecXmlPreParsing import SecPreXmlXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 
 import pandas as pd
 
@@ -19,7 +19,7 @@ def read_txt() -> pd.DataFrame:
 
 
 def read_xml() -> pd.DataFrame:
-    parser = SecPreXmlXmlParser()
+    parser = SecPreXmlParser()
     with open(xml_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
         df_xml = parser.parse(xml_content, "H")

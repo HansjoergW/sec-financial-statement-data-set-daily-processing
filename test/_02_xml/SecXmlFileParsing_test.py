@@ -3,6 +3,7 @@ from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
 from _02_xml.SecXmlFileParsing import SecXmlParser
 import shutil
 import pytest
+import glob
 
 folder = "./tmp"
 
@@ -12,12 +13,7 @@ def dbmgr():
     new_dbmgr = DBManager(work_dir=folder)
     new_dbmgr._create_db()
     new_dbmgr.create_test_data()
-    new_dbmgr.copy_uncopied_entries()
-
-    # todo: fixes datenset dafür erzeugen, dass direkt geladen werden kann
-    processor = SecXmlFileProcessor(new_dbmgr, folder)
-    processor.downloadNumFiles()
-    processor.downloadPreFiles()
+    new_dbmgr.create_processing_test_data()
 
     yield new_dbmgr
     shutil.rmtree(folder)
@@ -26,4 +22,12 @@ def test_parse_num_xml(dbmgr: DBManager):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parseNumFiles()
 
-    print("end it")
+    files = glob.glob("./tmp/data/*/*.csv")
+    assert len(files) == 7
+
+def test_parse_pre_xml(dbmgr: DBManager):
+    parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
+    parser.parsePreFiles()
+
+    files = glob.glob("./tmp/data/*/*.csv")
+    assert len(files) == 7

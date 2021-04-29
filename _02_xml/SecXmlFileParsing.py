@@ -1,6 +1,6 @@
 # coordinates the parsing of donwloaded xml files and stores the data in a new folder
 from _02_xml.SecXmlNumParsing import SecNumXmlParser
-from _02_xml.SecXmlPreParsing import SecPreXmlXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 from _02_xml.SecXmlParsingBase import SecXmlParserBase
 from _00_common.DBManagement import DBManager
 
@@ -28,7 +28,7 @@ class SecXmlParser:
             os.makedirs(self.data_dir)
 
         self.numparser = SecNumXmlParser()
-        self.preparser = SecPreXmlXmlParser()
+        self.preparser = SecPreXmlParser()
 
 
     @staticmethod
@@ -47,7 +47,7 @@ class SecXmlParser:
             try:
                 df = parser.parse(xml_content)
                 df = parser.clean_for_financial_statement_dataset(df, accessionnr)
-                df.to_csv(targetfilepath, header=True)
+                df.to_csv(targetfilepath, header=True, sep="\t")
 
                 return (targetfilepath, accessionnr)
             except Exception as e:

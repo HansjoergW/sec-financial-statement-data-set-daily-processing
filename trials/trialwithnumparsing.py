@@ -1,11 +1,15 @@
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from lxml import etree
 
 if __name__ == '__main__':
 
-    urg failed..
 
-    with open('c:/tmp/cday-10k_20201231_htm.xml', "r", encoding="utf-8") as f:
+    with open('c:/ieu/projects/sec_processing/test/_02_xml/data/cday-20201231_pre.xml', "r", encoding="utf-8") as f:
         content = f.read()
+        content = bytes(bytearray(content, encoding='utf-8'))
 
-        parser = SecNumXmlParser()
+        #parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        etree.fromstring(content) #, parser=parser)
+
+        parser = SecPreXmlParser()
         parser.parse(content)
