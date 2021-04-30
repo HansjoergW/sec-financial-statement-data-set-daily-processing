@@ -31,7 +31,7 @@ class SecPreXmlParser(SecXmlParserBase):
                               }
 
     def __init__(self):
-        super(SecPreXmlParser, self).__init__()
+        super(SecPreXmlParser, self).__init__("pre")
         pass
 
     def _strip_file(self, data: str) -> str:
@@ -131,6 +131,7 @@ class SecPreXmlParser(SecXmlParserBase):
 
     def parse(self, data: str) -> pd.DataFrame:
         data = self._strip_file(data)
+        data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)
         df = self._process_presentations(root, "-")
         return df

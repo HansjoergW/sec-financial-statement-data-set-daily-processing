@@ -91,7 +91,7 @@ def test_parse():
     f.close()
 
     parser = SecPreXmlParser()
-    df = parser.parse(xml_exp_content, "H")
+    df = parser.parse(xml_exp_content)
 
     assert 52 == len(df)
     assert 10 == len(df.columns)
@@ -103,8 +103,8 @@ def test_clean_for_pure_pre():
     f.close()
 
     parser = SecPreXmlParser()
-    df = parser.parse(xml_exp_content, "H")
-    df_clean = parser.clean_for_pure_pre(df, "an_adsh")
+    df = parser.parse(xml_exp_content)
+    df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
 
     assert 45 == len(df_clean)
 
@@ -115,5 +115,5 @@ def test_complete_file_parse():
 
     with open(xml_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
-        df = parser.parse(xml_content, "H")
+        df = parser.parse(xml_content)
         print(len(df))

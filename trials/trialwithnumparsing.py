@@ -4,7 +4,7 @@ from lxml import etree
 if __name__ == '__main__':
 
 
-    with open('c:/ieu/projects/sec_processing/test/_02_xml/data/cday-20201231_pre.xml', "r", encoding="utf-8") as f:
+    with open('/testdata/cday-20201231_pre.xml', "r", encoding="utf-8") as f:
         content = f.read()
         content = bytes(bytearray(content, encoding='utf-8'))
 

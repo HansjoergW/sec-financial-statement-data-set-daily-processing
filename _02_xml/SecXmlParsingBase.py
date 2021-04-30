@@ -4,9 +4,11 @@ import pandas as pd
 
 class SecXmlParserBase(ABC):
 
-    def __init__(self):
-        pass
+    def __init__(self, type: str):
+        self.type = type
 
+    def get_type(self):
+        return self.type
     @abstractmethod
     def parse(self, data: str) -> pd.DataFrame:
         pass
@@ -14,3 +16,4 @@ class SecXmlParserBase(ABC):
     @abstractmethod
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         pass
+

@@ -30,7 +30,7 @@ class SecNumXmlParser(SecXmlParserBase):
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
     def __init__(self):
-        super(SecNumXmlParser, self).__init__()
+        super(SecNumXmlParser, self).__init__("num")
         pass
 
     def _strip_file(self, data: str) -> str:
@@ -179,6 +179,7 @@ class SecNumXmlParser(SecXmlParserBase):
 
     def parse(self, data: str) -> pd.DataFrame:
         data = self._strip_file(data)
+        data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)
         df = self._read_tags(root)
         return df

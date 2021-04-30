@@ -38,12 +38,13 @@ class SecXmlParser:
         data_dir: str = data_tuple[2]
         parser: SecXmlParserBase = data_tuple[3]
 
-        filename = xml_file.rsplit('/', 1)[-1]
-        filename = filename.rsplit('.', 1)[0] + ".csv" # remove xml at end and add csv instead
-        targetfilepath = data_dir + filename
+        # filename = xml_file.rsplit('/', 1)[-1]
+        # filename = filename.rsplit('.', 1)[0] + ".csv" # remove xml at end and add csv instead
+        targetfilepath = data_dir + accessionnr + '_' + parser.get_type() + ".csv"
 
         with open(xml_file, "r", encoding="utf-8") as f:
             xml_content = f.read()
+
             try:
                 df = parser.parse(xml_content)
                 df = parser.clean_for_financial_statement_dataset(df, accessionnr)
