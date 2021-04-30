@@ -2,6 +2,7 @@ from _00_common.DBManagement import DBManager
 from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
 from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
+from _02_xml.SecXmlFileParsing import SecXmlParser
 
 import logging
 from datetime import datetime
@@ -18,6 +19,7 @@ class SecXMLProcessingOrchestrator():
         self.workdir = workdir
         self.feeddir = workdir + "feed/"
         self.xmldir = workdir + "xml/"
+        self.csvdir = workdir + "csv/"
 
         self.dbmanager = DBManager(work_dir=workdir)
 
@@ -54,6 +56,10 @@ class SecXMLProcessingOrchestrator():
         secxmlfilesprocessor = SecXmlFileProcessor(self.dbmanager, self.xmldir)
         secxmlfilesprocessor.downloadNumFiles()
         secxmlfilesprocessor.downloadPreFiles()
+
+        secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)
+        secxmlfileparser.parseNumFiles()
+        secxmlfileparser.parsePreFiles()
 
 
 if __name__ == '__main__':

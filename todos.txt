@@ -1,14 +1,18 @@
 Next
 ====
 
-- tests laufen nicht alle durch, wenn via test folder gestartet -> pfad stimmt so nicht in sexcmlfileprocessing_test
 - pre und num files erzeugen..
+
+- quartal durchparsen
+
+- quartal vergleichen
+
+
 - organistaion directory
   -https://docs.python-guide.org/writing/structure/
 
-- Fehler -> missing num-file
-  https://www.sec.gov/Archives/edgar/data/315852/000156459021020565/ -> Datei ist relativ neu, kann es sein, dass eine fehlendes num file erst später kommt ?
-  sollte nicht kopiert werden, stattdessen ein fehler status in sec_feeds Tabelle
+
+
 Later
 =====
 
@@ -29,6 +33,9 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Die txt-Dateien dürfen keine Zeilen enthalten, die nicht in den XML Daten vorhanden sind
 --- Prüfen ob
 
+- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
+
+-process
 
 
 Done
