@@ -38,8 +38,6 @@ class SecXmlParser:
         data_dir: str = data_tuple[2]
         parser: SecXmlParserBase = data_tuple[3]
 
-        # filename = xml_file.rsplit('/', 1)[-1]
-        # filename = filename.rsplit('.', 1)[0] + ".csv" # remove xml at end and add csv instead
         targetfilepath = data_dir + accessionnr + '_' + parser.get_type() + ".csv"
 
         with open(xml_file, "r", encoding="utf-8") as f:
@@ -65,10 +63,9 @@ class SecXmlParser:
             chunk = missing[i:i + 100]
 
             update_data: List[Tuple[str]] = pool.map(SecXmlParser._parse_file, chunk)
+            update_data = [(entry[0],self.processdate, 'parsed', entry[1]) for entry in update_data if entry[0] != None]
 
-            #todo update logic
-            # add additional infos, ignore None values in update_data
-            #update_funct(update_data)
+            update_funct(update_data)
 
             logging.info("   commited chunk: " + str(i))
 
