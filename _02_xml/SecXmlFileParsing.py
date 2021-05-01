@@ -48,10 +48,10 @@ class SecXmlParser:
                 df = parser.clean_for_financial_statement_dataset(df, accessionnr)
                 df.to_csv(targetfilepath, header=True, sep="\t")
 
-                return (targetfilepath, accessionnr)
+                return (targetfilepath, accessionnr, 'parsed')
             except Exception as e:
                 logging.exception("failed to parse data: " + xml_file, e)
-                return (None, accessionnr)
+                return (None, accessionnr, str(e))
 
     def _parse(self, parser: SecXmlParserBase, select_funct: Callable, update_funct: Callable):
         pool = Pool(8)
@@ -63,7 +63,7 @@ class SecXmlParser:
             chunk = missing[i:i + 100]
 
             update_data: List[Tuple[str]] = pool.map(SecXmlParser._parse_file, chunk)
-            update_data = [(entry[0],self.processdate, 'parsed', entry[1]) for entry in update_data if entry[0] != None]
+            update_data = [(entry[0], self.processdate, entry[2], entry[1]) for entry in update_data]
 
             update_funct(update_data)
 

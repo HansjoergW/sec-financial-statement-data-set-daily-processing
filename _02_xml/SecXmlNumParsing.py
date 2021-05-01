@@ -22,16 +22,18 @@ class SecNumXmlParser(SecXmlParserBase):
     # id_regex = re.compile(r"id=\"[^<]*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
     # single textblock tags like <xyTextBlock .. />
-    textblock_single_regex = re.compile(r"<[^/]*?TextBlock[^<]*?/>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-
+    # textblock_single_regex = re.compile(r"<[^/]*?TextBlock[^<]*?/>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     # textblock with ending tag like <xyTextBlock...>...</xyTextBlock>
-    textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    # textblock_regex = re.compile(r"<[^/]*?TextBlock.*?<[/].*?TextBlock.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
     xbrlns_regex = re.compile(r"xmlns=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_regex = re.compile(r"<link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_end_regex = re.compile(r"</link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     clean_tag_regex = re.compile(r"[{].*?[}]")
     # remove_wspace_regex = re.compile(r">[\s\r\n]*<", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    find_year_regex = re.compile(r"\d\d\d\d")
 
     def __init__(self):
         super(SecNumXmlParser, self).__init__("num")
@@ -43,10 +45,10 @@ class SecNumXmlParser(SecXmlParserBase):
         data = self.identifier_regex.sub("", data)
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
-        # data = self.id_regex.sub("", data)
-        data = self.textblock_single_regex.sub("", data)
-        data = self.textblock_regex.sub("", data)
+
+
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
+
         data = self.link_regex.sub("", data)
         data = self.link_end_regex.sub("", data)
         # data = self.remove_wspace_regex.sub("><", data)
@@ -122,7 +124,7 @@ class SecNumXmlParser(SecXmlParserBase):
         return context_map
 
     def _find_company_namespaces(self, root: etree._Element) -> List[str]:
-        official = ['xbrl.org', 'sec.gov','fasb.org','w3.org']
+        official = ['xbrl.org', 'sec.gov','fasb.org','w3.org', 'xbrl.ifrs.org']
         company_namespaces = []
         for key, value in root.nsmap.items():
             if not any(x in value for x in official):
@@ -132,9 +134,16 @@ class SecNumXmlParser(SecXmlParserBase):
     def _read_tags(self, root: etree._Element) -> pd.DataFrame:
         company_namespaces = self._find_company_namespaces(root)
 
-        us_gaap_ns = root.nsmap['us-gaap']
-        pos = us_gaap_ns.rfind("/") + 1
-        versionyear = us_gaap_ns[pos:pos+4]
+        us_gaap_ns = root.nsmap.get('us-gaap', None)
+        ifrs_ns = root.nsmap.get('ifrs-full', None)
+
+        versionyear = 0
+        if us_gaap_ns:
+            pos = us_gaap_ns.rfind("/") + 1
+            versionyear = us_gaap_ns[pos:pos+4]
+
+        if ifrs_ns:
+            versionyear = self.find_year_regex.findall(ifrs_ns)[0]
 
         context_map = self._read_contexts(root)
 
@@ -151,10 +160,14 @@ class SecNumXmlParser(SecXmlParserBase):
             unitRef = tag.get("unitRef").lower()
             tagname = self.clean_tag_regex.sub("", tag.tag)
 
-            if tag.prefix in company_namespaces:
+            prefix = tag.prefix
+            if prefix.startswith("ifrs"):
+                prefix = "ifrs"
+
+            if prefix in company_namespaces:
                 version = 'company'
             else:
-                version = tag.prefix + "/" + versionyear
+                version = prefix + "/" + str(versionyear)
 
             context_entry = context_map[ctxtRef]
             ddate = context_entry[0]
