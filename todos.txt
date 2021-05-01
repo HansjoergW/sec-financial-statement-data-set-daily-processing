@@ -1,8 +1,6 @@
 Next
 ====
 
-- pre und num files erzeugen..
-
 - quartal durchparsen
 
 - quartal vergleichen
@@ -33,13 +31,29 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Die txt-Dateien dürfen keine Zeilen enthalten, die nicht in den XML Daten vorhanden sind
 --- Prüfen ob
 
+- status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
+  -> man sieht die letzte Bearbeitung
+  -> man sieht die letzte Datei
+  -> siehe auch Besondere Fehler
+
 - bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
--process
+- zippen von xml dateien
+
+
+Besondere Fehler
+==============
+- Wenn am Anfang des Monats das index file noch nicht vorhanden ist (z.B. Fehler am 1. Mai), dann bricht der download
+  ab, weil die Datei nicht gefunden werden konnte. (kann auch aufgrund der Zeitverzögerung sein, wurde um 07:10 ausgeführt)
+- man könnte auch die index seite parsen -> https://www.sec.gov/Archives/edgar/monthly/index.json
+  dann würde man alle vorhandenen Einträge mit ihrer letzten Verarbeitung sehen. So könnte man auch prüfen, welche
+  Dateien neu sind und noch nicht verarbeitet worden sind
 
 
 Done
 ====
+30.04.2021  - pre und num files erzeugen..
+            -- erste Version läuft, nächster Schritt komplettes quartal durchparsen
 26.04.2021  - aufteilen code für index und xml files
 22.04.2021  - Verwaltung Index Files
              -- bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished

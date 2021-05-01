@@ -6,7 +6,6 @@ from _02_xml.SecXmlFileParsing import SecXmlParser
 
 import logging
 from datetime import datetime
-from typing import List
 import dateutil
 
 
@@ -35,36 +34,44 @@ class SecXMLProcessingOrchestrator():
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
 
-    def _process_sec_index_files(self):
+    def _download_index_data(self):
         secindexprocessor = SecIndexFileProcessor(self.dbmanager, self.start_year, self.current_year, self.start_month, self.current_month, self.feeddir)
         secindexprocessor.download_sec_feeds()
 
-    def _postprocess_sec_index_files(self):
+    def _postprocess_index_data(self):
         secindexpostprocessor = SecIndexFilePostProcessor(self.dbmanager)
         secindexpostprocessor.add_missing_xbrlinsurl()
         secindexpostprocessor.check_for_duplicated()
 
     def process_index_data(self):
-        self._process_sec_index_files()
-        self._postprocess_sec_index_files()
+        self._download_index_data()
+        self._postprocess_index_data()
+
+    def _download_xml(self):
+        secxmlfilesprocessor = SecXmlFileProcessor(self.dbmanager, self.xmldir)
+        secxmlfilesprocessor.downloadNumFiles()
+        secxmlfilesprocessor.downloadPreFiles()
+
+    def _parse_xml(self):
+        secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)
+        secxmlfileparser.parseNumFiles()
+        secxmlfileparser.parsePreFiles()
 
     def process_xml_data(self):
         # move new entries in sec_feeds to sec_processing
         entries = self.dbmanager.copy_uncopied_entries()
         logging.info("{} entries copied into processing table".format(entries))
 
-        secxmlfilesprocessor = SecXmlFileProcessor(self.dbmanager, self.xmldir)
-        secxmlfilesprocessor.downloadNumFiles()
-        secxmlfilesprocessor.downloadPreFiles()
+        self._download_xml()
+        self._parse_xml()
 
-        secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)
-        secxmlfileparser.parseNumFiles()
-        secxmlfileparser.parsePreFiles()
+    def process(self):
+        self.process_index_data()
+        self.process_xml_data()
 
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecXMLProcessingOrchestrator(workdir_default)
-    orchestrator.process_index_data()
-    orchestrator.process_xml_data()
-    #orchestrator._complete_sec_feed_data()
+    #orchestrator.process()
+    orchestrator._parse_xml()

@@ -12,6 +12,10 @@ class SecNumXmlParser(SecXmlParserBase):
     """ Parses the data of an Num.Xml file and delivers the data in a similar format than the num.txt
        contained in the financial statements dataset of the sec."""
 
+    # reports who's num file is part of the report use a "xbrli" prefix for all tags
+    # reports for which the "num"xml has been created from the html don't use such a tag
+    xbrli_prefix_regex = re.compile(r"xbrli:", re.IGNORECASE  + re.DOTALL)
+
     period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     identifier_regex = re.compile(r"(<identifier).*?(</identifier>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -35,6 +39,7 @@ class SecNumXmlParser(SecXmlParserBase):
 
     def _strip_file(self, data: str) -> str:
         """removes unneeded content from the datastring, so that xml parsing will be faster"""
+        data = self.xbrli_prefix_regex.sub("", data)
         data = self.identifier_regex.sub("", data)
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
@@ -177,8 +182,8 @@ class SecNumXmlParser(SecXmlParserBase):
 
         return pd.DataFrame(entries)
 
-    def parse(self, data: str) -> pd.DataFrame:
-        data = self._strip_file(data)
+    def parse(self, data_in: str) -> pd.DataFrame:
+        data = self._strip_file(data_in)
         data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)
         df = self._read_tags(root)
