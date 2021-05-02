@@ -48,11 +48,11 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return data
 
-    def _get_prefered_label(self, presentation: etree._Element) -> Dict[str, str]:
+    def _get_prefered_label(self, presentation: etree._Element, namesapces: Dict[str,str]) -> Dict[str, str]:
         """just parse the presentationArc Elements and get the content of the preferredLabel for every location key"""
 
         dict:Dict[str, str] = {}
-        arcs = list(presentation.iter('presentationArc'))
+        arcs = presentation.findall('presentationArc', presentation.nsmap)
 
         for arc in arcs:
             child = arc.get('to')
@@ -61,9 +61,9 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return dict
 
-    def _simple_list(self, presentation: etree._Element) -> List[Dict[str, str]]:
-        locs  = list(presentation.iter('loc'))
-        prefered_label_dict = self._get_prefered_label(presentation)
+    def _simple_list(self, presentation: etree._Element, namesapces: Dict[str,str]) -> List[Dict[str, str]]:
+        locs = presentation.findall('loc', namesapces)
+        prefered_label_dict = self._get_prefered_label(presentation, namesapces)
 
         result_list = []
         line = 0
@@ -93,8 +93,8 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return result_list
 
-    def _process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
-        entries = self._simple_list(presentation)
+    def _process_presentation(self, reportnr: int, presentation: etree._Element, namesapces: Dict[str,str]) -> List[Dict[str, str]]:
+        entries = self._simple_list(presentation, namesapces)
 
         inpth = 0
         presentation_role = presentation.get('role',"").lower()
@@ -116,12 +116,20 @@ class SecPreXmlParser(SecXmlParserBase):
         return entries
 
     def _process_presentations(self, root: etree._Element, rfile: str) -> pd.DataFrame:
-        presentation_links = list(root.iter('presentationLink'))
+        namespaces = root.nsmap
+
+        # there are documents, which define the linke namespace diretcly in the node itself, without a prefix
+        # therefore it is necessary to add the link-ns without a prefix into the namespace map
+        # examples:
+        #  normal:         "d:/secprocessing/xml/2021-04-24/blpg-20200630_pre.xml"
+        #  with ns in tag: "d:/secprocessing/xml/2021-04-24/cspi-20200930_pre.xml"
+        namespaces[""] = root.nsmap.get('link')
+        presentation_links = root.findall('presentationLink', namespaces)
 
         report = 1
         all_entries: List[Dict[str, str]] = []
         for presentation in presentation_links:
-            entries = self._process_presentation(report, presentation)
+            entries = self._process_presentation(report, presentation, namespaces)
             all_entries.extend(entries)
             report += 1
 
