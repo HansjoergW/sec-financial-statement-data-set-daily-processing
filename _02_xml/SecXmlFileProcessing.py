@@ -83,9 +83,9 @@ class SecXmlFileProcessor:
             logging.info("   Failed to add missing for " + str(len(missing)))
 
     def downloadNumFiles(self):
-        logging.info("processing Num Files")
+        logging.info("download Num Files")
         self._download(self.dbmanager.find_missing_xmlNumFiles, self.dbmanager.update_processing_xml_num_file)
 
     def downloadPreFiles(self):
-        logging.info("processing Pre Files")
+        logging.info("download Pre Files")
         self._download(self.dbmanager.find_missing_xmlPreFiles, self.dbmanager.update_processing_xml_pre_file)

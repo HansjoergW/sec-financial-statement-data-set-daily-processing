@@ -58,6 +58,7 @@ class SecXmlParser:
 
         missing:List[Tuple[str]] = select_funct()
         missing = [(*entry, self.data_dir, parser) for entry in missing]
+        logging.info("   missing entries " + str(len(missing)))
 
         for i in range(0, len(missing), 100):
             chunk = missing[i:i + 100]
@@ -73,9 +74,9 @@ class SecXmlParser:
 
 
     def parseNumFiles(self):
-        logging.info("processing Num Files")
+        logging.info("parsing Num Files")
         self._parse(self.numparser, self.dbmanager.find_unparsed_numFiles, self.dbmanager.update_parsed_num_file)
 
     def parsePreFiles(self):
-        logging.info("processing Pre Files")
+        logging.info("parsing Pre Files")
         self._parse(self.preparser, self.dbmanager.find_unparsed_preFiles, self.dbmanager.update_parsed_pre_file)

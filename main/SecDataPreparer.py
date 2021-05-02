@@ -73,5 +73,5 @@ class SecXMLProcessingOrchestrator():
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecXMLProcessingOrchestrator(workdir_default)
-    #orchestrator.process()
-    orchestrator._parse_xml()
+    orchestrator.process()
+    #orchestrator._parse_xml()

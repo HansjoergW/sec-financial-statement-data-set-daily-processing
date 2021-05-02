@@ -1,10 +1,12 @@
 Next
 ====
 
-- quartal durchparsen
+- 1. alle Daten nochmals durchparsen
+- 2. Fehler prüfen -> "huge text node"
+    Message: 'failed to parse data: d:/secprocessing/xml/2021-04-24/adc-20201231x10k_htm.xml'
+    Arguments: (XMLSyntaxError('xmlSAX2Characters: huge text node, line 35644, column 11392483'),)
 
 - quartal vergleichen
-
 
 - organistaion directory
   -https://docs.python-guide.org/writing/structure/
@@ -15,14 +17,6 @@ Later
 =====
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
-
-
-- IFRS Standard Beispiel finden und prüfen
-
-- Automatisierung des Downloads und aufbereiten der Daten
--- Die Daten werden laufend nachgeladen und aufbereitet
--- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag (processingDay?) folder geschrieben, evtl. in Zip
-
 
 - Massentest über ganzes Quartal
 -- XML-Dateien für komplettes Quartal downloaden
@@ -52,8 +46,13 @@ Besondere Fehler
 
 Done
 ====
+02.05.2021  - Quartal durchparsen -> nur 2 'leere' numfiles können nicht vearbeitet werden
+            - Automatisierung des Downloads und aufbereiten der Daten
+            -- Die Daten werden laufend nachgeladen und aufbereitet
+            -- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag (processingday)
 30.04.2021  - pre und num files erzeugen..
             -- erste Version läuft, nächster Schritt komplettes quartal durchparsen
+            - IFRS Standard Beispiel finden und prüfen
 26.04.2021  - aufteilen code für index und xml files
 22.04.2021  - Verwaltung Index Files
              -- bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished
