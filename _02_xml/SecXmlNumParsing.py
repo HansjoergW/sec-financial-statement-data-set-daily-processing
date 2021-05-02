@@ -79,7 +79,7 @@ class SecNumXmlParser(SecXmlParserBase):
         return int(round(float(month_end - month_start) / 3))
 
     def _read_contexts(self, root: etree._Element) -> Dict[str, Tuple[str,int,Optional[list]]]:
-        contexts = list(root.iter('context'))
+        contexts = root.findall('context', root.nsmap)
         context_map:  Dict[str, Tuple[str,int,Optional[list]]] = {}
 
         for context in contexts:
@@ -89,7 +89,7 @@ class SecNumXmlParser(SecXmlParserBase):
 
             # generally, we are mainly interested in the contexts without a segment
             # however, the segment might be deliver interesting inside in future analysis
-            segments = list(context.findall('.//*[@dimension]'))
+            segments = list(context.findall('.//*[@dimension]', root.nsmap))
             segments_list = []
             for segment in segments:
                 segment_label = segment.text
@@ -100,15 +100,15 @@ class SecNumXmlParser(SecXmlParserBase):
                 segments_list = None
 
             id = context.get("id")
-            instant = context.find('instant')
+            instant = context.find('instant', root.nsmap)
             if instant is not None:
                 instanttxt = instant.text
 
-            startdate = context.find('startDate')
+            startdate = context.find('startDate', root.nsmap)
             if startdate is not None:
                 startdatetxt = startdate.text
 
-            enddate = context.find('endDate')
+            enddate = context.find('endDate', root.nsmap)
             if enddate is not None:
                 enddatetxt = enddate.text
 
@@ -139,8 +139,7 @@ class SecNumXmlParser(SecXmlParserBase):
 
         versionyear = 0
         if us_gaap_ns:
-            pos = us_gaap_ns.rfind("/") + 1
-            versionyear = us_gaap_ns[pos:pos+4]
+            versionyear = self.find_year_regex.findall(us_gaap_ns)[0]
 
         if ifrs_ns:
             versionyear = self.find_year_regex.findall(ifrs_ns)[0]
@@ -198,11 +197,14 @@ class SecNumXmlParser(SecXmlParserBase):
     def parse(self, data_in: str) -> pd.DataFrame:
         data = self._strip_file(data_in)
         data = bytes(bytearray(data, encoding='utf-8'))
-        root = etree.fromstring(data)
+        root: etree._Element = etree.fromstring(data)
         df = self._read_tags(root)
         return df
 
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+        if df.shape[0] == 0:
+            return df
+
         df = (df[df.segments.isnull()]).copy()
 
         df['qtrs']  = df.qtrs.apply(int)

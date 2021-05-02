@@ -129,6 +129,10 @@ class SecIndexFileParser():
         df = pd.DataFrame(entries)
 
         len_before = len(df)
+        if len_before == 0:
+            logging.info('empty feed file')
+            return df
+
         df.drop_duplicates('accessionNumber', inplace=True)
         df.set_index('accessionNumber', inplace=True)
         len_after = len(df)
