@@ -2,6 +2,9 @@ Next
 ====
 
 - 1. alle Daten nochmals durchparsen
+     UPDATE sec_report_processing SET preParseState=NULL, preParseDate=NULL,csvPreFile=null, numParseDate=Null, numParseState=Null, csvNumFile=Null;
+     und csv dir löschen
+
 - 2. Fehler prüfen -> "huge text node"
     Message: 'failed to parse data: d:/secprocessing/xml/2021-04-24/adc-20201231x10k_htm.xml'
     Arguments: (XMLSyntaxError('xmlSAX2Characters: huge text node, line 35644, column 11392483'),)

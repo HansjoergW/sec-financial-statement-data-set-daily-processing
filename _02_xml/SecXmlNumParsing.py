@@ -197,7 +197,9 @@ class SecNumXmlParser(SecXmlParserBase):
     def parse(self, data_in: str) -> pd.DataFrame:
         data = self._strip_file(data_in)
         data = bytes(bytearray(data, encoding='utf-8'))
-        root: etree._Element = etree.fromstring(data)
+        # in a few reports, there are sometimes huge textparts between nodes (in xyTextBlock-nodes), so huge_tree option has to be used
+        parser = etree.XMLParser(huge_tree=True)
+        root: etree._Element = etree.fromstring(data, parser)
         df = self._read_tags(root)
         return df
 
