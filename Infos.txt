@@ -7,3 +7,7 @@ Performance Fragen:
   https://www.youtube.com/playlist?list=PL32jwjv5sQFjbwqVuQoLiWzeyb1mmaVIX
    -> da gibt es ein paar Settings und Hinweise, die man sich gleich zu Beginn merken sollte
   https://numba.pydata.org/
+
+xbrl
+- hierarchie definition für us-gaap
+  https://xbrlview.fasb.org/yeti/resources/yeti-gwt/Yeti.jsp#tax~(id~174*v~7138)!con~(id~4702285)!net~(a~3474*l~832)!lang~(code~en-us)!path~(g~99049*p~0_0_2_0_0_0_3)!rg~(rg~32*p~12)
