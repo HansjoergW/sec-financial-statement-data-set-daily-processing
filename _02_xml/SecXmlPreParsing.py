@@ -7,6 +7,14 @@ from lxml import etree
 from typing import Dict, List, Tuple, Optional
 
 
+# there are documents, which define the linke namespace diretcly in the node itself, without a prefix
+# therefore it is necessary to add the link-ns without a prefix into the namespace map
+# examples:
+#  normal:         "d:/secprocessing/xml/2021-04-24/blpg-20200630_pre.xml"
+#  with ns in tag: "d:/secprocessing/xml/2021-04-24/cspi-20200930_pre.xml"
+# namespaces[""] = root.nsmap.get('link')
+
+
 class SecPreXmlParser(SecXmlParserBase):
     """Parses the data of an Pre.Xml file and delivers the data in a similar format than the pre.txt
        contained in the financial statements dataset of the sex."""
@@ -19,8 +27,10 @@ class SecPreXmlParser(SecXmlParserBase):
     role2003_regex = re.compile(r"http://www.xbrl.org/2003/role/", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     role2009_regex = re.compile(r"http://www.xbrl.org/2009/role/", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     # href_regex = re.compile(" href=\".*?#", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-    type_clean_regex = re.compile("( type=\"locator\")|( type=\"arc\")", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-    arcrole_parent_child_regex = re.compile(" arcrole=\"parent-child\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    type_clean_regex = re.compile(r"( type=\"locator\")|( type=\"arc\")", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    arcrole_parent_child_regex = re.compile(r" arcrole=\"parent-child\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    default_ns_regex = re.compile(r"xmlns=\"http://www.xbrl.org/2003/linkbase\"", re.IGNORECASE)
 
     stmt_map:Dict[str,str] = {'Cover': 'CP',
                               'IncomeStatement': 'IS',
@@ -37,6 +47,7 @@ class SecPreXmlParser(SecXmlParserBase):
     def _strip_file(self, data: str) -> str:
         """removes unneeded content from the datastring, so that xml parsing will be faster"""
         data = self.remove_unicode_tag_regex.sub("", data)
+        data = self.default_ns_regex.sub("", data) # some nodes define a default namespace.. that causes troubles
         data = self.link_regex.sub("<", data)
         data = self.link_end_regex.sub("</", data)
         data = self.xlink_regex.sub(" ", data)
@@ -118,12 +129,6 @@ class SecPreXmlParser(SecXmlParserBase):
     def _process_presentations(self, root: etree._Element, rfile: str) -> pd.DataFrame:
         namespaces = root.nsmap
 
-        # there are documents, which define the linke namespace diretcly in the node itself, without a prefix
-        # therefore it is necessary to add the link-ns without a prefix into the namespace map
-        # examples:
-        #  normal:         "d:/secprocessing/xml/2021-04-24/blpg-20200630_pre.xml"
-        #  with ns in tag: "d:/secprocessing/xml/2021-04-24/cspi-20200930_pre.xml"
-        namespaces[""] = root.nsmap.get('link')
         presentation_links = root.findall('presentationLink', namespaces)
 
         report = 1
