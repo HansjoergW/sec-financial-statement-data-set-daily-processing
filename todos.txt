@@ -1,20 +1,16 @@
 Next
 ====
-
-- 1. alle Daten nochmals durchparsen
-     UPDATE sec_report_processing SET preParseState=NULL, preParseDate=NULL,csvPreFile=null, numParseDate=Null, numParseState=Null, csvNumFile=Null;
-     und csv dir löschen
-
-- 2. Fehler prüfen -> "huge text node"
-    Message: 'failed to parse data: d:/secprocessing/xml/2021-04-24/adc-20201231x10k_htm.xml'
-    Arguments: (XMLSyntaxError('xmlSAX2Characters: huge text node, line 35644, column 11392483'),)
-
 - quartal vergleichen
 
 - organistaion directory
   -https://docs.python-guide.org/writing/structure/
 
+- status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
+  -> man sieht die letzte Bearbeitung
+  -> man sieht die letzte Datei
+  -> siehe auch Besondere Fehler
 
+- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 Later
 =====
@@ -27,13 +23,6 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Alle Reports (10-K/Q) müssen vorhanden sein
 --- Die txt-Dateien dürfen keine Zeilen enthalten, die nicht in den XML Daten vorhanden sind
 --- Prüfen ob
-
-- status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
-  -> man sieht die letzte Bearbeitung
-  -> man sieht die letzte Datei
-  -> siehe auch Besondere Fehler
-
-- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 - zippen von xml dateien
 
@@ -49,6 +38,8 @@ Besondere Fehler
 
 Done
 ====
+04.05.2021  - alle Daten nochmals durchparsen
+03.05.2021  - Fehler prüfen -> "huge text node"
 02.05.2021  - Quartal durchparsen -> nur 2 'leere' numfiles können nicht vearbeitet werden
             - Automatisierung des Downloads und aufbereiten der Daten
             -- Die Daten werden laufend nachgeladen und aufbereitet
