@@ -8,7 +8,7 @@ folder = "./tmp"
 
 @pytest.fixture(scope="module")
 def file():
-    new_sec_file = SecIndexFileParser(2020, 12, folder)
+    new_sec_file = SecIndexFileParser(2021, 1, folder)
     yield new_sec_file
     shutil.rmtree(folder)
 

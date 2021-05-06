@@ -18,3 +18,5 @@ def test_multidownload(dbmgr: DBManager):
     processor.download_sec_feeds()
     data = dbmgr.read_all()
     assert len(data) > 0
+
+

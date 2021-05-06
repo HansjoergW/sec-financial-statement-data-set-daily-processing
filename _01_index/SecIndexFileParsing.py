@@ -141,4 +141,7 @@ class SecIndexFileParser():
             logging.info('Dropped %d duplicates', dropped)
 
         df['sec_feed_file'] = self.feed_filename
+        df['filingMonth'] = pd.to_numeric(df.filingDate.str.slice(0,2), downcast="integer")
+        df['filingYear'] = pd.to_numeric(df.filingDate.str.slice(6,10), downcast="integer")
+
         return df
