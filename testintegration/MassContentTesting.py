@@ -6,7 +6,7 @@
 from _00_common.DBManagement import DBManager
 import zipfile
 import pandas as pd
-from typing import List
+from typing import List, Set
 
 
 def read_file_from_zip(zipfile_to_read: str, file_to_read: str) -> pd.DataFrame:
@@ -18,49 +18,68 @@ def filter_relevant_reports(sub_df: pd.DataFrame) -> pd.DataFrame:
     return sub_df[sub_df.form.isin(['10-K', '10-Q'])].copy()
 
 
-def read_entries_from_sec_feeds(dbm: DBManager, files: List[str]) -> pd.DataFrame:
+def read_entries_from_sec_processing(dbm: DBManager, year: int, months: List[int]) -> pd.DataFrame:
     conn = dbm._get_connection()
-    files_list = ','.join(["'" + file + "'" for file in files])
+    months = ','.join([str(month) for month in months])
 
     try:
-        sql = '''SELECT * from sec_feeds WHERE sec_feed_file in ({}) and status = 'copied' '''.format(files_list)
+        sql = '''SELECT * from sec_report_processing WHERE filingYear = {} and filingMonth in ({}) and preParseState = 'parsed' and numParseState = 'parsed' '''.format(year, months)
         return pd.read_sql_query(sql, conn)
     finally:
         conn.close()
 
 
-def compare_adsh(zip_df: pd.DataFrame, xml_df: pd.DataFrame):
+def compare_adsh_entries(zip_df: pd.DataFrame, process_df: pd.DataFrame) -> Set[str]:
     zip_adshs = zip_df.adsh.tolist()
-    xml_adshs = xml_df.accessionNumber.tolist()
+    process_adshs = process_df.accessionNumber.tolist()
 
     zip_adshs_set = set(zip_adshs)
-    xml_adshs_set = set(xml_adshs)
+    process_adshs_set = set(process_adshs)
 
-    print("in zip, but not in xml: ", zip_adshs_set - xml_adshs_set)
-    print("in xml, but not in zip: ", xml_adshs_set - zip_adshs_set)
+    print("in zip, but not in xml: ", zip_adshs_set - process_adshs_set)
+    print("in xml, but not in zip: ", process_adshs_set - zip_adshs_set)
+
+    return zip_adshs_set.intersection(process_adshs_set)
+
+
+def compare_pre_content_for_adsh(zip_pre_df: pd.DataFrame, xml_pre_df: pd.DataFrame):
+    pass
+
+
+def compare_adsh_contents(adshs_in_both: Set[str], process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame):
+
+    for adsh in adshs_in_both:
+        process_adsh_data_df = process_df[process_df.accessionNumber == adsh]
+        #process_pre_data = pd.read_csv(process_adsh_data_df.csvPreFile.to_list()[0], header=0, delimiter="\t")
+        
+        
+        zip_pre_adsh_data = zip_pre_df[zip_pre_df.adsh == adsh]
+        zip_num_adsh_data = zip_num_df[zip_num_df.adsh == adsh]
+        print("")
+
+
 
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     quarterfile = "d:/secprocessing/quarterzip/2021q1.zip"
-    feed_files = ["xbrlrss-2021-01.xml","xbrlrss-2021-02.xml","xbrlrss-2021-03.xml"]
+    feed_year: int = 2021
+    feed_months: List[int] = [1,2,3]
 
     dbm = DBManager(workdir_default)
 
     zip_sub_df_all = read_file_from_zip(quarterfile, "sub.txt")
     zip_sub_df = filter_relevant_reports(zip_sub_df_all)
-    print(zip_sub_df.shape)
 
-    xml_sub_df = read_entries_from_sec_feeds(dbm, feed_files)
-    print(xml_sub_df.shape)
+    process_df = read_entries_from_sec_processing(dbm, feed_year, feed_months)
 
-    compare_adsh(zip_sub_df, xml_sub_df)
+    adshs_in_both: Set[str] = compare_adsh_entries(zip_sub_df, process_df)
 
+    zip_pre_df_all = read_file_from_zip(quarterfile, "pre.txt")
+    zip_num_df_all = read_file_from_zip(quarterfile, "num.txt")
 
+    # zip_pre_df_filtered = zip_pre_df_all[zip_pre_df_all.adsh.isin(adshs_in_both)]
+    # zip_num_df_filtered = zip_num_df_all[zip_num_df_all.adsh.isin(adshs_in_both)]
 
+    compare_adsh_contents(adshs_in_both, process_df, zip_pre_df_all, zip_num_df_all)
 
-    special_df = zip_sub_df[zip_sub_df.adsh == '0001437749-21-004277']
-    print(special_df.shape)
-
-# Notiz: 0001437749-21-004277 ist doppelt vorhanden, sowohl im Februar, wie im März, mit den exakt gleichen Daten
-# - besser auf filling month und jahr einschränken -> filing data noch splitten...

@@ -234,6 +234,11 @@ class DBManager():
         try:
             sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
             to_copy_df =  pd.read_sql_query(sql, conn)
+
+            to_copy_df['filingMonth'] = pd.to_numeric(to_copy_df.filingDate.str.slice(0,2), downcast="integer")
+            to_copy_df['filingDay'] = pd.to_numeric(to_copy_df.filingDate.str.slice(3,5), downcast="integer")
+            to_copy_df['filingYear'] = pd.to_numeric(to_copy_df.filingDate.str.slice(6,10), downcast="integer")
+
             to_copy_df.to_sql(SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
 
             update_sql =  '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(SEC_FEED_TBL_NAME)
