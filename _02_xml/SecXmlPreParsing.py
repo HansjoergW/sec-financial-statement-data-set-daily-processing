@@ -37,7 +37,7 @@ class SecPreXmlParser(SecXmlParserBase):
                               'StatementOfIncomeAndComprehensiveIncome': 'CI',
                               'StatementOfFinancialPosition': 'BS',
                               'StatementOfStockholdersEquity': 'EQ',
-                              'StatementOfCashFlows': 'CF'
+                              'StatementOfCashFlows': 'CF',
                               }
 
     def __init__(self):
@@ -59,29 +59,43 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return data
 
-    def _get_prefered_label(self, presentation: etree._Element, namesapces: Dict[str,str]) -> Dict[str, str]:
-        """just parse the presentationArc Elements and get the content of the preferredLabel for every location key"""
 
-        dict:Dict[str, str] = {}
+    def _get_presentation_arc_content(self, presentation: etree._Element) -> Dict[str, Dict[str, str]]:
+        # get order (line), and preferred_label (label, terselabel, totallabel, ...)
+        result: Dict[str, Dict[str, str]] = {}
         arcs = presentation.findall('presentationArc', presentation.nsmap)
 
+        line = 1
         for arc in arcs:
-            child = arc.get('to')
-            plabel = arc.get('preferredLabel')
-            dict[child] = plabel
+            details: Dict[str,str] = {}
+            tag = arc.get('to')
 
-        return dict
+            prefered_label = arc.get('preferredLabel')
 
-    def _simple_list(self, presentation: etree._Element, namesapces: Dict[str,str]) -> List[Dict[str, str]]:
-        locs = presentation.findall('loc', namesapces)
-        prefered_label_dict = self._get_prefered_label(presentation, namesapces)
+            negated = False
+            if prefered_label:
+                negated = "negated" in prefered_label
 
-        result_list = []
-        line = 0
+            details['preferredLabel'] = prefered_label
+            details['line'] = line
+            details['negating'] = negated
+
+            result[tag] = details
+            line += 1
+
+        return result
+
+    def _get_loc_content(self, presentation: etree._Element) -> Dict[str, Dict[str, str]]:
+        locs = presentation.findall('loc')
+
+        result: Dict[str, Dict[str, str]] = {}
+
         for loc in locs:
-            key = loc.get("label")
+            details: Dict[str,str] = {}
+            label = loc.get("label")
 
             href_parts = loc.get("href").split('#')
+            complete_tag = href_parts[1]
             version = None
             if href_parts[0].startswith('http'):
                 ns_parts = href_parts[0].split('/')
@@ -89,36 +103,71 @@ class SecPreXmlParser(SecXmlParserBase):
             else:
                 version = 'company'
 
-            tag_info = href_parts[1].split("_")
+            tag_info = complete_tag.split("_")
             tag_prefix = tag_info[0]
             tag = tag_info[1]
 
-            prefered_label = prefered_label_dict.get(key)
-            negated = False
-            if prefered_label:
-                negated = "negated" in prefered_label
+            details['tag'] = tag
+            details['version'] = version
 
-            entry = {"line": line, "version": version, "tag": tag, "negating": negated, "plabel": prefered_label, "key": key}
-            result_list.append(entry)
-            line += 1
+            result[label] = details
 
-        return result_list
+        return result
 
-    def _process_presentation(self, reportnr: int, presentation: etree._Element, namesapces: Dict[str,str]) -> List[Dict[str, str]]:
-        entries = self._simple_list(presentation, namesapces)
+    def _get_presentation_tag_info(self, presentation: etree._Element) -> List[Dict[str, str]]:
 
+        presentation_arc_content = self._get_presentation_arc_content(presentation)
+        loc_content = self._get_loc_content(presentation)
+
+        result: List[Dict[str, str]] = []
+        for k in loc_content.keys():
+            details = {}
+            loc_content_entry = loc_content[k]
+            pre_arc_content_entry = presentation_arc_content.get(k)
+
+            details['version'] = loc_content_entry.get('version')
+            details['tag'] = loc_content_entry.get('tag')
+
+            if pre_arc_content_entry is not None:
+                details['plabel'] = pre_arc_content_entry.get('preferredLabel')
+                if pre_arc_content_entry.get('negating'):
+                    details['negating'] = 1
+                else:
+                    details['negating'] = 0
+                details['line'] = pre_arc_content_entry.get('line')
+            else:
+                details['line'] = 0
+
+            result.append(details)
+
+        return result
+
+    def _find_statement_in_presentation(self, presentation: etree._Element) -> str:
+        arcs = presentation.findall('presentationArc', presentation.nsmap)
+
+        to_list: List[str] = []
+        from_list: List[str] = []
+
+        for arc in arcs:
+            to_list.append(arc.get('to'))
+            from_list.append(arc.get('from'))
+
+        root_nodes = set(from_list) - set(to_list)
+        for root_node in root_nodes:
+            for k, v in self.stmt_map.items():
+                if k in root_node:
+                    return v
+        return None
+
+    def _process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
+        entries = self._get_presentation_tag_info(presentation)
+        stmt = self._find_statement_in_presentation(presentation)
         inpth = 0
         presentation_role = presentation.get('role',"").lower()
         if "parenthetical" in presentation_role:
             inpth = 1
 
         if len(entries) > 0:
-            first_tag = entries[0]['tag']
-            stmt = None
-
-            for k, v in self.stmt_map.items():
-                if k in first_tag:
-                    stmt = v
             for entry in entries:
                 entry['report'] = reportnr
                 entry['stmt'] = stmt
@@ -134,7 +183,7 @@ class SecPreXmlParser(SecXmlParserBase):
         report = 1
         all_entries: List[Dict[str, str]] = []
         for presentation in presentation_links:
-            entries = self._process_presentation(report, presentation, namespaces)
+            entries = self._process_presentation(report, presentation)
             all_entries.extend(entries)
             report += 1
 
@@ -152,7 +201,7 @@ class SecPreXmlParser(SecXmlParserBase):
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         df = df[~df.stmt.isnull()]
         df = df[df.line != 0].copy()
-        df.drop(['plabel', 'key'], axis=1, inplace=True)
+        df.drop(['plabel'], axis=1, inplace=True)
         df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
         df.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)

@@ -35,10 +35,12 @@ def compare():
     df_txt.rename(columns = lambda x: x + '_txt', inplace=True)
 
     df_xml.rename(columns = lambda x: x + '_xml', inplace=True)
+    print(df_txt.index.to_frame().dtypes)
+    print(df_xml.index.to_frame().dtypes)
 
     df_merge = pd.merge(df_txt, df_xml, how="outer", left_index=True, right_index=True)
 
-    df_diff = df_merge[(df_merge.negating_xml != df_merge.negating_txt)|(df_merge.inpth_xml != df_merge.inpth_txt)|(df_merge.rfile_xml != df_merge.rfile_txt)]
+    df_diff = df_merge[(df_merge.negating_xml != df_merge.negating_txt)|(df_merge.inpth_xml != df_merge.inpth_txt)]
 
     # nur noch EQ Eintrag vorhanden. Es scheint als wäre EQ 2mal vorhanden
     print("len xml: ", len(df_xml))

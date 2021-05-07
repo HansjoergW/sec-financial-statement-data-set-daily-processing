@@ -8,8 +8,8 @@ import os
 scriptpath = os.path.realpath(__file__ + "/..")
 
 xml_test_data_file = scriptpath + '/data/test_pre.xml'
-
 xml_expected_stripped_file = scriptpath + './data/test_pre_exp.xml'
+xml_unsorted_loc_file = scriptpath + './data/test_pre_unsorted_loc.xml'
 
 
 def test_strip_file():
@@ -117,3 +117,15 @@ def test_complete_file_parse():
         xml_content = f.read()
         df = parser.parse(xml_content)
         print(len(df))
+
+
+def test_unsorted_loc_file_parse():
+    with open(xml_unsorted_loc_file, "r", encoding="utf-8") as f:
+        xml_exp_content = f.read()
+    f.close()
+
+    parser = SecPreXmlParser()
+    df = parser.parse(xml_exp_content)
+    df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
+
+    assert len(df_clean[df_clean.index.isin(["IS"], level="stmt")]) > 0

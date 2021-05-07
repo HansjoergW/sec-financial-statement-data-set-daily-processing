@@ -48,7 +48,7 @@ class SecXmlParser:
                 df = parser.clean_for_financial_statement_dataset(df, accessionnr)
                 df.to_csv(targetfilepath, header=True, sep="\t")
 
-                return (targetfilepath, accessionnr, 'parsed')
+                return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)))
             except Exception as e:
                 logging.exception("failed to parse data: " + xml_file, e)
                 return (None, accessionnr, str(e))
