@@ -1,6 +1,10 @@
 Next
 ====
 - quartal vergleichen
+-- pre zip
+   -> report nummern können nicht verglichen werden -> quasi nur eine Trennung
+   -> oftmals sind Positionen  um 1 verschoben ->
+        evtl. spielt das keine Rolle, oder aber eine zusätzliche Info (wie z.B totalLabel :)
 
 - organistaion directory
   -https://docs.python-guide.org/writing/structure/

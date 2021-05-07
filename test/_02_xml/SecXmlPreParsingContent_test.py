@@ -33,7 +33,6 @@ def compare():
 
     df_txt.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
     df_txt.rename(columns = lambda x: x + '_txt', inplace=True)
-
     df_xml.rename(columns = lambda x: x + '_xml', inplace=True)
     print(df_txt.index.to_frame().dtypes)
     print(df_xml.index.to_frame().dtypes)
