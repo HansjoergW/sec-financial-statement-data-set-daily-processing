@@ -10,6 +10,7 @@ Next
   -https://docs.python-guide.org/writing/structure/
 
 - status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
+  -> File SecIndexIndexJsonParsing.py
   -> man sieht die letzte Bearbeitung
   -> man sieht die letzte Datei
   -> siehe auch Besondere Fehler

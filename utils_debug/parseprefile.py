@@ -11,8 +11,12 @@ if __name__ == '__main__':
     file_nok = "d:/secprocessing/xml/2021-05-02/vgz-20210331_pre.xml"
     file_empty= "d:/secprocessing/xml/2021-05-06/nvec-20210331_pre.xml"
     file_oder = "d:/secprocessing/xml/2021-04-24/uboh-20201231_pre.xml"
+    order_problem = "d:/secprocessing/xml/2021-04-24/temir-20200831_pre.xml"
+    key_problem = "d:/secprocessing/xml/2021-04-24/gbt-20201231_pre.xml"
+    more_than_one_root_node_problem = "d:/secprocessing/xml/2021-04-24/npk-20201231_pre.xml"
+    more_than_one_root_node_problem_2 = "d:/secprocessing/xml/2021-04-24/dov-20210331_pre.xml"
 
-    with open(file_oder, "r", encoding="utf-8") as f:
+    with open(more_than_one_root_node_problem_2, "r", encoding="utf-8") as f:
         content = f.read()
 
         parser = SecPreXmlParser()

@@ -5,6 +5,7 @@ import pandas as pd
 
 from lxml import etree
 from typing import Dict, List, Tuple, Optional
+import logging
 
 
 # there are documents, which define the linke namespace diretcly in the node itself, without a prefix
@@ -64,23 +65,94 @@ class SecPreXmlParser(SecXmlParserBase):
         # get order (line), and preferred_label (label, terselabel, totallabel, ...)
         result: Dict[str, Dict[str, str]] = {}
         arcs = presentation.findall('presentationArc', presentation.nsmap)
+        if len(arcs) == 0:
+            return result
 
-        line = 1
+        parent_child_dict: Dict[str, Dict[int, str]] = {}
+
+        to_list: List[str] = []
+        from_list: List[str] = []
+
         for arc in arcs:
             details: Dict[str,str] = {}
-            tag = arc.get('to')
-
+            to_tag = arc.get('to')
+            from_tag = arc.get('from')
             prefered_label = arc.get('preferredLabel')
+            order_nr = int(float(arc.get('order'))) # some xmls have 0.0, 1.0 ... as order number instead of a pure int
+
+            if from_tag not in parent_child_dict:
+                parent_child_dict[from_tag] = {}
+
+            parent_child_dict[from_tag][order_nr] = to_tag
+            to_list.append(to_tag)
+            from_list.append(from_tag)
 
             negated = False
             if prefered_label:
                 negated = "negated" in prefered_label
 
             details['preferredLabel'] = prefered_label
-            details['line'] = line
             details['negating'] = negated
 
-            result[tag] = details
+            result[to_tag] = details
+
+        # line calculation
+        root_node = set(from_list) - set(to_list)
+        if len(root_node) != 1:
+            raise Exception("more than one root node")
+
+        # the problem with the order number is, that the usage is not consistent.
+        # in some reports, every child node starts with zero, in others, it starts with 1.
+        # sometimes that is even mixed within the same presentation link.
+        # example (temir-20200831_pre.xml)
+        # other reports use a unique order number inside the presentation. (like gbt-20201231_pre.xml)
+        # in this case, this would directly reflect the line number which would be the most simple way to calculate
+        # so we first need to convert that in a simple ordered list which follows the defined order
+        parent_child_ordered_list: Dict[str, List[str]] = {}
+        for node_name, order_dict in parent_child_dict.items():
+            child_list: List[str] = []
+            for childkey in sorted(order_dict.keys()):
+                child_list.append(order_dict.get(childkey))
+            parent_child_ordered_list[node_name] = child_list
+
+
+        # in order to calculate the line numbers, it is necessary walk along the parent-child relationship of the
+        # presentation-arc while respecting the order number and starting with the root_node
+        # in order to that, a recursive loop is used
+        root_node = list(root_node)[0]
+
+        node_path: List[str] = [root_node] # used to track the path
+
+        # used to keep track of current processed child of these node
+        # the problem is, that in some documents the order starts with a 0, in others with 1
+        # in some documents, this is even mixed within the same presentation, so we need to figure out
+        # what the start key is
+        node_index: Dict[str, int] = {root_node : 0}
+
+        line = 1
+        while len(node_path) > 0:
+            current_node = node_path[-1]
+            current_index = node_index.get(current_node)
+            current_children_ordered_list = parent_child_ordered_list[current_node]
+
+            if current_index + 1 > len(current_children_ordered_list):
+                node_path.pop()
+                continue
+
+            node_index[current_node] = current_index + 1
+
+            child = current_children_ordered_list[0]
+
+            if child is None:
+                print("")
+
+            result[child]['line'] = line
+
+            grand_children = parent_child_ordered_list.get(child)
+            if grand_children is not None:
+                node_path.append(child)
+                node_index[child] = 0
+
             line += 1
 
         return result
@@ -183,7 +255,15 @@ class SecPreXmlParser(SecXmlParserBase):
         report = 1
         all_entries: List[Dict[str, str]] = []
         for presentation in presentation_links:
-            entries = self._process_presentation(report, presentation)
+            try:
+                entries = self._process_presentation(report, presentation)
+            except Exception as err:
+                # often a report contains a "presentation" entry with  more than one root node.
+                # so far, we do not handle this, since that type of problem is mainly in presentations which do
+                # not belong to the primary fincancial statements. so we ignore it
+                logging.info("skipped report: {}".format(str(err)))
+                continue
+
             all_entries.extend(entries)
             report += 1
 
