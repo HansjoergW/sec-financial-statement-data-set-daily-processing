@@ -2,9 +2,11 @@ Next
 ====
 - quartal vergleichen
 -- pre zip
-   -> report nummern können nicht verglichen werden -> quasi nur eine Trennung
-   -> oftmals sind Positionen  um 1 verschoben ->
-        evtl. spielt das keine Rolle, oder aber eine zusätzliche Info (wie z.B totalLabel :)
+    # problem, die gruppierung muss beim vergleich beachtet werden.
+    # es wird so eine art universelle gruppe benötigt.. so was wie
+    # statement-anz rows..
+    # vlt. würde es auch helfen, wenn nur die relevanten statements gefiltert
+    # werden. Vlt würde dann die Nummerierung stimmen..
 
 - organistaion directory
   -https://docs.python-guide.org/writing/structure/

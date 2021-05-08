@@ -87,6 +87,15 @@ class DBManager():
         finally:
             conn.close()
 
+    def get_files_for_adsh(self, adsh: str) -> Tuple[str, str, str, str, str]:
+        conn = self._get_connection()
+        try:
+            sql = '''SELECT accessionNumber, xmlPreFile, xmlNumFile, csvPreFile, csvNumFile FROM {} where accessionNumber = '{}' '''.format(SEC_REPORT_PROCESSING_TBL_NAME, adsh)
+            return conn.execute(sql).fetchone()
+        finally:
+            conn.close()
+
+
     def find_missing_xmlNumFiles(self) -> List[Tuple[str]]:
         conn = self._get_connection()
         try:

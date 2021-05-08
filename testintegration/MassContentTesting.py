@@ -62,7 +62,7 @@ def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFram
     process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
 
     process_pre_adsh_data = pd.read_csv(process_table_adsh_df.csvPreFile.to_list()[0], header=0, delimiter="\t")
-    process_pre_adsh_data.drop(columns=['rfile','report'], inplace=True)
+    process_pre_adsh_data.drop(columns=['rfile'], inplace=True)
 
     zip_pre_adsh_data = zip_pre_df[zip_pre_df.adsh == adsh].copy()
     compare_pre_content_for_adsh(adsh, zip_pre_adsh_data, process_pre_adsh_data)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     adshs_in_both: Set[str] = compare_adsh_entries(zip_sub_df, process_df)
 
     zip_pre_df_all = read_file_from_zip(quarterfile, "pre.txt")
-    zip_pre_df_all.drop(columns=['rfile','plabel','report'], inplace=True)
+    zip_pre_df_all.drop(columns=['rfile','plabel'], inplace=True)
 
     zip_num_df_all = read_file_from_zip(quarterfile, "num.txt")
 
@@ -101,5 +101,18 @@ if __name__ == '__main__':
     # zip_num_df_filtered = zip_num_df_all[zip_num_df_all.adsh.isin(adshs_in_both)]
 
     #compare_adsh_contents(adshs_in_both, process_df, zip_pre_df_all, zip_num_df_all)
-    compare_by_adsh("0001437749-21-005151", process_df, zip_pre_df_all, zip_num_df_all)
+    compare_by_adsh("'0001437749-21-005151'", process_df, zip_pre_df_all, zip_num_df_all)
+
+
+
+    # problem, die gruppierung muss beim vergleich beachtet
+    # es wird so eine art universelle gruppe benötigt.. so was wie
+    # statement-anz rows..
+    # vlt. würde es auch helfen, wenn nur die relevanten statements gefiltert
+    # (werden.)
+
+
+man müsste evtl. schrittweise vorgehen, d.h., zuerst prüfen, ob die Anzahl Reports/Statements stimmen, und von daher
+weitertesten. evtl. kann man so auch die reportnr richtigmachen.
+mit den reports könnte man auch gleich die anzahl einträge testen.
 

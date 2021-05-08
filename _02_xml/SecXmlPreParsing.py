@@ -98,6 +98,7 @@ class SecPreXmlParser(SecXmlParserBase):
 
         # line calculation
         root_node = set(from_list) - set(to_list)
+        # there should be just one rootnote, at least in the presentations we are interested in
         if len(root_node) != 1:
             raise Exception("more than one root node")
 
@@ -141,10 +142,7 @@ class SecPreXmlParser(SecXmlParserBase):
 
             node_index[current_node] = current_index + 1
 
-            child = current_children_ordered_list[0]
-
-            if child is None:
-                print("")
+            child = current_children_ordered_list[current_index]
 
             result[child]['line'] = line
 
