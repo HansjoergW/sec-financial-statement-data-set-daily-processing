@@ -4,22 +4,21 @@
 # 1. all 10-k and 10-q reports are of the zip files are available
 # are the contents in the csv file the same
 from _00_common.DBManagement import DBManager
+from _00_common.DebugUtils import DataAccessTool, DataAccessByAdshTool, ReparseTool
+
 import zipfile
 import pandas as pd
 from typing import List, Set
 
-
-def read_file_from_zip(zipfile_to_read: str, file_to_read: str) -> pd.DataFrame:
-    with zipfile.ZipFile(zipfile_to_read, "r") as myzip:
-        return pd.read_csv(myzip.open(file_to_read), header=0, delimiter="\t")
-
+dbg_tools = DataAccessTool("d:/secprocessing/")
+workdir_default = "d:/secprocessing/"
 
 def filter_relevant_reports(sub_df: pd.DataFrame) -> pd.DataFrame:
     return sub_df[sub_df.form.isin(['10-K', '10-Q'])].copy()
 
 
 def read_entries_from_sec_processing(dbm: DBManager, year: int, months: List[int]) -> pd.DataFrame:
-    conn = dbm._get_connection()
+    conn = dbm.get_connection()
     months = ','.join([str(month) for month in months])
 
     try:
@@ -43,6 +42,11 @@ def compare_adsh_entries(zip_df: pd.DataFrame, process_df: pd.DataFrame) -> Set[
 
 
 def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame):
+
+    hier müssen wir zuerst überlegen, wie mit der reportNr umgegangen werden soll.
+    das ganze vlt. besser in einem jupyter notebook ausprobieren?
+
+
     zip_pre_df.set_index(['adsh', 'tag','version', 'stmt', 'line'], inplace=True)
     process_pre_data.set_index(['adsh', 'tag','version', 'stmt', 'line'], inplace=True)
 
@@ -58,10 +62,8 @@ def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pr
     print(outstr)
 
 
-def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame):
-    process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
-
-    process_pre_adsh_data = pd.read_csv(process_table_adsh_df.csvPreFile.to_list()[0], header=0, delimiter="\t")
+def compare_by_adsh_and_file(adsh: str, csvPreFile: str, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame):
+    process_pre_adsh_data = pd.read_csv(csvPreFile, header=0, delimiter="\t")
     process_pre_adsh_data.drop(columns=['rfile'], inplace=True)
 
     zip_pre_adsh_data = zip_pre_df[zip_pre_df.adsh == adsh].copy()
@@ -72,36 +74,56 @@ def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFram
     # print("")
 
 
+def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame):
+    process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
+    csvPreFile = process_table_adsh_df.csvPreFile.to_list()[0]
+    compare_by_adsh(adsh, csvPreFile, zip_pre_df, zip_num_df)
+
+
 def compare_adsh_contents(adshs_in_both: Set[str], process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame):
-
     for adsh in adshs_in_both:
-        compare_by_adsh(adsh, process_df, zip_pre_df, zip_num_df)
+        process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
+        csvPreFile = process_table_adsh_df.csvPreFile.to_list()[0]
+        compare_by_adsh(adsh, csvPreFile, zip_pre_df, zip_num_df)
 
-if __name__ == '__main__':
-    workdir_default = "d:/secprocessing/"
-    quarterfile = "d:/secprocessing/quarterzip/2021q1.zip"
+
+def compare_all():
+    quarterfile = dbg_tools._get_zipfilename(2021, 1)
     feed_year: int = 2021
     feed_months: List[int] = [1,2,3]
 
-    dbm = DBManager(workdir_default)
+    dbm = dbg_tools.dbmgr
 
-    zip_sub_df_all = read_file_from_zip(quarterfile, "sub.txt")
+    zip_sub_df_all = dbg_tools._read_file_from_zip(quarterfile, "sub.txt")
     zip_sub_df = filter_relevant_reports(zip_sub_df_all)
 
     process_df = read_entries_from_sec_processing(dbm, feed_year, feed_months)
 
-    adshs_in_both: Set[str] = compare_adsh_entries(zip_sub_df, process_df)
-
-    zip_pre_df_all = read_file_from_zip(quarterfile, "pre.txt")
+    zip_pre_df_all = dbg_tools._read_file_from_zip(quarterfile, "pre.txt")
     zip_pre_df_all.drop(columns=['rfile','plabel'], inplace=True)
 
-    zip_num_df_all = read_file_from_zip(quarterfile, "num.txt")
+    zip_num_df_all = dbg_tools._read_file_from_zip(quarterfile, "num.txt")
 
+
+    adshs_in_both: Set[str] = compare_adsh_entries(zip_sub_df, process_df)
     # zip_pre_df_filtered = zip_pre_df_all[zip_pre_df_all.adsh.isin(adshs_in_both)]
     # zip_num_df_filtered = zip_num_df_all[zip_num_df_all.adsh.isin(adshs_in_both)]
 
     #compare_adsh_contents(adshs_in_both, process_df, zip_pre_df_all, zip_num_df_all)
+
     compare_by_adsh("'0001437749-21-005151'", process_df, zip_pre_df_all, zip_num_df_all)
+
+
+def reparse_pre():
+    reparse = ReparseTool(workdir_default)
+    reparse.reparse_pre(2021, [1,2,3], 'd:/secprocessing/tmp/precsv/')
+
+
+if __name__ == '__main__':
+    #compare_all()
+    #reparse_pre()
+    pass
+
 
 
 
@@ -112,7 +134,7 @@ if __name__ == '__main__':
     # (werden.)
 
 
-man müsste evtl. schrittweise vorgehen, d.h., zuerst prüfen, ob die Anzahl Reports/Statements stimmen, und von daher
-weitertesten. evtl. kann man so auch die reportnr richtigmachen.
-mit den reports könnte man auch gleich die anzahl einträge testen.
+    # man müsste evtl. schrittweise vorgehen, d.h., zuerst prüfen, ob die Anzahl Reports/Statements stimmen, und von daher
+    # weitertesten. evtl. kann man so auch die reportnr richtigmachen.
+    # mit den reports könnte man auch gleich die anzahl einträge testen.
 

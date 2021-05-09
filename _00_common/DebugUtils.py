@@ -1,9 +1,13 @@
 from _00_common.DBManagement import DBManager
+from _02_xml.SecXmlFileParsing import SecXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 
+from typing import List, Dict, Tuple
 import pandas as pd
 import zipfile
 
-class Tools():
+
+class DataAccessTool():
     def __init__(self, workdir = './'):
         if workdir[-1] != '/':
             data_dir = workdir + '/'
@@ -50,10 +54,10 @@ class Tools():
         return pd.read_csv(csvnum, header=0, delimiter="\t")
 
 
-class AdshTool():
+class DataAccessByAdshTool():
 
     def __init__(self, workdir: str, adsh: str, year: int, qrtr: int):
-        self.tool = Tools(workdir)
+        self.tool = DataAccessTool(workdir)
         self.adsh = adsh
         self.year = year
         self.qrtr = qrtr
@@ -77,9 +81,39 @@ class AdshTool():
         return self.tool.get_num_csv_as_df_by_adsh(self.adsh)
 
 
+class ReparseTool():
+
+    def __init__(self, workdir: str):
+        self.tool = DataAccessTool(workdir)
+
+    def get_xml_files_info_from_sec_processing(self, year: int, months: List[int]) -> List[Tuple[str, str, str]]:
+        conn = self.tool.dbmgr.get_connection()
+        months = ','.join([str(month) for month in months])
+
+        try:
+            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE filingYear = {} and filingMonth in ({}) and xmlPreFile not null and xmlNumFile not null '''.format(year, months)
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def reparse_pre(self, year: int, months: List[int], targetFolder: str):
+        xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing(year, months)
+        pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
+
+        select_funct = lambda : pre_xml_files_info
+
+        def update_function(data:List[Tuple[str, str, str, str]]):
+            for entry in data:
+                print(entry)
+
+        preParser = SecPreXmlParser()
+        xmlParser = SecXmlParser(None, targetFolder)
+        xmlParser._parse(preParser, select_funct, update_function)
+
 
 if __name__ == '__main__':
-    adsh_tool = AdshTool("d:/secprocessing/", '0001437749-21-005151', 2021, 1)
+    # short test to check if all methods can be executed
+    adsh_tool = DataAccessByAdshTool("d:/secprocessing/", '0001437749-21-005151', 2021, 1)
     adsh_tool.get_pre_from_qrtr_zip()
     adsh_tool.get_num_from_qrtr_zip()
     adsh_tool.get_pre_xml_content()

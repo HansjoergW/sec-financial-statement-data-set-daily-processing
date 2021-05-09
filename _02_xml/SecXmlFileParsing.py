@@ -30,7 +30,6 @@ class SecXmlParser:
         self.numparser = SecNumXmlParser()
         self.preparser = SecPreXmlParser()
 
-
     @staticmethod
     def _parse_file(data_tuple: Tuple[str]) -> (pd.DataFrame, str):
         accessionnr: str = data_tuple[0]
@@ -56,8 +55,8 @@ class SecXmlParser:
     def _parse(self, parser: SecXmlParserBase, select_funct: Callable, update_funct: Callable):
         pool = Pool(8)
 
-        missing:List[Tuple[str]] = select_funct()
-        missing = [(*entry, self.data_dir, parser) for entry in missing]
+        missing: List[Tuple[str, str]] = select_funct()
+        missing: List[Tuple[str, str, str, str]] = [(*entry, self.data_dir, parser) for entry in missing]
         logging.info("   missing entries " + str(len(missing)))
 
         for i in range(0, len(missing), 100):
@@ -71,7 +70,6 @@ class SecXmlParser:
             logging.info("   commited chunk: " + str(i))
 
         # todo failed berechnen oder aus update_data extrahieren
-
 
     def parseNumFiles(self):
         logging.info("parsing Num Files")

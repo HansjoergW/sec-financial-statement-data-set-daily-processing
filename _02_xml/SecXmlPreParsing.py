@@ -230,8 +230,11 @@ class SecPreXmlParser(SecXmlParserBase):
         return None
 
     def _process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
-        entries = self._get_presentation_tag_info(presentation)
         stmt = self._find_statement_in_presentation(presentation)
+        if stmt is None: # if this presentation does not reflect a "real primary statement" it is ignored
+            return []
+
+        entries = self._get_presentation_tag_info(presentation)
         inpth = 0
         presentation_role = presentation.get('role',"").lower()
         if "parenthetical" in presentation_role:

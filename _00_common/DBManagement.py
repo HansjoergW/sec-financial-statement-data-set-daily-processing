@@ -27,7 +27,7 @@ class DBManager():
         self.work_dir = work_dir
         self.database = os.path.join(self.work_dir, 'sec_processing.db')
 
-    def _get_connection(self):
+    def get_connection(self):
         return sqlite3.connect(self.database)
 
     def _create_db(self):
@@ -41,7 +41,7 @@ class DBManager():
         if not os.path.isdir(self.work_dir):
             os.makedirs(self.work_dir)
 
-        conn = self._get_connection()
+        conn = self.get_connection()
         curr = conn.cursor()
         for sqlfile in sqlfiles:
             script = open(sqlfile, 'r').read()
@@ -51,7 +51,7 @@ class DBManager():
 
     # ---- index files / sec-feed-file table
     def read_all_index_files(self) -> pd.DataFrame:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT * FROM {}'''.format(SEC_INDEX_FILE_TBL_NAME)
             return pd.read_sql_query(sql, conn)
@@ -59,7 +59,7 @@ class DBManager():
             conn.close()
 
     def insert_index_file(self, name:str, processdate:str):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''INSERT INTO {} ('sec_feed_file','status', 'processdate') VALUES('{}','progress','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
             conn.execute(sql)
@@ -70,7 +70,7 @@ class DBManager():
             conn.close()
 
     def update_index_file(self, name:str, processdate:str):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
             conn.execute(sql)
@@ -80,7 +80,7 @@ class DBManager():
 
     # - processing file / sec-report-processing table
     def read_all_processing(self) -> pd.DataFrame:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT * FROM {}'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             return pd.read_sql_query(sql, conn)
@@ -88,7 +88,7 @@ class DBManager():
             conn.close()
 
     def get_files_for_adsh(self, adsh: str) -> Tuple[str, str, str, str, str]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlPreFile, xmlNumFile, csvPreFile, csvNumFile FROM {} where accessionNumber = '{}' '''.format(SEC_REPORT_PROCESSING_TBL_NAME, adsh)
             return conn.execute(sql).fetchone()
@@ -96,8 +96,8 @@ class DBManager():
             conn.close()
 
 
-    def find_missing_xmlNumFiles(self) -> List[Tuple[str]]:
-        conn = self._get_connection()
+    def find_missing_xmlNumFiles(self) -> List[Tuple[str, str]]:
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xbrlInsUrl FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
@@ -105,8 +105,8 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_missing_xmlPreFiles(self) -> List[Tuple[str]]:
-        conn = self._get_connection()
+    def find_missing_xmlPreFiles(self) -> List[Tuple[str, str]]:
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xbrlPreUrl FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
@@ -115,7 +115,7 @@ class DBManager():
             conn.close()
 
     def update_processing_xml_num_file(self, update_data: List[Tuple[str]]):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET xmlNumFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
@@ -124,7 +124,7 @@ class DBManager():
             conn.close()
 
     def update_processing_xml_pre_file(self, update_data: List[Tuple[str]]):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET xmlPreFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
@@ -133,7 +133,7 @@ class DBManager():
             conn.close()
 
     def find_unparsed_numFiles(self) -> List[Tuple[str]]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
@@ -142,7 +142,7 @@ class DBManager():
             conn.close()
 
     def find_unparsed_preFiles(self) -> List[Tuple[str]]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
@@ -151,7 +151,7 @@ class DBManager():
             conn.close()
 
     def update_parsed_num_file(self, update_data: List[Tuple[str]]):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
@@ -160,7 +160,7 @@ class DBManager():
             conn.close()
 
     def update_parsed_pre_file(self, update_data: List[Tuple[str]]):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
@@ -170,7 +170,7 @@ class DBManager():
 
     # - report metadata / sec-feed table
     def read_all(self) -> pd.DataFrame:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT * FROM {}'''.format(SEC_FEED_TBL_NAME)
             return pd.read_sql_query(sql, conn)
@@ -178,14 +178,14 @@ class DBManager():
             conn.close()
 
     def insert_feed_info(self, df: pd.DataFrame):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             df.to_sql(SEC_FEED_TBL_NAME, conn, if_exists="append", chunksize=1000)
         finally:
             conn.close()
 
     def find_missing_xbrl_ins_urls(self) -> List[Tuple[str]]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl FROM {} WHERE xbrlInsUrl is NULL'''.format(
                 SEC_FEED_TBL_NAME)
@@ -196,7 +196,7 @@ class DBManager():
 
     # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET xbrlInsUrl = ? WHERE accessionNumber = ?'''.format(SEC_FEED_TBL_NAME)
             conn.executemany(sql, update_data)
@@ -205,7 +205,7 @@ class DBManager():
             conn.close()
 
     def get_adsh_by_feed_file(self, feed_file_name:str) -> Set[str]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber FROM sec_feeds where sec_feed_file == '{}' '''.format(feed_file_name)
             result: List[Tuple[str]] = conn.execute(sql).fetchall()
@@ -214,7 +214,7 @@ class DBManager():
             conn.close()
 
     def find_duplicated_adsh(self) -> List[str]:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM sec_feeds WHERE status is null GROUP BY accessionNumber'''
             duplicated_df = pd.read_sql_query(sql, conn)
@@ -226,7 +226,7 @@ class DBManager():
             conn.close()
 
     def mark_duplicated_adsh(self, adsh: str):
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, sec_feed_file FROM sec_feeds WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(adsh)
             result: List[Tuple[str]] = conn.execute(sql).fetchall()
@@ -239,7 +239,7 @@ class DBManager():
 
     # copies entries from the feed table to the processing table if they are not already present
     def copy_uncopied_entries(self) -> int:
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
             to_copy_df =  pd.read_sql_query(sql, conn)
@@ -272,7 +272,7 @@ class DBManager():
             "INSERT INTO sec_feeds ('accessionNumber', 'companyName', 'formType', 'filingDate', 'cikNumber', 'fileNumber', 'acceptanceDatetime', 'period', 'assistantDirector', 'assignedSic', 'fiscalYearEnd', 'xbrlInsUrl', 'xbrlCalUrl', 'xbrlDefUrl', 'xbrlLabUrl', 'xbrlPreUrl','sec_feed_file') VALUES ('0001564590-21-009507', 'Gores Holdings V Inc.', '10-K', '02/26/2021', '0001816816', '001-39429', '20210226172257', '20201231', 'Office of Real Estate & Construction', '6770', '1231', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-10k_20201231_htm.xml', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-20201231_cal.xml', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-20201231_def.xml', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-20201231_lab.xml', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-20201231_pre.xml','file1.xml');"
         ]
 
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             for sql in inserts:
                 conn.execute(sql)
@@ -291,7 +291,7 @@ class DBManager():
             "INSERT INTO sec_report_processing ('accessionNumber', 'formType', 'filingDate', 'cikNumber', 'xbrlInsUrl', 'xbrlPreUrl', 'xmlNumFile', 'xmlPreFile') VALUES ('0001564590-21-009507', '10-K', '02/26/2021', '0001816816', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-10k_20201231_htm.xml', 'https://www.sec.gov/Archives/edgar/data/1816816/000156459021009507/grsv-20201231_pre.xml', '{0}grsv-10k_20201231_htm.xml', '{0}grsv-20201231_pre.xml')".format(testdata_path)
         ]
 
-        conn = self._get_connection()
+        conn = self.get_connection()
         try:
             for sql in inserts:
                 conn.execute(sql)
