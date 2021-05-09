@@ -9,6 +9,8 @@ from _00_common.DebugUtils import DataAccessTool, DataAccessByAdshTool, ReparseT
 import zipfile
 import pandas as pd
 from typing import List, Set
+import glob
+import os
 
 dbg_tools = DataAccessTool("d:/secprocessing/")
 workdir_default = "d:/secprocessing/"
@@ -91,10 +93,10 @@ def compare_by_adsh_and_file(adsh: str, csvPreFile: str, zip_pre_adsh_df: pd.Dat
 
 
 def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame, use_temp_folder: bool):
-    process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
     if use_temp_folder:
         csvPreFile = f'D:/secprocessing/tmp/precsv/{adsh}_pre.csv'
     else:
+        process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
         csvPreFile = process_table_adsh_df.csvPreFile.to_list()[0]
     zip_pre_adsh_df = zip_pre_df[zip_pre_df.adsh == adsh].copy()
     compare_by_adsh_and_file(adsh, csvPreFile, zip_pre_adsh_df, zip_num_df)
@@ -131,10 +133,24 @@ def compare_all():
 
     #compare_by_adsh("'0001437749-21-005151'", process_df, zip_pre_df_all, zip_num_df_all)
 
+def compare_from_test_dir():
+    quarterfile = dbg_tools._get_zipfilename(2021, 1)
+    pre_test_dir = 'd:/secprocessing/tmp/precsv/'
+    files = glob.glob(pre_test_dir + "*.csv")
+    files: List[str] = [os.path.basename(path) for path in files]
+    adshs: Set[str] = set([x.split('_')[0] for x in files])
 
-def reparse_pre():
+    dbm = dbg_tools.dbmgr
+
+    zip_pre_df_all = dbg_tools._read_file_from_zip(quarterfile, "pre.txt")
+    zip_pre_df_all = zip_pre_df_all[zip_pre_df_all.adsh.isin(adshs)].copy()
+    zip_pre_df_all.drop(columns=['rfile','plabel'], inplace=True)
+
+    compare_adsh_contents(adshs, None, zip_pre_df_all, None, True)
+
+def reparse_pre(count: int):
     reparse = ReparseTool(workdir_default)
-    reparse.reparse_pre(2021, [1,2,3], 'd:/secprocessing/tmp/precsv/')
+    reparse.reparse_pre(2021, [1,2,3], 'd:/secprocessing/tmp/precsv/', count)
 
 
 def direct_test():
@@ -154,8 +170,9 @@ def direct_test():
 
 if __name__ == '__main__':
     #compare_all()
-    #reparse_pre()
-    direct_test()
+    compare_from_test_dir()
+    #reparse_pre(100)
+    #direct_test()
     pass
 
 

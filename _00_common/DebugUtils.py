@@ -86,18 +86,22 @@ class ReparseTool():
     def __init__(self, workdir: str):
         self.tool = DataAccessTool(workdir)
 
-    def get_xml_files_info_from_sec_processing(self, year: int, months: List[int]) -> List[Tuple[str, str, str]]:
+    def get_xml_files_info_from_sec_processing(self, year: int, months: List[int], count: int = None) -> List[Tuple[str, str, str]]:
         conn = self.tool.dbmgr.get_connection()
         months = ','.join([str(month) for month in months])
 
         try:
-            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE filingYear = {} and filingMonth in ({}) and xmlPreFile not null and xmlNumFile not null '''.format(year, months)
-            return conn.execute(sql).fetchall()
+            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE filingYear = {} and filingMonth in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(year, months)
+            result: List[Tuple[str, str, str]] =  conn.execute(sql).fetchall()
+            if count is not None:
+                return result[:count]
+            else:
+                return result
         finally:
             conn.close()
 
-    def reparse_pre(self, year: int, months: List[int], targetFolder: str):
-        xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing(year, months)
+    def reparse_pre(self, year: int, months: List[int], targetFolder: str, count: int = None):
+        xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing(year, months, count)
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
 
         select_funct = lambda : pre_xml_files_info

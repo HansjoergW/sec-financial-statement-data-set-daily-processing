@@ -191,7 +191,7 @@ class SecPreXmlParser(SecXmlParserBase):
         loc_content = self._get_loc_content(presentation)
 
         result: List[Dict[str, str]] = []
-        for k in loc_content.keys():
+        for k in presentation_arc_content.keys():
             details = {}
             loc_content_entry = loc_content[k]
             pre_arc_content_entry = presentation_arc_content.get(k)

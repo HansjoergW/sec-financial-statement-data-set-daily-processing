@@ -28,5 +28,9 @@ if __name__ == '__main__':
         df_clean = parser.clean_for_financial_statement_dataset(df, "accnr")
         print(df_clean.shape) # die meisten attribute sind im index, daher ist die anzahl der spalten nur 3
 
-proble -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor
+problem -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor
 es muss zwischen key und tag/label unterschieden werden
+bei beispiel ist terse und total  unterschiedlich..
+d.h. aber, dass mehrere locs aufs selbe presentation_arc zeigen
+entsprechend muss beim iterieren aufgepasst werden.
+es gibt anscheined locs, die haben kein presentation.. -> evtl. sollten wir nur presentation_beachten.
