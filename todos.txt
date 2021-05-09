@@ -1,5 +1,12 @@
 Next
 ====
+- berechnen pre-xml
+
+    problem -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor
+    es muss zwischen key und tag/label unterschieden werden
+    evtl. mit terse/totallabel ?
+
+
 - quartal vergleichen
 -- pre zip
     # problem, die gruppierung muss beim vergleich beachtet werden.

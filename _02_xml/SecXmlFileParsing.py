@@ -15,14 +15,16 @@ from multiprocessing import Pool
 
 class SecXmlParser:
 
-    def __init__(self, dbmanager: DBManager, data_dir: str = "./tmp/data/"):
+    def __init__(self, dbmanager: DBManager, data_dir: str = "./tmp/data/", use_process_date_in_path: bool = True):
         self.dbmanager = dbmanager
         self.processdate = datetime.date.today().isoformat()
+        self.data_dir = data_dir
 
-        if data_dir[-1] != '/':
-            data_dir = data_dir + '/'
+        if self.data_dir[-1] != '/':
+            self.data_dir = data_dir + '/'
 
-        self.data_dir = data_dir + self.processdate + '/'
+        if use_process_date_in_path:
+            self.data_dir = self.data_dir + self.processdate + '/'
 
         if not os.path.isdir(self.data_dir):
             os.makedirs(self.data_dir)

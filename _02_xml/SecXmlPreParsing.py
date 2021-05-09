@@ -34,6 +34,7 @@ class SecPreXmlParser(SecXmlParserBase):
     default_ns_regex = re.compile(r"xmlns=\"http://www.xbrl.org/2003/linkbase\"", re.IGNORECASE)
 
     stmt_map:Dict[str,str] = {'Cover': 'CP',
+                              'DocumentAndEntityInformation': 'CP',
                               'IncomeStatement': 'IS',
                               'StatementOfIncomeAndComprehensiveIncome': 'CI',
                               'StatementOfFinancialPosition': 'BS',
@@ -280,6 +281,8 @@ class SecPreXmlParser(SecXmlParserBase):
         return df
 
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+        if len(df) == 0:
+            return df
         df = df[~df.stmt.isnull()]
         df = df[df.line != 0].copy()
         df.drop(['plabel'], axis=1, inplace=True)

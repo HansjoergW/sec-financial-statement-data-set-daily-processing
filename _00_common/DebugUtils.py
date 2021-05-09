@@ -107,7 +107,7 @@ class ReparseTool():
                 print(entry)
 
         preParser = SecPreXmlParser()
-        xmlParser = SecXmlParser(None, targetFolder)
+        xmlParser = SecXmlParser(None, targetFolder, False)
         xmlParser._parse(preParser, select_funct, update_function)
 
 
