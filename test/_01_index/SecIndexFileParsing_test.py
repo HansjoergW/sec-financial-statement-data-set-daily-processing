@@ -1,9 +1,10 @@
-from src._01_index.SecIndexFileParsing import SecIndexFileParser
+from _01_index.SecIndexFileParsing import SecIndexFileParser
 import shutil
 import os
 import pytest
 
-folder = "./tmp"
+scriptpath = os.path.realpath(__file__ + "/..")
+folder = scriptpath + "/tmp"
 
 
 @pytest.fixture(scope="module")

@@ -1,4 +1,4 @@
-from src._02_xml import SecNumXmlParser
+from _02_xml.SecXmlNumParsing import SecNumXmlParser
 
 # special cases
 # "huge text node"    file_nok ="d:/secprocessing/xml/2021-04-24/breit-20201231.xml"       # 0001564590-21-013907

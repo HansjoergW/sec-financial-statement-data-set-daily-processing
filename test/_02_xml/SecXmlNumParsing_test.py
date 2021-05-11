@@ -1,8 +1,11 @@
-from src._02_xml import SecNumXmlParser
+from _02_xml.SecXmlNumParsing import SecNumXmlParser
 
 from typing import Dict, Tuple, Optional
 from lxml import etree, objectify
+import os
 
+scriptpath = os.path.realpath(__file__ + "/..")
+datafolder = scriptpath + "/data/"
 
 xml_test_data = """<?xml version="1.0" encoding="utf-8"?>
 <xbrl
@@ -152,7 +155,7 @@ def test_parse():
 
 
 def test_complete_file_parse():
-    xml_file = "/data/aapl-20200926_htm.xml"
+    xml_file = datafolder + "aapl-20200926_htm.xml"
     parser = SecNumXmlParser()
 
     with open(xml_file, "r", encoding="utf-8") as f:

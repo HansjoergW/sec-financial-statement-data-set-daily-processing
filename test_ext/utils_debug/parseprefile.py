@@ -1,4 +1,4 @@
-from src._02_xml import SecPreXmlParser
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
 
 #special cases
 # default namespace  xmlns="http://www.xbrl.org/2003/linkbase": d:/secprocessing/xml/2021-05-02/vgz-20210331_pre.xml

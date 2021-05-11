@@ -1,13 +1,17 @@
-from src._02_xml import SecNumXmlParser
+from _02_xml.SecXmlNumParsing import SecNumXmlParser
 
 import pandas as pd
+import os
+
+scriptpath = os.path.realpath(__file__ + "/..")
+datafolder = scriptpath + "/data/"
 
 # An example of a test which compares the content of the num-xml with the data of the same company contained in the
 # quarterly num-txt file
 
 
-text_file = "/data/num_apple_10k_2020_q4.txt"
-xml_file = "/data/aapl-20200926_htm.xml"
+text_file = datafolder +"num_apple_10k_2020_q4.txt"
+xml_file = datafolder + "aapl-20200926_htm.xml"
 
 
 def read_txt() -> pd.DataFrame:

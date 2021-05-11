@@ -3,8 +3,8 @@
 # Checks that are done:
 # 1. all 10-k and 10-q reports are of the zip files are available
 # are the contents in the csv file the same
-from src._00_common import DBManager
-from src._00_common import DataAccessTool, ReparseTool
+from _00_common.DBManagement import DBManager
+from _00_common.DebugUtils import DataAccessTool, ReparseTool
 
 import pandas as pd
 from typing import List, Set

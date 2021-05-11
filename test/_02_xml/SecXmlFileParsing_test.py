@@ -1,11 +1,12 @@
-from src._00_common import DBManager
-from src._02_xml.SecXmlFileParsing import SecXmlParser
+from _00_common.DBManagement import DBManager
+from _02_xml.SecXmlFileParsing import SecXmlParser
 import shutil
 import pytest
 import glob
+import os
 
-folder = "./tmp"
-
+scriptpath = os.path.realpath(__file__ + "/..")
+folder = scriptpath + "/tmp"
 
 @pytest.fixture(scope="module")
 def dbmgr():
@@ -23,7 +24,7 @@ def test_parse_num_xml(dbmgr: DBManager):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parseNumFiles()
 
-    files = glob.glob("./tmp/data/*/*num.csv")
+    files = glob.glob(folder + "/data/*/*num.csv")
     assert len(files) == 7
 
     df = dbmgr.read_all_processing()
@@ -34,7 +35,7 @@ def test_parse_pre_xml(dbmgr: DBManager):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parsePreFiles()
 
-    files = glob.glob("./tmp/data/*/*pre.csv")
+    files = glob.glob(folder + "/data/*/*num.csv")
     assert 7 == len(files)
 
     df = dbmgr.read_all_processing()

@@ -4,7 +4,7 @@ import calendar
 import pandas as pd
 from typing import Dict, List, Tuple
 
-file = "/data/aapl-20200926_pre.xml"
+file = "../data/aapl-20200926_pre.xml"
 target_pre_clean_xml = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre-clean.xml"
 
 remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)

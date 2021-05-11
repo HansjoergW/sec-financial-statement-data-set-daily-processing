@@ -1,9 +1,12 @@
-from src._00_common import DBManager
-from src._01_index import SecIndexFileProcessor
+from _00_common.DBManagement import DBManager
+from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 import shutil
 import pytest
+import os
 
-folder = "./tmp"
+scriptpath = os.path.realpath(__file__ + "/..")
+folder = scriptpath + "/tmp"
+
 
 @pytest.fixture(scope="module")
 def dbmgr():
