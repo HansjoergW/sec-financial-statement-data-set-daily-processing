@@ -1,5 +1,5 @@
-from _00_common.DBManagement import DBManager
-from _01_index.SecIndexFileProcessing import SecXmlFilesProcessor
+from src._00_common import DBManager
+from src._01_index import SecXmlFilesProcessor
 
 if __name__ == '__main__':
     dbm = DBManager("d:/secprocessing/")

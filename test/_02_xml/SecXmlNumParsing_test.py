@@ -1,6 +1,6 @@
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
+from src._02_xml import SecNumXmlParser
 
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, Tuple, Optional
 from lxml import etree, objectify
 
 
@@ -152,7 +152,7 @@ def test_parse():
 
 
 def test_complete_file_parse():
-    xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm.xml"
+    xml_file = "/data/aapl-20200926_htm.xml"
     parser = SecNumXmlParser()
 
     with open(xml_file, "r", encoding="utf-8") as f:

@@ -1,6 +1,5 @@
-from _00_common.DBManagement import DBManager
-from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
-from _02_xml.SecXmlFileParsing import SecXmlParser
+from src._00_common import DBManager
+from src._02_xml.SecXmlFileParsing import SecXmlParser
 import shutil
 import pytest
 import glob

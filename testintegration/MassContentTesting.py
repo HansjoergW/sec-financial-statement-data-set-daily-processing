@@ -3,10 +3,9 @@
 # Checks that are done:
 # 1. all 10-k and 10-q reports are of the zip files are available
 # are the contents in the csv file the same
-from _00_common.DBManagement import DBManager
-from _00_common.DebugUtils import DataAccessTool, DataAccessByAdshTool, ReparseTool
+from src._00_common import DBManager
+from src._00_common import DataAccessTool, ReparseTool
 
-import zipfile
 import pandas as pd
 from typing import List, Set
 import glob
@@ -53,6 +52,9 @@ def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: 
 
     zip_report_count.rename(columns = lambda x: x + '_count_zip', inplace=True)
     process_report_count.rename(columns = lambda x: x + '_count_xml', inplace=True)
+
+    if (len(zip_report_count) != len(process_report_count)):
+        print('count diff', end = ' : ')
 
     df_merge = pd.merge(zip_report_count, process_report_count, how="outer", left_index=True, right_index=True)
     df_diff = df_merge[(df_merge.adsh_count_zip != df_merge.adsh_count_xml)]
@@ -159,7 +161,7 @@ def direct_test():
     # 0001558370-21-002205
     #    CoverPage missing
 
-    adsh = '0001564590-21-015517'
+    adsh = '0000004457-21-000019'
     preCsvFile = f'D:/secprocessing/tmp/precsv/{adsh}_pre.csv'
     #preCsvFile = 'd:/secprocessing/csv/2021-05-08/0000883984-21-000005_pre.csv'
     quarterfile = dbg_tools._get_zipfilename(2021, 1)
@@ -170,9 +172,10 @@ def direct_test():
 
 if __name__ == '__main__':
     #compare_all()
-    compare_from_test_dir()
     #reparse_pre(100)
-    #direct_test()
+    #compare_from_test_dir()
+    #reparse_pre(100)
+    direct_test()
     pass
 
 

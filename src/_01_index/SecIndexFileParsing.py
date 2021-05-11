@@ -4,7 +4,7 @@ import os
 import logging
 import pandas as pd
 from lxml import etree
-from typing import List, Dict
+from typing import Dict
 
 FEED_FIELDS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',

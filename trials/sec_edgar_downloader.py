@@ -1,4 +1,4 @@
-from _00_common import indexer as ix
+from src._00_common import indexer as ix
 work_dir = 'd:/edgar'
 from_year = 2021
 to_year = 2021

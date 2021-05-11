@@ -1,6 +1,6 @@
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from src._02_xml import SecPreXmlParser
 
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 from lxml import etree
 import os
 
@@ -110,7 +110,7 @@ def test_clean_for_pure_pre():
 
 
 def test_complete_file_parse():
-    xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre.xml"
+    xml_file = "/data/aapl-20200926_pre.xml"
     parser = SecPreXmlParser()
 
     with open(xml_file, "r", encoding="utf-8") as f:

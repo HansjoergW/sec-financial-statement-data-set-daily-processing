@@ -1,10 +1,11 @@
 Next
 ====
 - berechnen pre-xml
-
-    problem -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor
-    es muss zwischen key und tag/label unterschieden werden
-    evtl. mit terse/totallabel ?
+ - vlt sollte man sich zuerst nur auf fehlende reports konzentrieren
+   -> könnte man höchstens über die anzahl lösen ->
+   -> das grösste problem ist aber, dass die report nummer nicht stimmt
+   -> vlt wäre es besser, zuerst nur stmt:anzahl Zeilen zu vergleichen, also wirklich eine spezielles report tag  zu generieren
+ - nicht beachten der speziellen "srt" Zeilen
 
 
 - quartal vergleichen
@@ -52,6 +53,9 @@ Besondere Fehler
 
 Done
 ====
+09.05.2021  - Masstest für teiltestset mit erneutem parsing
+            - nur relevante statements parsen
+08.05.2021  - line Eintrag aufgrund Hierarchie berechnet
 04.05.2021  - alle Daten nochmals durchparsen
 03.05.2021  - Fehler prüfen -> "huge text node"
 02.05.2021  - Quartal durchparsen -> nur 2 'leere' numfiles können nicht vearbeitet werden

@@ -1,5 +1,5 @@
-from _00_common.DBManagement import DBManager
-from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
+from src._00_common import DBManager
+from src._01_index import SecIndexFileProcessor
 import shutil
 import pytest
 

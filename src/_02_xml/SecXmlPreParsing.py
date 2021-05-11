@@ -4,7 +4,7 @@ import re
 import pandas as pd
 
 from lxml import etree
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 import logging
 
 
@@ -75,18 +75,28 @@ class SecPreXmlParser(SecXmlParserBase):
         from_list: List[str] = []
 
         for arc in arcs:
+            from_list.append(arc.get('from'))
+            to_list.append(arc.get('to'))
+
+        for arc in arcs:
             details: Dict[str,str] = {}
             to_tag = arc.get('to')
             from_tag = arc.get('from')
             prefered_label = arc.get('preferredLabel')
+
+            # it is possible, that the same to_tag appears twice with different prefered_label
+            # but this is only the case, if the to_tag is not also a from_tag
+            if to_tag in from_list:
+                key_tag = to_tag
+            else:
+                key_tag = to_tag + "." + prefered_label
+
             order_nr = int(float(arc.get('order'))) # some xmls have 0.0, 1.0 ... as order number instead of a pure int
 
             if from_tag not in parent_child_dict:
                 parent_child_dict[from_tag] = {}
 
-            parent_child_dict[from_tag][order_nr] = to_tag
-            to_list.append(to_tag)
-            from_list.append(from_tag)
+            parent_child_dict[from_tag][order_nr] = key_tag
 
             negated = False
             if prefered_label:
@@ -95,7 +105,7 @@ class SecPreXmlParser(SecXmlParserBase):
             details['preferredLabel'] = prefered_label
             details['negating'] = negated
 
-            result[to_tag] = details
+            result[key_tag] = details
 
         # line calculation
         root_node = set(from_list) - set(to_list)
@@ -193,7 +203,8 @@ class SecPreXmlParser(SecXmlParserBase):
         result: List[Dict[str, str]] = []
         for k in presentation_arc_content.keys():
             details = {}
-            loc_content_entry = loc_content[k]
+            loc_key = k.split('.')[0] # pre_arc key can consist out label + '.' + and preferred label
+            loc_content_entry = loc_content[loc_key]
             pre_arc_content_entry = presentation_arc_content.get(k)
 
             details['version'] = loc_content_entry.get('version')
@@ -259,6 +270,8 @@ class SecPreXmlParser(SecXmlParserBase):
         for presentation in presentation_links:
             try:
                 entries = self._process_presentation(report, presentation)
+                if len(entries) > 0:
+                    report += 1
             except Exception as err:
                 # often a report contains a "presentation" entry with  more than one root node.
                 # so far, we do not handle this, since that type of problem is mainly in presentations which do
@@ -267,7 +280,6 @@ class SecPreXmlParser(SecXmlParserBase):
                 continue
 
             all_entries.extend(entries)
-            report += 1
 
         df = pd.DataFrame(all_entries)
         df['rfile'] = rfile # filetype X for xml or H for html file

@@ -1,4 +1,4 @@
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from src._02_xml import SecPreXmlParser
 
 import pandas as pd
 
@@ -6,8 +6,8 @@ import pandas as pd
 # An example of a test which compares the content of the prex-xml with the data of the same company contained in the
 # quarterly pre-txt file
 
-text_file = "c:/ieu/projects/sec_processing/data/pre_apple_10k_2020_q4.txt"
-xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre.xml"
+text_file = "/data/pre_apple_10k_2020_q4.txt"
+xml_file = "/data/aapl-20200926_pre.xml"
 
 def read_txt() -> pd.DataFrame:
     df_txt = pd.read_csv(text_file, sep="\t", encoding="utf-8", header=0)

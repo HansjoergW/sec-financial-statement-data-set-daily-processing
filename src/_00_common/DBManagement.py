@@ -1,6 +1,5 @@
 import os
 import sqlite3
-import re
 from typing import List, Tuple, Set
 import pandas as pd
 import glob
@@ -34,7 +33,7 @@ class DBManager():
         """
 
         """
-        ddl_folder = os.path.realpath(__file__ + "/../../ddl")
+        ddl_folder = os.path.realpath(__file__ + "/../../../ddl")
         sqlfiles = list(glob.glob(ddl_folder + "/*.sql"))
         sorted(sqlfiles)
 

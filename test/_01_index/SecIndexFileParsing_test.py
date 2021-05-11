@@ -1,4 +1,4 @@
-from _01_index.SecIndexFileParsing import SecIndexFileParser
+from src._01_index.SecIndexFileParsing import SecIndexFileParser
 import shutil
 import os
 import pytest

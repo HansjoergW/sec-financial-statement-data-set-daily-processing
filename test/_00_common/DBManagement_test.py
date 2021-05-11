@@ -1,13 +1,15 @@
 from _00_common.DBManagement import DBManager
 import shutil
 import pytest
+import os
 
-folder = "./data"
+scriptpath = os.path.realpath(__file__ + "/..")
+folder = scriptpath + "/data"
 
 
 @pytest.fixture(scope="module")
 def dbm():
-    shutil.rmtree("./data", ignore_errors=True)
+    shutil.rmtree(folder, ignore_errors=True)
     new_dbmgr = DBManager(work_dir=folder)
     new_dbmgr._create_db()
     new_dbmgr.create_test_data()

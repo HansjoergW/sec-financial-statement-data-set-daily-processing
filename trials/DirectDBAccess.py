@@ -1,6 +1,4 @@
-from _00_common.DBManagement import DBManager
-import shutil
-import pytest
+from src._00_common import DBManager
 
 
 def test_duplicates():

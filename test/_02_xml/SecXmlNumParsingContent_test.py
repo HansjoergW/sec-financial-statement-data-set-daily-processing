@@ -1,4 +1,4 @@
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
+from src._02_xml import SecNumXmlParser
 
 import pandas as pd
 
@@ -6,8 +6,8 @@ import pandas as pd
 # quarterly num-txt file
 
 
-text_file = "c:/ieu/projects/sec_processing/data/num_apple_10k_2020_q4.txt"
-xml_file = "c:/ieu/projects/sec_processing/data/aapl-20200926_htm.xml"
+text_file = "/data/num_apple_10k_2020_q4.txt"
+xml_file = "/data/aapl-20200926_htm.xml"
 
 
 def read_txt() -> pd.DataFrame:
