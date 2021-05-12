@@ -7,7 +7,7 @@ from _00_common.DBManagement import DBManager
 from _00_common.DebugUtils import DataAccessTool, ReparseTool
 
 import pandas as pd
-from typing import List, Set
+from typing import List, Set, Dict
 import glob
 import os
 
@@ -41,27 +41,82 @@ def compare_adsh_entries(zip_df: pd.DataFrame, process_df: pd.DataFrame) -> Set[
 
     return zip_adshs_set.intersection(process_adshs_set)
 
+
+def find_report_candidates_in_pre_data(zip_stmt: str, zip_tag_version_set: Set[str], pre_reports_dict: Dict[str, List[Dict]]) -> List[int]:
+    pre_same_statements = pre_reports_dict.get(zip_stmt, [])
+
+    pre_report_candidates: List[int] = []
+    for pre_same_statement in pre_same_statements:
+        pre_report = pre_same_statement['report']
+        pre_tag_version_set = pre_same_statement['tagset']
+
+        if len(zip_tag_version_set - pre_tag_version_set) == 0:
+            pre_report_candidates.append(pre_report)
+
+    return pre_report_candidates
+
+
 def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame):
-    zip_report_count = zip_pre_df.groupby(['report', 'stmt']).adsh.count().to_frame()
 
     if len(process_pre_data) == 0:
         print(f"{adsh} - no data")
         return
 
-    process_report_count = process_pre_data.groupby(['report', 'stmt']).adsh.count().to_frame()
+    # Daten von process_pre_data aufbereiten
+    # - wird verwendet um den passenden report zu finden
+    # dict mit stmt -> darin liste mit dictt mit reports für dieses statement
+    # stmt dict enthält
+    #  - report nummer
+    #  - stmt
+    #  - liste mit tag_version
 
-    zip_report_count.rename(columns = lambda x: x + '_count_zip', inplace=True)
-    process_report_count.rename(columns = lambda x: x + '_count_xml', inplace=True)
+    pre_reports_dict: Dict[str, List[Dict]] = {}
+    pre_reports = process_pre_data.report.unique()
+    for pre_report in pre_reports:
+        pre_report_entries = process_pre_data[process_pre_data.report == pre_report]
+        stmt = pre_report_entries.stmt.to_list()[0]
+        tag_version_set = set((pre_report_entries.tag + "#" + pre_report_entries.version).to_list())
+        report_dict: Dict = {}
+        report_dict['report'] = pre_report
+        report_dict['stmt'] = stmt
+        report_dict['tagset'] = tag_version_set
 
-    if (len(zip_report_count) != len(process_report_count)):
-        print('count diff', end = ' : ')
+        if pre_reports_dict.get(stmt) == None:
+            pre_reports_dict[stmt] = []
 
-    df_merge = pd.merge(zip_report_count, process_report_count, how="outer", left_index=True, right_index=True)
-    df_diff = df_merge[(df_merge.adsh_count_zip != df_merge.adsh_count_xml)]
+        pre_reports_dict.get(stmt).append(report_dict)
 
-    diff_len = len(df_diff)
-    if diff_len > 0:
-        print(f"{adsh} - {diff_len}")
+
+    zip_reports = zip_pre_df.report.unique()
+    missing_count = 0
+    for zip_report in zip_reports:
+        zip_report_entries = zip_pre_df[zip_pre_df.report == zip_report]
+        stmt = zip_report_entries.stmt.to_list()[0]
+        zip_tag_version_set = set((zip_report_entries.tag + "#" + zip_report_entries.version).to_list())
+
+        pre_report_candidates = find_report_candidates_in_pre_data(stmt, zip_tag_version_set, pre_reports_dict)
+
+        if len(pre_report_candidates) != 1:
+            missing_count += 1
+
+    if missing_count > 0:
+        print(f"{adsh} - {missing_count}")
+
+    # zip_report_count = zip_pre_df.groupby(['report', 'stmt']).adsh.count().to_frame()
+    # process_report_count = process_pre_data.groupby(['report', 'stmt']).adsh.count().to_frame()
+    #
+    # zip_report_count.rename(columns = lambda x: x + '_count_zip', inplace=True)
+    # process_report_count.rename(columns = lambda x: x + '_count_xml', inplace=True)
+    #
+    # if (len(zip_report_count) != len(process_report_count)):
+    #     print('count diff', end = ' : ')
+    #
+    # df_merge = pd.merge(zip_report_count, process_report_count, how="outer", left_index=True, right_index=True)
+    # df_diff = df_merge[(df_merge.adsh_count_zip != df_merge.adsh_count_xml)]
+    #
+    # diff_len = len(df_diff)
+    # if diff_len > 0:
+    #     print(f"{adsh} - {diff_len}")
 
 
 def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame):
@@ -173,9 +228,9 @@ def direct_test():
 if __name__ == '__main__':
     #compare_all()
     #reparse_pre(100)
-    #compare_from_test_dir()
+    compare_from_test_dir()
     #reparse_pre(100)
-    direct_test()
+    #direct_test()
     pass
 
 
@@ -192,3 +247,27 @@ if __name__ == '__main__':
     # weitertesten. evtl. kann man so auch die reportnr richtigmachen.
     # mit den reports könnte man auch gleich die anzahl einträge testen.
 
+"""
+Probleme:
+1. es gibt im selben Report oft auch "doppelte" Gruppen mit gleichen Einträgen
+2. Anzahl Gruppen ist nicht immer gleich 
+3. Die report Nummern sind oft nicht in der gleichen Reihenfolge
+4. Es gibt oft mehrere Reports pro Kategorie
+5. Die Anzahl  Zeilen in den Gruppen ist nicht immer gleich 
+6. Dasselbe Tag kann mehrmals vorkommen, aber mit anderm label..
+
+Was ist das Ziel:
+-> alles was in zip ist, ist auch in geparstem XMl, mehr sollte ok sein
+-> Ziel müsste sein, den Inhalt aus der Zip Datei im XML wiederzufinden, und zwar komplett
+-> wenn wir also eine Gruppe mit dem selben Statement finden, dann müsste geprüft werden, ob alle diese Einträge 
+   vorhandne sind.
+-> wir iter
+-> wir akzeptieren mehr Reports und mehr zeilen, aber keine fehlenden
+-> die Reihenfolge muss auch geprüft werden.
+d.h.
+Loop über die report Nr aus dem Zip
+-> suche in den XML Daten mit Reports, welche die gleichen Tags und Versionen beinhalten
+-> prüfen auf die selben Werte
+-> prüfen auf die selbe Reihenfolge
+
+"""

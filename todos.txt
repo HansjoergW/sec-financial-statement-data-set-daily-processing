@@ -1,5 +1,10 @@
 Next
 ====
+- Aufbau erweiterbarer "PRE" Test, in welchem mann spezialfälle direkt in ein testdaten verzeichnis ablegen
+  kann. der Test iteriert dann über alle Testfiles und prüft die Ergebnisse.
+  Die Prüfungen müsste man vermutlich auch irgendwie standardisieren, bzw. die erwartete CSV auch Datei hinstellen.
+
+
 - berechnen pre-xml
  - vlt sollte man sich zuerst nur auf fehlende reports konzentrieren
    -> könnte man höchstens über die anzahl lösen ->
@@ -16,8 +21,6 @@ Next
     # vlt. würde es auch helfen, wenn nur die relevanten statements gefiltert
     # werden. Vlt würde dann die Nummerierung stimmen..
 
-- organistaion directory
-  -https://docs.python-guide.org/writing/structure/
 
 - status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
   -> File SecIndexIndexJsonParsing.py
@@ -53,6 +56,8 @@ Besondere Fehler
 
 Done
 ====
+11.05.2021 - organistaion directory
+               -https://docs.python-guide.org/writing/structure/
 09.05.2021  - Masstest für teiltestset mit erneutem parsing
             - nur relevante statements parsen
 08.05.2021  - line Eintrag aufgrund Hierarchie berechnet
