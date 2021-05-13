@@ -101,7 +101,7 @@ def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: 
         pre_report_candidates = find_report_candidates_in_pre_data(stmt, zip_tag_version_set, pre_reports_dict)
 
         if len(pre_report_candidates) != 1:
-            case_dict.append({stmt: 'possible canditates: ' + str(len(pre_report_candidates))})
+           case_dict.append({stmt: 'possible canditates: ' + str(len(pre_report_candidates))})
 
 
     # zip_report_count = zip_pre_df.groupby(['report', 'stmt']).adsh.count().to_frame()
@@ -203,13 +203,16 @@ def compare_all():
     #compare_by_adsh("'0001437749-21-005151'", process_df, zip_pre_df_all, zip_num_df_all)
 
 
-def compare_from_test_dir():
+def compare_from_test_dir(exceptions: Set[str]):
     quarterfile = dbg_tools._get_zipfilename(2021, 1)
     pre_test_dir = 'd:/secprocessing/tmp/precsv/'
 
     files = glob.glob(pre_test_dir + "*.csv")
     files: List[str] = [os.path.basename(path) for path in files]
     adshs: Set[str] = set([x.split('_')[0] for x in files])
+
+    # sonderfälle ausklammern, die noch nicht richtig geparsed werden
+    adshs = adshs - exceptions
 
 
     zip_pre_df_all = dbg_tools._read_file_from_zip(quarterfile, "pre.txt")
@@ -230,7 +233,7 @@ def direct_test():
     # 0001558370-21-002205
     #    CoverPage missing
 
-    adsh = '0000004904-21-000010' # not all statements present
+    adsh = '0000016918-21-000010' # IS is missing
     reparse = ReparseTool(workdir_default)
     reparse.reparse_pre_by_adshs([adsh], 'd:/secprocessing/tmp/precsv/')
 
@@ -248,15 +251,20 @@ def direct_test():
 if __name__ == '__main__':
     #compare_all()
     #reparse_pre(100)
-    #compare_from_test_dir()
+    #compare_from_test_dir(set(['0000018255-21-000004']))
     #reparse_pre(100)
     direct_test()
     pass
 
 """
 History:
+- find all reports
 12.05.2021       - 46
 13.05.2021-07:00 - 42
+13.05.2021-12:11 - 30 -> loc labels können auch '.' enthalten -> Trenner für key und plabel von . auf $$$ gesetzt
+13.05.2021-12:24 - 26 -> "stmt" keys auf to lowercase vergleichen
+13.05.2021-12.46 - 
+
 """
 
 

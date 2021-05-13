@@ -4,7 +4,7 @@ import re
 import pandas as pd
 
 from lxml import etree
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import logging
 import traceback
 
@@ -34,14 +34,23 @@ class SecPreXmlParser(SecXmlParserBase):
 
     default_ns_regex = re.compile(r"xmlns=\"http://www.xbrl.org/2003/linkbase\"", re.IGNORECASE)
 
-    stmt_map:Dict[str,str] = {'Cover': 'CP',
-                              'DocumentAndEntityInformation': 'CP',
-                              'IncomeStatement': 'IS',
-                              'StatementOfIncomeAndComprehensiveIncome': 'CI',
-                              'StatementOfFinancialPosition': 'BS',
-                              'StatementOfStockholdersEquity': 'EQ',
-                              'StatementOfCashFlows': 'CF',
-                              }
+    # Die Verarbeitung muss in der Reihenfolge der Länge der Strings erfolgen,
+    # Da 'IncomeStatement' auch in ComprehensiveIncomeStatement vorkommt.
+    stmt_map: List[Tuple[str, str]] = [
+        ('StatementsOfIncomeAndComprehensiveIncome', 'CI'),
+        ('StatementOfIncomeAndComprehensiveIncome', 'CI'),
+        ('StatementsOfComprehensiveIncome', 'CI'),
+        ('StatementOfComprehensiveIncome', 'CI'),
+        ('StatementsOfStockholdersEquity', 'EQ'),
+        ('StatementsOfFinancialPosition', 'BS'),
+        ('StatementOfStockholdersEquity', 'EQ'),
+        ('DocumentAndEntityInformation', 'CP'),
+        ('StatementOfFinancialPosition', 'BS'),
+        ('StatementsOfCashFlows', 'CF'),
+        ('StatementOfCashFlows', 'CF'),
+        ('IncomeStatement', 'IS'),
+        ('Cover', 'CP'),
+    ]
 
     def __init__(self):
         super(SecPreXmlParser, self).__init__("pre")
@@ -50,7 +59,7 @@ class SecPreXmlParser(SecXmlParserBase):
     def _strip_file(self, data: str) -> str:
         """removes unneeded content from the datastring, so that xml parsing will be faster"""
         data = self.remove_unicode_tag_regex.sub("", data)
-        data = self.default_ns_regex.sub("", data) # some nodes define a default namespace.. that causes troubles
+        data = self.default_ns_regex.sub("", data)  # some nodes define a default namespace.. that causes troubles
         data = self.link_regex.sub("<", data)
         data = self.link_end_regex.sub("</", data)
         data = self.xlink_regex.sub(" ", data)
@@ -61,7 +70,6 @@ class SecPreXmlParser(SecXmlParserBase):
         data = self.arcrole_parent_child_regex.sub("", data)
 
         return data
-
 
     def _get_presentation_arc_content(self, presentation: etree._Element) -> Dict[str, Dict[str, str]]:
         # get order (line), and preferred_label (label, terselabel, totallabel, ...)
@@ -80,19 +88,20 @@ class SecPreXmlParser(SecXmlParserBase):
             to_list.append(arc.get('to'))
 
         for arc in arcs:
-            details: Dict[str,str] = {}
+            details: Dict[str, str] = {}
             to_tag = arc.get('to')
             from_tag = arc.get('from')
-            prefered_label = arc.get('preferredLabel','') # not all reports define a preferrerdLabel for every presentation Arc: 0000019584-21-000003
+            prefered_label = arc.get('preferredLabel',
+                                     '')  # not all reports define a preferrerdLabel for every presentation Arc: 0000019584-21-000003
 
             # it is possible, that the same to_tag appears twice with different prefered_label
             # but this is only the case, if the to_tag is not also a from_tag
             if to_tag in from_list:
                 key_tag = to_tag
             else:
-                key_tag = to_tag + "." + prefered_label
+                key_tag = to_tag + "$$$" + prefered_label
 
-            order_nr = int(float(arc.get('order'))) # some xmls have 0.0, 1.0 ... as order number instead of a pure int
+            order_nr = int(float(arc.get('order')))  # some xmls have 0.0, 1.0 ... as order number instead of a pure int
 
             if from_tag not in parent_child_dict:
                 parent_child_dict[from_tag] = {}
@@ -128,19 +137,18 @@ class SecPreXmlParser(SecXmlParserBase):
                 child_list.append(order_dict.get(childkey))
             parent_child_ordered_list[node_name] = child_list
 
-
         # in order to calculate the line numbers, it is necessary walk along the parent-child relationship of the
         # presentation-arc while respecting the order number and starting with the root_node
         # in order to that, a recursive loop is used
         root_node = list(root_node)[0]
 
-        node_path: List[str] = [root_node] # used to track the path
+        node_path: List[str] = [root_node]  # used to track the path
 
         # used to keep track of current processed child of these node
         # the problem is, that in some documents the order starts with a 0, in others with 1
         # in some documents, this is even mixed within the same presentation, so we need to figure out
         # what the start key is
-        node_index: Dict[str, int] = {root_node : 0}
+        node_index: Dict[str, int] = {root_node: 0}
 
         line = 1
         while len(node_path) > 0:
@@ -173,7 +181,7 @@ class SecPreXmlParser(SecXmlParserBase):
         result: Dict[str, Dict[str, str]] = {}
 
         for loc in locs:
-            details: Dict[str,str] = {}
+            details: Dict[str, str] = {}
             label = loc.get("label")
 
             href_parts = loc.get("href").split('#')
@@ -204,7 +212,7 @@ class SecPreXmlParser(SecXmlParserBase):
         result: List[Dict[str, str]] = []
         for k in presentation_arc_content.keys():
             details = {}
-            loc_key = k.split('.')[0] # pre_arc key can consist out label + '.' + and preferred label
+            loc_key = k.split('$$$')[0]  # pre_arc key can consist out label + '.' + and preferred label
             loc_content_entry = loc_content[loc_key]
             pre_arc_content_entry = presentation_arc_content.get(k)
 
@@ -226,6 +234,7 @@ class SecPreXmlParser(SecXmlParserBase):
         return result
 
     def _find_statement_in_presentation(self, presentation: etree._Element) -> str:
+        role = presentation.get('role')
         arcs = presentation.findall('presentationArc', presentation.nsmap)
 
         to_list: List[str] = []
@@ -236,20 +245,27 @@ class SecPreXmlParser(SecXmlParserBase):
             from_list.append(arc.get('from'))
 
         root_nodes = set(from_list) - set(to_list)
-        for root_node in root_nodes:
-            for k, v in self.stmt_map.items():
-                if k in root_node:
-                    return v
+        root_nodes_or_role = [role]
+        root_nodes_or_role.extend(root_nodes)
+
+        for map_entry in self.stmt_map:
+            map_stmt = map_entry[1]
+            map_key = map_entry[0]
+
+            for root_node in root_nodes_or_role:
+                if map_key.lower() in root_node.lower():
+                        return map_stmt
+
         return None
 
     def _process_presentation(self, reportnr: int, presentation: etree._Element) -> List[Dict[str, str]]:
         stmt = self._find_statement_in_presentation(presentation)
-        if stmt is None: # if this presentation does not reflect a "real primary statement" it is ignored
+        if stmt is None:  # if this presentation does not reflect a "real primary statement" it is ignored
             return []
 
         entries = self._get_presentation_tag_info(presentation)
         inpth = 0
-        presentation_role = presentation.get('role',"").lower()
+        presentation_role = presentation.get('role', "").lower()
         if "parenthetical" in presentation_role:
             inpth = 1
 
@@ -257,7 +273,7 @@ class SecPreXmlParser(SecXmlParserBase):
             for entry in entries:
                 entry['report'] = reportnr
                 entry['stmt'] = stmt
-                entry['inpth']  = inpth
+                entry['inpth'] = inpth
 
         return entries
 
@@ -284,7 +300,7 @@ class SecPreXmlParser(SecXmlParserBase):
             all_entries.extend(entries)
 
         df = pd.DataFrame(all_entries)
-        df['rfile'] = rfile # filetype X for xml or H for html file
+        df['rfile'] = rfile  # filetype X for xml or H for html file
         return df
 
     def parse(self, data: str) -> pd.DataFrame:
@@ -302,6 +318,10 @@ class SecPreXmlParser(SecXmlParserBase):
         df.drop(['plabel'], axis=1, inplace=True)
         df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
-        df.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
-        print(adsh, ' - ', len(df))
+
+        # we discovered, that comprehensive income statements are labelled as IS, if no IS is present.
+
+
+        df.set_index(['adsh', 'tag', 'version', 'report', 'line', 'stmt'], inplace=True)
+        # print(adsh, ' - ', len(df))
         return df
