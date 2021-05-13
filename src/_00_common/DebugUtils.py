@@ -100,6 +100,15 @@ class ReparseTool():
         finally:
             conn.close()
 
+    def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
+        conn = self.tool.dbmgr.get_connection()
+        adshs = ','.join("'" + adsh + "'" for adsh in adshs)
+        try:
+            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(adshs)
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
     def reparse_pre(self, year: int, months: List[int], targetFolder: str, count: int = None):
         xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing(year, months, count)
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
@@ -114,6 +123,19 @@ class ReparseTool():
         xmlParser = SecXmlParser(None, targetFolder, False)
         xmlParser._parse(preParser, select_funct, update_function)
 
+    def reparse_pre_by_adshs(self, adshs: List[str],  targetFolder: str,):
+        xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing_by_adshs(adshs)
+        pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
+
+        select_funct = lambda : pre_xml_files_info
+
+        def update_function(data:List[Tuple[str, str, str, str]]):
+            for entry in data:
+                print(entry)
+
+        preParser = SecPreXmlParser()
+        xmlParser = SecXmlParser(None, targetFolder, False)
+        xmlParser._parse(preParser, select_funct, update_function)
 
 if __name__ == '__main__':
     # short test to check if all methods can be executed

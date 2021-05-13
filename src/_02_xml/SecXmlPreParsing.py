@@ -6,6 +6,7 @@ import pandas as pd
 from lxml import etree
 from typing import Dict, List
 import logging
+import traceback
 
 
 # there are documents, which define the linke namespace diretcly in the node itself, without a prefix
@@ -82,7 +83,7 @@ class SecPreXmlParser(SecXmlParserBase):
             details: Dict[str,str] = {}
             to_tag = arc.get('to')
             from_tag = arc.get('from')
-            prefered_label = arc.get('preferredLabel')
+            prefered_label = arc.get('preferredLabel','') # not all reports define a preferrerdLabel for every presentation Arc: 0000019584-21-000003
 
             # it is possible, that the same to_tag appears twice with different prefered_label
             # but this is only the case, if the to_tag is not also a from_tag
@@ -277,6 +278,7 @@ class SecPreXmlParser(SecXmlParserBase):
                 # so far, we do not handle this, since that type of problem is mainly in presentations which do
                 # not belong to the primary fincancial statements. so we ignore it
                 logging.info("skipped report: {}".format(str(err)))
+                print(traceback.format_exc())
                 continue
 
             all_entries.extend(entries)
@@ -301,4 +303,5 @@ class SecPreXmlParser(SecXmlParserBase):
         df['adsh'] = adsh
         df.loc[df.version == 'company', 'version'] = adsh
         df.set_index(['adsh', 'tag','version', 'report', 'line', 'stmt'], inplace=True)
+        print(adsh, ' - ', len(df))
         return df

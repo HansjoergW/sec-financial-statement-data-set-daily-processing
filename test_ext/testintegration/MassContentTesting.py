@@ -56,10 +56,11 @@ def find_report_candidates_in_pre_data(zip_stmt: str, zip_tag_version_set: Set[s
     return pre_report_candidates
 
 
-def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame):
+def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame, case_dict: List[Dict[str,str]]):
 
     if len(process_pre_data) == 0:
-        print(f"{adsh} - no data")
+        #print(f"{adsh} - no data")
+        case_dict.append({'no data':''})
         return
 
     # Daten von process_pre_data aufbereiten
@@ -88,19 +89,20 @@ def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: 
 
 
     zip_reports = zip_pre_df.report.unique()
-    missing_count = 0
     for zip_report in zip_reports:
         zip_report_entries = zip_pre_df[zip_pre_df.report == zip_report]
         stmt = zip_report_entries.stmt.to_list()[0]
         zip_tag_version_set = set((zip_report_entries.tag + "#" + zip_report_entries.version).to_list())
 
+        if pre_reports_dict.get(stmt) is None:
+            case_dict.append({stmt: 'not present'})
+            continue
+
         pre_report_candidates = find_report_candidates_in_pre_data(stmt, zip_tag_version_set, pre_reports_dict)
 
         if len(pre_report_candidates) != 1:
-            missing_count += 1
+            case_dict.append({stmt: 'possible canditates: ' + str(len(pre_report_candidates))})
 
-    if missing_count > 0:
-        print(f"{adsh} - {missing_count}")
 
     # zip_report_count = zip_pre_df.groupby(['report', 'stmt']).adsh.count().to_frame()
     # process_report_count = process_pre_data.groupby(['report', 'stmt']).adsh.count().to_frame()
@@ -119,8 +121,8 @@ def compare_adsh_reports(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: 
     #     print(f"{adsh} - {diff_len}")
 
 
-def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame):
-    compare_adsh_reports(adsh, zip_pre_df, process_pre_data)
+def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pre_data: pd.DataFrame, case_dict: List[Dict[str,str]]):
+    compare_adsh_reports(adsh, zip_pre_df, process_pre_data, case_dict)
 
     # geht so nicht, die report nummer muss berücksichtigt werden
     # zip_pre_df.set_index(['adsh', 'tag','version', 'stmt', 'line'], inplace=True)
@@ -138,30 +140,40 @@ def compare_pre_content_for_adsh(adsh: str, zip_pre_df: pd.DataFrame, process_pr
     # print(outstr)
 
 
-def compare_by_adsh_and_file(adsh: str, csvPreFile: str, zip_pre_adsh_df: pd.DataFrame, zip_num_df: pd.DataFrame):
+def compare_by_adsh_and_file(adsh: str, csvPreFile: str, zip_pre_adsh_df: pd.DataFrame, zip_num_df: pd.DataFrame, case_dict: List[Dict[str,str]]):
     process_pre_adsh_data = pd.read_csv(csvPreFile, header=0, delimiter="\t")
     process_pre_adsh_data.drop(columns=['rfile'], inplace=True)
 
-    compare_pre_content_for_adsh(adsh, zip_pre_adsh_df, process_pre_adsh_data)
+    compare_pre_content_for_adsh(adsh, zip_pre_adsh_df, process_pre_adsh_data, case_dict)
 
     # process_num_data = pd.read_csv(process_table_adsh_df.csvNumFile.to_list()[0], header=0, delimiter="\t")
     # zip_num_adsh_data = zip_num_df[zip_num_df.adsh == adsh]
     # print("")
 
 
-def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame, use_temp_folder: bool):
+def compare_by_adsh(adsh: str, process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame, use_temp_folder: bool, case_dict: List[Dict[str,str]]):
     if use_temp_folder:
         csvPreFile = f'D:/secprocessing/tmp/precsv/{adsh}_pre.csv'
     else:
         process_table_adsh_df = process_df[process_df.accessionNumber == adsh]
         csvPreFile = process_table_adsh_df.csvPreFile.to_list()[0]
     zip_pre_adsh_df = zip_pre_df[zip_pre_df.adsh == adsh].copy()
-    compare_by_adsh_and_file(adsh, csvPreFile, zip_pre_adsh_df, zip_num_df)
+    compare_by_adsh_and_file(adsh, csvPreFile, zip_pre_adsh_df, zip_num_df, case_dict)
 
 
 def compare_adsh_contents(adshs_in_both: Set[str], process_df: pd.DataFrame, zip_pre_df: pd.DataFrame, zip_num_df: pd.DataFrame, use_temp_folder: bool):
+    case_dicts: Dict[str, List[Dict[str,str]]] = {}
     for adsh in list(adshs_in_both)[:100]:
-        compare_by_adsh(adsh, process_df, zip_pre_df, zip_num_df, use_temp_folder)
+        case_dict: List[Dict[str,str]] = []
+        compare_by_adsh(adsh, process_df, zip_pre_df, zip_num_df, use_temp_folder, case_dict)
+        if len(case_dict) > 0:
+            case_dicts[adsh] = case_dict
+
+    print("total cases: " + str(len(case_dicts)))
+    for k, v in case_dicts.items():
+        print(k)
+        for el in v:
+            print("\t", el)
 
 
 def compare_all():
@@ -190,20 +202,22 @@ def compare_all():
 
     #compare_by_adsh("'0001437749-21-005151'", process_df, zip_pre_df_all, zip_num_df_all)
 
+
 def compare_from_test_dir():
     quarterfile = dbg_tools._get_zipfilename(2021, 1)
     pre_test_dir = 'd:/secprocessing/tmp/precsv/'
+
     files = glob.glob(pre_test_dir + "*.csv")
     files: List[str] = [os.path.basename(path) for path in files]
     adshs: Set[str] = set([x.split('_')[0] for x in files])
 
-    dbm = dbg_tools.dbmgr
 
     zip_pre_df_all = dbg_tools._read_file_from_zip(quarterfile, "pre.txt")
     zip_pre_df_all = zip_pre_df_all[zip_pre_df_all.adsh.isin(adshs)].copy()
     zip_pre_df_all.drop(columns=['rfile','plabel'], inplace=True)
 
     compare_adsh_contents(adshs, None, zip_pre_df_all, None, True)
+
 
 def reparse_pre(count: int):
     reparse = ReparseTool(workdir_default)
@@ -216,24 +230,34 @@ def direct_test():
     # 0001558370-21-002205
     #    CoverPage missing
 
-    adsh = '0000004457-21-000019'
+    adsh = '0000004904-21-000010' # not all statements present
+    reparse = ReparseTool(workdir_default)
+    reparse.reparse_pre_by_adshs([adsh], 'd:/secprocessing/tmp/precsv/')
+
     preCsvFile = f'D:/secprocessing/tmp/precsv/{adsh}_pre.csv'
-    #preCsvFile = 'd:/secprocessing/csv/2021-05-08/0000883984-21-000005_pre.csv'
     quarterfile = dbg_tools._get_zipfilename(2021, 1)
     zip_pre_df_all = dbg_tools._read_file_from_zip(quarterfile, "pre.txt")
     zip_pre_df_all.drop(columns=['rfile','plabel'], inplace=True)
     zip_pre_adsh_df = zip_pre_df_all[zip_pre_df_all.adsh == adsh].copy()
-    compare_by_adsh_and_file(adsh, preCsvFile, zip_pre_adsh_df, None)
+    case_dict: List[Dict[str,str]] = []
+    compare_by_adsh_and_file(adsh, preCsvFile, zip_pre_adsh_df, None, case_dict)
+    for el in case_dict:
+        print("\t", el)
+
 
 if __name__ == '__main__':
     #compare_all()
     #reparse_pre(100)
-    compare_from_test_dir()
+    #compare_from_test_dir()
     #reparse_pre(100)
-    #direct_test()
+    direct_test()
     pass
 
-
+"""
+History:
+12.05.2021       - 46
+13.05.2021-07:00 - 42
+"""
 
 
     # problem, die gruppierung muss beim vergleich beachtet
