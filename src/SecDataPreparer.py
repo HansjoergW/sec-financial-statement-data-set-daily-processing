@@ -5,13 +5,13 @@ from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
 from _02_xml.SecXmlFileParsing import SecXmlParser
 
 import logging
-from datetime import datetime
+from datetime import datetime, date
 import dateutil
 
 
 class SecXMLProcessingOrchestrator():
 
-    def __init__(self, workdir: str):
+    def __init__(self, workdir: str, current_year: int = None, current_month: int = None, months: int = 4):
         if workdir[-1] != '/':
             workdir = workdir + '/'
 
@@ -23,11 +23,19 @@ class SecXMLProcessingOrchestrator():
         self.dbmanager = DBManager(work_dir=workdir)
 
         self.today = datetime.today()
-        self.current_month = self.today.month
-        self.current_year = self.today.year
+        if current_month is None:
+            self.current_month = self.today.month
+        else:
+            self.current_month = current_month
 
-        delta_month = dateutil.relativedelta.relativedelta(months=4)
-        start_date = self.today - delta_month
+        if current_year is None:
+            self.current_year = self.today.year
+        else:
+            self.current_year = current_year
+
+        current_date = date(self.current_year, self.current_month, 1)
+        delta_month = dateutil.relativedelta.relativedelta(months=months)
+        start_date = current_date - delta_month
         self.start_month = start_date.month
         self.start_year = start_date.year
 
@@ -72,6 +80,6 @@ class SecXMLProcessingOrchestrator():
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
-    orchestrator = SecXMLProcessingOrchestrator(workdir_default)
-    orchestrator.process()
-    #orchestrator._parse_xml()
+    orchestrator = SecXMLProcessingOrchestrator(workdir_default, 2021, 3, 3)
+    #orchestrator.process()
+    orchestrator.process_xml_data()

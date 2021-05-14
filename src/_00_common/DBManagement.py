@@ -98,7 +98,7 @@ class DBManager():
     def find_missing_xmlNumFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, xbrlInsUrl FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            sql = '''SELECT accessionNumber, xbrlInsUrl, insSize FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
             return conn.execute(sql).fetchall()
         finally:
@@ -107,7 +107,7 @@ class DBManager():
     def find_missing_xmlPreFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, xbrlPreUrl FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            sql = '''SELECT accessionNumber, xbrlPreUrl, preSize FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
             return conn.execute(sql).fetchall()
         finally:
@@ -194,10 +194,10 @@ class DBManager():
             conn.close()
 
     # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
-    def update_xbrl_ins_urls(self, update_data: List[Tuple[str]]):
+    def update_xbrl_ins_urls(self, update_data: List[Tuple[str, str, str]]):
         conn = self.get_connection()
         try:
-            sql = '''UPDATE {} SET xbrlInsUrl = ? WHERE accessionNumber = ?'''.format(SEC_FEED_TBL_NAME)
+            sql = '''UPDATE {} SET xbrlInsUrl = ?, insSize = ? WHERE accessionNumber = ?'''.format(SEC_FEED_TBL_NAME)
             conn.executemany(sql, update_data)
             conn.commit()
         finally:
@@ -240,7 +240,7 @@ class DBManager():
     def copy_uncopied_entries(self) -> int:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, xbrlPreUrl  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
+            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
             to_copy_df =  pd.read_sql_query(sql, conn)
 
             to_copy_df['filingMonth'] = pd.to_numeric(to_copy_df.filingDate.str.slice(0,2), downcast="integer")

@@ -50,7 +50,10 @@ def find_report_candidates_in_pre_data(zip_stmt: str, zip_tag_version_set: Set[s
         pre_report = pre_same_statement['report']
         pre_tag_version_set = pre_same_statement['tagset']
 
-        if len(zip_tag_version_set - pre_tag_version_set) == 0:
+        not_in_pre = zip_tag_version_set - pre_tag_version_set
+        not_in_zip = pre_tag_version_set - zip_tag_version_set
+
+        if not_in_pre == 0:
             pre_report_candidates.append(pre_report)
 
     return pre_report_candidates
@@ -233,7 +236,7 @@ def direct_test():
     # 0001558370-21-002205
     #    CoverPage missing
 
-    adsh = '0000016918-21-000010' # IS is missing
+    adsh = '0000018926-21-000017' # no possible canditates
     reparse = ReparseTool(workdir_default)
     reparse.reparse_pre_by_adshs([adsh], 'd:/secprocessing/tmp/precsv/')
 
@@ -251,10 +254,12 @@ def direct_test():
 if __name__ == '__main__':
     #compare_all()
     #reparse_pre(100)
-    #compare_from_test_dir(set(['0000018255-21-000004']))
-    #reparse_pre(100)
+    #compare_from_test_dir({'0000018255-21-000004', # numbered labels
+    #                           '0000016160-21-000018', # numbered labels
+    #                       })
+
     direct_test()
-    pass
+
 
 """
 History:
@@ -263,7 +268,8 @@ History:
 13.05.2021-07:00 - 42
 13.05.2021-12:11 - 30 -> loc labels können auch '.' enthalten -> Trenner für key und plabel von . auf $$$ gesetzt
 13.05.2021-12:24 - 26 -> "stmt" keys auf to lowercase vergleichen
-13.05.2021-12.46 - 
+14.05.2021-12.46 - 25 -> CI nach IS, falls nur CI 
+14.05.2021-13:59 - 24 -> all numbered labels removed from testing
 
 """
 

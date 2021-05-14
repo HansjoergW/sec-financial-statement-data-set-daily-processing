@@ -5,7 +5,8 @@ Next
     - es scheint, als würden files manchmal nicht komplett runtergeladen. Fall tratt bei 0000004904-21-000010 auf.
       Das heruntergeladene xml war nicht komplett, obwohl das xml richtig abgeschlossen war.
       ein einzelner Download der Datei hat geklappt.
-    - "nummerierte Tags", die dann keine to from beziehung mehr ermöglichen: 0000018255-21-000004
+    - "nummerierte Tags", die dann keine to from beziehung mehr ermöglichen:
+       0000018255-21-000004, 0000016160-21-000018
 
     - Klassifikation von IS in zip ist falsch, müsste CI sein: '0000016918-21-000010', 0000024090-21-000012" "0000034903-21-000020"
       - im Q1 2021 gibt es nur einen report, bei dem CI vorhanden ist, aber IS nicht (0001628280-21-003313).
@@ -41,7 +42,7 @@ Next
   -> File SecIndexIndexJsonParsing.py
   -> man sieht die letzte Bearbeitung
   -> man sieht die letzte Datei
-  -> siehe auch Besondere Fehler
+
 
 - bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
@@ -58,15 +59,6 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Prüfen ob
 
 - zippen von xml dateien
-
-
-Besondere Fehler
-==============
-- Wenn am Anfang des Monats das index file noch nicht vorhanden ist (z.B. Fehler am 1. Mai), dann bricht der download
-  ab, weil die Datei nicht gefunden werden konnte. (kann auch aufgrund der Zeitverzögerung sein, wurde um 07:10 ausgeführt)
-- man könnte auch die index seite parsen -> https://www.sec.gov/Archives/edgar/monthly/index.json
-  dann würde man alle vorhandenen Einträge mit ihrer letzten Verarbeitung sehen. So könnte man auch prüfen, welche
-  Dateien neu sind und noch nicht verarbeitet worden sind
 
 
 Done

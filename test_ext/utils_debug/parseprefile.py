@@ -37,6 +37,7 @@ if __name__ == '__main__':
     no_attr_stmt = "d:/secprocessing/xml/2021-04-24/pssr-20210131_pre.xml"
     missing_cover_page = "d:/secprocessing/xml/2021-04-24/ll-20201231_pre.xml"
     missing_line_15_in_IS = 'd:/secprocessing/xml/2021-04-24/nktx-20201231_pre.xml'
+    # content = get_pre_xml_content_from_file(missing_line_15_in_IS)
 
     missing_statements_adsh = "0000019584-21-000003" # not every pres-arc has preferredLabel attribut
     missing_statements_2_adsh = "0000004904-21-000010" # loc labels with '.' in the name
@@ -48,8 +49,12 @@ if __name__ == '__main__':
     missing_statements_8_adsh = "0000016918-21-000010" # IS not present
     missing_statements_9_adsh = "0000024090-21-000012" # IS not present
     missing_statements_10_adsh = "0000034903-21-000020" # IS not present
-    # content = get_pre_xml_content_from_file(missing_line_15_in_IS)
-    content = get_pre_xml_content_by_adsh(missing_statements_10_adsh)
+
+    un_not_present_1_adsh = "0000003570-21-000039" # identified as CF
+    no_data_1_adsh = "0000016160-21-000018" # numbered labels
+    no_matching_report_1 = "0000018926-21-000017" # almost all none matching
+
+    content = get_pre_xml_content_by_adsh(no_matching_report_1)
 
     parse_content(content)
     print("")

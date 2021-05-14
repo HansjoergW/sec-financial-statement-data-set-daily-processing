@@ -320,7 +320,9 @@ class SecPreXmlParser(SecXmlParserBase):
         df.loc[df.version == 'company', 'version'] = adsh
 
         # we discovered, that comprehensive income statements are labelled as IS, if no IS is present.
-
+        contained_statements = df.stmt.unique()
+        if ("CI" in contained_statements) and ("IS" not in contained_statements):
+            df.loc[df.stmt == 'CI', 'stmt'] = 'IS'
 
         df.set_index(['adsh', 'tag', 'version', 'report', 'line', 'stmt'], inplace=True)
         # print(adsh, ' - ', len(df))

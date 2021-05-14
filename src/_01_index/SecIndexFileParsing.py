@@ -4,7 +4,7 @@ import os
 import logging
 import pandas as pd
 from lxml import etree
-from typing import Dict
+from typing import Dict, Tuple
 
 FEED_FIELDS = (
     'companyName', 'formType', 'filingDate', 'cikNumber',
@@ -54,7 +54,7 @@ class SecIndexFileParser():
 
         logging.info('Downloaded RSS feed: %s', self.feed_file)
 
-    def _parse_xbrlfiles(self, edgar_sub_elem: etree.Element, edgar_ns: Dict[str, str]):
+    def _parse_xbrlfiles(self, edgar_sub_elem: etree.Element, edgar_ns: Dict[str, str]) -> Tuple[str]:
 
         ed_xbrl = './/edgar:xbrlFile'
         xbrl_files = edgar_sub_elem.findall(ed_xbrl, namespaces=edgar_ns)
@@ -64,26 +64,42 @@ class SecIndexFileParser():
         xbrl_def_url = None
         xbrl_lab_url = None
         xbrl_pre_url = None
+        xbrl_ins_size = None
+        xbrl_cal_size = None
+        xbrl_def_size = None
+        xbrl_lab_size = None
+        xbrl_pre_size = None
+        xbrl_ins_lastchanged = None
+        xbrl_cal_lastchanged = None
+        xbrl_def_lastchanged = None
+        xbrl_lab_lastchanged = None
+        xbrl_pre_lastchanged = None
 
         for xbrl_file in xbrl_files:
             xbrl_type = xbrl_file.attrib['{' + self.namespace + '}type']
 
             if xbrl_type == "EX-101.INS" or xbrl_type == 'EX-100.INS':
                 xbrl_ins_url = xbrl_file.attrib['{' + self.namespace + '}url']
+                xbrl_ins_size = xbrl_file.attrib['{' + self.namespace + '}size']
 
             if xbrl_type == "EX-101.CAL" or xbrl_type == 'EX-100.CAL':
                 xbrl_cal_url = xbrl_file.attrib['{' + self.namespace + '}url']
+                xbrl_cal_size = xbrl_file.attrib['{' + self.namespace + '}size']
 
             if xbrl_type == "EX-101.DEF" or xbrl_type == 'EX-100.DEF':
                 xbrl_def_url = xbrl_file.attrib['{' + self.namespace + '}url']
+                xbrl_def_size = xbrl_file.attrib['{' + self.namespace + '}size']
 
             if xbrl_type == "EX-101.LAB" or xbrl_type == 'EX-100.LAB':
                 xbrl_lab_url = xbrl_file.attrib['{' + self.namespace + '}url']
+                xbrl_lab_size = xbrl_file.attrib['{' + self.namespace + '}size']
 
             if xbrl_type == "EX-101.PRE" or xbrl_type == 'EX-100.PRE':
                 xbrl_pre_url = xbrl_file.attrib['{' + self.namespace + '}url']
+                xbrl_pre_size = xbrl_file.attrib['{' + self.namespace + '}size']
 
-        return xbrl_ins_url, xbrl_cal_url, xbrl_def_url, xbrl_lab_url, xbrl_pre_url
+        return xbrl_ins_url, xbrl_cal_url, xbrl_def_url, xbrl_lab_url, xbrl_pre_url, \
+               xbrl_ins_size, xbrl_cal_size, xbrl_def_size, xbrl_lab_size, xbrl_pre_size
 
     def parse_sec_rss_feeds(self) -> pd.DataFrame:
         """ Parses an Edgar RSS feed into a dict
@@ -110,8 +126,8 @@ class SecIndexFileParser():
                 # xbrlfiles contains the URLs of the actual filings
                 if 'xbrlFiles' in edgar_sub_elem.tag:
                     assert key == 'xbrlFiles'
-                    xbrl_ins_url, xbrl_cal_url, xbrl_def_url, xbrl_lab_url, xbrl_pre_url = self._parse_xbrlfiles(
-                        edgar_sub_elem, edgar_ns)
+                    xbrl_ins_url, xbrl_cal_url, xbrl_def_url, xbrl_lab_url, xbrl_pre_url, \
+                    xbrl_ins_size, xbrl_cal_size, xbrl_def_size, xbrl_lab_size, xbrl_pre_size = self._parse_xbrlfiles(edgar_sub_elem, edgar_ns)
 
                     # edgar_dict[key].append(xbrl_url)
                     temp_dict['xbrlInsUrl'] = xbrl_ins_url
@@ -119,6 +135,11 @@ class SecIndexFileParser():
                     temp_dict['xbrlDefUrl'] = xbrl_def_url
                     temp_dict['xbrlLabUrl'] = xbrl_lab_url
                     temp_dict['xbrlPreUrl'] = xbrl_pre_url
+                    temp_dict['insSize'] = xbrl_ins_size
+                    temp_dict['calSize'] = xbrl_cal_size
+                    temp_dict['defSize'] = xbrl_def_size
+                    temp_dict['labSize'] = xbrl_lab_size
+                    temp_dict['preSize'] = xbrl_pre_size
 
                 else:
                     temp_dict[key] = edgar_sub_elem.text
