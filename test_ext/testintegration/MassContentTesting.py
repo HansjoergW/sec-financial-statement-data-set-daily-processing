@@ -253,12 +253,12 @@ def direct_test():
 
 if __name__ == '__main__':
     #compare_all()
-    #reparse_pre(100)
-    #compare_from_test_dir({'0000018255-21-000004', # numbered labels
-    #                           '0000016160-21-000018', # numbered labels
-    #                       })
+    reparse_pre(100)
+    compare_from_test_dir({'0000018255-21-000004', # numbered labels
+                               '0000016160-21-000018', # numbered labels
+                           })
 
-    direct_test()
+    #direct_test()
 
 
 """

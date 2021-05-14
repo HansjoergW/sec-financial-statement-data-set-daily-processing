@@ -41,7 +41,7 @@ class SecXmlFileProcessor:
 
         filename = url.rsplit('/', 1)[-1]
 
-        filepath = xml_dir + filename
+        filepath = xml_dir + accessionnr + "-" + filename
         try:
             download_url_to_file(url, filepath, size)
             return (filepath, accessionnr)

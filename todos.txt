@@ -1,6 +1,9 @@
 Next
 ====
 
+- Die Namen der runtergeladenen Dateien sind nicht eindeutig. Es muss daher immer noch die adsh_nummer beim Nahmen hinzugefügt werden.
+  !!!
+
 - Pre Spezialfälle
     - es scheint, als würden files manchmal nicht komplett runtergeladen. Fall tratt bei 0000004904-21-000010 auf.
       Das heruntergeladene xml war nicht komplett, obwohl das xml richtig abgeschlossen war.
@@ -63,6 +66,9 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+14.05.2021 - diverse optimierungen in pre-parsing
+           - neu download mit prüfung auf grösse, da irgendwie die falschen Daten vorhanden sind...
+           - donwload-xml Namen mit ADSH, damit eindeutigkeit sicher gestellt ist
 13.05.2021 - diverse pre-parsing korrekturen
 11.05.2021 - organistaion directory
                -https://docs.python-guide.org/writing/structure/

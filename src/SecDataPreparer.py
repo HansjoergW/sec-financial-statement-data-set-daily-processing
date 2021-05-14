@@ -66,6 +66,7 @@ class SecXMLProcessingOrchestrator():
         secxmlfileparser.parsePreFiles()
 
     def process_xml_data(self):
+        # todo: sollte in eigene xml preprocessor klasse
         # move new entries in sec_feeds to sec_processing
         entries = self.dbmanager.copy_uncopied_entries()
         logging.info("{} entries copied into processing table".format(entries))
@@ -81,5 +82,5 @@ class SecXMLProcessingOrchestrator():
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     orchestrator = SecXMLProcessingOrchestrator(workdir_default, 2021, 3, 3)
-    #orchestrator.process()
-    orchestrator.process_xml_data()
+    orchestrator.process()
+    #orchestrator.process_xml_data()

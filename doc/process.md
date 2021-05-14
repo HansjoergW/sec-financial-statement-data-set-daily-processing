@@ -9,7 +9,7 @@
 2. fehlende xbrlInsUrl Einträge werden nachgeführt. Es kommt oft vor, dass die "direkte" XBRLInsDatei nicht vorhanden ist und dass diese anders erzeugt worden ist (suffix htm). Das erfolgt jedoch nicht nach einem konkreten Schema, weshalb die index.json Dateien dieser Reports untersucht werden müssen.
 3. duplicate check wird durchgeführt. Es kann vorkommen, dass ein Report in zwei aufeinanderfolgenden Monaten erfolgt. Ist das der Fall, wird der 2. Report mit dem Status duplicate versehen
 
-
-parsing der xml-dateien
+download der xml-dateien 
 1. nur nicht duplicated selectieren
+2. Dateien runterladen und speichern -> beim Namen wird die ADSH nummer als Prefix vorangestellt, sowohl für num, wie auch für pre Dateien
        
