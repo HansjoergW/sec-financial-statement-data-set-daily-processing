@@ -53,7 +53,7 @@ def find_report_candidates_in_pre_data(zip_stmt: str, zip_tag_version_set: Set[s
         not_in_pre = zip_tag_version_set - pre_tag_version_set
         not_in_zip = pre_tag_version_set - zip_tag_version_set
 
-        if not_in_pre == 0:
+        if len(not_in_pre) == 0:
             pre_report_candidates.append(pre_report)
 
     return pre_report_candidates

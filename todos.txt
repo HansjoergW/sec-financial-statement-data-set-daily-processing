@@ -1,8 +1,7 @@
 Next
 ====
 
-- Die Namen der runtergeladenen Dateien sind nicht eindeutig. Es muss daher immer noch die adsh_nummer beim Nahmen hinzugefügt werden.
-  !!!
+- Reihenfolge der geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
 
 - Pre Spezialfälle
     - es scheint, als würden files manchmal nicht komplett runtergeladen. Fall tratt bei 0000004904-21-000010 auf.
