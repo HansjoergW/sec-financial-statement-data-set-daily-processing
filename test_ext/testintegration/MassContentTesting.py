@@ -233,7 +233,7 @@ def reparse_pre(count: int):
 def direct_test():
 
 
-    adsh = '0000031791-21-000003' # no possible canditates
+    adsh = '0000014272-21-000066' # no possible canditates
     reparse = ReparseTool(workdir_default)
     reparse.reparse_pre_by_adshs([adsh], 'd:/secprocessing/tmp/precsv/')
 
@@ -250,12 +250,13 @@ def direct_test():
 
 if __name__ == '__main__':
     #compare_all()
-    reparse_pre(100)
-    compare_from_test_dir({'0000018255-21-000004', # numbered labels
-                               '0000016160-21-000018', # numbered labels
-                           })
+    # reparse_pre(100)
+    # compare_from_test_dir({'0000018255-21-000004', # numbered labels
+    #                        '0000016160-21-000018', # numbered labels
+    #                        '0000016918-21-000010', # BS in zip als EQ markiert, obwohl unter BS note
+    #                        })
 
-    #direct_test()
+    direct_test()
 
 
 """
@@ -269,6 +270,8 @@ History:
 14.05.2021-13:59 - 24 -> all numbered labels removed from testing
 14.05.2021-20:00 - 24 -> ensure unique  names for storing xml data files
 15.06.2021-08:11 - 20 -> label name from xlink:href after first _ after #
+15.06.2021-12:34 - 19 -> additional filters for Equity entries
+15.06.2021-12:51 - 18 -> excluded 0000016918-21-000010 in zip ist BS als EQ definiert
 """
 
 

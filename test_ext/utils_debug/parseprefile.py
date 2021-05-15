@@ -54,8 +54,11 @@ if __name__ == '__main__':
     no_data_1_adsh = "0000016160-21-000018" # numbered labels
     no_matching_report_1 = "0000018926-21-000017" # almost all none matching
     no_matching_report_2 = "0000031791-21-000003" # no matching EQ and BS
+    no_matching_report_3 = "0000028412-21-000054" # no matching EQ
+    no_matching_report_4 = "0000016918-21-000010" # no matching CF
+    two_canditates_1 = "0000014272-21-000066"
 
-    content = get_pre_xml_content_by_adsh(no_matching_report_2)
+    content = get_pre_xml_content_by_adsh(two_canditates_1)
 
     parse_content(content)
     print("")
