@@ -49,6 +49,7 @@ class SecPreXmlParser(SecXmlParserBase):
         ('StatementsOfCashFlows', 'CF'),
         ('StatementOfCashFlows', 'CF'),
         ('IncomeStatement', 'IS'),
+        ('BalanceSheets', 'BS'),
         ('Cover', 'CP'),
     ]
 
@@ -175,31 +176,47 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return result
 
+    @staticmethod
+    def _get_version_tag_name_from_href(href: str) -> Dict[str, str]:
+        # Attention: extend testcases if adaptions should be necessary.
+
+        # in the href-definition, the first part indicates wich namespace and version it, if they start with http:
+        # eg: xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member"
+        # if it is a company namespace, then there is no http:
+        # eg: xlink:href="pki-20210103.xsd#pki_AccountingStandardsUpdate_201616Member"
+        # if it is a "company", then the version of the tag is the adsh number of the report
+        # otherwise, the year and namespace is extracted from the namespace path.
+        # the used "tag" itself follows after the hash, without the content before the first "_"
+        # eg: us-gaap_AccountingStandardsUpdate201802Member -> AccountingStandardsUpdate201802Member
+        # eg: pki_AccountingStandardsUpdate_201616Member    -> AccountingStandardsUpdate_201616Member
+        # Note
+        # tags kann have '_' in their name
+
+        details: Dict[str, str] = {}
+        href_parts = href.split('#')
+        complete_tag = href_parts[1]
+        version = None
+        if href_parts[0].startswith('http'):
+            ns_parts = href_parts[0].split('/')
+            version = ns_parts[3] + '/' + ns_parts[4]
+        else:
+            version = 'company'
+
+        pos = complete_tag.find('_')
+        tag = complete_tag[pos+1:]
+
+        details['tag'] = tag
+        details['version'] = version
+        return details
+
     def _get_loc_content(self, presentation: etree._Element) -> Dict[str, Dict[str, str]]:
         locs = presentation.findall('loc')
 
         result: Dict[str, Dict[str, str]] = {}
 
         for loc in locs:
-            details: Dict[str, str] = {}
+            details: Dict[str, str] = SecPreXmlParser._get_version_tag_name_from_href(loc.get("href"))
             label = loc.get("label")
-
-            href_parts = loc.get("href").split('#')
-            complete_tag = href_parts[1]
-            version = None
-            if href_parts[0].startswith('http'):
-                ns_parts = href_parts[0].split('/')
-                version = ns_parts[3] + '/' + ns_parts[4]
-            else:
-                version = 'company'
-
-            tag_info = complete_tag.split("_")
-            tag_prefix = tag_info[0]
-            tag = tag_info[1]
-
-            details['tag'] = tag
-            details['version'] = version
-
             result[label] = details
 
         return result

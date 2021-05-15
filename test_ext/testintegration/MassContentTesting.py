@@ -231,12 +231,9 @@ def reparse_pre(count: int):
 
 
 def direct_test():
-    # 0000883984-21-000005 - hat zusätzliche Einträge im XML in den Statements
-    #    StatementScenarioAxis und ScenarioUnspecifiedDomain von srt/2020 erscheinen nicht, erst ab StatementLineItems..
-    # 0001558370-21-002205
-    #    CoverPage missing
 
-    adsh = '0000018926-21-000017' # no possible canditates
+
+    adsh = '0000031791-21-000003' # no possible canditates
     reparse = ReparseTool(workdir_default)
     reparse.reparse_pre_by_adshs([adsh], 'd:/secprocessing/tmp/precsv/')
 
@@ -270,7 +267,8 @@ History:
 13.05.2021-12:24 - 26 -> "stmt" keys auf to lowercase vergleichen
 14.05.2021-12.46 - 25 -> CI nach IS, falls nur CI 
 14.05.2021-13:59 - 24 -> all numbered labels removed from testing
-
+14.05.2021-20:00 - 24 -> ensure unique  names for storing xml data files
+15.06.2021-08:11 - 20 -> label name from xlink:href after first _ after #
 """
 
 

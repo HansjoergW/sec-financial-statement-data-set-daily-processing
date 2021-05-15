@@ -1,26 +1,13 @@
 Next
 ====
 
-- Reihenfolge der geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
-
 - Pre Spezialfälle
-    - es scheint, als würden files manchmal nicht komplett runtergeladen. Fall tratt bei 0000004904-21-000010 auf.
-      Das heruntergeladene xml war nicht komplett, obwohl das xml richtig abgeschlossen war.
-      ein einzelner Download der Datei hat geklappt.
     - "nummerierte Tags", die dann keine to from beziehung mehr ermöglichen:
        0000018255-21-000004, 0000016160-21-000018
-
-    - Klassifikation von IS in zip ist falsch, müsste CI sein: '0000016918-21-000010', 0000024090-21-000012" "0000034903-21-000020"
-      - im Q1 2021 gibt es nur einen report, bei dem CI vorhanden ist, aber IS nicht (0001628280-21-003313).
-        demgegenüber stehen 3473 Reports, bei denen ein IS vorhanden ist, aber kein CI
-        so gesehen wäre das vorgehen, falls kein IS vorhanden ist CI zu verwenden ok
-
-
 
 - Aufbau erweiterbarer "PRE" Test, in welchem mann spezialfälle direkt in ein testdaten verzeichnis ablegen
   kann. der Test iteriert dann über alle Testfiles und prüft die Ergebnisse.
   Die Prüfungen müsste man vermutlich auch irgendwie standardisieren, bzw. die erwartete CSV auch Datei hinstellen.
-
 
 
 - berechnen pre-xml
@@ -61,6 +48,8 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 --- Prüfen ob
 
 - zippen von xml dateien
+
+- Reihenfolge der Spalten in den geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
 
 
 Done

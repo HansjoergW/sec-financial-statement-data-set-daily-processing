@@ -54,7 +54,7 @@ def test_process_presentations():
     parser = SecPreXmlParser()
     df = parser._process_presentations(root, "H")
 
-    assert 40 == len(df)
+    assert 45 == len(df)
     assert 9 == len(df.columns)
 
 
@@ -66,7 +66,7 @@ def test_parse():
     parser = SecPreXmlParser()
     df = parser.parse(xml_exp_content)
 
-    assert 40 == len(df)
+    assert 45 == len(df)
     assert 9 == len(df.columns)
 
 
@@ -79,7 +79,7 @@ def test_clean_for_pure_pre():
     df = parser.parse(xml_exp_content)
     df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
 
-    assert 40 == len(df_clean)
+    assert 45 == len(df_clean)
 
 
 def test_complete_file_parse():
@@ -101,3 +101,16 @@ def test_unsorted_loc_file_parse():
     df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
 
     assert len(df_clean[df_clean.index.isin(["IS"], level="stmt")]) > 0
+
+
+def test_get_version_tag_name_from_href():
+    testcases = [
+        {"href":"http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member", "version":"us-gaap/2020", "tag":"AccountingStandardsUpdate201802Member"},
+        {"href":"pki-20210103.xsd#pki_AccountingStandardsUpdate_201616Member", "version":"company", "tag":"AccountingStandardsUpdate_201616Member"},
+    ]
+
+    for testcase in testcases:
+        details = SecPreXmlParser._get_version_tag_name_from_href(testcase['href'])
+
+        assert details['tag'] == testcase['tag']
+        assert details['version'] == testcase['version']
