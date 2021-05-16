@@ -1,6 +1,29 @@
 Next
 ====
 
+Reparse Tools -> get_xml_fils_from_sec muss irgendwie aufgeteilt werden
+ - > finden eines bestimmten Testset aus aus der DB sollte nicht Bestandteil von
+     Rparse Tool sein, dass sollte nur liste mit adshs bekommen
+
+     -> TestsetcreatorTool ->
+
+
+- da das tag herauslesen jetzt einigermassen funktioniert, könnte man vlt einen besseren vergleich
+  zwischen inhalt in zip und geparsten files machen.
+  -> prüfen, welche genau übereinstimmen,
+  -> prüfen, welche Inhalte zuviel gescannt werden
+  -> z.B Report 0000014272-21-000066 -> hier werden beim parsen viel mehr reports gefunden, als in zip
+
+  es wäre auch gut für die zip datei die selbe stmt-taglist struktur aufzubauen, das würde den vergleich einfacher machen,
+  so dass man auch sieht, was für statments es in zip gibt und wie gross die anzahl tags darin ist
+
+  ziel müsste sein, dass über Tabellen machen zu können.
+  - Aufbereiten der pre.txt in eine Tabelle mit den adsh, stmt, report, taglist, taglist-länge
+  - Aufbereiten der geparsten Daten in ähnlicher Form, zusätzlich für die gefunden Reports die role und root-node,
+    sowie der Key, aufgrund dessen der Eintrag klassifziert wurde
+
+
+
 - Pre Spezialfälle
     - "nummerierte Tags", die dann keine to from beziehung mehr ermöglichen:
        0000018255-21-000004, 0000016160-21-000018

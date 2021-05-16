@@ -4,7 +4,7 @@
 # 1. all 10-k and 10-q reports are of the zip files are available
 # are the contents in the csv file the same
 from _00_common.DBManagement import DBManager
-from _00_common.DebugUtils import DataAccessTool, ReparseTool
+from _00_common.DebugUtils import DataAccessTool, ReparseTool, TestSetCreatorTool
 
 import pandas as pd
 from typing import List, Set, Dict
@@ -226,8 +226,10 @@ def compare_from_test_dir(exceptions: Set[str]):
 
 
 def reparse_pre(count: int):
+    testset_creator = TestSetCreatorTool(workdir_default)
+    adshs: List[str] = testset_creator.get_testset_by_year_and_months(2021,[1,2,3], count)
     reparse = ReparseTool(workdir_default)
-    reparse.reparse_pre(2021, [1,2,3], 'd:/secprocessing/tmp/precsv/', count)
+    reparse.reparse_pre_by_adshs(adshs,  'd:/secprocessing/tmp/precsv/')
 
 
 def direct_test():

@@ -24,12 +24,14 @@
      in which the check is done. For instance "IncomeStatement" would also be true in "ComprehensiveIncomeStatement"
 3.4. If there is no IS, but only a CI, then the report is labeled as IS: 0000016918-21-000010', 0000024090-21-000012" "0000034903-21-000020"
      However, in 2021 Q1 there was one Exception to that rule: 0001628280-21-003313
+3.5. up-lowercase is not consistent, e.g. roles are sometimes in uppercase, somtimes in lowercase
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:
 5.1.1. with http namespace in xlink:href -> before # get ns and year -> us-gaap/2020
 5.1.2. if no http in xlink:href-> "company tag" -> version -> adsh of the report
 5.1.3. label starts after the first _ after the # in the xlink:href 
+5.1.4. it happens rarely, that the tagname is None (in two stmts 'UN' for 0001564590-21-017096)
 
 6. differences
 6.1.    0000883984-21-000005 - hat zusätzliche Einträge im XML in den Statements

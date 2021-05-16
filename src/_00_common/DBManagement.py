@@ -131,7 +131,7 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_unparsed_numFiles(self) -> List[Tuple[str]]:
+    def find_unparsed_numFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
@@ -140,7 +140,7 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_unparsed_preFiles(self) -> List[Tuple[str]]:
+    def find_unparsed_preFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
