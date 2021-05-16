@@ -17,6 +17,8 @@ import traceback
 # namespaces[""] = root.nsmap.get('link')
 
 
+
+
 class SecPreXmlParser(SecXmlParserBase):
     """Parses the data of an Pre.Xml file and delivers the data in a similar format than the pre.txt
        contained in the financial statements dataset of the sex."""

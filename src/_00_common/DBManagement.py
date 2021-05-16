@@ -86,6 +86,15 @@ class DBManager():
         finally:
             conn.close()
 
+    def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
+        conn = self.get_connection()
+        adshs = ','.join("'" + adsh + "'" for adsh in adshs)
+        try:
+            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(adshs)
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
     def get_files_for_adsh(self, adsh: str) -> Tuple[str, str, str, str, str]:
         conn = self.get_connection()
         try:

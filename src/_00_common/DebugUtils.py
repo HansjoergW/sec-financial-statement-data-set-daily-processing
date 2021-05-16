@@ -106,17 +106,8 @@ class ReparseTool():
     def __init__(self, workdir: str):
         self.tool = DataAccessTool(workdir)
 
-    def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
-        conn = self.tool.dbmgr.get_connection()
-        adshs = ','.join("'" + adsh + "'" for adsh in adshs)
-        try:
-            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(adshs)
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
-
     def reparse_pre_by_adshs(self, adshs: List[str],  targetFolder: str,):
-        xml_files_info: List[Tuple[str, str, str]] = self.get_xml_files_info_from_sec_processing_by_adshs(adshs)
+        xml_files_info: List[Tuple[str, str, str]] = self.tool.dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
 
         select_funct = lambda : pre_xml_files_info

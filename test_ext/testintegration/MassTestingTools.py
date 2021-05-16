@@ -100,10 +100,14 @@ class ReadMassPreZipContent():
             conn.close()
 
 
-
 def fill_mass_pre_zip(dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qrtr: int):
     content_filler = FillMassPreZipContent(dbmgr, dataUtils, year, qrtr)
     content_filler.process()
+
+
+def read_mass_pre_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year:int, qrtr: int) -> pd.DataFrame :
+    reader = ReadMassPreZipContent(dbmgr, dataUtils, 2021, 1)
+    return reader.readContent()
 
 
 if __name__ == '__main__':
@@ -112,8 +116,7 @@ if __name__ == '__main__':
     dataUtils = DataAccessTool(workdir)
 
     #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
-    reader = ReadMassPreZipContent(dbmgr, dataUtils, 2021, 1)
-    df = reader.readContent()
+    df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     print(df.shape)
 
 
