@@ -97,8 +97,7 @@ class SecPreXmlParser(SecXmlParserBase):
             details: Dict[str, str] = {}
             to_tag = arc.get('to')
             from_tag = arc.get('from')
-            prefered_label = arc.get('preferredLabel',
-                                     '')  # not all reports define a preferrerdLabel for every presentation Arc: 0000019584-21-000003
+            prefered_label = arc.get('preferredLabel','')  # not all reports define a preferrerdLabel for every presentation Arc: 0000019584-21-000003
 
             # it is possible, that the same to_tag appears twice with different prefered_label
             # but this is only the case, if the to_tag is not also a from_tag

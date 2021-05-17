@@ -1,9 +1,13 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Union
+import re
 
-""" transforms the raw content of the information inside the xml in the a usable form. does not any processing of the data"""
+""" transforms the raw content of the information inside the xml in the a usable form. does not do any processing of the data, 
+but adds additional information"""
 
 
 class SecPreXmlTransformer():
+
+    digit_ending_label_regex = re.compile(r"_\d*$")
 
     def __init__(self):
         pass
@@ -35,31 +39,44 @@ class SecPreXmlTransformer():
             version = 'company'
 
         pos = complete_tag.find('_')
-        tag = complete_tag[pos+1:]
+        tag = complete_tag[pos + 1:]
 
         details['tag'] = tag
         details['version'] = version
         return details
 
+    def transform_loc(self, loc_list: List[Dict[str, str]]):
+        for loc in loc_list:
+            tag_version: Dict[str, str] = SecPreXmlTransformer._get_version_tag_name_from_href(loc.get('href'))
+            loc['version'] = tag_version['version']
+            loc['tag'] = tag_version['tag']
 
+    def transform_preArc(self, preArc_list: List[Dict[str, str]]):
 
-    def transform(self, data: Dict[int,Tuple[str, List[Dict[str,str]], List[Dict[str, str]]]]) -> Dict[int,Tuple[str, List[Dict[str,str]], List[Dict[str, str]]]]:
-        pass
+        for preArc in preArc_list:
+            # not all entries have a preferred label, so we ensure that we don't have a None value
+            preArc['preferred_label'] = preArc.get('preferredLabel', '')
 
-# evtl. noch herausfinden, ob es spezieller labeltyp ist, mit _12 oder so ending
-# label anpassen könnte man dann direkt hier machen
-# prüfen, ob nach letztem _ nur digits vorhanden sind
+            # figure out wether the preferredLabel gives a  hint that the displayed number is inverted
+            negated = "negated" in preArc['preferred_label']
+            preArc['negating'] = negated
 
-# in loc: tag und version aus href berechnen
-#
+            # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always an int
+            preArc['order_nr'] = int(float(preArc.get('order')))
 
-# in arc:
-# order -> wandeln: order_nr = int(float(arc.get('order')))
-# add negating:    negated = False
-#                  if prefered_label:
-#                     negated = "negated" in prefered_label
-# key tag bestimmen             if to_tag in from_list:
-                    #                 key_tag = to_tag
-                    #             else:
-                    #                 key_tag = to_tag + "$$$" + prefered_label
-#
+            # there are some special cases of reports which adds a running number to every appreance of a label.
+            # (like '...._12'). This makes it impossiple to build up the hierarchy and therefore to find the root.
+            # therefore, this labels have to handled in a special way
+            preArc['digit_ending'] = False
+            if self.digit_ending_label_regex.search(preArc.get('label')):
+                preArc['digit_ending'] = True
+
+    def transform(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]):
+        for k,v in data.items():
+            self.transform_loc(v.get('loc_list'))
+            self.transform_preArc(v.get('preArc_list'))
+
+            # figure out if data in a report where contained in parantheses
+            v['inpth'] = 0
+            if "parenthetical" in v.get('role'):
+                v['inpth'] = 1
