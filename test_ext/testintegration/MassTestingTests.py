@@ -1,6 +1,6 @@
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 from _00_common.DBManagement import DBManager
-from _02_xml.pre.SecPreXmlPreparation import SecPreXmlPreparer
+from _02_xml.pre.SecPreXmlExtracting import SecPreXmlExtractor
 
 from typing import List, Dict, Tuple
 from multiprocessing import Pool
@@ -20,7 +20,7 @@ dbmgr = DBManager(default_workdir)
 
 
 def prepare_func(data: Tuple[str, str]):
-    pre_xml_preparer = SecPreXmlPreparer()
+    pre_xml_preparer = SecPreXmlExtractor()
     adsh = data[0]
     pre_xml_file = data[1]
     with open(pre_xml_file, "r", encoding="utf-8") as f:

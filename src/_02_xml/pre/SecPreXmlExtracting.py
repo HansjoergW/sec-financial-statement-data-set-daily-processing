@@ -1,9 +1,9 @@
 import re
 from lxml import etree
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 
-class SecPreXmlPreparer():
+class SecPreXmlExtractor():
 
     """ Preparses the xml content and returns a Dict, Tuple, List Structure with the relevant raw information"""
 
@@ -64,25 +64,29 @@ class SecPreXmlPreparer():
             result.append(entry)
         return result
 
-    def _loop_presentationLink(self, root: etree._Element) -> Dict[int, Tuple[str, List[Dict[str,str]], List[Dict[str, str]]]]:
+    def _loop_presentationLink(self, root: etree._Element) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
         namespaces = root.nsmap
         presentation_links = root.findall('presentationLink', namespaces)
 
-        result: Dict[int, Tuple[str, List[Dict[str,str]], List[Dict[str, str]]]] = {}
+        result: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]] = {}
 
         report = 0
         for presentation_link in presentation_links:
+            details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
             report += 1
             role: str = presentation_link.get("role")
             loc_list: List[Dict[str, str]] = self._get_locations(presentation_link)
             preArc_list: List[Dict[str, str]] = self._get_presentationArcs(presentation_link)
 
-            data_tuple: Tuple[str, List[Dict[str,str]], List[Dict[str, str]]] = (role, loc_list, preArc_list)
-            result[report] = data_tuple
+            details['role'] = role
+            details['loc_list'] = loc_list
+            details['preArc_list'] = preArc_list
+
+            result[report] = details
 
         return result
 
-    def preparexml(self, data: str) -> Dict[int,Tuple[str, List[Dict[str,str]], List[Dict[str, str]]]]:
+    def preparexml(self, data: str) -> Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]]:
         data = self._strip_file(data)
         data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)
