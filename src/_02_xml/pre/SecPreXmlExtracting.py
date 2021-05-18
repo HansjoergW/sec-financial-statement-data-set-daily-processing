@@ -57,7 +57,7 @@ class SecPreXmlExtractor():
         for arc in arcs:
             entry: Dict[str, str] = {}
             entry['order'] = arc.get('order')
-            entry['preferredLabel'] = arc.get('preferredLabel')
+            entry['preferredLabel'] = arc.get('preferredLabel', '') # if missing, use a ''
             entry['from'] = arc.get('from')
             entry['to'] = arc.get('to')
 

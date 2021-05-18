@@ -36,7 +36,7 @@ class SecPreXmlTransformer():
             ns_parts = href_parts[0].split('/')
             version = ns_parts[3] + '/' + ns_parts[4]
         else:
-            version = 'company'
+            version = 'company' # special hint to indicate that this is a company specifig tag
 
         pos = complete_tag.find('_')
         tag = complete_tag[pos + 1:]
@@ -51,27 +51,25 @@ class SecPreXmlTransformer():
             loc['version'] = tag_version['version']
             loc['tag'] = tag_version['tag']
 
-    def transform_preArc(self, preArc_list: List[Dict[str, str]]):
+            # there are some special cases of reports which adds a running number to every appereance of a label,
+            # also in the to and from attributes of the preArc entries (e.g. 0000016160-21-000018).
+            # (like '...._12'). This makes it impossible to build up the hierarchy and therefore to find the root.
+            # therefore, this labels have to handled in a special way
+            loc['digit_ending'] = False
+            if self.digit_ending_label_regex.search(loc.get('label')):
+                loc['digit_ending'] = True
 
+    def transform_preArc(self, preArc_list: List[Dict[str, str]]):
         for preArc in preArc_list:
-            # not all entries have a preferred label, so we ensure that we don't have a None value
-            preArc['preferred_label'] = preArc.get('preferredLabel', '')
 
             # figure out wether the preferredLabel gives a  hint that the displayed number is inverted
-            negated = "negated" in preArc['preferred_label']
+            negated = "negated" in preArc['preferredLabel']
             preArc['negating'] = negated
 
             # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always an int
             preArc['order_nr'] = int(float(preArc.get('order')))
 
-            # there are some special cases of reports which adds a running number to every appreance of a label.
-            # (like '...._12'). This makes it impossiple to build up the hierarchy and therefore to find the root.
-            # therefore, this labels have to handled in a special way
-            preArc['digit_ending'] = False
-            if self.digit_ending_label_regex.search(preArc.get('label')):
-                preArc['digit_ending'] = True
-
-    def transform(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]):
+    def transform(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
         for k,v in data.items():
             self.transform_loc(v.get('loc_list'))
             self.transform_preArc(v.get('preArc_list'))
@@ -80,3 +78,5 @@ class SecPreXmlTransformer():
             v['inpth'] = 0
             if "parenthetical" in v.get('role'):
                 v['inpth'] = 1
+
+        return data

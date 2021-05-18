@@ -46,22 +46,24 @@ special case numbered labels example: 0000016160-21-000018
     <loc  label="Locator_us-gaap_StatementClassOfStockAxis_403"/>
 	<loc  label="Locator_us-gaap_ClassOfStockDomain_404"/>
 	<loc  label="Locator_us-gaap_ClassOfStockDomain_399"/>
-	<loc  label="Locator_calm_CommonStockNonConvertibleMember_400"/>
 	<loc  label="Locator_us-gaap_ClassOfStockDomain_401"/>
+	<loc  label="Locator_calm_CommonStockNonConvertibleMember_400"/>
+
 	<loc  label="Locator_us-gaap_CommonClassAMember_402"/>
 	<loc  label="Locator_us-gaap_StatementOfFinancialPositionAbstract_367"/>
+	<loc  label="Locator_us-gaap_StatementTable_397"/>
 	<loc  label="Locator_us-gaap_StatementTable_368"/>
 	<loc  label="Locator_us-gaap_StatementTable_395"/>
 	<loc  label="Locator_us-gaap_StatementLineItems_396"/>
 	<loc  label="Locator_us-gaap_StatementLineItems_369"/>
-	<loc  label="Locator_us-gaap_CommonStockParOrStatedValuePerShare_370"/>
 	<loc  label="Locator_us-gaap_StatementLineItems_371"/>
-	<loc  label="Locator_us-gaap_CommonStockSharesAuthorized_372"/>
 	<loc  label="Locator_us-gaap_StatementLineItems_373"/>
-	<loc  label="Locator_us-gaap_CommonStockSharesIssued_374"/>
 	<loc  label="Locator_us-gaap_StatementLineItems_375"/>
+	<loc  label="Locator_us-gaap_CommonStockParOrStatedValuePerShare_370"/>
+
+	<loc  label="Locator_us-gaap_CommonStockSharesAuthorized_372"/>
+	<loc  label="Locator_us-gaap_CommonStockSharesIssued_374"/>
 	<loc  label="Locator_us-gaap_TreasuryStockShares_376"/>
-	<loc  label="Locator_us-gaap_StatementTable_397"/>
 	<loc  label="Locator_us-gaap_StatementClassOfStockAxis_398"/>
 
 	<presentationArc from="Locator_us-gaap_StatementClassOfStockAxis_403"            to="Locator_us-gaap_ClassOfStockDomain_404" order="1.0" preferredLabel="terseLabel"/>
