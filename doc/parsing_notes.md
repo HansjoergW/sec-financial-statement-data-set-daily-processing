@@ -4,7 +4,8 @@
 1. order
 1.1. order can be as int 1 or as 1.0
 1.2. order can be start with 0 or 1. can be different between xml, between presentations or even between childs in a presentation
-1.2. order can restart in any sublist or can restart with every presentation or can be continuous throughout the whole xml
+1.3. order can restart in any sublist or can restart with every presentation or can be continuous throughout the whole xml
+1.4. there are also rarely cases where order contains a fraction like 10440.02 -> so order has to be processed as float
 
 2. relation loc - order
 2.1. version can only be generated from loc
@@ -39,70 +40,3 @@
 
 
 
-
-special case numbered labels example: 0000016160-21-000018
-<pre>
-<presentationLink type="extended" role="http://www.calmainefoods.com/role/CondensedConsolidatedBalanceSheetsParenthetical">		
-    <loc  label="Locator_us-gaap_StatementClassOfStockAxis_403"/>
-	<loc  label="Locator_us-gaap_ClassOfStockDomain_404"/>
-	<loc  label="Locator_us-gaap_ClassOfStockDomain_399"/>
-	<loc  label="Locator_us-gaap_ClassOfStockDomain_401"/>
-	<loc  label="Locator_calm_CommonStockNonConvertibleMember_400"/>
-
-	<loc  label="Locator_us-gaap_CommonClassAMember_402"/>
-	<loc  label="Locator_us-gaap_StatementOfFinancialPositionAbstract_367"/>
-	<loc  label="Locator_us-gaap_StatementTable_397"/>
-	<loc  label="Locator_us-gaap_StatementTable_368"/>
-	<loc  label="Locator_us-gaap_StatementTable_395"/>
-	<loc  label="Locator_us-gaap_StatementLineItems_396"/>
-	<loc  label="Locator_us-gaap_StatementLineItems_369"/>
-	<loc  label="Locator_us-gaap_StatementLineItems_371"/>
-	<loc  label="Locator_us-gaap_StatementLineItems_373"/>
-	<loc  label="Locator_us-gaap_StatementLineItems_375"/>
-	<loc  label="Locator_us-gaap_CommonStockParOrStatedValuePerShare_370"/>
-
-	<loc  label="Locator_us-gaap_CommonStockSharesAuthorized_372"/>
-	<loc  label="Locator_us-gaap_CommonStockSharesIssued_374"/>
-	<loc  label="Locator_us-gaap_TreasuryStockShares_376"/>
-	<loc  label="Locator_us-gaap_StatementClassOfStockAxis_398"/>
-
-	<presentationArc from="Locator_us-gaap_StatementClassOfStockAxis_403"            to="Locator_us-gaap_ClassOfStockDomain_404" order="1.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_ClassOfStockDomain_399"                   to="Locator_calm_CommonStockNonConvertibleMember_400" order="1.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_ClassOfStockDomain_401"                   to="Locator_us-gaap_CommonClassAMember_402" order="2.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementOfFinancialPositionAbstract_367" to="Locator_us-gaap_StatementTable_368" order="1.0"/>
-	<presentationArc from="Locator_us-gaap_StatementTable_395"                       to="Locator_us-gaap_StatementLineItems_396" order="2.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementLineItems_369"                   to="Locator_us-gaap_CommonStockParOrStatedValuePerShare_370" order="1.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementLineItems_371"                   to="Locator_us-gaap_CommonStockSharesAuthorized_372" order="2.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementLineItems_373"                   to="Locator_us-gaap_CommonStockSharesIssued_374" order="3.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementLineItems_375"                   to="Locator_us-gaap_TreasuryStockShares_376" order="4.0" preferredLabel="terseLabel"/>
-	<presentationArc from="Locator_us-gaap_StatementTable_397"                       to="Locator_us-gaap_StatementClassOfStockAxis_398" order="1.0" preferredLabel="terseLabel"/>
-</presentationLink>
- </pre>
- 
- special case: in Zip als EQ markiert, obwohl BS: 0000016918-21-000010 -> nur Equity members
- <pre>
- <link:presentationLink xlink:role="http://www.cbrands.com/role/ConsolidatedBalanceSheetsParenthetical" xlink:type="extended">
- 	<link:loc label="loc_us-gaap_StatementOfFinancialPositionAbstract_5651fb35-9495-415f-b022-3e73be08e210" xlink:href="us-gaap_StatementOfFinancialPositionAbstract"/>
- 	<link:loc label="loc_us-gaap_StatementTable_44bbe0e4-0ea8-4790-b40f-4920205b24fc"                       xlink:href="us-gaap_StatementTable"/>
- 	<link:loc label="loc_us-gaap_StatementClassOfStockAxis_ce55d326-b576-4e15-900e-1dd64c7a81e4"            xlink:href="us-gaap_StatementClassOfStockAxis"/>
- 	<link:loc label="loc_us-gaap_ClassOfStockDomain_620e418d-a3f7-4bd7-aab7-c0f7588af929"                   xlink:href="us-gaap_ClassOfStockDomain"/>
- 	<link:loc label="loc_us-gaap_CommonClassAMember_35fd5bb4-11d5-4b7f-b0d9-f22d9d75eca5"                   xlink:href="us-gaap_CommonClassAMember"/>
- 	<link:loc label="loc_us-gaap_CommonClassBMember_3ff13086-57b0-4e23-af20-b9b86b06b429"                   xlink:href="us-gaap_CommonClassBMember"/>
- 	<link:loc label="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3"                   xlink:href="us-gaap_StatementLineItems"/>
- 	<link:loc label="loc_us-gaap_CommonStockParOrStatedValuePerShare_ee4cc4f3-4e54-4f79-9276-f11361dece63"  xlink:href="us-gaap_CommonStockParOrStatedValuePerShare"/>
- 	<link:loc label="loc_us-gaap_CommonStockSharesAuthorized_da87084e-da61-4827-8a5f-a51aee3fe003"          xlink:href="us-gaap_CommonStockSharesAuthorized"/>
- 	<link:loc label="loc_us-gaap_CommonStockSharesIssued_115c30f7-caee-4a8a-ad5b-107b079ce2f3"              xlink:href="us-gaap_CommonStockSharesIssued"/>
- 	<link:loc label="loc_us-gaap_TreasuryStockShares_fdc8282c-438c-45a6-82fb-c3d1c980da45"                  xlink:href="us-gaap_TreasuryStockShares"/>
- 	
- 	<link:presentationArc order="1"  from="loc_us-gaap_StatementOfFinancialPositionAbstract_5651fb35-9495-415f-b022-3e73be08e210" xlink:to="loc_us-gaap_StatementTable_44bbe0e4-0ea8-4790-b40f-4920205b24fc" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="1"  from="loc_us-gaap_StatementTable_44bbe0e4-0ea8-4790-b40f-4920205b24fc"                       xlink:to="loc_us-gaap_StatementClassOfStockAxis_ce55d326-b576-4e15-900e-1dd64c7a81e4" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="1"  from="loc_us-gaap_StatementClassOfStockAxis_ce55d326-b576-4e15-900e-1dd64c7a81e4"            xlink:to="loc_us-gaap_ClassOfStockDomain_620e418d-a3f7-4bd7-aab7-c0f7588af929" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="1"  from="loc_us-gaap_ClassOfStockDomain_620e418d-a3f7-4bd7-aab7-c0f7588af929"                   xlink:to="loc_us-gaap_CommonClassAMember_35fd5bb4-11d5-4b7f-b0d9-f22d9d75eca5" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="2"  from="loc_us-gaap_ClassOfStockDomain_620e418d-a3f7-4bd7-aab7-c0f7588af929"                   xlink:to="loc_us-gaap_CommonClassBMember_3ff13086-57b0-4e23-af20-b9b86b06b429" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="2"  from="loc_us-gaap_StatementTable_44bbe0e4-0ea8-4790-b40f-4920205b24fc"                       xlink:to="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="1"  from="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3"                   xlink:to="loc_us-gaap_CommonStockParOrStatedValuePerShare_ee4cc4f3-4e54-4f79-9276-f11361dece63" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="2"  from="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3"                   xlink:to="loc_us-gaap_CommonStockSharesAuthorized_da87084e-da61-4827-8a5f-a51aee3fe003" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="3"  from="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3"                   xlink:to="loc_us-gaap_CommonStockSharesIssued_115c30f7-caee-4a8a-ad5b-107b079ce2f3" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- 	<link:presentationArc order="4"  from="loc_us-gaap_StatementLineItems_336dc232-e886-414a-b850-1a9308d35cd3"                   xlink:to="loc_us-gaap_TreasuryStockShares_fdc8282c-438c-45a6-82fb-c3d1c980da45" preferredLabel="http://www.xbrl.org/2003/role/terseLabel"/>
- </link:presentationLink>
- </pre>

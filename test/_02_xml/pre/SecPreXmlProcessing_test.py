@@ -21,8 +21,8 @@ def test_process():
     with open(testprexml_numbered_label, "r", encoding="utf-8") as f:
         content: str = f.read()
 
-        data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = extractor.preparexml(content)
-        data_transformed: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = transformer.transform(data)
-        data_processed = processor.process(data_transformed)
+        data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = extractor.extract("", content)
+        data_transformed: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = transformer.transform("", data)
+        data_processed = processor.process("", data_transformed)
 
         print(len(data_processed))

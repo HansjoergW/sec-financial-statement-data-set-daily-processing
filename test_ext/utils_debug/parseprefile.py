@@ -17,10 +17,10 @@ def get_pre_xml_content_from_file(file: str)-> str:
         return  f.read()
 
 
-def parse_content(content:  str):
+def parse_content(adsh, content:  str):
     parser = SecPreXmlParser()
-    df = parser.parse(content)
-    df_clean = parser.clean_for_financial_statement_dataset(df, "accnr")
+    df = parser.parse(adsh, content)
+    df_clean = parser.clean_for_financial_statement_dataset(df, adsh)
     print(df_clean.shape) # die meisten attribute sind im index, daher ist die anzahl der spalten nur 3
 
 
@@ -58,9 +58,18 @@ if __name__ == '__main__':
     no_matching_report_4 = "0000016918-21-000010" # no matching CF
     two_canditates_1 = "0000014272-21-000066"
 
-    content = get_pre_xml_content_by_adsh(two_canditates_1)
+    # interessanter Eintrag -> hat bei einem order ein ".02" 10440.02 und tatsächlich gibt es auch ein 1440.00 auf der selben Stufe
+    # und das ist auch der dunstkreis, in welchem dann  die line bei einträgen nicht gesetzt ist..
+    # es gibt Einträge ohne line und das is
+    line_error_adsh = "0001564590-21-012671"
 
-    parse_content(content)
+
+    further cases with line error
+    line_error_adsh_2 = "0001437749-21-002772"
+
+    content = get_pre_xml_content_by_adsh(line_error_adsh_2)
+    parse_content(line_error_adsh_2, content)
+
     print("")
 
 # problem -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor

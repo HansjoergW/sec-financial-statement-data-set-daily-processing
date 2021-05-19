@@ -10,7 +10,7 @@ class SecXmlParserBase(ABC):
     def get_type(self):
         return self.type
     @abstractmethod
-    def parse(self, data: str) -> pd.DataFrame:
+    def parse(self, adsh: str, data: str) -> pd.DataFrame:
         pass
 
     @abstractmethod

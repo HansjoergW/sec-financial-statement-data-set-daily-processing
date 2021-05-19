@@ -86,7 +86,7 @@ class SecPreXmlExtractor():
 
         return result
 
-    def preparexml(self, data: str) -> Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]]:
+    def extract(self, adsh: str, data: str) -> Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]]:
         data = self._strip_file(data)
         data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)

@@ -11,6 +11,8 @@ class SecPreXmlDataProcessor():
     stmt_keyword_map: List[Tuple[List[str], str]] = [
         (['consolidated', 'statement', 'income', 'comprehensive'],'CI'),
         (['consolidated', 'statement', 'income'], 'IS'),
+        (['consolidated', 'statement', 'operation'], 'IS'),
+        (['incomestatementabstract'],'IS'),
         (['consolidated', 'statement', 'financialposition'], 'BS'),
         (['consolidated', 'statement', 'cashflow'], 'CF'),
         (['statement', 'shareholder','equity'], 'EQ'),
@@ -243,17 +245,17 @@ class SecPreXmlDataProcessor():
         return result
 
 
-    def process(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, str]]:
+    def process(self, adsh:str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int]]]:
 
         reportnr = 0
-        results: List[Dict[str, str]] = []
+        results: List[Dict[str, Union[str, int]]] = []
         for idx, reportinfo in data.items():
-            try:
-                role: str = data.get('role')
-                inpth: int = data.get('inpth')
-                loc_list: List[Dict[str, str]] = reportinfo.get('loc_list')
-                preArc_list: List[Dict[str, str]] = reportinfo.get('preArc_list')
+            role: str = reportinfo.get('role')
+            inpth: int = int(reportinfo.get('inpth'))
+            loc_list: List[Dict[str, str]] = reportinfo.get('loc_list')
+            preArc_list: List[Dict[str, str]] = reportinfo.get('preArc_list')
 
+            try:
                 preArc_list, loc_list = self._handle_digit_ending_case(preArc_list, loc_list)
 
                 root_node = self._find_root_node(preArc_list)
@@ -270,14 +272,17 @@ class SecPreXmlDataProcessor():
                     entry['stmt'] = stmt
                     entry['inpth'] = inpth
 
-                results.append(entries)
+                results.extend(entries)
 
             except Exception as err:
                 # often a report contains a "presentation" entry with  more than one root node.
                 # so far, we do not handle this, since that type of problem is mainly in presentations which do
                 # not belong to the primary fincancial statements. so we ignore it
-                logging.info("skipped report: {}".format(str(err)))
-                print(traceback.format_exc())
+
+                # just log if the name gives a hint that this could be a primary statement
+                if self._evaluate_statement(role, "", []) is not None:
+                    logging.info("{} skipped report with role {} : {}".format(adsh, role, str(err)))
+                    print("{} skipped report with role {} : {}".format(adsh, role, str(err)))
                 continue
 
         return results

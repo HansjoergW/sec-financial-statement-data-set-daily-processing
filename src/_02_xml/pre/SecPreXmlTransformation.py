@@ -66,17 +66,18 @@ class SecPreXmlTransformer():
             negated = "negated" in preArc['preferredLabel']
             preArc['negating'] = negated
 
-            # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always an int
-            preArc['order_nr'] = int(float(preArc.get('order')))
+            # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always a float
+            # there are also strange entries which have an order number of xy.02 or so
+            preArc['order_nr'] = float(preArc.get('order'))
 
-    def transform(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
+    def transform(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
         for k,v in data.items():
             self._transform_loc(v.get('loc_list'))
             self._transform_preArc(v.get('preArc_list'))
 
             # figure out if data in a report where contained in parantheses
-            v['inpth'] = 0
+            v['inpth'] = "0"
             if "parenthetical" in v.get('role'):
-                v['inpth'] = 1
+                v['inpth'] = "1"
 
         return data
