@@ -45,7 +45,7 @@ class SecPreXmlTransformer():
         details['version'] = version
         return details
 
-    def transform_loc(self, loc_list: List[Dict[str, str]]):
+    def _transform_loc(self, loc_list: List[Dict[str, str]]):
         for loc in loc_list:
             tag_version: Dict[str, str] = SecPreXmlTransformer._get_version_tag_name_from_href(loc.get('href'))
             loc['version'] = tag_version['version']
@@ -59,7 +59,7 @@ class SecPreXmlTransformer():
             if self.digit_ending_label_regex.search(loc.get('label')):
                 loc['digit_ending'] = True
 
-    def transform_preArc(self, preArc_list: List[Dict[str, str]]):
+    def _transform_preArc(self, preArc_list: List[Dict[str, str]]):
         for preArc in preArc_list:
 
             # figure out wether the preferredLabel gives a  hint that the displayed number is inverted
@@ -71,8 +71,8 @@ class SecPreXmlTransformer():
 
     def transform(self, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
         for k,v in data.items():
-            self.transform_loc(v.get('loc_list'))
-            self.transform_preArc(v.get('preArc_list'))
+            self._transform_loc(v.get('loc_list'))
+            self._transform_preArc(v.get('preArc_list'))
 
             # figure out if data in a report where contained in parantheses
             v['inpth'] = 0
