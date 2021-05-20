@@ -16,6 +16,11 @@
 3.1 there are reports which add a running number to every occurence of to and from label, so the
     hierarchy cannot be evaluated without removing this suffixes. Problem these reports will appear as if they
     have many root nodes within a presentation (0000018255-21-000004)
+3.2 there are some rare cases of statements (2 statements in 5500 reports for q1 2021) in a report for which have ambiguous parent-child defnition, meaning
+    that the from-node could be connect to more than one to-node. In this case, the ambiguous entries have
+    to be removed from the structure.
+    examples: 0001562762-21-000101 # StatementConsolidatedStatementsOfStockholdersEquity
+              0001564590-21-012964 # StatementConsolidatedStatementsOfCashFlows
     
 4. Evaluate of report
 3.1. the naming is not always consistent
