@@ -2,6 +2,7 @@ from typing import Dict, Union, List, Tuple, Set
 import logging
 import traceback
 
+
 class SecPreXmlDataProcessor():
     """
     processes the extracted and transformed data from a prexml file
@@ -9,19 +10,19 @@ class SecPreXmlDataProcessor():
 
     # keywords that indicate the type of the report
     stmt_keyword_map: List[Tuple[List[str], str]] = [
-        (['consolidated', 'statement', 'income', 'comprehensive'],'CI'),
+        (['consolidated', 'statement', 'income', 'comprehensive'], 'CI'),
         (['consolidated', 'statement', 'income'], 'IS'),
         (['consolidated', 'statement', 'operation'], 'IS'),
-        (['incomestatementabstract'],'IS'),
+        (['incomestatementabstract'], 'IS'),
         (['consolidated', 'statement', 'financialposition'], 'BS'),
         (['consolidated', 'statement', 'cashflow'], 'CF'),
-        (['statement', 'shareholder','equity'], 'EQ'),
-        (['statement', 'stockholder','equity'], 'EQ'),
-        (['statement', 'shareowner','equity'], 'EQ'),
-        (['statement', 'stockowner','equity'], 'EQ'),
+        (['statement', 'shareholder', 'equity'], 'EQ'),
+        (['statement', 'stockholder', 'equity'], 'EQ'),
+        (['statement', 'shareowner', 'equity'], 'EQ'),
+        (['statement', 'stockowner', 'equity'], 'EQ'),
         (['document', 'entity', 'information'], 'CP'),
         (['balancesheet'], 'BS'),
-        (['cover'],'CP'),
+        (['cover'], 'CP'),
     ]
 
     key_tag_separator = '$$$'
@@ -29,7 +30,8 @@ class SecPreXmlDataProcessor():
     def __init__(self):
         pass
 
-    def _handle_digit_ending_case(self, preArc_list: List[Dict[str, str]], loc_list: List[Dict[str, str]]) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
+    def _handle_digit_ending_case(self, preArc_list: List[Dict[str, str]], loc_list: List[Dict[str, str]]) -> Tuple[
+        List[Dict[str, str]], List[Dict[str, str]]]:
         """
         # a digit ending case has all labels ending with _<digits>, this case has to be handled especially, since
         # no hiearchy can be build. An example for this case is: 0000016160-21-000018
@@ -43,7 +45,7 @@ class SecPreXmlDataProcessor():
             digit_ending = digit_ending and loc.get('digit_ending')
 
         # no digit_ending case, return list without processing
-        if not  digit_ending:
+        if not digit_ending:
             return preArc_list, loc_list
 
         # a digit ending case is disjoint between from and to list
@@ -117,7 +119,7 @@ class SecPreXmlDataProcessor():
 
         for map_entry in self.stmt_keyword_map:
             map_stmt: str = map_entry[1]
-            map_keys:  List[str] = map_entry[0]
+            map_keys: List[str] = map_entry[0]
 
             for entry in role_and_root_node:
                 if all(map_key in entry for map_key in map_keys):
@@ -127,9 +129,10 @@ class SecPreXmlDataProcessor():
 
     def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
-        # it is possible, that the same to_tag appears twice with different prefered_label and we need to be able to
-        # distinguish these entries.
-        # but this is only the case, if the to_tag is not also a from_tag
+        # it is possible that the same to_tag appears twice under different from_tags.
+        # but this seems to be only the case, if the to_tag is not also a from_tag.
+        # therefore the keytag is the "to_tag" for the entries which have children (so they also appear in the from tag)
+        # for the entries which don't have children, the keytag is the combination of from_tag and to_tag
 
         to_list: List[str] = []
         from_list: List[str] = []
@@ -138,16 +141,20 @@ class SecPreXmlDataProcessor():
             to_list.append(preArc.get('to'))
             from_list.append(preArc.get('from'))
 
+        # it is possible, that the same to_tag can appears twice from different to_tags.
+        # so the identifier tag is a combination from the "from" and the "to" tag
+
         for preArc in preArc_list:
             to_tag = preArc.get('to')
-            preferred_label = preArc.get('preferredLabel')
+            from_tag = preArc.get('from')
 
             if to_tag in from_list:
                 key_tag = to_tag
             else:
-                key_tag = to_tag + "$$$" + preferred_label
+                key_tag = to_tag + "$$$" + from_tag
 
             preArc['key_tag'] = key_tag
+
 
     def _calculate_line_nr(self, root_node: str, preArc_list: List[Dict[str, str]]):
         """ the 'only' thing this method does is to add the 'line' attribute to the preArc entries.
@@ -215,8 +222,8 @@ class SecPreXmlDataProcessor():
 
             line += 1
 
-
-    def _calculate_entries(self, root_node: str,  loc_list: List[Dict[str, str]],  preArc_list: List[Dict[str, str]])-> List[Dict[str, str]]:
+    def _calculate_entries(self, root_node: str, loc_list: List[Dict[str, str]], preArc_list: List[Dict[str, str]]) -> \
+    List[Dict[str, str]]:
 
         self._calculate_line_nr(root_node, preArc_list)
 
@@ -244,8 +251,8 @@ class SecPreXmlDataProcessor():
 
         return result
 
-
-    def process(self, adsh:str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int]]]:
+    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[
+        Dict[str, Union[str, int]]]:
 
         reportnr = 0
         results: List[Dict[str, Union[str, int]]] = []

@@ -6,6 +6,44 @@ from _00_common.DebugUtils import DataAccessByAdshTool
 
 workdir = "d:/secprocessing/"
 
+special_content_line_wrong = """<?xml version="1.0" encoding="UTF-8"?>
+<link:linkbase xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xbrldt="http://xbrl.org/2005/xbrldt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd">
+  <link:roleRef roleURI="http://www.huntsman.com/20201231/role/statement-consolidated-statements-of-comprehensive-income" xlink:href="hun-20201231.xsd#statement-consolidated-statements-of-comprehensive-income" xlink:type="simple"/>
+  <link:presentationLink xlink:role="http://www.huntsman.com/20201231/role/statement-consolidated-statements-of-comprehensive-income" xlink:type="extended">
+    <link:loc xlink:href="https://xbrl.sec.gov/dei/2019/dei-2019-01-31.xsd#dei_EntityDomain" xlink:label="dei_EntityDomain" xlink:type="locator"/>
+    <link:loc xlink:href="https://xbrl.sec.gov/dei/2019/dei-2019-01-31.xsd#dei_LegalEntityAxis" xlink:label="dei_LegalEntityAxis" xlink:type="locator"/>
+    <link:loc xlink:href="hun-20201231.xsd#hun_HuntsmanInternationalLLCMember" xlink:label="hun_HuntsmanInternationalLLCMember" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ComprehensiveIncomeNetOfTax" xlink:label="us-gaap_ComprehensiveIncomeNetOfTax-3" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest" xlink:label="us-gaap_ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest-n8" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest" xlink:label="us-gaap_ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest-3" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax" xlink:label="us-gaap_OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeLossNetOfTax" xlink:label="us-gaap_OtherComprehensiveIncomeLossNetOfTax-3" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:label="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansAdjustmentNetOfTax" xlink:label="us-gaap_OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansAdjustmentNetOfTax-n8" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeOtherNetOfTax" xlink:label="us-gaap_OtherComprehensiveIncomeOtherNetOfTax" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ProfitLoss" xlink:label="us-gaap_ProfitLoss-1" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="us-gaap_StatementLineItems" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementOfIncomeAndComprehensiveIncomeAbstract" xlink:label="us-gaap_StatementOfIncomeAndComprehensiveIncomeAbstract" xlink:type="locator"/>
+    <link:loc xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="us-gaap_StatementTable" xlink:type="locator"/>
+    <link:presentationArc order="0" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_StatementOfIncomeAndComprehensiveIncomeAbstract" xlink:to="us-gaap_StatementTable" xlink:type="arc"/>
+    <link:presentationArc order="0" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="dei_LegalEntityAxis" xlink:to="dei_EntityDomain" xlink:type="arc"/>
+    <link:presentationArc order="0" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_StatementTable" xlink:to="dei_LegalEntityAxis" xlink:type="arc"/>
+    <link:presentationArc order="1" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="dei_LegalEntityAxis" xlink:to="hun_HuntsmanInternationalLLCMember" xlink:type="arc"/>
+    <link:presentationArc order="1" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_StatementTable" xlink:to="us-gaap_StatementLineItems" xlink:type="arc"/>
+    <link:presentationArc order="0" preferredLabel="http://www.xbrl.org/2003/role/verboseLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_StatementLineItems" xlink:to="us-gaap_ProfitLoss-1" xlink:type="arc"/>
+    <link:presentationArc order="1" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_StatementLineItems" xlink:to="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:type="arc"/>
+    <link:presentationArc order="0" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax" xlink:type="arc"/>
+    <link:presentationArc order="1" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansAdjustmentNetOfTax-n8" xlink:type="arc"/>
+    <link:presentationArc order="2" preferredLabel="http://www.xbrl.org/2003/role/label" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_OtherComprehensiveIncomeOtherNetOfTax" xlink:type="arc"/>
+    <link:presentationArc order="3" preferredLabel="http://www.xbrl.org/2003/role/totalLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_OtherComprehensiveIncomeLossNetOfTax-3" xlink:type="arc"/>
+    <link:presentationArc order="4" preferredLabel="http://www.xbrl.org/2003/role/totalLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest-3" xlink:type="arc"/>
+    <link:presentationArc order="5" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest-n8" xlink:type="arc"/>
+    <link:presentationArc order="6" preferredLabel="http://www.xbrl.org/2003/role/totalLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_ComprehensiveIncomeNetOfTax-3" xlink:type="arc"/>
+    <link:presentationArc order="7" preferredLabel="http://www.xbrl.org/2003/role/verboseLabel" xbrldt:closed="true" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="us-gaap_OtherComprehensiveIncomeLossNetOfTaxPeriodIncreaseDecreaseAbstract" xlink:to="us-gaap_ProfitLoss-1" xlink:type="arc"/>
+  </link:presentationLink>
+</link:linkbase>
+"""
+
 
 def get_pre_xml_content_by_adsh(adsh: str)-> str :
     by_adsh = DataAccessByAdshTool(workdir, adsh, 2021, 1)
@@ -62,13 +100,12 @@ if __name__ == '__main__':
     # und das ist auch der dunstkreis, in welchem dann  die line bei einträgen nicht gesetzt ist..
     # es gibt Einträge ohne line und das is
     line_error_adsh = "0001564590-21-012671"
-
-
-    further cases with line error
     line_error_adsh_2 = "0001437749-21-002772"
 
-    content = get_pre_xml_content_by_adsh(line_error_adsh_2)
-    parse_content(line_error_adsh_2, content)
+    content = special_content_line_wrong
+    #content = get_pre_xml_content_by_adsh(line_error_adsh_2)
+
+    parse_content("", content)
 
     print("")
 
