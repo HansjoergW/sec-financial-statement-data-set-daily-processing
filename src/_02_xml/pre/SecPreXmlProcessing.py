@@ -1,6 +1,6 @@
 from typing import Dict, Union, List, Tuple, Set
 import logging
-import traceback
+import pprint as pp
 
 
 class SecPreXmlDataProcessor():
@@ -129,10 +129,10 @@ class SecPreXmlDataProcessor():
 
     def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
-        # it is possible that the same to_tag appears twice under different from_tags.
+        # it is possible that the same to_tag appears twice under different from_tags or (!) also the same from_tag.
         # but this seems to be only the case, if the to_tag is not also a from_tag.
         # therefore the keytag is the "to_tag" for the entries which have children (so they also appear in the from tag)
-        # for the entries which don't have children, the keytag is the combination of from_tag and to_tag
+        # for the entries which don't have children, the keytag is the combination of from_tag, to_tag and order
 
         to_list: List[str] = []
         from_list: List[str] = []
@@ -147,11 +147,12 @@ class SecPreXmlDataProcessor():
         for preArc in preArc_list:
             to_tag = preArc.get('to')
             from_tag = preArc.get('from')
+            order_str = str(preArc.get('order_nr'))
 
             if to_tag in from_list:
                 key_tag = to_tag
             else:
-                key_tag = to_tag + "$$$" + from_tag
+                key_tag = to_tag + self.key_tag_separator + from_tag + self.key_tag_separator +  order_str
 
             preArc['key_tag'] = key_tag
 

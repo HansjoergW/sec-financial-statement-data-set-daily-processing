@@ -38,5 +38,6 @@
 6.1.    0000883984-21-000005 - hat zusätzliche Einträge im XML in den Statements
         StatementScenarioAxis und ScenarioUnspecifiedDomain von srt/2020 erscheinen nicht, erst ab StatementLineItems..
 
-
+7. preferredlabels
+7.1. there are also perdiodStartLabel and periodEndLabel in a CF for CashAndCashEq at beginning and end of period
 
