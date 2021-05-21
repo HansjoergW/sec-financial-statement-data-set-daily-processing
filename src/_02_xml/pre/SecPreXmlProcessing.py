@@ -304,11 +304,13 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[
-        Dict[str, Union[str, int]]]:
+    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
 
         reportnr = 0
         results: List[Dict[str, Union[str, int]]] = []
+
+        error_collector: List[Tuple[str, str, str]] = []
+
         for idx, reportinfo in data.items():
             role: str = reportinfo.get('role')
             inpth: int = int(reportinfo.get('inpth'))
@@ -344,14 +346,11 @@ class SecPreXmlDataProcessor():
                 results.extend(entries)
 
             except Exception as err:
-                # often a report contains a "presentation" entry with  more than one root node.
-                # so far, we do not handle this, since that type of problem is mainly in presentations which do
-                # not belong to the primary fincancial statements. so we ignore it
-
+                error_collector.append((adsh, role, str(err)))
                 # just log if the name gives a hint that this could be a primary statement
                 if self._evaluate_statement(role, "", []) is not None:
                     logging.info("{} skipped report with role {} : {}".format(adsh, role, str(err)))
                     print("{} skipped report with role {} : {}".format(adsh, role, str(err)))
                 continue
 
-        return results
+        return (results, error_collector)

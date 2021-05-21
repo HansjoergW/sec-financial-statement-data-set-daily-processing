@@ -1,10 +1,61 @@
 from _00_common.DBManagement import DBManager
-from _00_common.DebugUtils import DataAccessTool
+from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
+from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from _02_xml.SecXmlParsingBase import SecError
 import pandas as pd
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
+from multiprocessing import Pool
 
 MASS_PRE_ZIP_TABLE = "mass_pre_zip_content"
+MASS_PRE_XML_TABLE = "mass_pre_parse_xml_data"
+
+
+def convert_to_mass_report_test_df(dbmgr: DBManager, df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
+    pre_by_adsh_grouped = df.groupby(['adsh','report'])
+
+    processing_df = dbmgr.read_all_processing()
+    adsh_xmlPre_df = processing_df[['accessionNumber', 'xmlPreFile']]
+    adsh_xmlPre_df.set_index('accessionNumber', inplace=True)
+
+    adsh_xml_dict = adsh_xmlPre_df.to_dict('index')
+
+    records: List[Dict[str,str]] = []
+    missing_xml_files:List[str] = []
+    for groupname, groupdf in pre_by_adsh_grouped:
+        stmt = groupdf.stmt.tolist()[0]
+        tags = groupdf.tag.tolist()
+        adsh = groupname[0]
+        report = groupname[1]
+
+        try:
+            # it could happen, that for some reason, the tagname is missing.
+            tags = [str(tag) for tag in tags]
+            taglist = ",".join(tags)
+
+            # check
+            if len(taglist.split(',')) != len(tags):
+                raise Exception("tag contain ','!!")
+            try:
+                xmlFile = adsh_xml_dict[adsh]['xmlPreFile']
+            except KeyError:
+                missing_xml_files.append(adsh)
+                xmlFile = None
+
+            details = {}
+            details['adsh'] = adsh
+            details['report'] = report
+            details['stmt'] = stmt
+            details['length'] = len(tags)
+            details['tagList'] = taglist
+            details['xmlFile'] = xmlFile
+
+            records.append(details)
+        except Exception as e:
+            print(groupname, " - ", tags, " - ", str(e))
+
+    return (pd.DataFrame.from_records(records), missing_xml_files)
+
 
 class FillMassPreZipContent():
     """ prepares the most important information from pre.txt in the zip file in order for
@@ -26,50 +77,8 @@ class FillMassPreZipContent():
 
         print(pre_df.shape)
 
-        pre_by_adsh_grouped = pre_df.groupby(['adsh','report'])
-
-        processing_df = self.dbmgr.read_all_processing()
-        adsh_xmlPre_df = processing_df[['accessionNumber', 'xmlPreFile']]
-        adsh_xmlPre_df.set_index('accessionNumber', inplace=True)
-
-        adsh_xml_dict = adsh_xmlPre_df.to_dict('index')
-
-        records: List[Dict[str,str]] = []
-        missing_xml_files:List[str] = []
-        for groupname, groupdf in pre_by_adsh_grouped:
-            stmt = groupdf.stmt.tolist()[0]
-            tags = groupdf.tag.tolist()
-            adsh = groupname[0]
-            report = groupname[1]
-
-            try:
-                # it could happen, that for some reason, the tagname is missing.
-                tags = [str(tag) for tag in tags]
-                taglist = ",".join(tags)
-
-                # check
-                if len(taglist.split(',')) != len(tags):
-                    raise Exception("tag contain ','!!")
-                try:
-                    xmlFile = adsh_xml_dict[adsh]['xmlPreFile']
-                except KeyError:
-                    missing_xml_files.append(adsh)
-                    xmlFile = None
-
-                details = {}
-                details['adsh'] = adsh
-                details['report'] = report
-                details['stmt'] = stmt
-                details['length'] = len(tags)
-                details['tagList'] = taglist
-                details['xmlFile'] = xmlFile
-                details['qrtrFile'] = self.zipfileName
-
-                records.append(details)
-            except Exception as e:
-                print(groupname, " - ", tags, " - ", str(e))
-
-        pre_mass_df = pd.DataFrame.from_records(records)
+        pre_mass_df, missing_xml_files = convert_to_mass_report_test_df(self.dbmgr, pre_df)
+        pre_mass_df['qrtrFile'] = self.zipfileName
 
         conn = self.dbmgr.get_connection()
         try:
@@ -81,6 +90,7 @@ class FillMassPreZipContent():
 
 
 class ReadMassPreZipContent():
+    """ reads the prezip content for a whole quarter back from db into a dataframe"""
 
     def __init__(self, dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qrtr: int):
         self.dbmgr = dbmgr
@@ -100,6 +110,75 @@ class ReadMassPreZipContent():
             conn.close()
 
 
+class FillMassParseContent():
+
+    def __init__(self, dbmgr: DBManager, testsetcreator: TestSetCreatorTool, year: int, months: List[int]):
+        self.dbmgr = dbmgr
+        self.testsetcreator = testsetcreator
+        self.year = year
+        self.months: List[int] = months
+
+    @staticmethod
+    def prepare_func(data: Tuple[str, str]) -> Tuple[pd.DataFrame, List[SecError]]:
+        pre_xml_parser = SecPreXmlParser()
+
+        adsh = data[0]
+        pre_xml_file = data[1]
+        try:
+            with open(pre_xml_file, "r", encoding="utf-8") as f:
+                content: str = f.read()
+                df: pd.DataFrame
+                errors: List[SecError]
+                df, errors  = pre_xml_parser.parse(adsh, content)
+                df = pre_xml_parser.clean_for_financial_statement_dataset(df, adsh)
+
+                return (df, errors)
+        except Exception as e:
+            return (None, [SecError(adsh, pre_xml_file, str(e))])
+
+    def process(self):
+        # complete run needs about 4 minutes (first time to load data in disk-cache, afterwards about 100secs)
+        # executes the complete parsing on all of the available reports from the
+        # provided year and months
+        adshs: List[str] = self.testsetcreator.get_testset_by_year_and_months(self.year, self.months)
+        xml_files_info: List[Tuple[str, str, str]] = dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
+        pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
+
+        pool = Pool(8)
+
+        all_failed: List[SecError] = []
+        all_dfs: List[pd.DataFrame] = []
+
+        print("adsh to test: ", len(adshs))
+        for i in range(0, len(pre_xml_files_info), 500):
+            chunk = pre_xml_files_info[i:i + 500]
+
+            result: List[pd.DataFrame, List[SecError]] = pool.map(FillMassParseContent.prepare_func, chunk)
+
+            print(".", end="")
+            for entry in result:
+                all_failed.extend(entry[1])
+                all_dfs.append(entry[0])
+
+        all_failed = [x for x in all_failed if x is not None]
+        # Attention: prints the failed for all entries, not only primary financial statement canditates
+        for failed in all_failed:
+            failed.printentry()
+
+        all_df = pd.concat(all_dfs)
+        all_df.reset_index(inplace=True)
+
+        xml_mass_df, missing_xml_files = convert_to_mass_report_test_df(self.dbmgr, all_df)
+
+        conn = self.dbmgr.get_connection()
+        try:
+            xml_mass_df.to_sql(MASS_PRE_XML_TABLE, conn, if_exists="append", chunksize=1000, index=False)
+        finally:
+            conn.close()
+
+        print('mising xmlfiles: ', len(set(missing_xml_files)))
+
+
 def fill_mass_pre_zip(dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qrtr: int):
     content_filler = FillMassPreZipContent(dbmgr, dataUtils, year, qrtr)
     content_filler.process()
@@ -110,13 +189,19 @@ def read_mass_pre_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year:
     return reader.readContent()
 
 
+def fill_mass_pre_xml(dbmgr: DBManager, testsetcreator: TestSetCreatorTool, year: int, months: List[int]):
+    content_filler = FillMassParseContent(dbmgr, testsetcreator, year, months)
+    content_filler.process()
+
+
 if __name__ == '__main__':
     workdir = "d:/secprocessing/"
     dbmgr = DBManager(workdir)
     dataUtils = DataAccessTool(workdir)
+    testCreatorTool = TestSetCreatorTool(workdir)
 
     #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
-    df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
-    print(df.shape)
-
+    #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
+    #print(df.shape)
+    fill_mass_pre_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
 

@@ -1,3 +1,4 @@
+-- table with content in order to prepare the reports and not the single entries
 CREATE TABLE IF NOT EXISTS mass_pre_zip_content
 (
     adsh,
@@ -11,6 +12,7 @@ CREATE TABLE IF NOT EXISTS mass_pre_zip_content
     PRIMARY KEY (adsh, report)
 );
 
+-- table with content in order to prepare the reports and not the single entries
 CREATE TABLE IF NOT EXISTS mass_pre_parse_xml_data
 (
     adsh,

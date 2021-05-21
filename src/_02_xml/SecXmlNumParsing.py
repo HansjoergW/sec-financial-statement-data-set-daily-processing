@@ -1,4 +1,4 @@
-from _02_xml.SecXmlParsingBase import SecXmlParserBase
+from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
 
 import re
 import calendar
@@ -194,14 +194,14 @@ class SecNumXmlParser(SecXmlParserBase):
 
         return pd.DataFrame(entries)
 
-    def parse(self, data_in: str) -> pd.DataFrame:
+    def parse(self, adsh: str, data_in: str) -> Tuple[pd.DataFrame, List[SecError]]:
         data = self._strip_file(data_in)
         data = bytes(bytearray(data, encoding='utf-8'))
         # in a few reports, there are sometimes huge textparts between nodes (in xyTextBlock-nodes), so huge_tree option has to be used
         parser = etree.XMLParser(huge_tree=True)
         root: etree._Element = etree.fromstring(data, parser)
         df = self._read_tags(root)
-        return df
+        return (df, [])
 
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         if df.shape[0] == 0:

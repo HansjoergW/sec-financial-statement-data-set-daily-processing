@@ -147,7 +147,7 @@ def get_pre_xml_content_from_file(file: str)-> str:
 
 def parse_content(adsh, content:  str):
     parser = SecPreXmlParser()
-    df = parser.parse(adsh, content)
+    (df, errors) = parser.parse(adsh, content)
     df_clean = parser.clean_for_financial_statement_dataset(df, adsh)
     print(df_clean.shape) # die meisten attribute sind im index, daher ist die anzahl der spalten nur 3
 

@@ -1,32 +1,38 @@
-from _02_xml.SecXmlParsingBase import SecXmlParserBase
+from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
 from _02_xml.pre.SecPreXmlExtracting import SecPreXmlExtractor
 from _02_xml.pre.SecPreXmlTransformation import SecPreXmlTransformer
 from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor
 
 import pandas as pd
 
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 import pprint
 
-class SecPreXmlParser(SecXmlParserBase):
 
-    extractor: SecPreXmlExtractor  = SecPreXmlExtractor()
-    transformer: SecPreXmlTransformer = SecPreXmlTransformer()
-    processor: SecPreXmlDataProcessor = SecPreXmlDataProcessor()
+class SecPreXmlParser(SecXmlParserBase):
 
     def __init__(self):
         super(SecPreXmlParser, self).__init__("pre")
         pass
 
-    def parse(self, adsh:str, data: str) -> pd.DataFrame:
+    def parse(self, adsh:str, data: str) -> Tuple[pd.DataFrame, List[SecError]]:
+        extractor: SecPreXmlExtractor  = SecPreXmlExtractor()
+        transformer: SecPreXmlTransformer = SecPreXmlTransformer()
+        processor: SecPreXmlDataProcessor = SecPreXmlDataProcessor()
 
-        extracted_data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = self.extractor.extract(adsh, data)
-        transformed_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]] = self.transformer.transform(adsh, extracted_data)
-        processed_entries: List[Dict[str, Union[str, int]]] = self.processor.process(adsh, transformed_data)
+        extracted_data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = extractor.extract(adsh, data)
+        transformed_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]] = transformer.transform(adsh, extracted_data)
+
+        processed_entries: List[Dict[str, Union[str, int]]]
+        collected_errors: List[Tuple[str, str, str]]
+        processed_entries, collected_errors = processor.process(adsh, transformed_data)
+
+        sec_error_list = [SecError(x[0], x[1], x[2]) for x in collected_errors]
 
         df = pd.DataFrame(processed_entries)
         df['rfile'] = '-'
-        return df
+
+        return (df, sec_error_list)
 
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         if len(df) == 0:
