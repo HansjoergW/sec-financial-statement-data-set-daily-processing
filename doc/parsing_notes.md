@@ -24,17 +24,25 @@
      to be removed from the structure.
      examples: 0001562762-21-000101 # StatementConsolidatedStatementsOfStockholdersEquity
                0001564590-21-012964 # StatementConsolidatedStatementsOfCashFlows
+3.4. there are some rare cases of statements (4 statements in 5500 reports for q1 2021) that contain multiple root_nodes.
+     -> not supported yet.
+     0000829224-21-000029 http://www.starbucks.com/role/DocumentAndEntityInformation
+     0000920371-21-000042 http://www.simpsonfg.com/role/ConsolidatedStatementsofStockholdersEquityParenthetical
+     0001254699-21-000005 http://www.qvc.com/role/ConsolidatedStatementsofCashFlows
+     0001628280-21-002278 http://polaris.com/role/ConsolidatedStatementsOfCashFlows     
 
     
 4. Evaluate of report
 3.1. the naming is not always consistent
 3.2. normally, there is a root node in presentation which indicates which stmt type it is, however, this is not
      always the case. so also the the "role" attribute of the presentation-parent-node has to be considered
-3.3. Since the evaluation of the stmt has to be done on the basis of text-strings, it is important to consider the order
-     in which the check is done. For instance "IncomeStatement" would also be true in "ComprehensiveIncomeStatement"
+3.3. Since the evaluation of the stmt has to be done on the basis of text-strings, we have to check for appropriate
+     combinations of words, which may not be ambiguous, respectively the order in which the tests are done have
+     consider it.
 3.4. If there is no IS, but only a CI, then the report is labeled as IS: 0000016918-21-000010', 0000024090-21-000012" "0000034903-21-000020"
      However, in 2021 Q1 there was one Exception to that rule: 0001628280-21-003313
 3.5. up-lowercase is not consistent, e.g. roles are sometimes in uppercase, somtimes in lowercase
+3.6. sometimes there are empty presentionatLinks (not containing loc or prearc entries). These can be skipped.
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:

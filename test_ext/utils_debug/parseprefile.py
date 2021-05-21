@@ -194,10 +194,16 @@ if __name__ == '__main__':
     line_error_adsh_3 = "0000018255-21-000004"
     line_error_adsh_4 = "0001562762-21-000101" # StatementConsolidatedStatementsOfStockholdersEquity
     line_error_adsh_5 = "0001564590-21-012964" # StatementConsolidatedStatementsOfCashFlows
-    content = special_content_line_wrong
-    #content = get_pre_xml_content_by_adsh(line_error_adsh_4)
 
-    parse_content(line_error_adsh_3, content)
+    multiple_root_nodes_1 = "0000066756-21-000025" # several statements ending with role-name _1
+    not_one_root_node_1 = "0000072903-21-000012"
+    not_one_root_node_2 = "0000829224-21-000029" #
+    not_one_root_node_3 = "0000920371-21-000042" #
+    not_one_root_node_4 = "0001254699-21-000005" #
+    #content = special_content_line_wrong
+
+    content = get_pre_xml_content_by_adsh(not_one_root_node_4)
+    parse_content(not_one_root_node_4, content)
 
     print("")
 

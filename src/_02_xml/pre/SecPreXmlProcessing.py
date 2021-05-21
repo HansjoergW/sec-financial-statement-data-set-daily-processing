@@ -25,6 +25,9 @@ class SecPreXmlDataProcessor():
         (['cover'], 'CP'),
     ]
 
+    # keywords of role definition that should be ignored
+    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental']
+
     key_tag_separator = '$$$'
 
     def __init__(self):
@@ -187,7 +190,6 @@ class SecPreXmlDataProcessor():
             to_list.append(preArc.get('to'))
             from_list.append(preArc.get('from'))
 
-
         for preArc in preArc_list:
             to_tag = preArc.get('to')
             from_tag = preArc.get('from')
@@ -296,6 +298,12 @@ class SecPreXmlDataProcessor():
 
         return result
 
+    def _check_for_role_name_to_ignore(self, role: str) -> bool:
+        for ignore_keyword in self.role_report_ingore_keywords:
+            if ignore_keyword in role.lower():
+                return True
+        return False
+
     def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[
         Dict[str, Union[str, int]]]:
 
@@ -307,8 +315,17 @@ class SecPreXmlDataProcessor():
             loc_list: List[Dict[str, str]] = reportinfo.get('loc_list')
             preArc_list: List[Dict[str, str]] = reportinfo.get('preArc_list')
 
+            if (len(preArc_list) == 0) or (len(loc_list) == 0):  # no entries in node, so ignore
+                continue
+
+            # there are some strings which indicate that this is not a report we are interested in
+            if self._check_for_role_name_to_ignore(role):
+                continue
+
             try:
                 preArc_list, loc_list = self._handle_digit_ending_case(preArc_list, loc_list)
+
+                # todo: shall this be done before finding the root node, or afterwards?
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
