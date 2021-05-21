@@ -5,11 +5,8 @@ from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor
 
 import pandas as pd
 
-from lxml import etree
 from typing import Dict, List, Union
 import pprint
-
-
 
 class SecPreXmlParser(SecXmlParserBase):
 
@@ -47,5 +44,4 @@ class SecPreXmlParser(SecXmlParserBase):
             df.loc[df.stmt == 'CI', 'stmt'] = 'IS'
 
         df.set_index(['adsh', 'tag', 'version', 'report', 'line', 'stmt'], inplace=True)
-        # print(adsh, ' - ', len(df))
         return df

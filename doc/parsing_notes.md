@@ -7,20 +7,24 @@
 1.3. order can restart in any sublist or can restart with every presentation or can be continuous throughout the whole xml
 1.4. there are also rarely cases where order contains a fraction like 10440.02 -> so order has to be processed as float
 
-2. relation loc - order
+2. relation loc
 2.1. version can only be generated from loc
 2.2. there can be loc without a reference in presentation arc
 2.1. several presentation arc can reference the same loc element. in this case the presentation should have different preferredLabels (ex. total and terse)
 
-3. parent-child relation
-3.1 there are reports which add a running number to every occurence of to and from label, so the
-    hierarchy cannot be evaluated without removing this suffixes. Problem these reports will appear as if they
-    have many root nodes within a presentation (0000018255-21-000004)
-3.2 there are some rare cases of statements (2 statements in 5500 reports for q1 2021) in a report for which have ambiguous parent-child defnition, meaning
-    that the from-node could be connect to more than one to-node. In this case, the ambiguous entries have
-    to be removed from the structure.
-    examples: 0001562762-21-000101 # StatementConsolidatedStatementsOfStockholdersEquity
-              0001564590-21-012964 # StatementConsolidatedStatementsOfCashFlows
+3. parent-child relation - line calculation
+3.1. there are reports which add a running number to every occurence of to and from label, so the
+     hierarchy cannot be evaluated without removing this suffixes. Problem these reports will appear as if they
+     have many root nodes within a presentation (0000018255-21-000004)
+3.2. it can be that the same to-label can exist under different parent-labels, as well as under the 
+     same parent label. Therefore, in order to create a "key_tag" for that entry, the attributes to, from and order
+     have to be used
+3.3. there are some rare cases of statements (2 statements in 5500 reports for q1 2021) in a report for which have ambiguous parent-child defnition, meaning
+     that the from-node could be connect to more than one to-node. In this case, the ambiguous entries have
+     to be removed from the structure.
+     examples: 0001562762-21-000101 # StatementConsolidatedStatementsOfStockholdersEquity
+               0001564590-21-012964 # StatementConsolidatedStatementsOfCashFlows
+
     
 4. Evaluate of report
 3.1. the naming is not always consistent

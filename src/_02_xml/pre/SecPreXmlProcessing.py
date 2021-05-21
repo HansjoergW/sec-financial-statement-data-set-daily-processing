@@ -94,6 +94,52 @@ class SecPreXmlDataProcessor():
 
         return new_preArc_list, new_loc_list
 
+    def _handle_ambiguous_child_parent_relation(self, preArc_list: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        # there are some rare cases (2 in 5500 reports from 2021-q1) when for a single node no line can be evaluated.
+        # this is the reason when the child-parent relation is ambiguous.
+        # e.g. "0001562762-21-000101" # StatementConsolidatedStatementsOfStockholdersEquity because there
+        # in these cases, we have to kick out that entry and its children
+
+        # these cases are identified, when a from node appears more than once in a two node
+        to_list: List[str] = []
+        from_list: List[str] = []
+
+        for preArc in preArc_list:
+            to_list.append(preArc.get('to'))
+            from_list.append(preArc.get('from'))
+
+        kick_out_list: List[str] = []
+
+        for from_entry in from_list:
+            count = sum(map(lambda x: x == from_entry, to_list))
+            if count > 1:
+                kick_out_list.append(from_entry)
+
+        new_entries_found: bool = False
+
+        # if a node has to be removed then also its children have to be removed. This recursive logic finds
+        # all children, grandchildren, ... of nodes which have to be kicked-out as well
+        while new_entries_found:
+            new_entries_found = False
+            for preArc in preArc_list:
+                to_entry = preArc.get('to')
+                from_entry = preArc.get('from')
+                if from_entry in kick_out_list:
+                    if to_entry not in kick_out_list:
+                        kick_out_list.append(to_entry)
+                        new_entries_found = True
+
+
+        # now the entries can be removed from  orginial preArcList
+        cleared_preArc_list: List[Dict[str, str]] = []
+
+        for preArc in preArc_list:
+            from_entry = preArc.get('from')
+            if from_entry not in kick_out_list:
+                cleared_preArc_list.append(preArc)
+
+        return cleared_preArc_list
+
     def _find_root_node(self, preArc_list: List[Dict[str, str]]) -> str:
         """ finds the root node, expect only ONE entry. If there is more than one root node, then an exception is raised
             and this report will be skipped later in the process."""
@@ -127,7 +173,7 @@ class SecPreXmlDataProcessor():
 
         return None
 
-    def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
         # it is possible that the same to_tag appears twice under different from_tags or (!) also the same from_tag.
         # but this seems to be only the case, if the to_tag is not also a from_tag.
@@ -141,46 +187,8 @@ class SecPreXmlDataProcessor():
             to_list.append(preArc.get('to'))
             from_list.append(preArc.get('from'))
 
-        # there are rare cases, when a from_node could be connected to two different to_nodes
-        # there are some rare cases (2 in 5500 reports from 2021-q1) when for a single node no line can be evaluated
-        # e.g. "0001562762-21-000101" # StatementConsolidatedStatementsOfStockholdersEquity because there
-        # in this case, we have to kick out that entry and its children
-        kick_out_list: List[str] = []
-
-        for from_entry in from_list:
-            count = sum(map(lambda x: x == from_entry, to_list))
-            if count > 1:
-                kick_out_list.append(from_entry)
-
-        new_entries_found: bool = False
-
-        # find children hierarchy that has to be kicked out as well
-        while new_entries_found:
-            new_entries_found = False
-            for preArc in preArc_list:
-                to_entry = preArc.get('to')
-                from_entry = preArc.get('from')
-                if from_entry in kick_out_list:
-                    if to_entry not in kick_out_list:
-                        kick_out_list.append(to_entry)
-                        new_entries_found = True
-
-
-        # we have to remove the entries in the kickout list from the orginial preArcList
-        # and we have to rebuild the to and from list
-        cleared_preArc_list: List[Dict[str, str]] = []
-        to_list: List[str] = []
-        from_list: List[str] = []
 
         for preArc in preArc_list:
-            from_entry = preArc.get('from')
-            to_entry = preArc.get('to')
-            if from_entry not in kick_out_list:
-                cleared_preArc_list.append(preArc)
-                to_list.append(to_entry)
-                from_list.append(from_entry)
-
-        for preArc in cleared_preArc_list:
             to_tag = preArc.get('to')
             from_tag = preArc.get('from')
             order_str = str(preArc.get('order_nr'))
@@ -191,8 +199,6 @@ class SecPreXmlDataProcessor():
                 key_tag = to_tag + self.key_tag_separator + from_tag + self.key_tag_separator + order_str
 
             preArc['key_tag'] = key_tag
-
-        return cleared_preArc_list
 
     def _calculate_line_nr(self, root_node: str, preArc_list: List[Dict[str, str]]):
         """ the 'only' thing this method does is to add the 'line' attribute to the preArc entries.
@@ -303,14 +309,14 @@ class SecPreXmlDataProcessor():
 
             try:
                 preArc_list, loc_list = self._handle_digit_ending_case(preArc_list, loc_list)
+                preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
                 stmt = self._evaluate_statement(role, root_node, loc_list)
                 if stmt is None:
                     continue
 
-                preArc_list = self._calculate_key_tag_for_preArc(preArc_list)
-
+                self._calculate_key_tag_for_preArc(preArc_list)
                 entries = self._calculate_entries(root_node, loc_list, preArc_list)
                 reportnr += 1
                 for entry in entries:
