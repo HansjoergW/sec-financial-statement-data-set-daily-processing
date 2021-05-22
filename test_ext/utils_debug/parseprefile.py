@@ -200,10 +200,16 @@ if __name__ == '__main__':
     not_one_root_node_2 = "0000829224-21-000029" #
     not_one_root_node_3 = "0000920371-21-000042" #
     not_one_root_node_4 = "0001254699-21-000005" #
+
+    no_cp_report_1 = "0000773141-21-000024" # '0000916365-21-000052', '0001702744-21-000011', '0000773141-21-000024'
+    many_cp_reports_1 = "0000089089-21-000012" # 0000089089-21-000012, 0000898174-21-000006, 0001829126-21-002055
+
+
+
     #content = special_content_line_wrong
 
-    content = get_pre_xml_content_by_adsh(not_one_root_node_4)
-    parse_content(not_one_root_node_4, content)
+    content = get_pre_xml_content_by_adsh(many_cp_reports_1)
+    parse_content(many_cp_reports_1, content)
 
     print("")
 

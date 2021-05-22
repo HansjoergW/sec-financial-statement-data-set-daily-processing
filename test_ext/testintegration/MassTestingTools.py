@@ -179,19 +179,42 @@ class FillMassParseContent():
         print('mising xmlfiles: ', len(set(missing_xml_files)))
 
 
+class ReadMassPreXmlContent():
+    """ reads the prezip content for a whole quarter back from db into a dataframe"""
+
+    def __init__(self, dbmgr: DBManager):
+        self.dbmgr = dbmgr
+
+    def readContent(self, adshs: List[str] = None) -> pd.DataFrame:
+        conn = self.dbmgr.get_connection()
+        try:
+            sql = '''SELECT * FROM {} '''.format(MASS_PRE_XML_TABLE)
+            df = pd.read_sql_query(sql, conn)
+            if adshs is not None:
+                df = df[df.adsh.isin(adshs)].copy()
+            return df
+        finally:
+            conn.close()
+
+
 def fill_mass_pre_zip(dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qrtr: int):
     content_filler = FillMassPreZipContent(dbmgr, dataUtils, year, qrtr)
     content_filler.process()
 
 
-def read_mass_pre_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year:int, qrtr: int) -> pd.DataFrame :
-    reader = ReadMassPreZipContent(dbmgr, dataUtils, 2021, 1)
-    return reader.readContent()
+def read_mass_pre_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year:int, qrtr: int, adshs: List[str] = None) -> pd.DataFrame :
+    reader = ReadMassPreZipContent(dbmgr, dataUtils, year, qrtr)
+    return reader.readContent(adshs)
 
 
 def fill_mass_pre_xml(dbmgr: DBManager, testsetcreator: TestSetCreatorTool, year: int, months: List[int]):
     content_filler = FillMassParseContent(dbmgr, testsetcreator, year, months)
     content_filler.process()
+
+
+def read_mass_pre_xml_content(dbmgr: DBManager, adshs: List[str] = None) -> pd.DataFrame :
+    reader = ReadMassPreXmlContent(dbmgr)
+    return reader.readContent(adshs)
 
 
 if __name__ == '__main__':

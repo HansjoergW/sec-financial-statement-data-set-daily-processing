@@ -22,11 +22,15 @@ class SecPreXmlDataProcessor():
         (['statement', 'stockowner', 'equity'], 'EQ'),
         (['document', 'entity', 'information'], 'CP'),
         (['balancesheet'], 'BS'),
-        (['cover'], 'CP'),
+        (['coverpage'], 'CP'),
+        (['coverabstract'], 'CP'),
+        (['role/cover'], 'CP'),
+        (['deidocument'], 'CP'), # specialcase for 0001376986-21-000007
     ]
 
     # keywords of role definition that should be ignored
-    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental']
+    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-',
+                                              'coverpagenotes', 'coverpagetable', 'coverpagedetails']
 
     key_tag_separator = '$$$'
 
@@ -174,6 +178,16 @@ class SecPreXmlDataProcessor():
                 if all(map_key in entry for map_key in map_keys):
                     return map_stmt
 
+        # second check looking for specific tags
+        # todo: maybe we need something like that if reports are missing?
+        # dei_entries: int = 0
+        # for loc in loc_list:
+        #     if loc['version'].startswith('dei'):
+        #         dei_entries +=1
+        #
+        # if dei_entries/len(loc_list) > 0.8:
+        #     return "CP"
+
         return None
 
     def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
@@ -299,8 +313,9 @@ class SecPreXmlDataProcessor():
         return result
 
     def _check_for_role_name_to_ignore(self, role: str) -> bool:
+        role_lower = role.lower()
         for ignore_keyword in self.role_report_ingore_keywords:
-            if ignore_keyword in role.lower():
+            if ignore_keyword in role_lower:
                 return True
         return False
 
@@ -348,9 +363,10 @@ class SecPreXmlDataProcessor():
             except Exception as err:
                 error_collector.append((adsh, role, str(err)))
                 # just log if the name gives a hint that this could be a primary statement
-                if self._evaluate_statement(role, "", []) is not None:
-                    logging.info("{} skipped report with role {} : {}".format(adsh, role, str(err)))
-                    print("{} skipped report with role {} : {}".format(adsh, role, str(err)))
+                stmt_eval = self._evaluate_statement(role, "", [])
+                if stmt_eval is not None:
+                    logging.info("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
+                    print("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
                 continue
 
         return (results, error_collector)
