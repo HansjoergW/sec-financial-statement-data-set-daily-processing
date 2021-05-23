@@ -8,23 +8,158 @@ class SecPreXmlDataProcessor():
     processes the extracted and transformed data from a prexml file
     """
 
-    # keywords that indicate the type of the report
+    # confidence of 2 is max
+    # # stmt
+    #     role_keys: [{includes, excludes, confidence}]
+    #     root_keys
+    #     label_list -> evtll noch mit versionliste und tagliste unterscheiden
+
+    stmt_eval_dict = {
+        'CP': {
+            'role_keys': [
+                {
+                    'includes': ['role/cover'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['coverpage'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['coverabstract'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['deidocument'],
+                    'confidence': 2
+                },
+            ],
+            'root_keys': [
+                {
+                    'includes': ['document', 'entity', 'information'],
+                    'confidence': 2
+                },
+            ],
+            'label_list': [
+            ]
+        },
+        'BS': {
+            'role_keys': [
+                {
+                    'includes': ['consolidated', 'statement', 'financialposition'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['consolidated', 'balancesheet'],
+                    'confidence': 2
+                }
+            ],
+            'root_keys': [
+                {
+                    'includes': ['statementoffinancialposition'],
+                    'confidence': 1
+                },
+            ],
+            'label': []
+        },
+        'EQ': {
+            'role_keys': [
+                {
+                    'includes': ['statement', 'shareholder', 'equity'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'stockholder', 'equity'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'shareowner', 'equity'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'stockowner', 'equity'],
+                    'confidence': 2
+                },
+            ]
+        },
+        'IS': {
+            'role_keys': [
+                {
+                    'includes': ['consolidated', 'statement', 'income'],
+                    'excludes': ['comprehensive'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['consolidated', 'statement', 'operation'],
+                    'excludes': ['comprehensive'],
+                    'confidence': 2
+                },
+            ],
+            'root_keys': [
+                {
+                    'includes': ['income', 'statement', 'abstract'],
+                    'excludes': ['comprehensive'],
+                    'confidence': 1
+                },
+            ]
+        },
+        'CI': {
+            'role_keys': [
+                {
+                    'includes': ['comprehensive', 'consolidated', 'statement', 'income'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['comprehensive', 'consolidated', 'statement', 'operation'],
+                    'confidence': 2
+                },
+            ],
+            'root_keys': [
+                {
+                    'includes': ['comprehensive', 'income','statement', 'abstract'],
+                    'confidence': 1
+                },
+            ]
+        },
+        'CF': {
+            'role_keys': [
+                {
+                    'includes': ['consolidated', 'statement', 'cashflow'],
+                    'confidence': 2
+                }
+            ],
+            'root_keys': [
+
+            ]
+        }
+
+    }
+
+
+# keywords that indicate the type of the report
     stmt_keyword_map: List[Tuple[List[str], str]] = [
+
+        (['consolidated', 'statement', 'cashflow'], 'CF'),
+
         (['consolidated', 'statement', 'income', 'comprehensive'], 'CI'),
+
         (['consolidated', 'statement', 'income'], 'IS'),
         (['consolidated', 'statement', 'operation'], 'IS'),
         (['incomestatementabstract'], 'IS'),
-        (['consolidated', 'statement', 'financialposition'], 'BS'),
-        (['consolidated', 'statement', 'cashflow'], 'CF'),
+
         (['statement', 'shareholder', 'equity'], 'EQ'),
         (['statement', 'stockholder', 'equity'], 'EQ'),
         (['statement', 'shareowner', 'equity'], 'EQ'),
         (['statement', 'stockowner', 'equity'], 'EQ'),
-        (['document', 'entity', 'information'], 'CP'),
-        (['balancesheet'], 'BS'),
-        (['role/cover'], 'CP'),
-        (['coverpage'], 'CP'),
-        (['coverabstract'], 'CP'),
+
+        (['consolidated', 'statement', 'financialposition'], 'BS'),
+        (['consolidated','balancesheet'], 'BS'),
+        (['statementoffinancialposition'], 'BS'),
+
+        (['document', 'entity', 'information'], 'CP'), #role / root
+        (['role/cover'], 'CP'), # role
+        (['coverpage'], 'CP'), # role
+        (['coverabstract'], 'CP'), # role
         (['deidocument'], 'CP'), # specialcase for 0001376986-21-000007
     ]
 
@@ -163,6 +298,40 @@ class SecPreXmlDataProcessor():
             raise Exception("not exactly one root node")
 
         return root_nodes[0]
+
+
+    def _eval_statement_canditate_helper(self, key: str, definition: List[Dict[str, List[str]]]) -> int:
+        key = key.lower()
+        max_confidence = 0
+        for key_def in definition:
+            includes = key_def.get('includes', [])
+            excludes = key_def.get('excludes', [])
+            confidence = key_def['confidence']
+
+            if all(map_key in key for map_key in includes) and any(map_key in key for map_key in excludes) == False:
+                max_confidence = max(max_confidence, confidence)
+
+        return max_confidence
+
+    def _evaluate_statement_canditates(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Dict[str, Dict[str, int]]:
+        # returns for matches stmt: {byrole: confidence, byroot:confidence, bylabel: confidence}
+
+        result: Dict[str, Dict[str, int]] = {}
+
+        for key, definitions in self.stmt_eval_dict.items():
+            role_keys_definition = definitions.get('role_keys', [])
+            root_keys_definition = definitions.get('root_keys', [])
+            label_list = definitions.get('label_list', [])
+
+            details: Dict[str, int] = {}
+            details['byRole'] = self._eval_statement_canditate_helper(role, role_keys_definition)
+            details['byRoot'] = self._eval_statement_canditate_helper(root_node, root_keys_definition)
+            details['byLabel'] = 0
+
+            if max(details['byRole'], details['byRoot'], details['byLabel']) > 0:
+                result[key] = details
+
+        return result
 
     def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Tuple[str, Union[str, None]]:
         """ tries to figure out the """
@@ -349,6 +518,7 @@ class SecPreXmlDataProcessor():
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
+                stmt_candiates = self._evaluate_statement_canditates(role, root_node, loc_list)
                 selectStmtCriteria, stmt = self._evaluate_statement(role, root_node, loc_list)
                 if stmt is None:
                     continue
@@ -393,6 +563,37 @@ class SecPreXmlDataProcessor():
                 return [report_data]
         first_entry = stmt_list[0]
         return [first_entry]
+
+
+    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+        # zum beispiel, falls by role vorhanden -> hat prezedenz
+        # -> falls byrole vorhanden, diese zurückliefern
+        # ansonsten byroot
+
+        return []
+
+    # für BS
+    # prio1 scheint namen consolidated balancesheetp mit root StatementOfFinancialPositions zu sein
+    # man müsste quasi der reihenfolge in der matchliste eine art priorität zuordnen ..
+    # un dann nur die mit der höschten prio verwenden?, bzw. im post_process könnte man das nochmals erneut beurteilen..
+    # evtl. müsste man auch byrole und by root-node unterschiedlich bewerten .. und dann in Kombination beurteilen..
+    # auch mit verschiedenen kriterien
+    # role, rootNode, und Inhalt klassifizieren mit strongmatch, match, lowmwatch, parenthesis.. und aufgrund dessen entschieden
+    # und dann z.B. nur top klassifikationen nehmen?
+    # -> confidence für role
+    # -> conficdence für root
+
+    # -> sogesehen könnte es helfen, die xml db so zu ergänzen, dass rootnode und role auch in der db gespeichert werden..
+    # damit könnte die analyse massiv vereinfacht werden.
+
+    # Bsp: 0000874501-21-000028
+    # hier gibt es zwei einträge it role consolidatedbalancesheet/statementoffinancialposition
+    # und viele die zusätzlich als root statementoffinancialposition verwenden.
+
+    # man könnte diese idee jetzt ein wenig am postprocess für bs austesten..
+
+
+
 
     def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
 
