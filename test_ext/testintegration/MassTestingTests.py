@@ -31,9 +31,10 @@ adshs_in_zip = set(zip_data_df.adsh.unique().tolist())
 adshs_in_xml = set(xml_data_df.adsh.unique().tolist())
 
 adshs_in_both = adshs_in_xml.union(adshs_in_zip)
+sorted_adshs_in_both = sorted(list(adshs_in_both))
 
 
-def filter_for_adsh_and_statement(df: pd.DataFrame, adshs: Set[str], stmt: str) -> pd.DataFrame:
+def filter_for_adsh_and_statement(df: pd.DataFrame, adshs: List[str], stmt: str) -> pd.DataFrame:
     return df[df.adsh.isin(adshs) & (df.stmt == stmt)].copy()
 
 
@@ -47,6 +48,12 @@ def test_compare_adshs():
     print("Entries in ZIP: ", len(adshs_in_zip))
     print("not in xml: ", not_in_xml)
     print("not in zip: ", not_in_zip)
+    print('-')
+    print('number of reports per type: ')
+    print('xml')
+    print(xml_data_df.groupby('stmt').adsh.count())
+    print('\nzip')
+    print(zip_data_df.groupby('stmt').adsh.count())
 
     # we want to have all reports in the zip also present in the xml
     # however, we do not care if there additional entries present
@@ -54,8 +61,8 @@ def test_compare_adshs():
 
 
 def test_compare_CP():
-    xml_cp_df = filter_for_adsh_and_statement(xml_data_df, adshs_in_both, 'CP')
-    zip_cp_df = filter_for_adsh_and_statement(zip_data_df, adshs_in_both, 'CP')
+    xml_cp_df = filter_for_adsh_and_statement(xml_data_df, sorted_adshs_in_both, 'CP')
+    zip_cp_df = filter_for_adsh_and_statement(zip_data_df, sorted_adshs_in_both, 'CP')
 
     xml_adshs_with_cp = set(xml_cp_df.adsh.unique().tolist())
     xml_adshs_without_cp = adshs_in_xml - xml_adshs_with_cp
@@ -66,44 +73,25 @@ def test_compare_CP():
     print("XML adshs without CP: ", xml_adshs_without_cp)
 
 
+def test_compare_BS():
+    adshs_to_consider = sorted_adshs_in_both[:100]
+    xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, 'BS')
+    zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, 'BS')
+
+    xml_adshs_with_bs = set(xml_bs_df.adsh.unique().tolist())
+    xml_adshs_without_bs = set(adshs_to_consider) - xml_adshs_with_bs
+
+    print("")
+    print("BS Entries in XML: ", len(xml_bs_df))
+    print("BS Entries in ZIP: ", len(zip_bs_df))
+    print("XML adshs without BS: ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
+
+
+
 """
 Data:
-test_compare_adshs:
-  Entries in XML:  5470
-  Entries in ZIP:  5464
-  not in xml:  set()
-  not in zip:  {'0001775098-21-000005', '0001539816-21-000003', '0000065984-21-000096', '0001437749-21-007013', '0001587650-21-000010', '0001669374-21-000016'}
-  
-  Analyse:
-    - bis auf einen Eintrag vom Februar sind alle Einträge vom Ende März
 
-test_compare_CP                  
-  CP Entries in XML:  6282
-  CP Entries in ZIP:  5464
-  XML adshs without CP:  {'0001376986-21-000007', '0000829224-21-000029'}
-  
-  Test 1: initial
-  - Es gibt Einträge, die haben über 100 CP entries: 0001437107-21-000018, 0001393612-21-000014
-    Total haben 179 Einträge mehr al 1 CP
-  - In XML sind für 5668 Einträge CP Einträge vorhanden, für 2 adshs gibt es keine:  
-          '0001376986-21-000007' -> "company" role and root-node
-          '0000829224-21-000029' -> multiple root nodes in DocumentEntity (Starbucks)
-          
-  Test 2: coverabstract, coverpage und deidocument als neue schlüssel für CP
-  - Es gibt neu nur noch  3 Einträge mit je 3 CPs: 0000089089-21-000012, 0000898174-21-000006, 0001829126-21-002055
-                    und  13 Einträge mit je 2 CPs: z.B. 0000031791-21-000003, 0000039911-21-000021, 0000040211-21-000018, 0000842517-21-000069
-  - für 4 Einträge wurden keine CP gefunden: 
-         '0000916365-21-000052', '0001702744-21-000011', '0000773141-21-000024'  
-         '0000829224-21-000029' -> multiple root nodes in DocumentEntity (Starbucks) 
-
-
--> es wird ein weg benötigt, um prinzipiell roles zu ignorieren..
-    zb. gibt es coverpagenotes, coverpagetable, coverpagedetails.. 
-    das kann aber auch wieder nur als zusätzliche extensions vorhanden sein
-    -> erster versuch hat aber nichts gebracht.. 
-    
--> es mus snoch gerpüft werden, ob eventuell daten aus reports zusammengefügt werden
-
+                  
 
 """
 

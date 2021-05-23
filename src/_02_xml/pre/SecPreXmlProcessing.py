@@ -22,15 +22,14 @@ class SecPreXmlDataProcessor():
         (['statement', 'stockowner', 'equity'], 'EQ'),
         (['document', 'entity', 'information'], 'CP'),
         (['balancesheet'], 'BS'),
+        (['role/cover'], 'CP'),
         (['coverpage'], 'CP'),
         (['coverabstract'], 'CP'),
-        (['role/cover'], 'CP'),
         (['deidocument'], 'CP'), # specialcase for 0001376986-21-000007
     ]
 
     # keywords of role definition that should be ignored
-    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-',
-                                              'coverpagenotes', 'coverpagetable', 'coverpagedetails']
+    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-']
 
     key_tag_separator = '$$$'
 
@@ -165,18 +164,21 @@ class SecPreXmlDataProcessor():
 
         return root_nodes[0]
 
-    def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Union[str, None]:
+    def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Tuple[str, Union[str, None]]:
         """ tries to figure out the """
+        role: str = role.lower()
+        root_node: str = root_node.lower()
 
-        role_and_root_node: List[str] = [role.lower(), root_node.lower()]
-
+        # first we try to figure out the stmt-type by looking at the role
         for map_entry in self.stmt_keyword_map:
             map_stmt: str = map_entry[1]
             map_keys: List[str] = map_entry[0]
 
-            for entry in role_and_root_node:
-                if all(map_key in entry for map_key in map_keys):
-                    return map_stmt
+            if all(map_key in role for map_key in map_keys):
+                return 'byRole', map_stmt
+
+            if all(map_key in root_node for map_key in map_keys):
+                return 'byRoot', map_stmt
 
         # second check looking for specific tags
         # todo: maybe we need something like that if reports are missing?
@@ -188,7 +190,7 @@ class SecPreXmlDataProcessor():
         # if dei_entries/len(loc_list) > 0.8:
         #     return "CP"
 
-        return None
+        return 'none', None
 
     def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
@@ -319,11 +321,12 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
+    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]], List[Tuple[str, str, str]]]:
+        # processed the reports in the data.
+        # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
 
-        reportnr = 0
-        results: List[Dict[str, Union[str, int]]] = []
-
+        # result is a dictionary with the chosen stmt as key and a list of the reports as Dicts
+        result: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]] = {}
         error_collector: List[Tuple[str, str, str]] = []
 
         for idx, reportinfo in data.items():
@@ -346,27 +349,70 @@ class SecPreXmlDataProcessor():
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
-                stmt = self._evaluate_statement(role, root_node, loc_list)
+                selectStmtCriteria, stmt = self._evaluate_statement(role, root_node, loc_list)
                 if stmt is None:
                     continue
 
                 self._calculate_key_tag_for_preArc(preArc_list)
                 entries = self._calculate_entries(root_node, loc_list, preArc_list)
-                reportnr += 1
+
                 for entry in entries:
-                    entry['report'] = reportnr
                     entry['stmt'] = stmt
                     entry['inpth'] = inpth
 
-                results.extend(entries)
+                if result.get(stmt) is None:
+                    result[stmt] = []
+
+                details:  Dict[str, Union[str, List[Dict[str, str]]]] = {}
+                details['role'] = role
+                details['loc_list'] = loc_list
+                details['preArc_list'] = preArc_list
+                details['rootNode'] = root_node
+                details['entries'] = entries
+                details['selectStmtCriteria'] = selectStmtCriteria
+
+                result[stmt].append(details)
 
             except Exception as err:
                 error_collector.append((adsh, role, str(err)))
                 # just log if the name gives a hint that this could be a primary statement
-                stmt_eval = self._evaluate_statement(role, "", [])
+                selectCriteria, stmt_eval = self._evaluate_statement(role, "", [])
                 if stmt_eval is not None:
                     logging.info("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
                     print("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
                 continue
+
+        return (result, error_collector)
+
+    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+        # in all the reports, there was always just on CP entry
+        # so we either return the first who was identified as CP by the rolename
+        # or we return the first entry of the list (since CP is generally the first that appears in a report)
+        for report_data in stmt_list:
+            if report_data['selectStmtCriteria'] is 'byRole':
+                return [report_data]
+        first_entry = stmt_list[0]
+        return [first_entry]
+
+    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
+
+        results: List[Dict[str, Union[str, int]]] = []
+
+        stmt_data: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]]
+        error_collector: List[Tuple[str, str, str]]
+
+        stmt_data, error_collector = self.process_reports(adsh, data)
+
+        reportnr = 0
+        for stmt, stmt_list in stmt_data.items():
+            if stmt is 'CP':
+                stmt_list = self._post_process_cp(stmt_list)
+
+            for report_data in stmt_list:
+                entries: List[Dict[str, Union[str, int]]] = report_data['entries']
+                reportnr += 1
+                for entry in entries:
+                    entry['report'] = reportnr
+                results.extend(entries)
 
         return (results, error_collector)
