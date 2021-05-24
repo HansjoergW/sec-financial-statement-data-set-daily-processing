@@ -490,12 +490,12 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]], List[Tuple[str, str, str]]]:
+    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]], List[Tuple[str, str, str]]]:
         # processed the reports in the data.
         # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
 
         # result is a dictionary with the chosen stmt as key and a list of the reports as Dicts
-        result: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]] = {}
+        result: Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]] = {}
         error_collector: List[Tuple[str, str, str]] = []
 
         for idx, reportinfo in data.items():
@@ -518,30 +518,32 @@ class SecPreXmlDataProcessor():
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
-                stmt_candiates = self._evaluate_statement_canditates(role, root_node, loc_list)
-                selectStmtCriteria, stmt = self._evaluate_statement(role, root_node, loc_list)
-                if stmt is None:
+                stmt_canditates: Dict[str, Dict[str, int]] = self._evaluate_statement_canditates(role, root_node, loc_list)
+                if len(stmt_canditates) == 0:
                     continue
+
+                # selectStmtCriteria, stmt = self._evaluate_statement(role, root_node, loc_list)
+                # if stmt is None:
+                #     continue
 
                 self._calculate_key_tag_for_preArc(preArc_list)
                 entries = self._calculate_entries(root_node, loc_list, preArc_list)
 
-                for entry in entries:
-                    entry['stmt'] = stmt
-                    entry['inpth'] = inpth
-
-                if result.get(stmt) is None:
-                    result[stmt] = []
+                # if result.get(stmt) is None:
+                #     result[stmt] = []
 
                 details:  Dict[str, Union[str, List[Dict[str, str]]]] = {}
+                details['adsh'] = adsh
                 details['role'] = role
                 details['loc_list'] = loc_list
                 details['preArc_list'] = preArc_list
                 details['rootNode'] = root_node
                 details['entries'] = entries
-                details['selectStmtCriteria'] = selectStmtCriteria
+                details['inpth'] = inpth
+                # details['selectStmtCriteria'] = selectStmtCriteria
+                details['stmt_canditates'] = stmt_canditates
 
-                result[stmt].append(details)
+                result[idx] = details
 
             except Exception as err:
                 error_collector.append((adsh, role, str(err)))
@@ -554,66 +556,115 @@ class SecPreXmlDataProcessor():
 
         return (result, error_collector)
 
-    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+    def _post_process_assign_report_to_stmt(self, report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
+        # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
+
+        result: Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
+
+        # ensure that a report only belongs to one stmt type
+        for idx, reportinfo in report_data.items():
+            stmt_canditates_dict = reportinfo['stmt_canditates']
+            stmt_canditates_keys = list(stmt_canditates_dict.keys())
+
+            stmt = None
+            if len(stmt_canditates_keys) == 1:
+                stmt = stmt_canditates_keys[0]
+            else:
+                # try to either find a single confidence of 2
+                # or to find the entry with the biggest sum of confidence values
+
+                conf_of_2_list = []
+                max_sum_of_confidence = 0
+                max_sum_of_confidence_stmt = None
+
+                for stmt_key in stmt_canditates_keys:
+                    values_dict = stmt_canditates_dict[stmt_key]
+
+                    has_confidence_of_2 = max(values_dict.values()) == 2
+                    conf_of_2_list.append(stmt_key)
+
+                    sum_of_confidence = sum(values_dict.values())
+                    if sum_of_confidence > max_sum_of_confidence:
+                        max_sum_of_confidence = sum_of_confidence
+                        max_sum_of_confidence_stmt = stmt_key
+
+                if len(conf_of_2_list) == 1:
+                    stmt = conf_of_2_list[0]
+                else:
+                    if len(conf_of_2_list) > 1:
+                        logging.info("{} has confidence of 2 for several statement types {}".format(reportinfo.get('adsh'), conf_of_2_list))
+
+                    stmt = max_sum_of_confidence_stmt
+
+            if result.get(stmt) == None:
+                result[stmt] = []
+
+            result[stmt].append(reportinfo)
+
+        return result
+
+    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int, List[Dict[str, str]]]]]:
         # in all the reports, there was always just on CP entry
         # so we either return the first who was identified as CP by the rolename
         # or we return the first entry of the list (since CP is generally the first that appears in a report)
         for report_data in stmt_list:
-            if report_data['selectStmtCriteria'] is 'byRole':
+            confidence_dict = report_data['stmt_canditates']['CP']
+            if confidence_dict['byRole'] == 2:
                 return [report_data]
         first_entry = stmt_list[0]
         return [first_entry]
 
-
-    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
-        # zum beispiel, falls by role vorhanden -> hat prezedenz
-        # -> falls byrole vorhanden, diese zurückliefern
-        # ansonsten byroot
-
-        return []
-
-    # für BS
-    # prio1 scheint namen consolidated balancesheetp mit root StatementOfFinancialPositions zu sein
-    # man müsste quasi der reihenfolge in der matchliste eine art priorität zuordnen ..
-    # un dann nur die mit der höschten prio verwenden?, bzw. im post_process könnte man das nochmals erneut beurteilen..
-    # evtl. müsste man auch byrole und by root-node unterschiedlich bewerten .. und dann in Kombination beurteilen..
-    # auch mit verschiedenen kriterien
-    # role, rootNode, und Inhalt klassifizieren mit strongmatch, match, lowmwatch, parenthesis.. und aufgrund dessen entschieden
-    # und dann z.B. nur top klassifikationen nehmen?
-    # -> confidence für role
-    # -> conficdence für root
-
-    # -> sogesehen könnte es helfen, die xml db so zu ergänzen, dass rootnode und role auch in der db gespeichert werden..
-    # damit könnte die analyse massiv vereinfacht werden.
-
-    # Bsp: 0000874501-21-000028
-    # hier gibt es zwei einträge it role consolidatedbalancesheet/statementoffinancialposition
-    # und viele die zusätzlich als root statementoffinancialposition verwenden.
-
-    # man könnte diese idee jetzt ein wenig am postprocess für bs austesten..
+    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int, List[Dict[str, str]]]]]:
 
 
+        conf_2_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
+        current_max_confidence = 0
+        current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
 
+        for report_data in stmt_list:
+            confidence_dict = report_data['stmt_canditates']['BS']
+            if confidence_dict['byRole'] == 2:
+                conf_2_list.append(report_data)
+
+            sum_confidence = sum(confidence_dict.values())
+            if sum_confidence > current_max_confidence:
+                current_max_confidence = sum_confidence
+                current_max_confidence_list = []
+            if sum_confidence == current_max_confidence:
+                current_max_confidence_list.append(report_data)
+
+        # first check if there are reports with a confidence of by role 2
+        if len(conf_2_list) > 0:
+            return conf_2_list
+
+        # otherwise we return the max sum of confidence values
+        return current_max_confidence_list
 
     def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
 
         results: List[Dict[str, Union[str, int]]] = []
 
-        stmt_data: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]]
+        report_data: Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]]
         error_collector: List[Tuple[str, str, str]]
 
-        stmt_data, error_collector = self.process_reports(adsh, data)
+        report_data, error_collector = self.process_reports(adsh, data)
+        stmt_data: Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(report_data)
 
         reportnr = 0
         for stmt, stmt_list in stmt_data.items():
             if stmt is 'CP':
                 stmt_list = self._post_process_cp(stmt_list)
 
+            if stmt is 'BS':
+                stmt_list = self._post_process_bs(stmt_list)
+
             for report_data in stmt_list:
                 entries: List[Dict[str, Union[str, int]]] = report_data['entries']
                 reportnr += 1
                 for entry in entries:
                     entry['report'] = reportnr
+                    entry['inpth'] = None
+                    entry['stmt'] = stmt
                 results.extend(entries)
 
         return (results, error_collector)
