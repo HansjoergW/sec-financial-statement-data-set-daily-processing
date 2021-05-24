@@ -91,6 +91,7 @@ def test_compare_BS():
     print("BS Entries in ZIP: ", len(zip_bs_df))
     print("XML adshs without BS: ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
     print("ZIP adshs without BS: ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
+    print("not in xml", xml_adshs_without_bs - zip_adshs_without_bs )
 
 
 """
@@ -125,6 +126,18 @@ Data:
     BS Entries in ZIP:            10'730
     XML adshs without BS:             39
     ZIP adshs without BS:              8 
+    
+    
+  - 4. change -> additional keywords
+    ADSH with BS Entries in XML:   5'457
+    ADSH with BS Entries in ZIP:   5'462
+    BS Entries in XML:            10'716
+    BS Entries in ZIP:            10'730
+    XML adshs without BS:             13
+    ZIP adshs without BS:              8   
+    
+    not in xml {'0001827855-21-000003', '0001213900-21-019311', '0001448788-21-000006', '0001331757-21-000011', '0001625285-21-000004', '0001625285-21-000002', '0001625285-21-000006'}
+
 """
 
 
