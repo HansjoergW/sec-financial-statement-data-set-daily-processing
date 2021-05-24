@@ -33,10 +33,22 @@ class SecPreXmlDataProcessor():
                     'includes': ['deidocument'],
                     'confidence': 2
                 },
+                {
+                    'includes': ['document', 'entity', 'information'],
+                    'confidence': 2
+                },
             ],
             'root_keys': [
                 {
                     'includes': ['document', 'entity', 'information'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['coverpage'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['coverabstract'],
                     'confidence': 2
                 },
             ],
@@ -47,12 +59,34 @@ class SecPreXmlDataProcessor():
             'role_keys': [
                 {
                     'includes': ['consolidated', 'statement', 'financialposition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['consolidated', 'statement', 'financialcondition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['consolidated', 'statement', 'condition'],
+                    'excludes': ['detail'],
                     'confidence': 2
                 },
                 {
                     'includes': ['consolidated', 'balancesheet'],
+                    'excludes': ['detail'],
                     'confidence': 2
-                }
+                },
+                {
+                    'includes': ['statement', 'balancesheet'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['role/balancesheet'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
             ],
             'root_keys': [
                 {
@@ -91,6 +125,11 @@ class SecPreXmlDataProcessor():
                 },
                 {
                     'includes': ['consolidated', 'statement', 'operation'],
+                    'excludes': ['comprehensive'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'operation'],
                     'excludes': ['comprehensive'],
                     'confidence': 2
                 },
@@ -615,7 +654,11 @@ class SecPreXmlDataProcessor():
         return [first_entry]
 
     def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int, List[Dict[str, str]]]]]:
+        """
+         often detail-reports contain the keywords in their role definition but also much more text.
+         there are also cases with proper supparts of a company like 0001711269-21-000023
 
+        """
 
         conf_2_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
         current_max_confidence = 0
@@ -634,8 +677,13 @@ class SecPreXmlDataProcessor():
                 current_max_confidence_list.append(report_data)
 
         # first check if there are reports with a confidence of by role 2
-        if len(conf_2_list) > 0:
-            return conf_2_list
+        # if len(conf_2_list) > 0:
+        #     for entry in conf_2_list:
+        #         # sometimes details to balancesheet are contained in reports that contain all keywords, but are much longer
+        #         # so check for length of role
+        #         role_statement_part = entry['role'].split('/')[1]
+        #
+        #     return conf_2_list
 
         # otherwise we return the max sum of confidence values
         return current_max_confidence_list
