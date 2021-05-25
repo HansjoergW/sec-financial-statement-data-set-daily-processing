@@ -774,7 +774,7 @@ class SecPreXmlDataProcessor():
                 reportnr += 1
                 for entry in entries:
                     entry['report'] = reportnr
-                    entry['inpth'] = None
+                    entry['inpth'] = report_data['inpth']
                     entry['stmt'] = stmt
                 results.extend(entries)
 

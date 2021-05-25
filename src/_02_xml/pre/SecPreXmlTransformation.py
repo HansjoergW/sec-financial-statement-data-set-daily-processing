@@ -77,7 +77,7 @@ class SecPreXmlTransformer():
 
             # figure out if data in a report where contained in parantheses
             v['inpth'] = "0"
-            if "parenthetical" in v.get('role'):
+            if "parenthetical" in v.get('role').lower():
                 v['inpth'] = "1"
 
         return data

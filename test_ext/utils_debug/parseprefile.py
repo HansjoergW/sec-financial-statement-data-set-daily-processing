@@ -205,6 +205,7 @@ if __name__ == '__main__':
     many_cp_reports_1 = "0001829126-21-002055" # 0000089089-21-000012, 0000898174-21-000006, 0001829126-21-002055
     many_bs_reports_1 = "0001193125-21-094619"
     no_bs_report =     '0001213900-21-019311'
+    no_inpth = "0000074208-21-000025"
 
 
     # 0001213900-21-019311 BS: sieht aus als wäre das als CashFlow betitelt!
@@ -212,8 +213,8 @@ if __name__ == '__main__':
 
     content = special_content_line_wrong
 
-    content = get_pre_xml_content_by_adsh(no_bs_report)
-    parse_content(no_bs_report, content)
+    content = get_pre_xml_content_by_adsh(no_inpth)
+    parse_content(no_inpth, content)
 
     print("")
 

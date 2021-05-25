@@ -225,7 +225,7 @@ if __name__ == '__main__':
     dataUtils = DataAccessTool(workdir)
     testCreatorTool = TestSetCreatorTool(workdir)
 
-    fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
+    #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
     #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     #print(df.shape)
     fill_mass_pre_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
