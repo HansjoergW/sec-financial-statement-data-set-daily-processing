@@ -2,25 +2,6 @@ Next
 ====
 
 
-- da das tag herauslesen jetzt einigermassen funktioniert, könnte man vlt einen besseren vergleich
-  zwischen inhalt in zip und geparsten files machen.
-  -> prüfen, welche genau übereinstimmen,
-  -> prüfen, welche Inhalte zuviel gescannt werden
-  -> z.B Report 0000014272-21-000066 -> hier werden beim parsen viel mehr reports gefunden, als in zip
-
-  es wäre auch gut für die zip datei die selbe stmt-taglist struktur aufzubauen, das würde den vergleich einfacher machen,
-  so dass man auch sieht, was für statments es in zip gibt und wie gross die anzahl tags darin ist
-
-  ziel müsste sein, dass über Tabellen machen zu können.
-  - Aufbereiten der pre.txt in eine Tabelle mit den adsh, stmt, report, taglist, taglist-länge
-  - Aufbereiten der geparsten Daten in ähnlicher Form, zusätzlich für die gefunden Reports die role und root-node,
-    sowie der Key, aufgrund dessen der Eintrag klassifziert wurde
-
-
-
-- Pre Spezialfälle
-    - "nummerierte Tags", die dann keine to from beziehung mehr ermöglichen:
-       0000018255-21-000004, 0000016160-21-000018
 
 - Aufbau erweiterbarer "PRE" Test, in welchem mann spezialfälle direkt in ein testdaten verzeichnis ablegen
   kann. der Test iteriert dann über alle Testfiles und prüft die Ergebnisse.
@@ -68,13 +49,17 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 - Reihenfolge der Spalten in den geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
 
--handeln von
+-handhaben von
    3.4. there are some rare cases of statements (4 statements in 5500 reports for q1 2021) that contain multiple root_nodes.
-     -> not supported yet.
+     -> not supported yet. -> idee, zählen der Kinder und den Root mit den meisten children nehmen
      0000829224-21-000029 http://www.starbucks.com/role/DocumentAndEntityInformation
      0000920371-21-000042 http://www.simpsonfg.com/role/ConsolidatedStatementsofStockholdersEquityParenthetical
      0001254699-21-000005 http://www.qvc.com/role/ConsolidatedStatementsofCashFlows
      0001628280-21-002278 http://polaris.com/role/ConsolidatedStatementsOfCashFlows
+
+    BalanceSheet ist als CashFlow angegeben
+     0001213900-21-019311 BS: sieht aus als wäre das als CashFlow betitelt, entries deuten aber auf BS hin
+
 
 Done
 ====

@@ -87,12 +87,13 @@ def test_compare_BS():
     print("")
     print("ADSH with BS Entries in XML: ", len(xml_adshs_with_bs))
     print("ADSH with BS Entries in ZIP: ", len(zip_adshs_with_bs))
-    print("BS Entries in XML: ", len(xml_bs_df))
-    print("BS Entries in ZIP: ", len(zip_bs_df))
+    print("BS Entries in XML:    ", len(xml_bs_df))
+    print("BS Entries in ZIP:    ", len(zip_bs_df))
     print("XML adshs without BS: ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
     print("ZIP adshs without BS: ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
-    print("not in xml", xml_adshs_without_bs - zip_adshs_without_bs )
-
+    print("missing in both:      ", xml_adshs_without_bs.intersection(zip_adshs_without_bs))
+    print("only missing in xml  :", xml_adshs_without_bs - zip_adshs_without_bs)
+    print("only missing in zip  :", zip_adshs_without_bs - xml_adshs_without_bs)
 
 """
 Data:
@@ -138,6 +139,17 @@ Data:
     
     not in xml {'0001827855-21-000003', '0001213900-21-019311', '0001448788-21-000006', '0001331757-21-000011', '0001625285-21-000004', '0001625285-21-000002', '0001625285-21-000006'}
 
+  - 5. change -> kleinere Anpassungen, zusätzliche keywords
+    ADSH with BS Entries in XML:  5463
+    ADSH with BS Entries in ZIP:  5462
+    BS Entries in XML:     10737
+    BS Entries in ZIP:     10730
+    XML adshs without BS:  7  -  {'0001193125-21-102032', '0001213900-21-019311', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001587650-21-000010', '0001072627-21-000022'}
+    ZIP adshs without BS:  8  -  {'0001193125-21-102032', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0000065984-21-000096', '0001587650-21-000010', '0001437749-21-007013', '0001072627-21-000022'}
+    missing in both:       {'0001193125-21-102032', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001587650-21-000010', '0001072627-21-000022'}
+    only missing in xml  : {'0001213900-21-019311'}
+    only missing in zip  : {'0001437749-21-007013', '0000065984-21-000096'}
+    
 """
 
 

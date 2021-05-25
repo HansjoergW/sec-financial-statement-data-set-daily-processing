@@ -78,12 +78,37 @@ class SecPreXmlDataProcessor():
                     'confidence': 2
                 },
                 {
+                    'includes': ['condensed', 'balancesheet'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
                     'includes': ['statement', 'balancesheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
                 {
+                    'includes': ['statement', 'financialposition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'financialcondition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'condition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
                     'includes': ['role/balancesheet'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                { # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
+                    'includes': ['role/idr_balancesheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
@@ -129,6 +154,11 @@ class SecPreXmlDataProcessor():
                     'confidence': 2
                 },
                 {
+                    'includes': ['condensed', 'statement','operation'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
                     'includes': ['statement', 'operation'],
                     'excludes': ['comprehensive'],
                     'confidence': 2
@@ -164,6 +194,10 @@ class SecPreXmlDataProcessor():
             'role_keys': [
                 {
                     'includes': ['consolidated', 'statement', 'cashflow'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['condensed', 'statement', 'cashflow'],
                     'confidence': 2
                 }
             ],
