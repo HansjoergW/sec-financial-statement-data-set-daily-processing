@@ -107,11 +107,22 @@ class SecPreXmlDataProcessor():
                     'excludes': ['detail'],
                     'confidence': 2
                 },
-                { # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
+                {  # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
                     'includes': ['role/idr_balancesheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
+                {  # special case for "kingsway" only report with details in main BS 0001072627-21-000022
+                    'includes': ['kingsway-financial', 'consolidated', 'balancesheet'],
+                    'excludes': [],
+                    'confidence': 2
+                },
+                { # special case for xfleet BS with role cashflow 0001213900-21-019311
+                    'includes': ['www.xlfleet.com', 'consolidatedcashflow'],
+                    'excludes': ['cashflow0'],
+                    'confidence': 2
+                },
+
             ],
             'root_keys': [
                 {
@@ -154,7 +165,7 @@ class SecPreXmlDataProcessor():
                     'confidence': 2
                 },
                 {
-                    'includes': ['condensed', 'statement','operation'],
+                    'includes': ['condensed', 'statement', 'operation'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
@@ -185,7 +196,7 @@ class SecPreXmlDataProcessor():
             ],
             'root_keys': [
                 {
-                    'includes': ['comprehensive', 'income','statement', 'abstract'],
+                    'includes': ['comprehensive', 'income', 'statement', 'abstract'],
                     'confidence': 1
                 },
             ]
@@ -200,6 +211,14 @@ class SecPreXmlDataProcessor():
                     'includes': ['condensed', 'statement', 'cashflow'],
                     'confidence': 2
                 }
+
+                # SonderFall für diesen hier kann man nicht so einfach excluden...
+                # ginge nur über labels oder mit regex prüfung
+                # { # special case for xfleet BS with role cashflow 0001213900-21-019311
+                #     'includes': ['www.xlfleet.com', 'consolidatedcashflow'],
+                #     'excludes': ['cashflow0'],
+                #     'confidence': 2
+                # },
             ],
             'root_keys': [
 
@@ -208,8 +227,7 @@ class SecPreXmlDataProcessor():
 
     }
 
-
-# keywords that indicate the type of the report
+    # keywords that indicate the type of the report
     stmt_keyword_map: List[Tuple[List[str], str]] = [
 
         (['consolidated', 'statement', 'cashflow'], 'CF'),
@@ -226,14 +244,14 @@ class SecPreXmlDataProcessor():
         (['statement', 'stockowner', 'equity'], 'EQ'),
 
         (['consolidated', 'statement', 'financialposition'], 'BS'),
-        (['consolidated','balancesheet'], 'BS'),
+        (['consolidated', 'balancesheet'], 'BS'),
         (['statementoffinancialposition'], 'BS'),
 
-        (['document', 'entity', 'information'], 'CP'), #role / root
-        (['role/cover'], 'CP'), # role
-        (['coverpage'], 'CP'), # role
-        (['coverabstract'], 'CP'), # role
-        (['deidocument'], 'CP'), # specialcase for 0001376986-21-000007
+        (['document', 'entity', 'information'], 'CP'),  # role / root
+        (['role/cover'], 'CP'),  # role
+        (['coverpage'], 'CP'),  # role
+        (['coverabstract'], 'CP'),  # role
+        (['deidocument'], 'CP'),  # specialcase for 0001376986-21-000007
     ]
 
     # keywords of role definition that should be ignored
@@ -343,7 +361,6 @@ class SecPreXmlDataProcessor():
                         kick_out_list.append(to_entry)
                         new_entries_found = True
 
-
         # now the entries can be removed from  orginial preArcList
         cleared_preArc_list: List[Dict[str, str]] = []
 
@@ -372,7 +389,6 @@ class SecPreXmlDataProcessor():
 
         return root_nodes[0]
 
-
     def _eval_statement_canditate_helper(self, key: str, definition: List[Dict[str, List[str]]]) -> int:
         key = key.lower()
         max_confidence = 0
@@ -386,7 +402,8 @@ class SecPreXmlDataProcessor():
 
         return max_confidence
 
-    def _evaluate_statement_canditates(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Dict[str, Dict[str, int]]:
+    def _evaluate_statement_canditates(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Dict[
+        str, Dict[str, int]]:
         # returns for matches stmt: {byrole: confidence, byroot:confidence, bylabel: confidence}
 
         result: Dict[str, Dict[str, int]] = {}
@@ -406,7 +423,8 @@ class SecPreXmlDataProcessor():
 
         return result
 
-    def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Tuple[str, Union[str, None]]:
+    def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Tuple[
+        str, Union[str, None]]:
         """ tries to figure out the """
         role: str = role.lower()
         root_node: str = root_node.lower()
@@ -563,7 +581,8 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]], List[Tuple[str, str, str]]]:
+    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[
+        Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]], List[Tuple[str, str, str]]]:
         # processed the reports in the data.
         # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
 
@@ -591,7 +610,8 @@ class SecPreXmlDataProcessor():
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
 
                 root_node = self._find_root_node(preArc_list)
-                stmt_canditates: Dict[str, Dict[str, int]] = self._evaluate_statement_canditates(role, root_node, loc_list)
+                stmt_canditates: Dict[str, Dict[str, int]] = self._evaluate_statement_canditates(role, root_node,
+                                                                                                 loc_list)
                 if len(stmt_canditates) == 0:
                     continue
 
@@ -605,7 +625,7 @@ class SecPreXmlDataProcessor():
                 # if result.get(stmt) is None:
                 #     result[stmt] = []
 
-                details:  Dict[str, Union[str, List[Dict[str, str]]]] = {}
+                details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
                 details['adsh'] = adsh
                 details['role'] = role
                 details['loc_list'] = loc_list
@@ -629,7 +649,9 @@ class SecPreXmlDataProcessor():
 
         return (result, error_collector)
 
-    def _post_process_assign_report_to_stmt(self, report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
+    def _post_process_assign_report_to_stmt(self,
+                                            report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> \
+    Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
         # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
 
         result: Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
@@ -665,7 +687,9 @@ class SecPreXmlDataProcessor():
                     stmt = conf_of_2_list[0]
                 else:
                     if len(conf_of_2_list) > 1:
-                        logging.info("{} has confidence of 2 for several statement types {}".format(reportinfo.get('adsh'), conf_of_2_list))
+                        logging.info(
+                            "{} has confidence of 2 for several statement types {}".format(reportinfo.get('adsh'),
+                                                                                           conf_of_2_list))
 
                     stmt = max_sum_of_confidence_stmt
 
@@ -676,7 +700,8 @@ class SecPreXmlDataProcessor():
 
         return result
 
-    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int, List[Dict[str, str]]]]]:
+    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[
+        Dict[str, Union[str, int, List[Dict[str, str]]]]]:
         # in all the reports, there was always just on CP entry
         # so we either return the first who was identified as CP by the rolename
         # or we return the first entry of the list (since CP is generally the first that appears in a report)
@@ -687,7 +712,8 @@ class SecPreXmlDataProcessor():
         first_entry = stmt_list[0]
         return [first_entry]
 
-    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[Dict[str, Union[str, int, List[Dict[str, str]]]]]:
+    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[
+        Dict[str, Union[str, int, List[Dict[str, str]]]]]:
         """
          often detail-reports contain the keywords in their role definition but also much more text.
          there are also cases with proper supparts of a company like 0001711269-21-000023
@@ -722,7 +748,8 @@ class SecPreXmlDataProcessor():
         # otherwise we return the max sum of confidence values
         return current_max_confidence_list
 
-    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
+    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[
+        List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
 
         results: List[Dict[str, Union[str, int]]] = []
 
@@ -730,7 +757,9 @@ class SecPreXmlDataProcessor():
         error_collector: List[Tuple[str, str, str]]
 
         report_data, error_collector = self.process_reports(adsh, data)
-        stmt_data: Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(report_data)
+        stmt_data: Dict[
+            str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
+            report_data)
 
         reportnr = 0
         for stmt, stmt_list in stmt_data.items():

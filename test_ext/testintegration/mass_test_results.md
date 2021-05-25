@@ -10,6 +10,21 @@ EQ	7269
 IS	5955
 UN	448
 
+## Allgemein / Sonderfälle
+Keine Reports mit BS, IS, CF, etc.
+    '0001193125-21-102032', '0001669374-21-000016' '0001539816-21-000003' '0001775098-21-000005' '0001587650-21-000010'
+
+BS mit CashFlow Role
+    0001213900-21-019311 BS: sieht aus als wäre das als CashFlow betitelt!
+
+mit Mulitple RootNodes: 
+   CP 0000829224-21-000029 / DocumentEntity (Starbucks)
+   EQ 0000920371-21-000042 / EQ skipped report with role http://www.simpsonfg.com/role/ConsolidatedStatementsofStockholdersEquityParenthetical 
+   CF 0001254699-21-000005 / CF skipped report with role http://www.qvc.com/role/ConsolidatedStatementsofCashFlows 
+   CF 0001628280-21-002278 / CF skipped report with role http://polaris.com/role/ConsolidatedStatementsOfCashFlows     
+
+
+
 ## CP
 test_compare_adshs:
   Entries in XML:  5470
