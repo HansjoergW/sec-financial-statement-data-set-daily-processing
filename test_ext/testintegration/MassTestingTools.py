@@ -24,6 +24,7 @@ def convert_to_mass_report_test_df(dbmgr: DBManager, df: pd.DataFrame) -> Tuple[
     missing_xml_files:List[str] = []
     for groupname, groupdf in pre_by_adsh_grouped:
         stmt = groupdf.stmt.tolist()[0]
+        inpth = groupdf.inpth.tolist()[0]
         tags = groupdf.tag.tolist()
         adsh = groupname[0]
         report = groupname[1]
@@ -49,6 +50,7 @@ def convert_to_mass_report_test_df(dbmgr: DBManager, df: pd.DataFrame) -> Tuple[
             details['length'] = len(tags)
             details['tagList'] = taglist
             details['xmlFile'] = xmlFile
+            details['inpth'] = inpth
 
             records.append(details)
         except Exception as e:
@@ -223,7 +225,7 @@ if __name__ == '__main__':
     dataUtils = DataAccessTool(workdir)
     testCreatorTool = TestSetCreatorTool(workdir)
 
-    #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
+    fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
     #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     #print(df.shape)
     fill_mass_pre_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
