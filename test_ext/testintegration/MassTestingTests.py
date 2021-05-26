@@ -107,7 +107,7 @@ def test_compare_BS():
     print("only missing in zip  :", zip_adshs_without_bs - xml_adshs_without_bs)
     print("unequal counts:      :", len(merged_groupby_diff))
 
-    print(merged_groupby_diff[merged_groupby_diff.report_xml > 1][:10])
+    print(len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
 
 """
 Data:
@@ -163,7 +163,30 @@ Data:
     missing in both:       {'0001193125-21-102032', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001587650-21-000010', '0001072627-21-000022'}
     only missing in xml  : {'0001213900-21-019311'}
     only missing in zip  : {'0001437749-21-007013', '0000065984-21-000096'}
-    
+  
+  Anzahl der vergleichen je nach inpth und normal  
+    ADSH with BS Entries in XML:  5465
+    ADSH with BS Entries in ZIP:  5462
+    BS Entries in XML:     10699
+    BS Entries in ZIP:     10730
+    XML adshs without BS:  5  -  {'0001669374-21-000016', '0001193125-21-102032', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
+    ZIP adshs without BS:  8  -  {'0001437749-21-007013', '0001072627-21-000022', '0000065984-21-000096', '0001193125-21-102032', '0001669374-21-000016', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
+    missing in both:       {'0001669374-21-000016', '0001193125-21-102032', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
+    only missing in xml  : set()
+    only missing in zip  : {'0001437749-21-007013', '0001072627-21-000022', '0000065984-21-000096'}
+    unequal counts:      : 111 (71 haben keinen Eintrag in XML)
+                                     report_xml  report_zip  equal
+    adsh                 stmt inpth                               
+    0000040545-21-000011 BS   1             NaN         1.0  False
+    0000055772-21-000016 BS   0             NaN         1.0  False
+    0000076605-21-000059 BS   0             NaN         1.0  False
+    0000100716-21-000020 BS   0             NaN         1.0  False
+    0000105770-21-000008 BS   0             NaN         1.0  False
+    0000731766-21-000013 BS   1             NaN         1.0  False
+    0000784977-21-000007 BS   0             NaN         1.0  False
+    0000804269-21-000005 BS   1             NaN         1.0  False
+    0000866273-21-000008 BS   1             NaN         1.0  False
+    0000890926-21-000019 BS   1             NaN         1.0  False    
 """
 
 

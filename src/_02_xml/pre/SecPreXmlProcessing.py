@@ -129,6 +129,10 @@ class SecPreXmlDataProcessor():
                     'includes': ['statementoffinancialposition'],
                     'confidence': 1
                 },
+                {
+                    'includes': ['balancesheet', 'parenthetical'],
+                    'confidence': 1
+                },
             ],
             'label': []
         },
@@ -666,6 +670,8 @@ class SecPreXmlDataProcessor():
         """
         current_max_confidence = 0
         current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
+
+eigentlich müsste man für inpth und norm unterscheiden
 
         for report_data in stmt_list:
             confidence_dict = report_data['stmt_canditates']['BS']
