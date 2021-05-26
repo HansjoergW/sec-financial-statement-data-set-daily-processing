@@ -35,6 +35,8 @@ Next
 
 Later
 =====
+umbauen dictionaries mit https://realpython.com/python-data-classes/
+
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
 

@@ -74,9 +74,20 @@ def test_compare_CP():
 
 
 def test_compare_BS():
+
     adshs_to_consider = sorted_adshs_in_both # [:100]
     xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, 'BS')
     zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, 'BS')
+
+    xml_bs_group_df = xml_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
+    zip_bs_group_df = zip_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
+
+    xml_bs_group_df.rename(columns = lambda x: x + '_xml', inplace=True)
+    zip_bs_group_df.rename(columns = lambda x: x + '_zip', inplace=True)
+
+    merged_groupby = pd.merge(xml_bs_group_df, zip_bs_group_df, how="outer", left_index=True, right_index=True)
+    merged_groupby['equal'] = merged_groupby['report_xml'] == merged_groupby['report_zip']
+    merged_groupby_diff = merged_groupby[merged_groupby.equal == False]
 
     xml_adshs_with_bs = set(xml_bs_df.adsh.unique().tolist())
     xml_adshs_without_bs = set(adshs_to_consider) - xml_adshs_with_bs
@@ -94,6 +105,9 @@ def test_compare_BS():
     print("missing in both:      ", xml_adshs_without_bs.intersection(zip_adshs_without_bs))
     print("only missing in xml  :", xml_adshs_without_bs - zip_adshs_without_bs)
     print("only missing in zip  :", zip_adshs_without_bs - xml_adshs_without_bs)
+    print("unequal counts:      :", len(merged_groupby_diff))
+
+    print(merged_groupby_diff[merged_groupby_diff.report_xml > 1][:10])
 
 """
 Data:

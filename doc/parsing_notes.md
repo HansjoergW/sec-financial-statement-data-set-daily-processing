@@ -43,6 +43,8 @@
      However, in 2021 Q1 there was one Exception to that rule: 0001628280-21-003313
 3.5. up-lowercase is not consistent, e.g. roles are sometimes in uppercase, somtimes in lowercase
 3.6. sometimes there are empty presentionatLinks (not containing loc or prearc entries). These can be skipped.
+3.7. There is always a maximum number of 1 CP entry in the Zip
+     There is always a maximum number of 1 BS and 1 BS inparenthesis in the Zip
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:

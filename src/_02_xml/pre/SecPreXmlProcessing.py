@@ -227,32 +227,6 @@ class SecPreXmlDataProcessor():
 
     }
 
-    # keywords that indicate the type of the report
-    stmt_keyword_map: List[Tuple[List[str], str]] = [
-
-        (['consolidated', 'statement', 'cashflow'], 'CF'),
-
-        (['consolidated', 'statement', 'income', 'comprehensive'], 'CI'),
-
-        (['consolidated', 'statement', 'income'], 'IS'),
-        (['consolidated', 'statement', 'operation'], 'IS'),
-        (['incomestatementabstract'], 'IS'),
-
-        (['statement', 'shareholder', 'equity'], 'EQ'),
-        (['statement', 'stockholder', 'equity'], 'EQ'),
-        (['statement', 'shareowner', 'equity'], 'EQ'),
-        (['statement', 'stockowner', 'equity'], 'EQ'),
-
-        (['consolidated', 'statement', 'financialposition'], 'BS'),
-        (['consolidated', 'balancesheet'], 'BS'),
-        (['statementoffinancialposition'], 'BS'),
-
-        (['document', 'entity', 'information'], 'CP'),  # role / root
-        (['role/cover'], 'CP'),  # role
-        (['coverpage'], 'CP'),  # role
-        (['coverabstract'], 'CP'),  # role
-        (['deidocument'], 'CP'),  # specialcase for 0001376986-21-000007
-    ]
 
     # keywords of role definition that should be ignored
     role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-']
@@ -422,35 +396,6 @@ class SecPreXmlDataProcessor():
                 result[key] = details
 
         return result
-
-    def _evaluate_statement(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Tuple[
-        str, Union[str, None]]:
-        """ tries to figure out the """
-        role: str = role.lower()
-        root_node: str = root_node.lower()
-
-        # first we try to figure out the stmt-type by looking at the role
-        for map_entry in self.stmt_keyword_map:
-            map_stmt: str = map_entry[1]
-            map_keys: List[str] = map_entry[0]
-
-            if all(map_key in role for map_key in map_keys):
-                return 'byRole', map_stmt
-
-            if all(map_key in root_node for map_key in map_keys):
-                return 'byRoot', map_stmt
-
-        # second check looking for specific tags
-        # todo: maybe we need something like that if reports are missing?
-        # dei_entries: int = 0
-        # for loc in loc_list:
-        #     if loc['version'].startswith('dei'):
-        #         dei_entries +=1
-        #
-        # if dei_entries/len(loc_list) > 0.8:
-        #     return "CP"
-
-        return 'none', None
 
     def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
@@ -641,10 +586,10 @@ class SecPreXmlDataProcessor():
             except Exception as err:
                 error_collector.append((adsh, role, str(err)))
                 # just log if the name gives a hint that this could be a primary statement
-                selectCriteria, stmt_eval = self._evaluate_statement(role, "", [])
-                if stmt_eval is not None:
-                    logging.info("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
-                    print("{} / {} skipped report with role {} : {}".format(adsh, stmt_eval, role, str(err)))
+                role_candidates = self._evaluate_statement_canditates(role, "", [])
+                if len(role_candidates) > 0:
+                    logging.info("{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role, str(err)))
+                    print("{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role, str(err)))
                 continue
 
         return (result, error_collector)
@@ -719,15 +664,11 @@ class SecPreXmlDataProcessor():
          there are also cases with proper supparts of a company like 0001711269-21-000023
 
         """
-
-        conf_2_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
         current_max_confidence = 0
         current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
 
         for report_data in stmt_list:
             confidence_dict = report_data['stmt_canditates']['BS']
-            if confidence_dict['byRole'] == 2:
-                conf_2_list.append(report_data)
 
             sum_confidence = sum(confidence_dict.values())
             if sum_confidence > current_max_confidence:
@@ -736,17 +677,26 @@ class SecPreXmlDataProcessor():
             if sum_confidence == current_max_confidence:
                 current_max_confidence_list.append(report_data)
 
-        # first check if there are reports with a confidence of by role 2
-        # if len(conf_2_list) > 0:
-        #     for entry in conf_2_list:
-        #         # sometimes details to balancesheet are contained in reports that contain all keywords, but are much longer
-        #         # so check for length of role
-        #         role_statement_part = entry['role'].split('/')[1]
-        #
-        #     return conf_2_list
+        # at max, one bs report and one bs report with "inpth" (in parenthesis) is returned
+        # if there are more, then the ones with the shortest "role" are returned
+        shortest_bs = None
+        shortest_bs_inpth = None
+        for entry in current_max_confidence_list:
+            role = entry['role']
+            inpth = entry['inpth']
 
-        # otherwise we return the max sum of confidence values
-        return current_max_confidence_list
+            if inpth == 0 and (shortest_bs == None or len(role) < len(shortest_bs['role'])):
+                shortest_bs = entry
+            if inpth == 1 and (shortest_bs_inpth == None or len(role) < len(shortest_bs['role'])):
+                shortest_bs_inpth = entry
+
+        result: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
+        if shortest_bs is not None:
+            result.append(shortest_bs)
+        if shortest_bs_inpth is not None:
+            result.append(shortest_bs_inpth)
+
+        return result
 
     def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[
         List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
