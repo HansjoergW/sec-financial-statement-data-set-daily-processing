@@ -43,8 +43,15 @@
      However, in 2021 Q1 there was one Exception to that rule: 0001628280-21-003313
 3.5. up-lowercase is not consistent, e.g. roles are sometimes in uppercase, somtimes in lowercase
 3.6. sometimes there are empty presentionatLinks (not containing loc or prearc entries). These can be skipped.
-3.7. There is always a maximum number of 1 CP entry in the Zip
+3.7. in parenthical or not can be treated as different "report" types
+3.8. There is always a maximum number of 1 CP entry in the Zip
      There is always a maximum number of 1 BS and 1 BS inparenthesis in the Zip
+3.9. Sometimes a filed report can also contain statements of subsidiaries. In these cases, the 
+     name of the role of the presentation indicates that and therefore is longer as the role name of the
+     main company. Therefore if there is more than one presentation of type (BS, IS, ..) the one with the shortest
+     rolename has to be chosen.
+3.10. sometimes, there is a title attribute which contains the information of the statement type rather than the role
+      e.g. 0001010412-21-000004 or 0001079973-21-000172
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:

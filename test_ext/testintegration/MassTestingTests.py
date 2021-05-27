@@ -108,6 +108,7 @@ def test_compare_BS():
     print("unequal counts:      :", len(merged_groupby_diff))
 
     print(len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
+    print(merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
 
 """
 Data:

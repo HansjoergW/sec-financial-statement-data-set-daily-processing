@@ -600,17 +600,19 @@ class SecPreXmlDataProcessor():
 
     def _post_process_assign_report_to_stmt(self,
                                             report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> \
-    Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
+    Dict[Tuple[str,int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
         # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
 
-        result: Dict[str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
+        # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth" which indicates wether it is  a "in parenthical" report
+        result: Dict[Tuple[str,int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
 
         # ensure that a report only belongs to one stmt type
         for idx, reportinfo in report_data.items():
             stmt_canditates_dict = reportinfo['stmt_canditates']
             stmt_canditates_keys = list(stmt_canditates_dict.keys())
+            inpth = reportinfo['inpth']
 
-            stmt = None
+            stmt: str
             if len(stmt_canditates_keys) == 1:
                 stmt = stmt_canditates_keys[0]
             else:
@@ -642,10 +644,10 @@ class SecPreXmlDataProcessor():
 
                     stmt = max_sum_of_confidence_stmt
 
-            if result.get(stmt) == None:
-                result[stmt] = []
+            if result.get((stmt, inpth)) == None:
+                result[(stmt, inpth)] = []
 
-            result[stmt].append(reportinfo)
+            result[(stmt, inpth)].append(reportinfo)
 
         return result
 
@@ -671,8 +673,6 @@ class SecPreXmlDataProcessor():
         current_max_confidence = 0
         current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
 
-eigentlich müsste man für inpth und norm unterscheiden
-
         for report_data in stmt_list:
             confidence_dict = report_data['stmt_canditates']['BS']
 
@@ -683,24 +683,18 @@ eigentlich müsste man für inpth und norm unterscheiden
             if sum_confidence == current_max_confidence:
                 current_max_confidence_list.append(report_data)
 
-        # at max, one bs report and one bs report with "inpth" (in parenthesis) is returned
+        # at max, one bs report for either with or without the inpth (in parentical) flag is returned
         # if there are more, then the ones with the shortest "role" are returned
         shortest_bs = None
-        shortest_bs_inpth = None
         for entry in current_max_confidence_list:
             role = entry['role']
-            inpth = entry['inpth']
 
-            if inpth == 0 and (shortest_bs == None or len(role) < len(shortest_bs['role'])):
+            if shortest_bs == None or len(role) < len(shortest_bs['role']):
                 shortest_bs = entry
-            if inpth == 1 and (shortest_bs_inpth == None or len(role) < len(shortest_bs['role'])):
-                shortest_bs_inpth = entry
 
         result: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
         if shortest_bs is not None:
             result.append(shortest_bs)
-        if shortest_bs_inpth is not None:
-            result.append(shortest_bs_inpth)
 
         return result
 
@@ -714,11 +708,13 @@ eigentlich müsste man für inpth und norm unterscheiden
 
         report_data, error_collector = self.process_reports(adsh, data)
         stmt_data: Dict[
-            str, List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
+            Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
             report_data)
 
         reportnr = 0
-        for stmt, stmt_list in stmt_data.items():
+        for stmtkey, stmt_list in stmt_data.items():
+            stmt, inpth = stmtkey
+            # todo: check if it is really necessary that a list is returned
             if stmt is 'CP':
                 stmt_list = self._post_process_cp(stmt_list)
 
@@ -730,7 +726,7 @@ eigentlich müsste man für inpth und norm unterscheiden
                 reportnr += 1
                 for entry in entries:
                     entry['report'] = reportnr
-                    entry['inpth'] = report_data['inpth']
+                    entry['inpth'] = inpth
                     entry['stmt'] = stmt
                 results.extend(entries)
 
