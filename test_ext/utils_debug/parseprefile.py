@@ -208,7 +208,9 @@ if __name__ == '__main__':
 
     # 3: 0001711269-21-000023 / 2: 0000074208-21-000025, 0000354707-21-000036, 0000701869-21-000011, 0000826675-21-000015, 0000933036-21-000049, 0001010412-21-000004, 0001025996-21-000062
     # more_than_one_bs = "0000826675-21-000015"
-    missing_bs_inpth = "0001079973-21-000172" # 0001010412-21-000004 0001079973-21-000172 0001091818-21-000034 0001140361-21-008496
+    missing_bs = "0001553350-21-000261" #    0001387131-21-002995 0001387131-21-002996
+
+
 
     # 0000012208-21-000012: andere root node in parentheticals
 
@@ -217,8 +219,8 @@ if __name__ == '__main__':
 
     #content = special_content_line_wrong
 
-    content = get_pre_xml_content_by_adsh(missing_bs_inpth)
-    parse_content(missing_bs_inpth, content)
+    content = get_pre_xml_content_by_adsh(missing_bs)
+    parse_content(missing_bs, content)
 
     print("")
 

@@ -75,7 +75,12 @@ class SecPreXmlTransformer():
             self._transform_loc(v.get('loc_list'))
             self._transform_preArc(v.get('preArc_list'))
 
+            # if there is a title info, then this has precedence over the role
+            if v['title'] is not None:
+                v['role'] = v['title']
+
             # figure out if data in a report where contained in parantheses
+            # todo: title berücksichtigen
             v['inpth'] = "0"
             if "parenthetical" in v.get('role').lower():
                 v['inpth'] = "1"

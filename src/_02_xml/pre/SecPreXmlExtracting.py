@@ -75,9 +75,11 @@ class SecPreXmlExtractor():
             details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
             report += 1
             role: str = presentation_link.get("role")
+            title: str = presentation_link.get("title")
             loc_list: List[Dict[str, str]] = self._get_locations(presentation_link)
             preArc_list: List[Dict[str, str]] = self._get_presentationArcs(presentation_link)
 
+            details['title'] = title
             details['role'] = role
             details['loc_list'] = loc_list
             details['preArc_list'] = preArc_list

@@ -62,6 +62,23 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
     BalanceSheet ist als CashFlow angegeben
      0001213900-21-019311 BS: sieht aus als wäre das als CashFlow betitelt, entries deuten aber auf BS hin
 
+    parentheticals cases werden nicht gefunde
+        '0001174947-21-000168'
+        - xlink:role="http://ruger.com/role/rgr-cbs">
+        - xlink:role="http://ruger.com/role/rgr-cbsp">
+
+        '0001178913-21-000696'
+        - role="http://solaredge.com/role/sedg-cbs"
+        - role="http://solaredge.com/role/sedg-cbsp"
+
+        '0001206774-21-000530'
+        - role="http://cassinfo.com/role/cass-cbs1"
+        - role="http://cassinfo.com/role/cass-cbsp1"
+
+        '0001553350-21-000261'
+        - role="http://lightwavelogic.com/role/lwlg-bs">
+        - role="http://lightwavelogic.com/role/lwlg-bsp">
+
 
 Done
 ====

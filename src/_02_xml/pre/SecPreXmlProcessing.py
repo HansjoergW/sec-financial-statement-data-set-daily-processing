@@ -73,17 +73,17 @@ class SecPreXmlDataProcessor():
                     'confidence': 2
                 },
                 {
-                    'includes': ['consolidated', 'balancesheet'],
+                    'includes': ['consolidated', 'balance', 'sheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
                 {
-                    'includes': ['condensed', 'balancesheet'],
+                    'includes': ['condensed', 'balance', 'sheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
                 {
-                    'includes': ['statement', 'balancesheet'],
+                    'includes': ['statement', 'balance','sheet'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
@@ -99,6 +99,11 @@ class SecPreXmlDataProcessor():
                 },
                 {
                     'includes': ['statement', 'condition'],
+                    'excludes': ['detail'],
+                    'confidence': 2
+                },
+                {
+                    'includes': ['statement', 'assets','liabilities'],
                     'excludes': ['detail'],
                     'confidence': 2
                 },
