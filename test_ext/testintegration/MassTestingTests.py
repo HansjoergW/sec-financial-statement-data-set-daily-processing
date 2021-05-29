@@ -60,6 +60,7 @@ def test_compare_adshs():
     assert len(not_in_xml) == 0
 
 
+
 def test_compare_CP():
     xml_cp_df = filter_for_adsh_and_statement(xml_data_df, sorted_adshs_in_both, 'CP')
     zip_cp_df = filter_for_adsh_and_statement(zip_data_df, sorted_adshs_in_both, 'CP')
@@ -73,6 +74,29 @@ def test_compare_CP():
     print("XML adshs without CP: ", xml_adshs_without_cp)
 
 
+def _compare_attribute(data: pd.Series):
+    xml_tag_set = set(data.loc['tagList_xml'].split(','))
+    zip_tag_set = set(data.loc['tagList_xml'].split(','))
+
+    # test für exact, oder komplett in xml vorhanden unterscheiden -> bei apply müsste man dan mit expand arbeiten
+
+    return len(zip_tag_set - xml_tag_set) == 0
+
+def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame):
+    xml_idx = xml_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
+    zip_idx = zip_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
+
+    xml_idx.rename(columns = lambda x: x + '_xml', inplace=True)
+    zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
+
+    merged_df = pd.merge(xml_idx, zip_idx, left_index=True, right_index=True)
+    merged_df['tag_equals'] = merged_df.apply(_compare_attribute, axis = 1)
+
+    not_matching_df = merged_df[merged_df['tag_equals'] == False]
+
+    print(len(not_matching_df))
+
+
 def test_compare_BS():
 
     adshs_to_consider = sorted_adshs_in_both # [:100]
@@ -81,6 +105,7 @@ def test_compare_BS():
 
     xml_bs_group_df = xml_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
     zip_bs_group_df = zip_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
+
 
     xml_bs_group_df.rename(columns = lambda x: x + '_xml', inplace=True)
     zip_bs_group_df.rename(columns = lambda x: x + '_zip', inplace=True)
@@ -107,8 +132,12 @@ def test_compare_BS():
     print("only missing in zip  :", zip_adshs_without_bs - xml_adshs_without_bs)
     print("unequal counts:      :", len(merged_groupby_diff))
 
-    print(len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
+    print("bs reports not in xml:", len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
+    print("bs reports not in zip:", len(merged_groupby_diff[merged_groupby_diff.report_zip.isna()]))
     print(merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
+    print(merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10])
+
+    _compare_attributes(xml_bs_df, zip_bs_df)
 
 """
 Data:

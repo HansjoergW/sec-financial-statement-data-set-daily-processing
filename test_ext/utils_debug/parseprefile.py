@@ -204,11 +204,11 @@ if __name__ == '__main__':
     no_cp_report_1 = "0001558370-21-003462" # '0000916365-21-000052', '0001702744-21-000011', '0000773141-21-000024'
     many_cp_reports_1 = "0001829126-21-002055" # 0000089089-21-000012, 0000898174-21-000006, 0001829126-21-002055
     many_bs_reports_1 = "0001193125-21-094619"
-    no_bs_report =     '0001213900-21-019311'
+    no_bs_inpth_report_in_zip =     '0000007789-21-000018'
 
     # 3: 0001711269-21-000023 / 2: 0000074208-21-000025, 0000354707-21-000036, 0000701869-21-000011, 0000826675-21-000015, 0000933036-21-000049, 0001010412-21-000004, 0001025996-21-000062
     # more_than_one_bs = "0000826675-21-000015"
-    missing_bs = "0001553350-21-000261" #    0001387131-21-002995 0001387131-21-002996
+    #missing_bs = "0001553350-21-000261" #    0001387131-21-002995 0001387131-21-002996
 
 
 
@@ -219,8 +219,8 @@ if __name__ == '__main__':
 
     #content = special_content_line_wrong
 
-    content = get_pre_xml_content_by_adsh(missing_bs)
-    parse_content(missing_bs, content)
+    content = get_pre_xml_content_by_adsh(no_bs_inpth_report_in_zip)
+    parse_content(no_bs_inpth_report_in_zip, content)
 
     print("")
 
