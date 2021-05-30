@@ -1,19 +1,50 @@
-from typing import List, Dict, Union
+from _02_xml.pre.SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
+    SecPreExtractPresentationArcDetails
+
+from dataclasses import dataclass
+from typing import List, Dict, Union, Tuple
 import re
 
 """ transforms the raw content of the information inside the xml in the a usable form. does not do any processing of the data, 
 but adds additional information"""
 
 
-class SecPreXmlTransformer():
+@dataclass
+class SecPreTransformLocationDetails():
+    label: str
+    tag: str
+    version: str
+    digit_ending: bool
 
+
+@dataclass
+class SecPreTransformPresentationArcDetails():
+    negating: bool
+    order_nr: float
+    preferredLabel: str
+    from_entry: str
+    to_entry: str
+    key_tag: str = None
+    line: int = None
+
+
+@dataclass
+class SecPreTransformPresentationDetails():
+    loc_list: List[SecPreTransformLocationDetails]
+    preArc_list: List[SecPreTransformPresentationArcDetails]
+    title: str
+    role: str
+    inpth: str
+
+
+class SecPreXmlTransformer():
     digit_ending_label_regex = re.compile(r"_\d*$")
 
     def __init__(self):
         pass
 
     @staticmethod
-    def _get_version_tag_name_from_href(href: str) -> Dict[str, str]:
+    def _get_version_tag_name_from_href(href: str) -> Tuple[str, str]:
         # Attention: extend testcases if adaptions should be necessary.
 
         # in the href-definition, the first part indicates wich namespace and version it, if they start with http:
@@ -31,58 +62,80 @@ class SecPreXmlTransformer():
         details: Dict[str, str] = {}
         href_parts = href.split('#')
         complete_tag = href_parts[1]
-        version = None
+        version: str
         if href_parts[0].startswith('http'):
             ns_parts = href_parts[0].split('/')
             version = ns_parts[3] + '/' + ns_parts[4]
         else:
-            version = 'company' # special hint to indicate that this is a company specifig tag
+            version = 'company'  # special hint to indicate that this is a company specifig tag
 
         pos = complete_tag.find('_')
         tag = complete_tag[pos + 1:]
 
-        details['tag'] = tag
-        details['version'] = version
-        return details
+        return tag, version
 
-    def _transform_loc(self, loc_list: List[Dict[str, str]]):
-        for loc in loc_list:
-            tag_version: Dict[str, str] = SecPreXmlTransformer._get_version_tag_name_from_href(loc.get('href'))
-            loc['version'] = tag_version['version']
-            loc['tag'] = tag_version['tag']
+    def _transform_loc(self, extract_loc_list: List[SecPreExtractLocationDetails]) -> List[
+        SecPreTransformLocationDetails]:
+        result: List[SecPreTransformLocationDetails] = []
+        for extract_loc in extract_loc_list:
+            tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(extract_loc.href)
+            transform_loc = SecPreTransformLocationDetails(
+                label=extract_loc.label,
+                tag=tag,
+                version=version,
+                digit_ending=False
+            )
 
             # there are some special cases of reports which adds a running number to every appereance of a label,
             # also in the to and from attributes of the preArc entries (e.g. 0000016160-21-000018).
             # (like '...._12'). This makes it impossible to build up the hierarchy and therefore to find the root.
             # therefore, this labels have to handled in a special way
-            loc['digit_ending'] = False
-            if self.digit_ending_label_regex.search(loc.get('label')):
-                loc['digit_ending'] = True
+            if self.digit_ending_label_regex.search(extract_loc.label):
+                transform_loc.digit_ending = True
 
-    def _transform_preArc(self, preArc_list: List[Dict[str, str]]):
-        for preArc in preArc_list:
+            result.append(transform_loc)
+        return result
 
+    def _transform_preArc(self, extract_preArc_list: List[SecPreExtractPresentationArcDetails]) -> List[
+        SecPreTransformPresentationArcDetails]:
+        result: List[SecPreTransformPresentationArcDetails] = []
+
+        for extract_preArc in extract_preArc_list:
             # figure out wether the preferredLabel gives a  hint that the displayed number is inverted
-            negated = "negated" in preArc['preferredLabel']
-            preArc['negating'] = negated
+            negated: bool = "negated" in extract_preArc.preferredLabel
 
-            # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always a float
-            # there are also strange entries which have an order number of xy.02 or so
-            preArc['order_nr'] = float(preArc.get('order'))
+            transform_presentationArc = SecPreTransformPresentationArcDetails(
+                to_entry=extract_preArc.to_entry,
+                from_entry=extract_preArc.from_entry,
+                preferredLabel=extract_preArc.preferredLabel,
+                negating=negated,
+                # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always a float
+                # there are also strange entries which have an order number of xy.02 or so
+                order_nr=float(extract_preArc.order))
 
-    def transform(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
-        for k,v in data.items():
-            self._transform_loc(v.get('loc_list'))
-            self._transform_preArc(v.get('preArc_list'))
+            result.append(transform_presentationArc)
+
+        return result
+
+    def transform(self, adsh: str, data: Dict[int, SecPreExtractPresentationLink]) -> Dict[
+        int, SecPreTransformPresentationDetails]:
+
+        result: Dict[int, SecPreTransformPresentationDetails] = {}
+        for k, v in data.items():
+            entry = SecPreTransformPresentationDetails(
+                loc_list=self._transform_loc(v.loc_list),
+                preArc_list=self._transform_preArc(v.preArc_list),
+                title=v.title,
+                role=v.role,
+                inpth="0")
 
             # if there is a title info, then this has precedence over the role
-            if v['title'] is not None:
-                v['role'] = v['title']
+            if entry.title is not None:
+                entry.role = v.title
 
-            # figure out if data in a report where contained in parantheses
-            # todo: title berücksichtigen
-            v['inpth'] = "0"
-            if "parenthetical" in v.get('role').lower():
-                v['inpth'] = "1"
+            # figure out if data in a report where contained in parenthesis
+            if "parenthetical" in v.role.lower():
+                entry.inpth = "1"
 
-        return data
+            result[k] = entry
+        return result

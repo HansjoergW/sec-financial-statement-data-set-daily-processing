@@ -1,10 +1,32 @@
 import re
 from lxml import etree
 from typing import Dict, List, Tuple, Union
+from dataclasses import dataclass
+
+
+@dataclass
+class SecPreExtractPresentationArcDetails():
+    order: str
+    preferredLabel: str
+    from_entry: str
+    to_entry: str
+
+
+@dataclass
+class SecPreExtractLocationDetails():
+    label: str
+    href: str
+
+
+@dataclass
+class SecPreExtractPresentationLink():
+    role: str
+    title: str
+    loc_list: List[SecPreExtractLocationDetails]
+    preArc_list: List[SecPreExtractPresentationArcDetails]
 
 
 class SecPreXmlExtractor():
-
     """ Preparses the xml content and returns a Dict, Tuple, List Structure with the relevant raw information"""
 
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -37,58 +59,54 @@ class SecPreXmlExtractor():
 
         return data
 
-    def _get_locations(self, presentationLink: etree._Element) -> List[Dict[str, str]]:
+    def _get_locations(self, presentationLink: etree._Element) -> List[SecPreExtractLocationDetails]:
         locs = presentationLink.findall('loc', presentationLink.nsmap)
 
-        result: List[Dict[str, str]] = []
+        result: List[SecPreExtractLocationDetails] = []
         for loc in locs:
-            entry: Dict[str, str] = {}
-            entry['label'] = loc.get('label')
-            entry['href'] = loc.get('href')
+            entry: SecPreExtractLocationDetails = SecPreExtractLocationDetails(
+                label=loc.get('label'),
+                href=loc.get('href'))
 
             result.append(entry)
 
         return result
 
-    def _get_presentationArcs(self, presentationLink: etree._Element) -> List[Dict[str, str]]:
+    def _get_presentationArcs(self, presentationLink: etree._Element) -> List[SecPreExtractPresentationArcDetails]:
         arcs = presentationLink.findall('presentationArc', presentationLink.nsmap)
 
-        result: List[Dict[str, str]] = []
+        result: List[SecPreExtractPresentationArcDetails] = []
         for arc in arcs:
-            entry: Dict[str, str] = {}
-            entry['order'] = arc.get('order')
-            entry['preferredLabel'] = arc.get('preferredLabel', '') # if missing, use a ''
-            entry['from'] = arc.get('from')
-            entry['to'] = arc.get('to')
+            entry = SecPreExtractPresentationArcDetails(
+                order=arc.get('order'),
+                preferredLabel=arc.get('preferredLabel', ''),  # if missing, use a ''
+                from_entry=arc.get('from'),
+                to_entry=arc.get('to'))
 
             result.append(entry)
         return result
 
-    def _loop_presentationLink(self, root: etree._Element) -> Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]:
+    def _loop_presentationLink(self, root: etree._Element) -> Dict[int, SecPreExtractPresentationLink]:
         namespaces = root.nsmap
         presentation_links = root.findall('presentationLink', namespaces)
 
-        result: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]] = {}
+        result: Dict[int, SecPreExtractPresentationLink] = {}
 
         report = 0
         for presentation_link in presentation_links:
-            details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
             report += 1
-            role: str = presentation_link.get("role")
-            title: str = presentation_link.get("title")
-            loc_list: List[Dict[str, str]] = self._get_locations(presentation_link)
-            preArc_list: List[Dict[str, str]] = self._get_presentationArcs(presentation_link)
 
-            details['title'] = title
-            details['role'] = role
-            details['loc_list'] = loc_list
-            details['preArc_list'] = preArc_list
+            details: SecPreExtractPresentationLink = SecPreExtractPresentationLink(
+                role=presentation_link.get("role"),
+                title=presentation_link.get("title"),
+                loc_list=self._get_locations(presentation_link),
+                preArc_list=self._get_presentationArcs(presentation_link))
 
             result[report] = details
 
         return result
 
-    def extract(self, adsh: str, data: str) -> Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]]:
+    def extract(self, adsh: str, data: str) -> Dict[int, SecPreExtractPresentationLink]:
         data = self._strip_file(data)
         data = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(data)

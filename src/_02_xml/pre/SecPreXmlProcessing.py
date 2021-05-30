@@ -1,6 +1,38 @@
+from _02_xml.pre.SecPreXmlTransformation import SecPreTransformPresentationDetails, \
+    SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
 from typing import Dict, Union, List, Tuple, Set
 import logging
+import copy
 import pprint as pp
+
+from dataclasses import dataclass
+
+
+@dataclass
+class EvalEntry():
+    includes: List[str]
+    excludes: List[str]
+    confidence: int = 0
+
+
+@dataclass
+class StmtEvalDefinition():
+    role_keys: List[EvalEntry]
+    root_keys: List[EvalEntry]
+    label_list: List[str]
+
+
+@dataclass
+class StmtConfidence():
+    byRole: int
+    byRoot: int
+    byLabel: int
+
+    def get_max_confidenc(self):
+        return max(self.byRole, self.byRoot, self.byLabel)
+
+    def get_confidence_sum(self):
+        return self.byLabel + self.byRole + self.byRole
 
 
 class SecPreXmlDataProcessor():
@@ -15,227 +47,214 @@ class SecPreXmlDataProcessor():
     #     label_list -> evtll noch mit versionliste und tagliste unterscheiden
 
     stmt_eval_dict = {
-        'CP': {
-            'role_keys': [
-                {
-                    'includes': ['role/cover'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['coverpage'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['coverabstract'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['deidocument'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['document', 'entity', 'information'],
-                    'confidence': 2
-                },
+        'CP': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['role/cover'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['coverpage'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['coverabstract'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['deidocument'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['document', 'entity', 'information'],
+                    excludes=[],
+                    confidence=2),
             ],
-            'root_keys': [
-                {
-                    'includes': ['document', 'entity', 'information'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['coverpage'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['coverabstract'],
-                    'confidence': 2
-                },
+            root_keys=[
+                EvalEntry(
+                    includes=['document', 'entity', 'information'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['coverpage'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['coverabstract'],
+                    excludes=[],
+                    confidence=2),
             ],
-            'label_list': [
-            ]
-        },
-        'BS': {
-            'role_keys': [
-                {
-                    'includes': ['consolidated', 'statement', 'financialposition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['consolidated', 'statement', 'financialcondition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['consolidated', 'statement', 'condition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['consolidated', 'balance', 'sheet'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['condensed', 'balance', 'sheet'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'balance','sheet'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'financialposition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'financialcondition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'condition'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'assets','liabilities'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['role/balancesheet'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {  # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
-                    'includes': ['role/idr_balancesheet'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {  # special case for "kingsway" only report with details in main BS 0001072627-21-000022
-                    'includes': ['kingsway-financial', 'consolidated', 'balancesheet'],
-                    'excludes': [],
-                    'confidence': 2
-                },
-                { # special case for xfleet BS with role cashflow 0001213900-21-019311
-                    'includes': ['www.xlfleet.com', 'consolidatedcashflow'],
-                    'excludes': ['cashflow0'],
-                    'confidence': 2
-                },
+            label_list=[]
+        ),
+
+        'BS': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'financialposition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'financialcondition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'condition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['consolidated', 'balance', 'sheet'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['condensed', 'balance', 'sheet'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'balance', 'sheet'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'financialposition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'financialcondition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'condition'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'assets', 'liabilities'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['role/balancesheet'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
+                    includes=['role/idr_balancesheet'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(  # special case for "kingsway" only report with details in main BS 0001072627-21-000022
+                    includes=['kingsway-financial', 'consolidated', 'balancesheet'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(  # special case for xfleet BS with role cashflow 0001213900-21-019311
+                    includes=['www.xlfleet.com', 'consolidatedcashflow'],
+                    excludes=['cashflow0'],
+                    confidence=2),
+            ],
+            root_keys=[
+                EvalEntry(
+                    includes=['statementoffinancialposition'],
+                    excludes=[],
+                    confidence=1),
+                EvalEntry(
+                    includes=['balancesheet', 'parenthetical'],
+                    excludes=[],
+                    confidence=1),
+            ],
+            label_list=[]),
+
+        'EQ': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['statement', 'shareholder', 'equity'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'stockholder', 'equity'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'shareowner', 'equity'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'stockowner', 'equity'],
+                    excludes=[],
+                    confidence=2),
+            ],
+            root_keys=[],
+            label_list=[]
+        ),
+
+        'IS': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'income'],
+                    excludes=['comprehensive'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'operation'],
+                    excludes=['comprehensive'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['condensed', 'statement', 'operation'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['statement', 'operation'],
+                    excludes=['comprehensive'],
+                    confidence=2),
+            ],
+            root_keys=[
+                EvalEntry(
+                    includes=['income', 'statement', 'abstract'],
+                    excludes=['comprehensive'],
+                    confidence=1),
+            ],
+            label_list=[]
+        ),
+
+        'CI': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'statement', 'income'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'statement', 'operation'],
+                    excludes=[],
+                    confidence=2),
+            ],
+            root_keys=[
+                EvalEntry(
+                    includes=['comprehensive', 'income', 'statement', 'abstract'],
+                    excludes=[],
+                    confidence=1),
+            ],
+            label_list=[]
+        ),
+
+        'CF': StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'cashflow'],
+                    excludes=[],
+                    confidence=2),
+                EvalEntry(
+                    includes=['condensed', 'statement', 'cashflow'],
+                    excludes=[],
+                    confidence=2),
 
             ],
-            'root_keys': [
-                {
-                    'includes': ['statementoffinancialposition'],
-                    'confidence': 1
-                },
-                {
-                    'includes': ['balancesheet', 'parenthetical'],
-                    'confidence': 1
-                },
-            ],
-            'label': []
-        },
-        'EQ': {
-            'role_keys': [
-                {
-                    'includes': ['statement', 'shareholder', 'equity'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'stockholder', 'equity'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'shareowner', 'equity'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'stockowner', 'equity'],
-                    'confidence': 2
-                },
-            ]
-        },
-        'IS': {
-            'role_keys': [
-                {
-                    'includes': ['consolidated', 'statement', 'income'],
-                    'excludes': ['comprehensive'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['consolidated', 'statement', 'operation'],
-                    'excludes': ['comprehensive'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['condensed', 'statement', 'operation'],
-                    'excludes': ['detail'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['statement', 'operation'],
-                    'excludes': ['comprehensive'],
-                    'confidence': 2
-                },
-            ],
-            'root_keys': [
-                {
-                    'includes': ['income', 'statement', 'abstract'],
-                    'excludes': ['comprehensive'],
-                    'confidence': 1
-                },
-            ]
-        },
-        'CI': {
-            'role_keys': [
-                {
-                    'includes': ['comprehensive', 'consolidated', 'statement', 'income'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['comprehensive', 'consolidated', 'statement', 'operation'],
-                    'confidence': 2
-                },
-            ],
-            'root_keys': [
-                {
-                    'includes': ['comprehensive', 'income', 'statement', 'abstract'],
-                    'confidence': 1
-                },
-            ]
-        },
-        'CF': {
-            'role_keys': [
-                {
-                    'includes': ['consolidated', 'statement', 'cashflow'],
-                    'confidence': 2
-                },
-                {
-                    'includes': ['condensed', 'statement', 'cashflow'],
-                    'confidence': 2
-                }
 
-                # SonderFall für diesen hier kann man nicht so einfach excluden...
-                # ginge nur über labels oder mit regex prüfung
-                # { # special case for xfleet BS with role cashflow 0001213900-21-019311
-                #     'includes': ['www.xlfleet.com', 'consolidatedcashflow'],
-                #     'excludes': ['cashflow0'],
-                #     'confidence': 2
-                # },
-            ],
-            'root_keys': [
+            # SonderFall für diesen hier kann man nicht so einfach excluden...
+            # ginge nur über labels oder mit regex prüfung
+            # { # special case for xfleet BS with role cashflow 0001213900-21-019311
+            #     includes= ['www.xlfleet.com', 'consolidatedcashflow'],
+            #     excludes= ['cashflow0'],
+            #     confidence= 2
+            # },
 
-            ]
-        }
-
+            root_keys=[],
+            label_list=[]
+        )
     }
-
 
     # keywords of role definition that should be ignored
     role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-']
@@ -245,8 +264,9 @@ class SecPreXmlDataProcessor():
     def __init__(self):
         pass
 
-    def _handle_digit_ending_case(self, preArc_list: List[Dict[str, str]], loc_list: List[Dict[str, str]]) -> Tuple[
-        List[Dict[str, str]], List[Dict[str, str]]]:
+    def _handle_digit_ending_case(self, preArc_list: List[SecPreTransformPresentationArcDetails],
+                                  loc_list: List[SecPreTransformLocationDetails]) -> Tuple[
+        List[SecPreTransformPresentationArcDetails], List[SecPreTransformLocationDetails]]:
         """
         # a digit ending case has all labels ending with _<digits>, this case has to be handled especially, since
         # no hiearchy can be build. An example for this case is: 0000016160-21-000018
@@ -257,7 +277,7 @@ class SecPreXmlDataProcessor():
         """
         digit_ending = True
         for loc in loc_list:
-            digit_ending = digit_ending and loc.get('digit_ending')
+            digit_ending = digit_ending and loc.digit_ending
 
         # no digit_ending case, return list without processing
         if not digit_ending:
@@ -268,8 +288,8 @@ class SecPreXmlDataProcessor():
         from_list: List[str] = []
 
         for preArc in preArc_list:
-            to_list.append(preArc.get('to'))
-            from_list.append(preArc.get('from'))
+            to_list.append(preArc.to_entry)
+            from_list.append(preArc.from_entry)
 
         # if not disjoint, return preArc and loc lsit without processing
         if not set(to_list).isdisjoint(set(from_list)):
@@ -279,14 +299,14 @@ class SecPreXmlDataProcessor():
         # therefore the _<digit> part has to be removed from the label
         # furthermore, every lable may appear only once in the loclist
 
-        new_loc_list: List[Dict[str, str]] = []
+        new_loc_list: List[SecPreTransformLocationDetails] = []
         new_loc_label_list: List[str] = []
 
         for loc in loc_list:
-            new_loc = loc.copy()
-            label = loc.get('label')
+            new_loc = copy.copy(loc)
+            label = loc.label
             label = label[:label.rfind('_')]
-            new_loc['label'] = label
+            new_loc.label = label
 
             if label in new_loc_label_list:
                 continue
@@ -294,22 +314,23 @@ class SecPreXmlDataProcessor():
             new_loc_label_list.append(label)
 
         # in the preArc, the _<digit> part has to be removed from the from and to entries
-        new_preArc_list: List[Dict[str, str]] = []
+        new_preArc_list: List[SecPreTransformPresentationArcDetails] = []
         for preArc in preArc_list:
-            new_preArc = preArc.copy()
-            to_label = preArc.get('to')
+            new_preArc = copy.copy(preArc)
+            to_label = preArc.to_entry
             to_label = to_label[:to_label.rfind('_')]
-            new_preArc['to'] = to_label
+            new_preArc.to_entry = to_label
 
-            from_label = preArc.get('from')
+            from_label = preArc.from_entry
             from_label = from_label[:from_label.rfind('_')]
-            new_preArc['from'] = from_label
+            new_preArc.from_entry = from_label
 
             new_preArc_list.append(new_preArc)
 
         return new_preArc_list, new_loc_list
 
-    def _handle_ambiguous_child_parent_relation(self, preArc_list: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    def _handle_ambiguous_child_parent_relation(self, preArc_list: List[SecPreTransformPresentationArcDetails]) -> List[
+        SecPreTransformPresentationArcDetails]:
         # there are some rare cases (2 in 5500 reports from 2021-q1) when for a single node no line can be evaluated.
         # this is the reason when the child-parent relation is ambiguous.
         # e.g. "0001562762-21-000101" # StatementConsolidatedStatementsOfStockholdersEquity because there
@@ -320,8 +341,8 @@ class SecPreXmlDataProcessor():
         from_list: List[str] = []
 
         for preArc in preArc_list:
-            to_list.append(preArc.get('to'))
-            from_list.append(preArc.get('from'))
+            to_list.append(preArc.to_entry)
+            from_list.append(preArc.from_entry)
 
         kick_out_list: List[str] = []
 
@@ -337,32 +358,32 @@ class SecPreXmlDataProcessor():
         while new_entries_found:
             new_entries_found = False
             for preArc in preArc_list:
-                to_entry = preArc.get('to')
-                from_entry = preArc.get('from')
+                to_entry = preArc.to_entry
+                from_entry = preArc.from_entry
                 if from_entry in kick_out_list:
                     if to_entry not in kick_out_list:
                         kick_out_list.append(to_entry)
                         new_entries_found = True
 
         # now the entries can be removed from  orginial preArcList
-        cleared_preArc_list: List[Dict[str, str]] = []
+        cleared_preArc_list: List[SecPreTransformPresentationArcDetails] = []
 
         for preArc in preArc_list:
-            from_entry = preArc.get('from')
+            from_entry = preArc.from_entry
             if from_entry not in kick_out_list:
                 cleared_preArc_list.append(preArc)
 
         return cleared_preArc_list
 
-    def _find_root_node(self, preArc_list: List[Dict[str, str]]) -> str:
+    def _find_root_node(self, preArc_list: List[SecPreTransformPresentationArcDetails]) -> str:
         """ finds the root node, expect only ONE entry. If there is more than one root node, then an exception is raised
             and this report will be skipped later in the process."""
         to_list: List[str] = []
         from_list: List[str] = []
 
         for preArc in preArc_list:
-            to_list.append(preArc.get('to'))
-            from_list.append(preArc.get('from'))
+            to_list.append(preArc.to_entry)
+            from_list.append(preArc.from_entry)
 
         root_nodes = list(set(from_list) - set(to_list))
 
@@ -372,41 +393,42 @@ class SecPreXmlDataProcessor():
 
         return root_nodes[0]
 
-    def _eval_statement_canditate_helper(self, key: str, definition: List[Dict[str, List[str]]]) -> int:
+    def _eval_statement_canditate_helper(self, key: str, definition: List[EvalEntry]) -> int:
         key = key.lower()
         max_confidence = 0
         for key_def in definition:
-            includes = key_def.get('includes', [])
-            excludes = key_def.get('excludes', [])
-            confidence = key_def['confidence']
+            includes = key_def.includes
+            excludes = key_def.excludes
+            confidence = key_def.confidence
 
             if all(map_key in key for map_key in includes) and any(map_key in key for map_key in excludes) == False:
                 max_confidence = max(max_confidence, confidence)
 
         return max_confidence
 
-    def _evaluate_statement_canditates(self, role: str, root_node: str, loc_list: List[Dict[str, str]]) -> Dict[
-        str, Dict[str, int]]:
+    def _evaluate_statement_canditates(self, role: str, root_node: str,
+                                       loc_list: List[SecPreTransformLocationDetails]) -> Dict[str, StmtConfidence]:
         # returns for matches stmt: {byrole: confidence, byroot:confidence, bylabel: confidence}
 
-        result: Dict[str, Dict[str, int]] = {}
+        result: Dict[str, StmtConfidence] = {}
 
         for key, definitions in self.stmt_eval_dict.items():
-            role_keys_definition = definitions.get('role_keys', [])
-            root_keys_definition = definitions.get('root_keys', [])
-            label_list = definitions.get('label_list', [])
+            role_keys_definition = definitions.role_keys
+            root_keys_definition = definitions.root_keys
+            label_list = definitions.label_list
 
-            details: Dict[str, int] = {}
-            details['byRole'] = self._eval_statement_canditate_helper(role, role_keys_definition)
-            details['byRoot'] = self._eval_statement_canditate_helper(root_node, root_keys_definition)
-            details['byLabel'] = 0
+            details = StmtConfidence(
+                byRole=self._eval_statement_canditate_helper(role, role_keys_definition),
+                byRoot=self._eval_statement_canditate_helper(root_node, root_keys_definition),
+                byLabel=0
+            )
 
-            if max(details['byRole'], details['byRoot'], details['byLabel']) > 0:
+            if details.get_max_confidenc() > 0:
                 result[key] = details
 
         return result
 
-    def _calculate_key_tag_for_preArc(self, preArc_list: List[Dict[str, str]]):
+    def _calculate_key_tag_for_preArc(self, preArc_list: List[SecPreTransformPresentationArcDetails]):
         # the key_tag is needed in order to calculate the correct line number. it is necessary, since
         # it is possible that the same to_tag appears twice under different from_tags or (!) also the same from_tag.
         # but this seems to be only the case, if the to_tag is not also a from_tag.
@@ -417,32 +439,32 @@ class SecPreXmlDataProcessor():
         from_list: List[str] = []
 
         for preArc in preArc_list:
-            to_list.append(preArc.get('to'))
-            from_list.append(preArc.get('from'))
+            to_list.append(preArc.to_entry)
+            from_list.append(preArc.from_entry)
 
         for preArc in preArc_list:
-            to_tag = preArc.get('to')
-            from_tag = preArc.get('from')
-            order_str = str(preArc.get('order_nr'))
+            to_tag = preArc.to_entry
+            from_tag = preArc.from_entry
+            order_str = str(preArc.order_nr)
 
             if to_tag in from_list:
                 key_tag = to_tag
             else:
                 key_tag = to_tag + self.key_tag_separator + from_tag + self.key_tag_separator + order_str
 
-            preArc['key_tag'] = key_tag
+            preArc.key_tag = key_tag
 
-    def _calculate_line_nr(self, root_node: str, preArc_list: List[Dict[str, str]]):
+    def _calculate_line_nr(self, root_node: str, preArc_list: List[SecPreTransformPresentationArcDetails]):
         """ the 'only' thing this method does is to add the 'line' attribute to the preArc entries.
             this is done 'inplace'"""
 
         # building parent child relation from the from and to attributes of the preArc entries
         parent_child_dict: Dict[str, Dict[int, str]] = {}
-        preArc_by_keytag_dict: Dict[str, Dict[str, str]] = {}
+        preArc_by_keytag_dict: Dict[str, SecPreTransformPresentationArcDetails] = {}
         for preArc in preArc_list:
-            order_nr = preArc['order_nr']
-            key_tag = preArc['key_tag']
-            from_tag = preArc['from']
+            order_nr = preArc.order_nr
+            key_tag = preArc.key_tag
+            from_tag = preArc.from_entry
 
             if from_tag not in parent_child_dict:
                 parent_child_dict[from_tag] = {}
@@ -489,7 +511,7 @@ class SecPreXmlDataProcessor():
 
             child = current_children_ordered_list[current_index]
 
-            preArc_by_keytag_dict[child]['line'] = line
+            preArc_by_keytag_dict[child].line = line
 
             grand_children = parent_child_ordered_list.get(child)
             if grand_children is not None:
@@ -498,31 +520,32 @@ class SecPreXmlDataProcessor():
 
             line += 1
 
-    def _calculate_entries(self, root_node: str, loc_list: List[Dict[str, str]], preArc_list: List[Dict[str, str]]) -> \
+    def _calculate_entries(self, root_node: str, loc_list: List[SecPreTransformLocationDetails],
+                           preArc_list: List[SecPreTransformPresentationArcDetails]) -> \
             List[Dict[str, str]]:
 
         self._calculate_line_nr(root_node, preArc_list)
 
         # create dict by label for the loc-entries, so that we can link them to with the preArc entries
-        loc_by_label_dict: Dict[str, Dict[str]] = {}
+        loc_by_label_dict: Dict[str, SecPreTransformLocationDetails] = {}
         for loc in loc_list:
-            label = loc['label']
+            label = loc.label
             loc_by_label_dict[label] = loc
 
         result: List[Dict[str, str]] = []
         for preArc in preArc_list:
             # note: using [] instead of the get-method since we expect all keys to be present
             details = {}
-            to_tag = preArc['to']
+            to_tag = preArc.to_entry
 
             loc_entry = loc_by_label_dict[to_tag]
-            details['version'] = loc_entry['version']
-            details['tag'] = loc_entry['tag']
+            details['version'] = loc_entry.version
+            details['tag'] = loc_entry.tag
 
-            details['plabel'] = preArc['preferredLabel']
-            details['negating'] = preArc['negating']
+            details['plabel'] = preArc.preferredLabel
+            details['negating'] = preArc.negating
 
-            details['line'] = preArc['line']
+            details['line'] = preArc.line
 
             result.append(details)
 
@@ -535,7 +558,7 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process_reports(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[
+    def process_reports(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Tuple[
         Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]], List[Tuple[str, str, str]]]:
         # processed the reports in the data.
         # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
@@ -545,10 +568,10 @@ class SecPreXmlDataProcessor():
         error_collector: List[Tuple[str, str, str]] = []
 
         for idx, reportinfo in data.items():
-            role: str = reportinfo.get('role')
-            inpth: int = int(reportinfo.get('inpth'))
-            loc_list: List[Dict[str, str]] = reportinfo.get('loc_list')
-            preArc_list: List[Dict[str, str]] = reportinfo.get('preArc_list')
+            role: str = reportinfo.role
+            inpth: int = int(reportinfo.inpth)
+            loc_list: List[SecPreTransformLocationDetails] = reportinfo.loc_list
+            preArc_list: List[SecPreTransformPresentationArcDetails] = reportinfo.preArc_list
 
             if (len(preArc_list) == 0) or (len(loc_list) == 0):  # no entries in node, so ignore
                 continue
@@ -559,25 +582,16 @@ class SecPreXmlDataProcessor():
 
             try:
                 preArc_list, loc_list = self._handle_digit_ending_case(preArc_list, loc_list)
-
-                # todo: shall this be done before finding the root node, or afterwards?
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
-
                 root_node = self._find_root_node(preArc_list)
-                stmt_canditates: Dict[str, Dict[str, int]] = self._evaluate_statement_canditates(role, root_node,
+
+                stmt_canditates: Dict[str, StmtConfidence] = self._evaluate_statement_canditates(role, root_node,
                                                                                                  loc_list)
                 if len(stmt_canditates) == 0:
                     continue
 
-                # selectStmtCriteria, stmt = self._evaluate_statement(role, root_node, loc_list)
-                # if stmt is None:
-                #     continue
-
                 self._calculate_key_tag_for_preArc(preArc_list)
                 entries = self._calculate_entries(root_node, loc_list, preArc_list)
-
-                # if result.get(stmt) is None:
-                #     result[stmt] = []
 
                 details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
                 details['adsh'] = adsh
@@ -587,7 +601,6 @@ class SecPreXmlDataProcessor():
                 details['rootNode'] = root_node
                 details['entries'] = entries
                 details['inpth'] = inpth
-                # details['selectStmtCriteria'] = selectStmtCriteria
                 details['stmt_canditates'] = stmt_canditates
 
                 result[idx] = details
@@ -597,19 +610,22 @@ class SecPreXmlDataProcessor():
                 # just log if the name gives a hint that this could be a primary statement
                 role_candidates = self._evaluate_statement_canditates(role, "", [])
                 if len(role_candidates) > 0:
-                    logging.info("{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role, str(err)))
-                    print("{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role, str(err)))
+                    logging.info(
+                        "{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role,
+                                                                          str(err)))
+                    print("{} / {} skipped report with role {} : {}".format(adsh, list(role_candidates.keys()), role,
+                                                                            str(err)))
                 continue
 
         return (result, error_collector)
 
     def _post_process_assign_report_to_stmt(self,
                                             report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> \
-    Dict[Tuple[str,int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
+            Dict[Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
         # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
 
         # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth" which indicates wether it is  a "in parenthical" report
-        result: Dict[Tuple[str,int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
+        result: Dict[Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
 
         # ensure that a report only belongs to one stmt type
         for idx, reportinfo in report_data.items():
@@ -663,7 +679,7 @@ class SecPreXmlDataProcessor():
         # or we return the first entry of the list (since CP is generally the first that appears in a report)
         for report_data in stmt_list:
             confidence_dict = report_data['stmt_canditates']['CP']
-            if confidence_dict['byRole'] == 2:
+            if confidence_dict.byRole == 2:
                 return [report_data]
         first_entry = stmt_list[0]
         return [first_entry]
@@ -679,9 +695,9 @@ class SecPreXmlDataProcessor():
         current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
 
         for report_data in stmt_list:
-            confidence_dict = report_data['stmt_canditates']['BS']
+            confidence = report_data['stmt_canditates']['BS']
 
-            sum_confidence = sum(confidence_dict.values())
+            sum_confidence = confidence.get_confidence_sum()
             if sum_confidence > current_max_confidence:
                 current_max_confidence = sum_confidence
                 current_max_confidence_list = []
@@ -703,7 +719,7 @@ class SecPreXmlDataProcessor():
 
         return result
 
-    def process(self, adsh: str, data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> Tuple[
+    def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Tuple[
         List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
 
         results: List[Dict[str, Union[str, int]]] = []
@@ -713,7 +729,8 @@ class SecPreXmlDataProcessor():
 
         report_data, error_collector = self.process_reports(adsh, data)
         stmt_data: Dict[
-            Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
+            Tuple[str, int], List[
+                Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
             report_data)
 
         reportnr = 0
