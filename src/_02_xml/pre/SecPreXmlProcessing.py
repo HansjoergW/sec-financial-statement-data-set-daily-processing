@@ -9,21 +9,21 @@ from dataclasses import dataclass
 
 
 @dataclass
-class EvalEntry():
+class EvalEntry:
     includes: List[str]
     excludes: List[str]
     confidence: int = 0
 
 
 @dataclass
-class StmtEvalDefinition():
+class StmtEvalDefinition:
     role_keys: List[EvalEntry]
     root_keys: List[EvalEntry]
     label_list: List[str]
 
 
 @dataclass
-class StmtConfidence():
+class StmtConfidence:
     byRole: int
     byRoot: int
     byLabel: int
@@ -35,7 +35,30 @@ class StmtConfidence():
         return self.byLabel + self.byRole + self.byRole
 
 
-class SecPreXmlDataProcessor():
+@dataclass
+class PresentationEntry:
+    version: str
+    tag: str
+    plabel: str
+    negating: bool
+    line: int
+    stmt: str = None
+    inpth: int = None
+    report: int = None
+
+@dataclass
+class PresentationReport:
+    adsh: str
+    role: str
+    loc_list: List[SecPreTransformLocationDetails]
+    preArc_list: List[SecPreTransformPresentationArcDetails]
+    rootNode: str
+    entries: List[PresentationEntry]
+    inpth: int
+    stmt_canditates: Dict[str, StmtConfidence]
+
+
+class SecPreXmlDataProcessor:
     """
     processes the extracted and transformed data from a prexml file
     """
@@ -521,8 +544,7 @@ class SecPreXmlDataProcessor():
             line += 1
 
     def _calculate_entries(self, root_node: str, loc_list: List[SecPreTransformLocationDetails],
-                           preArc_list: List[SecPreTransformPresentationArcDetails]) -> \
-            List[Dict[str, str]]:
+                           preArc_list: List[SecPreTransformPresentationArcDetails]) -> List[PresentationEntry]:
 
         self._calculate_line_nr(root_node, preArc_list)
 
@@ -532,22 +554,21 @@ class SecPreXmlDataProcessor():
             label = loc.label
             loc_by_label_dict[label] = loc
 
-        result: List[Dict[str, str]] = []
+        result: List[PresentationEntry] = []
         for preArc in preArc_list:
             # note: using [] instead of the get-method since we expect all keys to be present
             details = {}
             to_tag = preArc.to_entry
 
             loc_entry = loc_by_label_dict[to_tag]
-            details['version'] = loc_entry.version
-            details['tag'] = loc_entry.tag
+            entry = PresentationEntry(
+                version = loc_entry.version,
+                tag = loc_entry.tag,
+                plabel = preArc.preferredLabel,
+                negating = preArc.negating,
+                line = preArc.line)
 
-            details['plabel'] = preArc.preferredLabel
-            details['negating'] = preArc.negating
-
-            details['line'] = preArc.line
-
-            result.append(details)
+            result.append(entry)
 
         return result
 
@@ -558,13 +579,13 @@ class SecPreXmlDataProcessor():
                 return True
         return False
 
-    def process_reports(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Tuple[
-        Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]], List[Tuple[str, str, str]]]:
+    def process_reports(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
+            Tuple[Dict[int, PresentationReport], List[Tuple[str, str, str]]]:
         # processed the reports in the data.
         # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
 
         # result is a dictionary with the chosen stmt as key and a list of the reports as Dicts
-        result: Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]] = {}
+        result: Dict[int, PresentationReport] = {}
         error_collector: List[Tuple[str, str, str]] = []
 
         for idx, reportinfo in data.items():
@@ -583,7 +604,7 @@ class SecPreXmlDataProcessor():
             try:
                 preArc_list, loc_list = self._handle_digit_ending_case(preArc_list, loc_list)
                 preArc_list = self._handle_ambiguous_child_parent_relation(preArc_list)
-                root_node = self._find_root_node(preArc_list)
+                root_node:str = self._find_root_node(preArc_list)
 
                 stmt_canditates: Dict[str, StmtConfidence] = self._evaluate_statement_canditates(role, root_node,
                                                                                                  loc_list)
@@ -591,19 +612,19 @@ class SecPreXmlDataProcessor():
                     continue
 
                 self._calculate_key_tag_for_preArc(preArc_list)
-                entries = self._calculate_entries(root_node, loc_list, preArc_list)
+                entries: List[PresentationEntry] = self._calculate_entries(root_node, loc_list, preArc_list)
 
-                details: Dict[str, Union[str, List[Dict[str, str]]]] = {}
-                details['adsh'] = adsh
-                details['role'] = role
-                details['loc_list'] = loc_list
-                details['preArc_list'] = preArc_list
-                details['rootNode'] = root_node
-                details['entries'] = entries
-                details['inpth'] = inpth
-                details['stmt_canditates'] = stmt_canditates
-
-                result[idx] = details
+                report = PresentationReport(
+                    adsh = adsh, # str
+                    role = role, # str
+                    loc_list = loc_list, # List[SecPreTransformLocationDetails]
+                    preArc_list = preArc_list, # List[SecPreTransformPresentationArcDetails]
+                    rootNode = root_node, # str
+                    entries = entries, # List[PresentationEntry]
+                    inpth = inpth, # int
+                    stmt_canditates = stmt_canditates # Dict[str, StmtConfidence]
+                )
+                result[idx] = report
 
             except Exception as err:
                 error_collector.append((adsh, role, str(err)))
@@ -619,19 +640,18 @@ class SecPreXmlDataProcessor():
 
         return (result, error_collector)
 
-    def _post_process_assign_report_to_stmt(self,
-                                            report_data: Dict[int, Dict[str, Union[str, List[Dict[str, str]]]]]) -> \
-            Dict[Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]]:
+    def _post_process_assign_report_to_stmt(self, report_data: Dict[int, PresentationReport]) -> \
+            Dict[Tuple[str, int], List[PresentationReport]]:
         # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
 
         # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth" which indicates wether it is  a "in parenthical" report
-        result: Dict[Tuple[str, int], List[Dict[str, Union[str, int, List[Dict[str, str]]]]]] = {}
+        result: Dict[Tuple[str, int], List[PresentationReport]] = {}
 
         # ensure that a report only belongs to one stmt type
         for idx, reportinfo in report_data.items():
-            stmt_canditates_dict = reportinfo['stmt_canditates']
+            stmt_canditates_dict: Dict[str, StmtConfidence] = reportinfo.stmt_canditates
             stmt_canditates_keys = list(stmt_canditates_dict.keys())
-            inpth = reportinfo['inpth']
+            inpth = reportinfo.inpth
 
             stmt: str
             if len(stmt_canditates_keys) == 1:
@@ -645,12 +665,12 @@ class SecPreXmlDataProcessor():
                 max_sum_of_confidence_stmt = None
 
                 for stmt_key in stmt_canditates_keys:
-                    values_dict = stmt_canditates_dict[stmt_key]
+                    confidence: StmtConfidence = stmt_canditates_dict[stmt_key]
 
-                    has_confidence_of_2 = max(values_dict.values()) == 2
-                    conf_of_2_list.append(stmt_key)
+                    if confidence.get_max_confidenc() == 2:
+                        conf_of_2_list.append(stmt_key)
 
-                    sum_of_confidence = sum(values_dict.values())
+                    sum_of_confidence = confidence.get_confidence_sum()
                     if sum_of_confidence > max_sum_of_confidence:
                         max_sum_of_confidence = sum_of_confidence
                         max_sum_of_confidence_stmt = stmt_key
@@ -660,7 +680,7 @@ class SecPreXmlDataProcessor():
                 else:
                     if len(conf_of_2_list) > 1:
                         logging.info(
-                            "{} has confidence of 2 for several statement types {}".format(reportinfo.get('adsh'),
+                            "{} has confidence of 2 for several statement types {}".format(reportinfo.adsh,
                                                                                            conf_of_2_list))
 
                     stmt = max_sum_of_confidence_stmt
@@ -672,30 +692,28 @@ class SecPreXmlDataProcessor():
 
         return result
 
-    def _post_process_cp(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[
-        Dict[str, Union[str, int, List[Dict[str, str]]]]]:
+    def _post_process_cp(self, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
         # in all the reports, there was always just on CP entry
         # so we either return the first who was identified as CP by the rolename
         # or we return the first entry of the list (since CP is generally the first that appears in a report)
         for report_data in stmt_list:
-            confidence_dict = report_data['stmt_canditates']['CP']
+            confidence_dict = report_data.stmt_canditates['CP']
             if confidence_dict.byRole == 2:
                 return [report_data]
         first_entry = stmt_list[0]
         return [first_entry]
 
-    def _post_process_bs(self, stmt_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]]) -> List[
-        Dict[str, Union[str, int, List[Dict[str, str]]]]]:
+    def _post_process_bs(self, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
         """
          often detail-reports contain the keywords in their role definition but also much more text.
          there are also cases with proper supparts of a company like 0001711269-21-000023
 
         """
         current_max_confidence = 0
-        current_max_confidence_list: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
+        current_max_confidence_list:  List[PresentationReport] = []
 
         for report_data in stmt_list:
-            confidence = report_data['stmt_canditates']['BS']
+            confidence = report_data.stmt_canditates['BS']
 
             sum_confidence = confidence.get_confidence_sum()
             if sum_confidence > current_max_confidence:
@@ -708,34 +726,34 @@ class SecPreXmlDataProcessor():
         # if there are more, then the ones with the shortest "role" are returned
         shortest_bs = None
         for entry in current_max_confidence_list:
-            role = entry['role']
+            role = entry.role
 
-            if shortest_bs == None or len(role) < len(shortest_bs['role']):
+            if (shortest_bs is None) or (len(role) < len(shortest_bs.role)):
                 shortest_bs = entry
 
-        result: List[Dict[str, Union[str, int, List[Dict[str, str]]]]] = []
+        result: List[PresentationReport] = []
         if shortest_bs is not None:
             result.append(shortest_bs)
 
         return result
 
-    def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Tuple[
-        List[Dict[str, Union[str, int]]], List[Tuple[str, str, str]]]:
+    def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
+            Tuple[List[PresentationEntry], List[Tuple[str, str, str]]]:
 
-        results: List[Dict[str, Union[str, int]]] = []
+        results: List[PresentationEntry] = []
 
-        report_data: Dict[int, Dict[str, Union[str, int, List[Dict[str, str]]]]]
+        report_data: Dict[int, PresentationReport]
         error_collector: List[Tuple[str, str, str]]
 
         report_data, error_collector = self.process_reports(adsh, data)
-        stmt_data: Dict[
-            Tuple[str, int], List[
-                Dict[str, Union[str, int, List[Dict[str, str]]]]]] = self._post_process_assign_report_to_stmt(
-            report_data)
+
+        stmt_data: Dict[Tuple[str, int], List[PresentationReport]] \
+            = self._post_process_assign_report_to_stmt(report_data)
 
         reportnr = 0
         for stmtkey, stmt_list in stmt_data.items():
             stmt, inpth = stmtkey
+
             # todo: check if it is really necessary that a list is returned
             if stmt is 'CP':
                 stmt_list = self._post_process_cp(stmt_list)
@@ -743,13 +761,14 @@ class SecPreXmlDataProcessor():
             if stmt is 'BS':
                 stmt_list = self._post_process_bs(stmt_list)
 
-            for report_data in stmt_list:
-                entries: List[Dict[str, Union[str, int]]] = report_data['entries']
+            for report in stmt_list:
+                entries: List[PresentationEntry] = report.entries
                 reportnr += 1
                 for entry in entries:
-                    entry['report'] = reportnr
-                    entry['inpth'] = inpth
-                    entry['stmt'] = stmt
+                    entry.report = reportnr
+                    entry.inpth = inpth
+                    entry.stmt = stmt
+
                 results.extend(entries)
 
         return (results, error_collector)

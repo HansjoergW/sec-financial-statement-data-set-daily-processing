@@ -1,11 +1,12 @@
 from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
 from _02_xml.pre.SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
 from _02_xml.pre.SecPreXmlTransformation import SecPreXmlTransformer, SecPreTransformPresentationDetails
-from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor
+from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor, PresentationEntry
 
 import pandas as pd
 
 from typing import Dict, List, Union, Tuple
+from dataclasses import asdict
 import pprint
 
 
@@ -21,15 +22,14 @@ class SecPreXmlParser(SecXmlParserBase):
         processor: SecPreXmlDataProcessor = SecPreXmlDataProcessor()
 
         extracted_data: Dict[int, SecPreExtractPresentationLink] = extractor.extract(adsh, data)
-        transformed_data:  Dict[int, SecPreTransformPresentationDetails] = transformer.transform(adsh, extracted_data)
+        transformed_data: Dict[int, SecPreTransformPresentationDetails] = transformer.transform(adsh, extracted_data)
 
-        processed_entries: List[Dict[str, Union[str, int]]]
+        processed_entries: List[PresentationEntry]
         collected_errors: List[Tuple[str, str, str]]
         processed_entries, collected_errors = processor.process(adsh, transformed_data)
 
         sec_error_list = [SecError(x[0], x[1], x[2]) for x in collected_errors]
 
-        # todo: use dataclasses asdict method to convert dataclasslist into dictionary, in case this pandas-version is not supporting dataclassed
         df = pd.DataFrame(processed_entries)
         df['rfile'] = '-'
 
