@@ -60,29 +60,16 @@ def test_compare_adshs():
     assert len(not_in_xml) == 0
 
 
-
-def test_compare_CP():
-    xml_cp_df = filter_for_adsh_and_statement(xml_data_df, sorted_adshs_in_both, 'CP')
-    zip_cp_df = filter_for_adsh_and_statement(zip_data_df, sorted_adshs_in_both, 'CP')
-
-    xml_adshs_with_cp = set(xml_cp_df.adsh.unique().tolist())
-    xml_adshs_without_cp = adshs_in_xml - xml_adshs_with_cp
-
-    print("")
-    print("CP Entries in XML: ", len(xml_cp_df))
-    print("CP Entries in ZIP: ", len(zip_cp_df))
-    print("XML adshs without CP: ", xml_adshs_without_cp)
-
-
 def _compare_attribute(data: pd.Series):
     xml_tag_set = set(data.loc['tagList_xml'].split(','))
     zip_tag_set = set(data.loc['tagList_xml'].split(','))
 
-    # test für exact, oder komplett in xml vorhanden unterscheiden -> bei apply müsste man dan mit expand arbeiten
+    # test für exact, oder komplett in xml vorhanden unterscheiden -> bei apply müsste man dann mit expand arbeiten
 
-    return len(zip_tag_set - xml_tag_set) == 0
+    return len(zip_tag_set - xml_tag_set) == 0, len(xml_tag_set) == len(zip_tag_set)
 
-def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame):
+
+def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[int,int]:
     xml_idx = xml_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
     zip_idx = zip_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
 
@@ -90,22 +77,21 @@ def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame):
     zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
 
     merged_df = pd.merge(xml_idx, zip_idx, left_index=True, right_index=True)
-    merged_df['tag_equals'] = merged_df.apply(_compare_attribute, axis = 1)
+    merged_df[['tag_equals','tag_length_equals']] = merged_df.apply(_compare_attribute, axis = 1, result_type='expand')
 
     not_matching_df = merged_df[merged_df['tag_equals'] == False]
+    not_exact_length_df = merged_df[merged_df['tag_length_equals'] == False]
 
-    print(len(not_matching_df))
+    return len(not_matching_df), len(not_exact_length_df)
 
 
-def test_compare_BS():
-
+def _compare_reports(type: str):
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, 'BS')
-    zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, 'BS')
+    xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, type)
+    zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, type)
 
     xml_bs_group_df = xml_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
     zip_bs_group_df = zip_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
-
 
     xml_bs_group_df.rename(columns = lambda x: x + '_xml', inplace=True)
     zip_bs_group_df.rename(columns = lambda x: x + '_zip', inplace=True)
@@ -121,102 +107,54 @@ def test_compare_BS():
     zip_adshs_without_bs = set(adshs_to_consider) - zip_adshs_with_bs
 
     print("")
-    print("ADSH with BS Entries in XML: ", len(xml_adshs_with_bs))
-    print("ADSH with BS Entries in ZIP: ", len(zip_adshs_with_bs))
-    print("BS Entries in XML:    ", len(xml_bs_df))
-    print("BS Entries in ZIP:    ", len(zip_bs_df))
-    print("XML adshs without BS: ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
-    print("ZIP adshs without BS: ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
-    print("missing in both:      ", xml_adshs_without_bs.intersection(zip_adshs_without_bs))
-    print("only missing in xml  :", xml_adshs_without_bs - zip_adshs_without_bs)
-    print("only missing in zip  :", zip_adshs_without_bs - xml_adshs_without_bs)
-    print("unequal counts:      :", len(merged_groupby_diff))
+    print(f"ADSH with {type} Entries in XML: ", len(xml_adshs_with_bs))
+    print(f"ADSH with {type} Entries in ZIP: ", len(zip_adshs_with_bs))
+    print(f"{type} Entries in XML       : ", len(xml_bs_df))
+    print(f"{type} Entries in ZIP       : ", len(zip_bs_df))
+    print(f"XML adshs without {type}    : ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
+    print(f"ZIP adshs without {type}    : ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
+    print(f"missing in both         : ", xml_adshs_without_bs.intersection(zip_adshs_without_bs))
+    print(f"only missing in xml     : ", xml_adshs_without_bs - zip_adshs_without_bs)
+    print(f"only missing in zip     : ", zip_adshs_without_bs - xml_adshs_without_bs)
+    print(f"\nentries with unmatching tags: ", _compare_attributes(xml_bs_df, zip_bs_df))
 
-    print("bs reports not in xml:", len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
-    print("bs reports not in zip:", len(merged_groupby_diff[merged_groupby_diff.report_zip.isna()]))
-    print(merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
-    print(merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10])
+    print(f"\nunequal counts:         : ", len(merged_groupby_diff))
+    print(f"{type} reports not in xml   : ", len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
+    print(f"{type} reports not in zip   : ", len(merged_groupby_diff[merged_groupby_diff.report_zip.isna()]))
+    print(f"\n{type} not in xml (first 10): ", merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
+    print(f"\n{type} not in zip (first 10): ", merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10])
 
-    _compare_attributes(xml_bs_df, zip_bs_df)
+
+def test_compare_CP():
+    _compare_reports('CP')
+
+
+def test_compare_BS():
+    _compare_reports('BS')
+
+
+def test_compare_IS():
+    _compare_reports('IS')
+
+
+def test_compare_CI():
+    _compare_reports('CI')
+
+
+def test_compare_CF():
+    _compare_reports('CF')
+
+
+def test_compare_EQ():
+    _compare_reports('EQ')
+
+
+def test_compare_UN():
+    _compare_reports('UN')
+
 
 """
-Data:
- BS Test
-  - Baseline
-   BS Entries in XML:  11474
-   BS Entries in ZIP:  10730
-   XML adshs without BS:  39  -  {'0001731122-21-000401', '0001376474-21-000052', '0001625285-21-000002', '0000715812-21-000002', '0001052918-21-000070', '0001539816-21-000003', '0001775098-21-000005', '0001078782-21-000032', '0001376474-21-000024', '0001376474-21-000080', '0001213900-21-019311', '0001078782-21-000166', '0001548123-21-000030', '0001376474-21-000025', '0001827855-21-000003', '0001376474-21-000072', '0001193125-21-102032', '0001096906-21-000531', '0001331757-21-000011', '0001564590-21-012829', '0001096906-21-000417', '0001548123-21-000029', '0001587650-21-000010', '0001350420-21-000002', '0001376474-21-000073', '0001552781-21-000008', '0001669374-21-000016', '0001448788-21-000006', '0001096906-21-000191', '0001078782-21-000193', '0001625285-21-000004', '0001376474-21-000053', '0001625285-21-000006', '0001078782-21-000120', '0001078782-21-000058', '0001393905-21-000014', '0001206942-21-000014', '0000100716-21-000020', '0001549983-21-000003'}
-   ZIP adshs without BS:   8  -  {'0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001437749-21-007013', '0001193125-21-102032', '0000065984-21-000096', '0001587650-21-000010', '0001072627-21-000022'}
 
-  - 1. change -> exclude 'details' 
-    ADSH with BS Entries in XML:   5'430
-    ADSH with BS Entries in ZIP:   5'462
-    BS Entries in XML:            10'977
-    BS Entries in ZIP:            10'730
-    XML adshs without BS:             40  
-    ZIP adshs without BS:              8  
-    
-  - 2. change -> use max_confident_list, instead conf_2_list
-    ADSH with BS Entries in XML:   5'430
-    ADSH with BS Entries in ZIP:   5'462
-    BS Entries in XML:            10'688
-    BS Entries in ZIP:            10'730
-    XML adshs without BS:             40 
-    ZIP adshs without BS:              8        
-    
-  - 3. change -> additional keywords (condition)            
-    ADSH with BS Entries in XML:   5'431
-    ADSH with BS Entries in ZIP:   5'462
-    BS Entries in XML:            10'665
-    BS Entries in ZIP:            10'730
-    XML adshs without BS:             39
-    ZIP adshs without BS:              8 
-    
-    
-  - 4. change -> additional keywords
-    ADSH with BS Entries in XML:   5'457
-    ADSH with BS Entries in ZIP:   5'462
-    BS Entries in XML:            10'716
-    BS Entries in ZIP:            10'730
-    XML adshs without BS:             13
-    ZIP adshs without BS:              8   
-    
-    not in xml {'0001827855-21-000003', '0001213900-21-019311', '0001448788-21-000006', '0001331757-21-000011', '0001625285-21-000004', '0001625285-21-000002', '0001625285-21-000006'}
-
-  - 5. change -> kleinere Anpassungen, zusätzliche keywords
-    ADSH with BS Entries in XML:  5463
-    ADSH with BS Entries in ZIP:  5462
-    BS Entries in XML:     10737
-    BS Entries in ZIP:     10730
-    XML adshs without BS:  7  -  {'0001193125-21-102032', '0001213900-21-019311', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001587650-21-000010', '0001072627-21-000022'}
-    ZIP adshs without BS:  8  -  {'0001193125-21-102032', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0000065984-21-000096', '0001587650-21-000010', '0001437749-21-007013', '0001072627-21-000022'}
-    missing in both:       {'0001193125-21-102032', '0001669374-21-000016', '0001539816-21-000003', '0001775098-21-000005', '0001587650-21-000010', '0001072627-21-000022'}
-    only missing in xml  : {'0001213900-21-019311'}
-    only missing in zip  : {'0001437749-21-007013', '0000065984-21-000096'}
-  
-  Anzahl der vergleichen je nach inpth und normal  
-    ADSH with BS Entries in XML:  5465
-    ADSH with BS Entries in ZIP:  5462
-    BS Entries in XML:     10699
-    BS Entries in ZIP:     10730
-    XML adshs without BS:  5  -  {'0001669374-21-000016', '0001193125-21-102032', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
-    ZIP adshs without BS:  8  -  {'0001437749-21-007013', '0001072627-21-000022', '0000065984-21-000096', '0001193125-21-102032', '0001669374-21-000016', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
-    missing in both:       {'0001669374-21-000016', '0001193125-21-102032', '0001775098-21-000005', '0001587650-21-000010', '0001539816-21-000003'}
-    only missing in xml  : set()
-    only missing in zip  : {'0001437749-21-007013', '0001072627-21-000022', '0000065984-21-000096'}
-    unequal counts:      : 111 (71 haben keinen Eintrag in XML)
-                                     report_xml  report_zip  equal
-    adsh                 stmt inpth                               
-    0000040545-21-000011 BS   1             NaN         1.0  False
-    0000055772-21-000016 BS   0             NaN         1.0  False
-    0000076605-21-000059 BS   0             NaN         1.0  False
-    0000100716-21-000020 BS   0             NaN         1.0  False
-    0000105770-21-000008 BS   0             NaN         1.0  False
-    0000731766-21-000013 BS   1             NaN         1.0  False
-    0000784977-21-000007 BS   0             NaN         1.0  False
-    0000804269-21-000005 BS   1             NaN         1.0  False
-    0000866273-21-000008 BS   1             NaN         1.0  False
-    0000890926-21-000019 BS   1             NaN         1.0  False    
 """
 
 

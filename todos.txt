@@ -1,51 +1,23 @@
 Next
 ====
 
-
-
-- Aufbau erweiterbarer "PRE" Test, in welchem mann spezialfälle direkt in ein testdaten verzeichnis ablegen
-  kann. der Test iteriert dann über alle Testfiles und prüft die Ergebnisse.
-  Die Prüfungen müsste man vermutlich auch irgendwie standardisieren, bzw. die erwartete CSV auch Datei hinstellen.
-
-
-- berechnen pre-xml
- - vlt sollte man sich zuerst nur auf fehlende reports konzentrieren
-   -> könnte man höchstens über die anzahl lösen ->
-   -> das grösste problem ist aber, dass die report nummer nicht stimmt
-   -> vlt wäre es besser, zuerst nur stmt:anzahl Zeilen zu vergleichen, also wirklich eine spezielles report tag  zu generieren
- - nicht beachten der speziellen "srt" Zeilen
-
-
 - quartal vergleichen
--- pre zip
-    # problem, die gruppierung muss beim vergleich beachtet werden.
-    # es wird so eine art universelle gruppe benötigt.. so was wie
-    # statement-anz rows..
-    # vlt. würde es auch helfen, wenn nur die relevanten statements gefiltert
-    # werden. Vlt würde dann die Nummerierung stimmen..
-
+-- saubere Reports pro Stmt Type, überprüfen, ob TagListe wirklich stimmen
+-- danach die weiteren Report Typen vergleichen
 
 - status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
   -> File SecIndexIndexJsonParsing.py
   -> man sieht die letzte Bearbeitung
   -> man sieht die letzte Datei
 
-
 - bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 Later
 =====
-umbauen dictionaries mit https://realpython.com/python-data-classes/
-
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
 
-- Massentest über ganzes Quartal
--- XML-Dateien für komplettes Quartal downloaden
--- Vergleich mit txt-Daten aus diesem Quartal
---- Alle Reports (10-K/Q) müssen vorhanden sein
---- Die txt-Dateien dürfen keine Zeilen enthalten, die nicht in den XML Daten vorhanden sind
---- Prüfen ob
+- generation der sub.txt dateien, soweit sinnvoll
 
 - zippen von xml dateien
 
@@ -82,6 +54,8 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+31.05.2021 - umbauen dictionaries mit https://realpython.com/python-data-classes/
+29.05.2021 - erfolgreich BS und CP parsen, nur noch sehr wenige Ausnahmen
 21.05.2021 - erfolgreiches parsen aller reports in q1 2021 ohne überraschungen..
 14.05.2021 - diverse optimierungen in pre-parsing
            - neu download mit prüfung auf grösse, da irgendwie die falschen Daten vorhanden sind...

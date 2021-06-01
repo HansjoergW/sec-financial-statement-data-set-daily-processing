@@ -1,137 +1,14 @@
 from _02_xml.SecXmlPreParsing import SecPreXmlParser
 from _00_common.DebugUtils import DataAccessByAdshTool
 
-#special cases
-# default namespace  xmlns="http://www.xbrl.org/2003/linkbase": d:/secprocessing/xml/2021-05-02/vgz-20210331_pre.xml
+"""
+Helper Class to process a single report based on the ADSH Nummer or directly from an xml content 
+"""
+
 
 workdir = "d:/secprocessing/"
 
-special_content_line_wrong = """<?xml version="1.0" encoding="UTF-8"?>
-<linkbase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.xbrl.org/2003/instance http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd" xmlns="http://www.xbrl.org/2003/linkbase" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <presentationLink xlink:type="extended" xlink:role="http://www.marlinleasing.com/role/StatementConsolidatedStatementsOfStockholdersEquity">
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_703" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementEquityComponentsAxis" xlink:label="Locator_us-gaap_StatementEquityComponentsAxis_704" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementTable_703" xlink:to="Locator_us-gaap_StatementEquityComponentsAxis_704" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementEquityComponentsAxis" xlink:label="Locator_us-gaap_StatementEquityComponentsAxis_725" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_EquityComponentDomain" xlink:label="Locator_us-gaap_EquityComponentDomain_726" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementEquityComponentsAxis_725" xlink:to="Locator_us-gaap_EquityComponentDomain_726" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_EquityComponentDomain" xlink:label="Locator_us-gaap_EquityComponentDomain_727" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_CommonStockMember" xlink:label="Locator_us-gaap_CommonStockMember_728" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_EquityComponentDomain_727" xlink:to="Locator_us-gaap_CommonStockMember_728" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_EquityComponentDomain" xlink:label="Locator_us-gaap_EquityComponentDomain_729" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AdditionalPaidInCapitalMember" xlink:label="Locator_us-gaap_AdditionalPaidInCapitalMember_730" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_EquityComponentDomain_729" xlink:to="Locator_us-gaap_AdditionalPaidInCapitalMember_730" order="2.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_EquityComponentDomain" xlink:label="Locator_us-gaap_EquityComponentDomain_731" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccumulatedOtherComprehensiveIncomeMember" xlink:label="Locator_us-gaap_AccumulatedOtherComprehensiveIncomeMember_732" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_EquityComponentDomain_731" xlink:to="Locator_us-gaap_AccumulatedOtherComprehensiveIncomeMember_732" order="3.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_EquityComponentDomain" xlink:label="Locator_us-gaap_EquityComponentDomain_733" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_RetainedEarningsMember" xlink:label="Locator_us-gaap_RetainedEarningsMember_734" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_EquityComponentDomain_733" xlink:to="Locator_us-gaap_RetainedEarningsMember_734" order="4.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_705" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_RestatementAxis" xlink:label="Locator_srt_RestatementAxis_706" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementTable_705" xlink:to="Locator_srt_RestatementAxis_706" order="2.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_RestatementAxis" xlink:label="Locator_srt_RestatementAxis_715" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_RestatementDomain" xlink:label="Locator_srt_RestatementDomain_716" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_srt_RestatementAxis_715" xlink:to="Locator_srt_RestatementDomain_716" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_RestatementDomain" xlink:label="Locator_srt_RestatementDomain_717" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_RevisionOfPriorPeriodAccountingStandardsUpdateAdjustmentMember" xlink:label="Locator_srt_RevisionOfPriorPeriodAccountingStandardsUpdateAdjustmentMember_718" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_srt_RestatementDomain_717" xlink:to="Locator_srt_RevisionOfPriorPeriodAccountingStandardsUpdateAdjustmentMember_718" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_707" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_CumulativeEffectPeriodOfAdoptionAxis" xlink:label="Locator_srt_CumulativeEffectPeriodOfAdoptionAxis_708" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementTable_707" xlink:to="Locator_srt_CumulativeEffectPeriodOfAdoptionAxis_708" order="3.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_CumulativeEffectPeriodOfAdoptionAxis" xlink:label="Locator_srt_CumulativeEffectPeriodOfAdoptionAxis_721" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_CumulativeEffectPeriodOfAdoptionDomain" xlink:label="Locator_srt_CumulativeEffectPeriodOfAdoptionDomain_722" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_srt_CumulativeEffectPeriodOfAdoptionAxis_721" xlink:to="Locator_srt_CumulativeEffectPeriodOfAdoptionDomain_722" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_CumulativeEffectPeriodOfAdoptionDomain" xlink:label="Locator_srt_CumulativeEffectPeriodOfAdoptionDomain_723" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/srt/2020/elts/srt-2020-01-31.xsd#srt_CumulativeEffectPeriodOfAdoptionAdjustmentMember" xlink:label="Locator_srt_CumulativeEffectPeriodOfAdoptionAdjustmentMember_724" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_srt_CumulativeEffectPeriodOfAdoptionDomain_723" xlink:to="Locator_srt_CumulativeEffectPeriodOfAdoptionAdjustmentMember_724" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_701" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_702" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementTable_701" xlink:to="Locator_us-gaap_StatementLineItems_702" order="5.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_581" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodValueNewIssues" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodValueNewIssues_582" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_581" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodValueNewIssues_582" order="3.0" preferredLabel="http://www.xbrl.org/2003/role/verboseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_583" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodSharesNewIssues" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodSharesNewIssues_584" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_583" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodSharesNewIssues_584" order="4.0" preferredLabel="http://www.xbrl.org/2003/role/verboseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_585" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockRepurchasedDuringPeriodValue" xlink:label="Locator_us-gaap_StockRepurchasedDuringPeriodValue_586" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_585" xlink:to="Locator_us-gaap_StockRepurchasedDuringPeriodValue_586" order="5.0" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_587" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockRepurchasedDuringPeriodShares" xlink:label="Locator_us-gaap_StockRepurchasedDuringPeriodShares_588" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_587" xlink:to="Locator_us-gaap_StockRepurchasedDuringPeriodShares_588" order="6.0" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_589" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodValueStockOptionsExercised" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodValueStockOptionsExercised_590" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_589" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodValueStockOptionsExercised_590" order="7.0" preferredLabel="http://www.xbrl.org/2003/role/terseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_591" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodSharesStockOptionsExercised" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodSharesStockOptionsExercised_592" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_591" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodSharesStockOptionsExercised_592" order="8.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_593" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ExcessTaxBenefitFromShareBasedCompensationOperatingActivities" xlink:label="Locator_us-gaap_ExcessTaxBenefitFromShareBasedCompensationOperatingActivities_594" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_593" xlink:to="Locator_us-gaap_ExcessTaxBenefitFromShareBasedCompensationOperatingActivities_594" order="9.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_595" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockOptionPlanExpense" xlink:label="Locator_us-gaap_StockOptionPlanExpense_596" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_595" xlink:to="Locator_us-gaap_StockOptionPlanExpense_596" order="10.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_597" />
-        <loc xlink:type="locator" xlink:href="mrln-20201231.xsd#mrln_PaymentOfReceivables" xlink:label="Locator_mrln_PaymentOfReceivables_598" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_597" xlink:to="Locator_mrln_PaymentOfReceivables_598" order="11.0" preferredLabel="http://www.xbrl.org/2003/role/terseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_599" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodValueRestrictedStockAwardNetOfForfeitures" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodValueRestrictedStockAwardNetOfForfeitures_600" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_599" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodValueRestrictedStockAwardNetOfForfeitures_600" order="12.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_601" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockIssuedDuringPeriodSharesRestrictedStockAwardNetOfForfeitures" xlink:label="Locator_us-gaap_StockIssuedDuringPeriodSharesRestrictedStockAwardNetOfForfeitures_602" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_601" xlink:to="Locator_us-gaap_StockIssuedDuringPeriodSharesRestrictedStockAwardNetOfForfeitures_602" order="13.0" preferredLabel="http://www.xbrl.org/2003/role/terseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_603" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AllocatedShareBasedCompensationExpense" xlink:label="Locator_us-gaap_AllocatedShareBasedCompensationExpense_604" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_603" xlink:to="Locator_us-gaap_AllocatedShareBasedCompensationExpense_604" order="14.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_605" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeLossReclassificationAdjustmentFromAOCIOnDerivativesNetOfTax" xlink:label="Locator_us-gaap_OtherComprehensiveIncomeLossReclassificationAdjustmentFromAOCIOnDerivativesNetOfTax_606" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_605" xlink:to="Locator_us-gaap_OtherComprehensiveIncomeLossReclassificationAdjustmentFromAOCIOnDerivativesNetOfTax_606" order="15.0" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_607" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodNetOfTax" xlink:label="Locator_us-gaap_OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodNetOfTax_608" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_607" xlink:to="Locator_us-gaap_OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodNetOfTax_608" order="16.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_609" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_ProfitLoss" xlink:label="Locator_us-gaap_ProfitLoss_610" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_609" xlink:to="Locator_us-gaap_ProfitLoss_610" order="17.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_611" />
-        <loc xlink:type="locator" xlink:href="mrln-20201231.xsd#mrln_EffectsOfAdoptingNewAccountingStandardsReclassificationFromAociToRetainedEarnings" xlink:label="Locator_mrln_EffectsOfAdoptingNewAccountingStandardsReclassificationFromAociToRetainedEarnings_612" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_611" xlink:to="Locator_mrln_EffectsOfAdoptingNewAccountingStandardsReclassificationFromAociToRetainedEarnings_612" order="18.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_613" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_DividendsCommonStockCash" xlink:label="Locator_us-gaap_DividendsCommonStockCash_614" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_613" xlink:to="Locator_us-gaap_DividendsCommonStockCash_614" order="19.0" preferredLabel="http://www.xbrl.org/2009/role/negatedLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_577" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest" xlink:label="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_578" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_577" xlink:to="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_578" order="1.0" preferredLabel="http://www.xbrl.org/2003/role/periodStartLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_615" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest" xlink:label="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_616" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_615" xlink:to="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_616" order="20.0" preferredLabel="http://www.xbrl.org/2003/role/periodEndLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest" xlink:label="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_621" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdateExtensibleList" xlink:label="Locator_us-gaap_AccountingStandardsUpdateExtensibleList_622" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest_621" xlink:to="Locator_us-gaap_AccountingStandardsUpdateExtensibleList_622" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_579" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_CommonStockSharesOutstanding" xlink:label="Locator_us-gaap_CommonStockSharesOutstanding_580" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_579" xlink:to="Locator_us-gaap_CommonStockSharesOutstanding_580" order="2.0" preferredLabel="http://www.xbrl.org/2003/role/periodStartLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementLineItems" xlink:label="Locator_us-gaap_StatementLineItems_617" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_CommonStockSharesOutstanding" xlink:label="Locator_us-gaap_CommonStockSharesOutstanding_618" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementLineItems_617" xlink:to="Locator_us-gaap_CommonStockSharesOutstanding_618" order="21.0" preferredLabel="http://www.xbrl.org/2003/role/periodEndLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_709" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AdjustmentsForNewAccountingPronouncementsAxis" xlink:label="Locator_us-gaap_AdjustmentsForNewAccountingPronouncementsAxis_710" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementTable_709" xlink:to="Locator_us-gaap_AdjustmentsForNewAccountingPronouncementsAxis_710" order="4.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AdjustmentsForNewAccountingPronouncementsAxis" xlink:label="Locator_us-gaap_AdjustmentsForNewAccountingPronouncementsAxis_719" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_TypeOfAdoptionMember" xlink:label="Locator_us-gaap_TypeOfAdoptionMember_720" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_AdjustmentsForNewAccountingPronouncementsAxis_719" xlink:to="Locator_us-gaap_TypeOfAdoptionMember_720" order="1.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_TypeOfAdoptionMember" xlink:label="Locator_us-gaap_TypeOfAdoptionMember_711" />
-        <loc xlink:type="locator" xlink:href="mrln-20201231.xsd#mrln_VariousAccountingStandardsAdoptedMember" xlink:label="Locator_mrln_VariousAccountingStandardsAdoptedMember_712" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_TypeOfAdoptionMember_711" xlink:to="Locator_mrln_VariousAccountingStandardsAdoptedMember_712" order="1.0" preferredLabel="http://www.xbrl.org/2003/role/terseLabel" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_TypeOfAdoptionMember" xlink:label="Locator_us-gaap_TypeOfAdoptionMember_713" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201613Member" xlink:label="Locator_us-gaap_AccountingStandardsUpdate201613Member_714" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_TypeOfAdoptionMember_713" xlink:to="Locator_us-gaap_AccountingStandardsUpdate201613Member_714" order="2.0" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementOfStockholdersEquityAbstract" xlink:label="Locator_us-gaap_StatementOfStockholdersEquityAbstract_623" />
-        <loc xlink:type="locator" xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_StatementTable" xlink:label="Locator_us-gaap_StatementTable_624" />
-        <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="Locator_us-gaap_StatementOfStockholdersEquityAbstract_623" xlink:to="Locator_us-gaap_StatementTable_624" order="1.0" />
-    </presentationLink>
-
-</link:linkbase>
+xml_content = """
 """
 
 
@@ -154,6 +31,15 @@ def parse_content(adsh, content:  str):
 
 if __name__ == '__main__':
 
+    adsh = ""
+    content = get_pre_xml_content_by_adsh(adsh)
+    #content = xml_content
+    parse_content(adsh, content)
+
+
+# old special cases
+
+"""
     file_ok = "d:/secprocessing/xml/2021-04-24/blpg-20200630_pre.xml"
     file_nok = "d:/secprocessing/xml/2021-05-02/vgz-20210331_pre.xml"
     file_empty= "d:/secprocessing/xml/2021-05-06/nvec-20210331_pre.xml"
@@ -211,22 +97,10 @@ if __name__ == '__main__':
     #missing_bs = "0001553350-21-000261" #    0001387131-21-002995 0001387131-21-002996
 
 
-
     # 0000012208-21-000012: andere root node in parentheticals
 
     # 0001213900-21-019311 BS: sieht aus als wäre das als CashFlow betitelt!
     # '0001193125-21-102032', '0001669374-21-000016' '0001539816-21-000003' '0001775098-21-000005' '0001587650-21-000010' # ->  kein normaler Report
+    
+"""
 
-    #content = special_content_line_wrong
-
-    content = get_pre_xml_content_by_adsh(no_bs_inpth_report_in_zip)
-    parse_content(no_bs_inpth_report_in_zip, content)
-
-    print("")
-
-# problem -> tag kann mehrmals vorkommen -> siehe missing_line_15_in_IS -> in IS kommt NetIncomeLoss mehrmals vor
-# es muss zwischen key und tag/label unterschieden werden
-# bei beispiel ist terse und total  unterschiedlich..
-# d.h. aber, dass mehrere locs aufs selbe presentation_arc zeigen
-# entsprechend muss beim iterieren aufgepasst werden.
-# es gibt anscheined locs, die haben kein presentation.. -> evtl. sollten wir nur presentation_beachten.
