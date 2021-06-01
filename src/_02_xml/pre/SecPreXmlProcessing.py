@@ -19,7 +19,7 @@ class EvalEntry:
 class StmtEvalDefinition:
     role_keys: List[EvalEntry]
     root_keys: List[EvalEntry]
-    label_list: List[str]
+    label_list: List[EvalEntry]
 
 
 @dataclass
@@ -45,6 +45,7 @@ class PresentationEntry:
     stmt: str = None
     inpth: int = None
     report: int = None
+
 
 @dataclass
 class PresentationReport:
@@ -230,7 +231,13 @@ class SecPreXmlDataProcessor:
                     excludes=['comprehensive'],
                     confidence=1),
             ],
-            label_list=[]
+            label_list=[
+                EvalEntry(
+                    includes=[],
+                    excludes=['comprehensiveincome'],
+                    confidence=1
+                )
+            ]
         ),
 
         'CI': StmtEvalDefinition(
@@ -250,7 +257,13 @@ class SecPreXmlDataProcessor:
                     excludes=[],
                     confidence=1),
             ],
-            label_list=[]
+            label_list=[
+                EvalEntry(
+                    includes=['comprehensiveincome'],
+                    excludes=[],
+                    confidence=1
+                )
+            ]
         ),
 
         'CF': StmtEvalDefinition(
@@ -429,6 +442,25 @@ class SecPreXmlDataProcessor:
 
         return max_confidence
 
+    def _eval_statement_canditate_label_helper(self, loc_list: List[SecPreTransformLocationDetails],
+                                               definition: List[EvalEntry]):
+        tag_list_lower = [loc_entry.tag.lower() for loc_entry in loc_list]
+
+        max_confidence = 0
+        for key_def in definition:
+            includes = key_def.includes
+            excludes = key_def.excludes
+            confidence = key_def.confidence
+
+            for tag in tag_list_lower:
+                if all(map_key in tag for map_key in includes) and any(map_key in tag for map_key in excludes) == False:
+                    max_confidence = max(max_confidence, confidence)
+
+        kann man nicht so lösen. test müsste eher sein, falls es ein IS ist, könnte es aufgrund der labels auch ein CI sein?
+
+
+        return max_confidence
+
     def _evaluate_statement_canditates(self, role: str, root_node: str,
                                        loc_list: List[SecPreTransformLocationDetails]) -> Dict[str, StmtConfidence]:
         # returns for matches stmt: {byrole: confidence, byroot:confidence, bylabel: confidence}
@@ -438,12 +470,12 @@ class SecPreXmlDataProcessor:
         for key, definitions in self.stmt_eval_dict.items():
             role_keys_definition = definitions.role_keys
             root_keys_definition = definitions.root_keys
-            label_list = definitions.label_list
+            label_definition = definitions.label_list
 
             details = StmtConfidence(
                 byRole=self._eval_statement_canditate_helper(role, role_keys_definition),
                 byRoot=self._eval_statement_canditate_helper(root_node, root_keys_definition),
-                byLabel=0
+                byLabel=self._eval_statement_canditate_label_helper(loc_list, label_definition)
             )
 
             if details.get_max_confidenc() > 0:
@@ -760,6 +792,9 @@ class SecPreXmlDataProcessor:
 
             if stmt is 'BS':
                 stmt_list = self._post_process_bs(stmt_list)
+
+            if stmt is 'CI':
+                print("")
 
             for report in stmt_list:
                 entries: List[PresentationEntry] = report.entries

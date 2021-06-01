@@ -30,8 +30,18 @@ def parse_content(adsh, content:  str):
 
 
 if __name__ == '__main__':
+    # adsh = "0001010412-21-000004"
+    # adsh = "0001079973-21-000172"
+    # adsh = "0001091818-21-000034"
+    # adsh = "0001140361-21-008496"
+    # adsh = "0001174947-21-000152"
+    # adsh = "0001174947-21-000157"
+    # adsh = "0001174947-21-000168"
+    # adsh = "0001174947-21-000315"
+    # adsh = "0001178913-21-000696"
+    adsh = "0001213900-21-019217" # missing CI
 
-    adsh = ""
+
     content = get_pre_xml_content_by_adsh(adsh)
     #content = xml_content
     parse_content(adsh, content)

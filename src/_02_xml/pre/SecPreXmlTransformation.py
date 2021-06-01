@@ -131,10 +131,10 @@ class SecPreXmlTransformer():
 
             # if there is a title info, then this has precedence over the role
             if entry.title is not None:
-                entry.role = v.title
+                entry.role = entry.title
 
             # figure out if data in a report where contained in parenthesis
-            if "parenthetical" in v.role.lower():
+            if "parenthetical" in entry.role.lower():
                 entry.inpth = "1"
 
             result[k] = entry
