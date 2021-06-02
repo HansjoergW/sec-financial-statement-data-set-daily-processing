@@ -39,7 +39,8 @@ if __name__ == '__main__':
     # adsh = "0001174947-21-000168"
     # adsh = "0001174947-21-000315"
     # adsh = "0001178913-21-000696"
-    adsh = "0001213900-21-019217" # missing CI
+    #adsh = "0001213900-21-019217" # missing CI
+    adsh = "0000076605-21-000059" # missing BS
 
 
     content = get_pre_xml_content_by_adsh(adsh)

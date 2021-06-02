@@ -113,9 +113,12 @@ def _compare_reports(type: str):
     print(f"{type} Entries in ZIP       : ", len(zip_bs_df))
     print(f"XML adshs without {type}    : ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
     print(f"ZIP adshs without {type}    : ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
-    print(f"missing in both         : ", xml_adshs_without_bs.intersection(zip_adshs_without_bs))
-    print(f"only missing in xml     : ", xml_adshs_without_bs - zip_adshs_without_bs)
-    print(f"only missing in zip     : ", zip_adshs_without_bs - xml_adshs_without_bs)
+    missing_in_both = xml_adshs_without_bs.intersection(zip_adshs_without_bs)
+    missing_in_xml = xml_adshs_without_bs - zip_adshs_without_bs
+    missing_in_zip = zip_adshs_without_bs - xml_adshs_without_bs
+    print(f"missing in both         : ", len(missing_in_both), ' - ', missing_in_both)
+    print(f"only missing in xml     : ", len(missing_in_xml), ' - ',  missing_in_xml)
+    print(f"only missing in zip     : ", len(missing_in_zip), ' - ',  missing_in_zip)
     print(f"\nentries with unmatching tags: ", _compare_attributes(xml_bs_df, zip_bs_df))
 
     print(f"\nunequal counts:         : ", len(merged_groupby_diff))

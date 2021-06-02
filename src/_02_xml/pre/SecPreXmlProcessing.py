@@ -76,37 +76,37 @@ class SecPreXmlDataProcessor:
                 EvalEntry(
                     includes=['role/cover'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['coverpage'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['coverabstract'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['deidocument'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['document', 'entity', 'information'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
             ],
             root_keys=[
                 EvalEntry(
                     includes=['document', 'entity', 'information'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['coverpage'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['coverabstract'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
             ],
             label_list=[]
         ),
@@ -116,70 +116,74 @@ class SecPreXmlDataProcessor:
                 EvalEntry(
                     includes=['consolidated', 'statement', 'financialposition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['consolidated', 'statement', 'financialcondition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['consolidated', 'statement', 'condition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['consolidated', 'balance', 'sheet'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'financialposition'],
+                    excludes=['detail'],
+                    confidence=3),
                 EvalEntry(
                     includes=['condensed', 'balance', 'sheet'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'balance', 'sheet'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'financialposition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'financialcondition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'condition'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'assets', 'liabilities'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['role/balancesheet'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
                     includes=['role/idr_balancesheet'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(  # special case for "kingsway" only report with details in main BS 0001072627-21-000022
                     includes=['kingsway-financial', 'consolidated', 'balancesheet'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(  # special case for xfleet BS with role cashflow 0001213900-21-019311
                     includes=['www.xlfleet.com', 'consolidatedcashflow'],
                     excludes=['cashflow0'],
-                    confidence=2),
+                    confidence=3),
             ],
             root_keys=[
                 EvalEntry(
                     includes=['statementoffinancialposition'],
                     excludes=[],
-                    confidence=1),
+                    confidence=2),
                 EvalEntry(
                     includes=['balancesheet', 'parenthetical'],
                     excludes=[],
-                    confidence=1),
+                    confidence=2),
             ],
             label_list=[]),
 
@@ -188,19 +192,19 @@ class SecPreXmlDataProcessor:
                 EvalEntry(
                     includes=['statement', 'shareholder', 'equity'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'stockholder', 'equity'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'shareowner', 'equity'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'stockowner', 'equity'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
             ],
             root_keys=[],
             label_list=[]
@@ -210,57 +214,63 @@ class SecPreXmlDataProcessor:
             role_keys=[
                 EvalEntry(
                     includes=['consolidated', 'statement', 'income'],
-                    excludes=['comprehensive'],
-                    confidence=2),
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
                 EvalEntry(
                     includes=['consolidated', 'statement', 'operation'],
-                    excludes=['comprehensive'],
-                    confidence=2),
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'results', 'operation'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
                 EvalEntry(
                     includes=['condensed', 'statement', 'operation'],
-                    excludes=['detail'],
-                    confidence=2),
+                    excludes=['comprehensive','detail'],
+                    confidence=3),
                 EvalEntry(
                     includes=['statement', 'operation'],
-                    excludes=['comprehensive'],
-                    confidence=2),
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
             ],
             root_keys=[
                 EvalEntry(
                     includes=['income', 'statement', 'abstract'],
                     excludes=['comprehensive'],
-                    confidence=1),
+                    confidence=2),
             ],
-            label_list=[
-                EvalEntry(
-                    includes=[],
-                    excludes=['comprehensiveincome'],
-                    confidence=1
-                )
-            ]
+            label_list=[]
         ),
 
         'CI': StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
                     includes=['comprehensive', 'consolidated', 'statement', 'income'],
-                    excludes=[],
-                    confidence=2),
+                    excludes=['detail'],
+                    confidence=3),
                 EvalEntry(
                     includes=['comprehensive', 'consolidated', 'statement', 'operation'],
-                    excludes=[],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'operation'],
+                    excludes=['detail'],
+                    confidence=2),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'operation'],
+                    excludes=['detail'],
                     confidence=2),
             ],
             root_keys=[
                 EvalEntry(
                     includes=['comprehensive', 'income', 'statement', 'abstract'],
                     excludes=[],
-                    confidence=1),
+                    confidence=2),
             ],
             label_list=[
                 EvalEntry(
                     includes=['comprehensiveincome'],
-                    excludes=[],
+                    excludes=['asset'],
                     confidence=1
                 )
             ]
@@ -271,11 +281,11 @@ class SecPreXmlDataProcessor:
                 EvalEntry(
                     includes=['consolidated', 'statement', 'cashflow'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
                     includes=['condensed', 'statement', 'cashflow'],
                     excludes=[],
-                    confidence=2),
+                    confidence=3),
 
             ],
 
@@ -452,11 +462,19 @@ class SecPreXmlDataProcessor:
             excludes = key_def.excludes
             confidence = key_def.confidence
 
+            contains_include = False
+            contains_exlcude = False
             for tag in tag_list_lower:
-                if all(map_key in tag for map_key in includes) and any(map_key in tag for map_key in excludes) == False:
-                    max_confidence = max(max_confidence, confidence)
+                if all(map_key in tag for map_key in includes):
+                    contains_include = True
+                if any(map_key in tag for map_key in excludes):
+                    contains_exlcude = True
+            # the included condition has to be present and the excluded conditions may not be present
+            if contains_include and contains_exlcude == False:
+                max_confidence = max(max_confidence, confidence)
 
-        kann man nicht so lösen. test müsste eher sein, falls es ein IS ist, könnte es aufgrund der labels auch ein CI sein?
+        # kann man nicht so lösen. test müsste eher sein, falls es ein IS ist, könnte es aufgrund der labels auch ein CI sein?
+        # falls bereits ein IS vorhanden und noch kein CI vorhanden, dann könnte IS CI sein, falls Labels vorhanden.
 
 
         return max_confidence
@@ -692,28 +710,28 @@ class SecPreXmlDataProcessor:
                 # try to either find a single confidence of 2
                 # or to find the entry with the biggest sum of confidence values
 
-                conf_of_2_list = []
+                conf_of_3_list = []
                 max_sum_of_confidence = 0
                 max_sum_of_confidence_stmt = None
 
                 for stmt_key in stmt_canditates_keys:
                     confidence: StmtConfidence = stmt_canditates_dict[stmt_key]
 
-                    if confidence.get_max_confidenc() == 2:
-                        conf_of_2_list.append(stmt_key)
+                    if confidence.get_max_confidenc() == 3:
+                        conf_of_3_list.append(stmt_key)
 
                     sum_of_confidence = confidence.get_confidence_sum()
                     if sum_of_confidence > max_sum_of_confidence:
                         max_sum_of_confidence = sum_of_confidence
                         max_sum_of_confidence_stmt = stmt_key
 
-                if len(conf_of_2_list) == 1:
-                    stmt = conf_of_2_list[0]
+                if len(conf_of_3_list) == 1:
+                    stmt = conf_of_3_list[0]
                 else:
-                    if len(conf_of_2_list) > 1:
+                    if len(conf_of_3_list) > 1:
                         logging.info(
                             "{} has confidence of 2 for several statement types {}".format(reportinfo.adsh,
-                                                                                           conf_of_2_list))
+                                                                                           conf_of_3_list))
 
                     stmt = max_sum_of_confidence_stmt
 
@@ -735,7 +753,7 @@ class SecPreXmlDataProcessor:
         first_entry = stmt_list[0]
         return [first_entry]
 
-    def _post_process_bs(self, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
+    def _post_process_general(self, stmt_type: str, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
         """
          often detail-reports contain the keywords in their role definition but also much more text.
          there are also cases with proper supparts of a company like 0001711269-21-000023
@@ -745,7 +763,7 @@ class SecPreXmlDataProcessor:
         current_max_confidence_list:  List[PresentationReport] = []
 
         for report_data in stmt_list:
-            confidence = report_data.stmt_canditates['BS']
+            confidence = report_data.stmt_canditates[stmt_type]
 
             sum_confidence = confidence.get_confidence_sum()
             if sum_confidence > current_max_confidence:
@@ -791,10 +809,13 @@ class SecPreXmlDataProcessor:
                 stmt_list = self._post_process_cp(stmt_list)
 
             if stmt is 'BS':
-                stmt_list = self._post_process_bs(stmt_list)
+                stmt_list = self._post_process_general('BS', stmt_list)
+
+            if stmt is 'IS':
+                stmt_list = self._post_process_general('IS', stmt_list)
 
             if stmt is 'CI':
-                print("")
+                stmt_list = self._post_process_general('CI', stmt_list)
 
             for report in stmt_list:
                 entries: List[PresentationEntry] = report.entries
