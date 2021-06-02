@@ -52,6 +52,14 @@
      rolename has to be chosen.
 3.10. sometimes, there is a title attribute present which contains the information of the statement type rather than the role
       e.g. 0001010412-21-000004 or 0001079973-21-000172
+3.11. sometimes reports with/without paranthesis just differ by a p in the role, like
+    '0001178913-21-000696'  - role="http://solaredge.com/role/sedg-cbs"
+                            - role="http://solaredge.com/role/sedg-cbsp"
+    '0001553350-21-000261'  - role="http://lightwavelogic.com/role/lwlg-bs"
+                            - role="http://lightwavelogic.com/role/lwlg-bsp"
+3.12. IS/CI sometimes only differ in the labels that are present while role and root are the same.
+
+
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:

@@ -217,6 +217,14 @@ class SecPreXmlDataProcessor:
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
                 EvalEntry(
+                    includes=['consolidated', 'statement', 'loss'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'earnings'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
                     includes=['consolidated', 'statement', 'operation'],
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
@@ -232,6 +240,14 @@ class SecPreXmlDataProcessor:
                     includes=['statement', 'operation'],
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
+                EvalEntry(
+                    includes=['statement', 'income'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'loss'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
             ],
             root_keys=[
                 EvalEntry(
@@ -239,7 +255,13 @@ class SecPreXmlDataProcessor:
                     excludes=['comprehensive'],
                     confidence=2),
             ],
-            label_list=[]
+            label_list=[
+                EvalEntry(
+                    includes=['operating', 'income', 'loss'],
+                    excludes=['asset'],
+                    confidence=1
+                )
+            ]
         ),
 
         'CI': StmtEvalDefinition(
@@ -249,7 +271,19 @@ class SecPreXmlDataProcessor:
                     excludes=['detail'],
                     confidence=3),
                 EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'statement', 'earnings'],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'statement', 'loss'],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
                     includes=['comprehensive', 'consolidated', 'statement', 'operation'],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'results', 'operation'],
                     excludes=['detail'],
                     confidence=3),
                 EvalEntry(
@@ -286,6 +320,14 @@ class SecPreXmlDataProcessor:
                     includes=['condensed', 'statement', 'cashflow'],
                     excludes=[],
                     confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'cashflow'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['condensed', 'cashflow'],
+                    excludes=[],
+                    confidence=3),
 
             ],
 
@@ -297,7 +339,11 @@ class SecPreXmlDataProcessor:
             #     confidence= 2
             # },
 
-            root_keys=[],
+            root_keys=[
+                EvalEntry(
+                includes=['statement', 'cashflow'],
+                excludes=[],
+                confidence=3), ],
             label_list=[]
         )
     }
