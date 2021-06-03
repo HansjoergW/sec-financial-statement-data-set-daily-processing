@@ -1,4 +1,4 @@
-from _02_xml.pre.SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
+from _02_xml.pre._1_SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
     SecPreExtractPresentationArcDetails
 
 from dataclasses import dataclass
@@ -35,6 +35,7 @@ class SecPreTransformPresentationDetails():
     title: str
     role: str
     inpth: str
+    root_node: str = None
 
 
 class SecPreXmlTransformer():

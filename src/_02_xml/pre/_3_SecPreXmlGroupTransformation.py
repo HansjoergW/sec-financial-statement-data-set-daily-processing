@@ -1,4 +1,4 @@
-from _02_xml.pre.SecPreXmlTransformation import SecPreTransformPresentationDetails, \
+from _02_xml.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
     SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
 from typing import Dict, Union, List, Tuple, Set
 import logging
@@ -22,7 +22,6 @@ class SecPreXmlGroupTransformer:
 
     def __init__(self):
         pass
-
 
     def _check_for_role_name_to_ignore(self, role: str) -> bool:
         role_lower = role.lower()
@@ -168,6 +167,24 @@ class SecPreXmlGroupTransformer:
 
             preArc.key_tag = key_tag
 
+    def _find_root_node(self, preArc_list: List[SecPreTransformPresentationArcDetails]) -> str:
+        """ finds the root node, expect only ONE entry. If there is more than one root node, then an exception is raised
+            and this report will be skipped later in the process."""
+        to_list: List[str] = []
+        from_list: List[str] = []
+
+        for preArc in preArc_list:
+            to_list.append(preArc.to_entry)
+            from_list.append(preArc.from_entry)
+
+        root_nodes = list(set(from_list) - set(to_list))
+
+        # there should be just one rootnote, at least in the presentations we are interested in
+        if len(root_nodes) != 1:
+            return None
+
+        return root_nodes[0]
+
     def grouptransform(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Dict[int, SecPreTransformPresentationDetails]:
 
         result: Dict[int, SecPreTransformPresentationDetails] = {}
@@ -192,6 +209,7 @@ class SecPreXmlGroupTransformer:
 
             reportinfo.preArc_list = preArc_list
             reportinfo.loc_list = loc_list
+            reportinfo.root_node = self._find_root_node(preArc_list)
 
             result[idx] = reportinfo
 

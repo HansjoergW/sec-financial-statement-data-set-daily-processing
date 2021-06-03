@@ -1,6 +1,8 @@
 Next
 ====
 
+extract evaluate_statement_in eigene Klasse
+
 - quartal vergleichen
 -- saubere Reports pro Stmt Type, überprüfen, ob TagListe wirklich stimmen
 -- danach die weiteren Report Typen vergleichen

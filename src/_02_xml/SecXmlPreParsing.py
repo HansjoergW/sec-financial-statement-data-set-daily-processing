@@ -1,8 +1,8 @@
 from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
-from _02_xml.pre.SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
-from _02_xml.pre.SecPreXmlTransformation import SecPreXmlTransformer, SecPreTransformPresentationDetails
-from _02_xml.pre.SecXmlPreGroupTransformation import SecPreXmlGroupTransformer
-from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor, PresentationEntry
+from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
+from _02_xml.pre._2_SecPreXmlTransformation import SecPreXmlTransformer, SecPreTransformPresentationDetails
+from _02_xml.pre._3_SecPreXmlGroupTransformation import SecPreXmlGroupTransformer
+from _02_xml.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor, PresentationEntry
 
 import pandas as pd
 
