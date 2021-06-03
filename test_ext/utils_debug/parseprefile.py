@@ -40,6 +40,7 @@ if __name__ == '__main__':
     # adsh = "0001213900-21-012601"
     # adsh = "                    " # missing IS
 
+    adsh = "0000007789-21-000018"
 
     content = get_pre_xml_content_by_adsh(adsh)
     #content = xml_content

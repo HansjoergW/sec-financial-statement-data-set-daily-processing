@@ -1,6 +1,7 @@
 from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
 from _02_xml.pre.SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
 from _02_xml.pre.SecPreXmlTransformation import SecPreXmlTransformer, SecPreTransformPresentationDetails
+from _02_xml.pre.SecXmlPreGroupTransformation import SecPreXmlGroupTransformer
 from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor, PresentationEntry
 
 import pandas as pd
@@ -19,14 +20,16 @@ class SecPreXmlParser(SecXmlParserBase):
     def parse(self, adsh:str, data: str) -> Tuple[pd.DataFrame, List[SecError]]:
         extractor: SecPreXmlExtractor  = SecPreXmlExtractor()
         transformer: SecPreXmlTransformer = SecPreXmlTransformer()
+        grouptransformer: SecPreXmlGroupTransformer = SecPreXmlGroupTransformer()
         processor: SecPreXmlDataProcessor = SecPreXmlDataProcessor()
 
         extracted_data: Dict[int, SecPreExtractPresentationLink] = extractor.extract(adsh, data)
         transformed_data: Dict[int, SecPreTransformPresentationDetails] = transformer.transform(adsh, extracted_data)
+        group_transformed_data: Dict[int, SecPreTransformPresentationDetails] = grouptransformer.grouptransform(adsh, transformed_data)
 
         processed_entries: List[PresentationEntry]
         collected_errors: List[Tuple[str, str, str]]
-        processed_entries, collected_errors = processor.process(adsh, transformed_data)
+        processed_entries, collected_errors = processor.process(adsh, group_transformed_data)
 
         sec_error_list = [SecError(x[0], x[1], x[2]) for x in collected_errors]
 

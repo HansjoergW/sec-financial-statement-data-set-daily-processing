@@ -4,6 +4,7 @@ Next
 - quartal vergleichen
 -- saubere Reports pro Stmt Type, überprüfen, ob TagListe wirklich stimmen
 -- danach die weiteren Report Typen vergleichen
+-- 'Line' Reihenfolge muss noch geprüft werden...
 
 - status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
   -> File SecIndexIndexJsonParsing.py
