@@ -30,17 +30,25 @@ def parse_content(adsh, content:  str):
 
 
 if __name__ == '__main__':
-    # adsh = "0001062822-21-000013"
-    # adsh = "                    "
-    # adsh = "0001193125-21-025264"
-    # adsh = "0001193125-21-081336"
-    adsh = "0001213900-21-009521"
-    # adsh = "0001213900-21-012572"
-    # adsh = "                    "
-    # adsh = "0001213900-21-012601"
-    # adsh = "                    " # missing IS
+    # adsh = "0001213900-21-009521" # IS Sonderfall
+    # adsh = "0001213900-21-012572" # sonderfall IS ConsolidatedBalanceSheet0 / ConsolidatedBalanceSheet_Parentheticals0->
+    # adsh = "0001193125-21-081336" # IS Sonderfall in Liquidation
+    # adsh = "0001140361-21-004772" # IS Sonderfall in Liquidation
+    # adsh = "0001193125-21-040108" # IS Sonderfall in Liquidation
 
-    adsh = "0000007789-21-000018"
+    # adsh = "0001014739-21-000011" # inpth = 1
+    # adsh = "0001140361-21-004772"
+    # adsh = "0001193125-21-040108"
+    # adsh = ""
+    # adsh = "0001553350-21-000261"
+    # adsh = "0001564590-21-009011" # inpth = 1
+    # adsh = "0001628280-21-005217"
+
+    # adsh = ""
+    # adsh = "" # missing IS
+
+    # adsh = "0000007789-21-000018"
+    adsh = "0001564590-21-008444"
 
     content = get_pre_xml_content_by_adsh(adsh)
     #content = xml_content

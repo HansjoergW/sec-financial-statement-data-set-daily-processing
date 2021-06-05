@@ -62,7 +62,7 @@ def test_compare_adshs():
 
 def _compare_attribute(data: pd.Series):
     xml_tag_set = set(data.loc['tagList_xml'].split(','))
-    zip_tag_set = set(data.loc['tagList_xml'].split(','))
+    zip_tag_set = set(data.loc['tagList_zip'].split(','))
 
     # test für exact, oder komplett in xml vorhanden unterscheiden -> bei apply müsste man dann mit expand arbeiten
 
@@ -85,8 +85,7 @@ def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[int
     return len(not_matching_df), len(not_exact_length_df)
 
 
-def _compare_reports(type: str):
-    adshs_to_consider = sorted_adshs_in_both # [:100]
+def _compare_reports(type: str, adshs_to_consider: List[str]):
     xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, type)
     zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, type)
 
@@ -129,30 +128,38 @@ def _compare_reports(type: str):
 
 
 def test_compare_CP():
-    _compare_reports('CP')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    _compare_reports('CP', adshs_to_consider)
 
 
 def test_compare_BS():
-    _compare_reports('BS')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    #adshs_to_consider = ["0000883984-21-000005"]
+    _compare_reports('BS', adshs_to_consider)
 
 
 def test_compare_IS():
-    _compare_reports('IS')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    _compare_reports('IS', adshs_to_consider)
 
 
 def test_compare_CI():
-    _compare_reports('CI')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    _compare_reports('CI', adshs_to_consider)
 
 
 def test_compare_CF():
-    _compare_reports('CF')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    _compare_reports('CF', adshs_to_consider)
 
 
 def test_compare_EQ():
-    _compare_reports('EQ')
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+    _compare_reports('EQ', adshs_to_consider)
 
 
 def test_compare_UN():
+    adshs_to_consider = sorted_adshs_in_both # [:100]
     _compare_reports('UN')
 
 

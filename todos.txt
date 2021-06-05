@@ -1,9 +1,10 @@
 Next
 ====
 
-extract evaluate_statement_in eigene Klasse
+
 
 - quartal vergleichen
+-- Tests results auch in DB ablegen, so dass  Filtern danach einfacher möglich ist
 -- saubere Reports pro Stmt Type, überprüfen, ob TagListe wirklich stimmen
 -- danach die weiteren Report Typen vergleichen
 -- 'Line' Reihenfolge muss noch geprüft werden...
@@ -19,13 +20,10 @@ Later
 =====
 
 Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
-
+- extract evaluate_statement_in als eigener Schritt vor Process
 - generation der sub.txt dateien, soweit sinnvoll
-
 - zippen von xml dateien
-
 - Reihenfolge der Spalten in den geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
-
 -handhaben von
    3.4. there are some rare cases of statements (4 statements in 5500 reports for q1 2021) that contain multiple root_nodes.
      -> not supported yet. -> idee, zählen der Kinder und den Root mit den meisten children nehmen

@@ -27,7 +27,7 @@ class StmtConfidence:
         return max(self.byRole, self.byRoot, self.byLabel)
 
     def get_confidence_sum(self):
-        return self.byLabel + self.byRole + self.byRole
+        return self.byLabel + self.byRole + self.byRoot
 
 
 class SecPreXmlStatementTypeEvaluator:
@@ -189,7 +189,15 @@ class SecPreXmlStatementTypeEvaluator:
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
                 EvalEntry(
+                    includes=['consolidated', 'statement', 'revenue'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
                     includes=['consolidated', 'statement', 'earnings'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['condensed', 'statement', 'earnings'],
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
                 EvalEntry(
@@ -206,7 +214,7 @@ class SecPreXmlStatementTypeEvaluator:
                     confidence=3),
                 EvalEntry(
                     includes=['statement', 'operation'],
-                    excludes=['comprehensive', 'detail'],
+                    excludes=['comprehensive', 'detail', 'presentation'],
                     confidence=3),
                 EvalEntry(
                     includes=['statement', 'income'],
@@ -216,6 +224,26 @@ class SecPreXmlStatementTypeEvaluator:
                     includes=['statement', 'loss'],
                     excludes=['comprehensive', 'detail'],
                     confidence=3),
+                EvalEntry(
+                    includes=['statement', 'earnings'],
+                    excludes=['comprehensive', 'detail'],
+                    confidence=3),
+                EvalEntry( # case 00000007789-21-000018 -> IS parenth contains detail in name
+                    includes=['consolidated', 'statement','income','parenthetical'],
+                    excludes=['comprehensive'],
+                    confidence=3),
+                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=['consolidated', 'statement','income','parenthetical'],
+                    excludes=['comprehensive'],
+                    confidence=3),
+                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=['consolidatedbalancesheet_parentheticals0'],
+                    excludes=['comprehensive'],
+                    confidence=6),
+                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=['consolidatedbalancesheet0'],
+                    excludes=['comprehensive'],
+                    confidence=6),
             ],
             root_keys=[
                 EvalEntry(
@@ -243,6 +271,10 @@ class SecPreXmlStatementTypeEvaluator:
                     excludes=['detail'],
                     confidence=3),
                 EvalEntry(
+                    includes=['comprehensive','condensed', 'statement', 'earnings'],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
                     includes=['comprehensive', 'consolidated', 'statement', 'loss'],
                     excludes=['detail'],
                     confidence=3),
@@ -255,23 +287,40 @@ class SecPreXmlStatementTypeEvaluator:
                     excludes=['detail'],
                     confidence=3),
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'operation'],
+                    includes=['comprehensive', 'consolidated', 'statement', 'loss'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'operation'],
+                    includes=['comprehensive', 'statement', 'income'],
                     excludes=['detail'],
-                    confidence=2),
+                    confidence=3),
+                EvalEntry(
+                    includes=['comprehensive','statement', 'loss'],
+                    excludes=['detail'],
+                    confidence=3),
+                EvalEntry(
+                    includes=['comprehensive', 'statement', 'operation'],
+                    excludes=['detail'],
+                    confidence=3),
+
+                EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'income'],
+                    excludes=['detail'],
+                    confidence=3),
             ],
             root_keys=[
                 EvalEntry(
                     includes=['comprehensive', 'income', 'statement', 'abstract'],
                     excludes=[],
                     confidence=2),
+                EvalEntry(
+                    includes=['income', 'statement', 'abstract'],
+                    excludes=[],
+                    confidence=1),
             ],
             label_list=[
                 EvalEntry(
-                    includes=['comprehensiveincome'],
+                    includes=['comprehensiveincome', 'income','loss'],
                     excludes=['asset'],
                     confidence=1
                 )

@@ -30,12 +30,20 @@ parentheticals cases werden nicht gefunden
                             - role="http://solaredge.com/role/sedg-cbsp"
     '0001206774-21-000530'  - role="http://cassinfo.com/role/cass-cbs1"
                              - role="http://cassinfo.com/role/cass-cbsp1"
-    '0001553350-21-000261'   - role="http://lightwavelogic.com/role/lwlg-bs">
-                             - role="http://lightwavelogic.com/role/lwlg-bsp">
+    '0001553350-21-000261'   - role="http://lightwavelogic.com/role/lwlg-bs      BS
+                             - role="http://lightwavelogic.com/role/lwlg-bsp     BS inpth
+
 Spezielfälle IS:
  0001193125-21-081336 -> ConsolidatedStatementsOfNetAssets ConsolidatedStatementsOfChangesInNetAssets LiquidationPlan
                          in Liquidation
+ 0001193125-21-040108 -> in Liquidation   
+ 0001140361-21-004772 -> in Liquidation
+                       
  0001213900-21-009521 -> role und root als BS, obwohl eigentlich IS -> obwohl schon anderes BS vorhanden
+ 
+ 
+## Fehler in Zip
+ 0001564590-21-009011 -> EQ inpth wird in Zip als IS inpth markiert 
 
 ## IS
 Stand 02.06.2021

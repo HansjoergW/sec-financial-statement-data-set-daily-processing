@@ -215,23 +215,25 @@ class SecPreXmlDataProcessor:
                 for stmt_key in stmt_canditates_keys:
                     confidence: StmtConfidence = stmt_canditates_dict[stmt_key]
 
-                    if confidence.get_max_confidenc() == 3:
-                        conf_of_3_list.append(stmt_key)
+                    # if confidence.get_max_confidenc() == 3:
+                    #     conf_of_3_list.append(stmt_key)
 
                     sum_of_confidence = confidence.get_confidence_sum()
                     if sum_of_confidence > max_sum_of_confidence:
                         max_sum_of_confidence = sum_of_confidence
                         max_sum_of_confidence_stmt = stmt_key
 
-                if len(conf_of_3_list) == 1:
-                    stmt = conf_of_3_list[0]
-                else:
-                    if len(conf_of_3_list) > 1:
-                        logging.info(
-                            "{} has confidence of 2 for several statement types {}".format(reportinfo.adsh,
-                                                                                           conf_of_3_list))
+                # if len(conf_of_3_list) == 1:
+                #     stmt = conf_of_3_list[0]
+                # else:
+                #     if len(conf_of_3_list) > 1:
+                #         logging.info(
+                #             "{} has confidence of 2 for several statement types {}".format(reportinfo.adsh,
+                #                                                                            conf_of_3_list))
+                #
+                #     stmt = max_sum_of_confidence_stmt
 
-                    stmt = max_sum_of_confidence_stmt
+                stmt = max_sum_of_confidence_stmt
 
             if result.get((stmt, inpth)) == None:
                 result[(stmt, inpth)] = []
@@ -285,6 +287,17 @@ class SecPreXmlDataProcessor:
 
         return result
 
+
+    def _post_process_is(self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
+
+        result: List[PresentationReport] =  self._post_process_general(stmt_type, stmt_list)
+
+        # just the label hint is not enough for IS
+        if (inpth==0) and (result[0].stmt_canditates['IS'].get_confidence_sum() == 1):
+            return []
+
+        return result
+
     def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
             Tuple[List[PresentationEntry], List[Tuple[str, str, str]]]:
 
@@ -310,10 +323,13 @@ class SecPreXmlDataProcessor:
                 stmt_list = self._post_process_general('BS', stmt_list)
 
             if stmt is 'IS':
-                stmt_list = self._post_process_general('IS', stmt_list)
+                stmt_list = self._post_process_is('IS', inpth, stmt_list)
 
             if stmt is 'CI':
                 stmt_list = self._post_process_general('CI', stmt_list)
+
+            if stmt is 'CF':
+                stmt_list = self._post_process_general('CF', stmt_list)
 
             for report in stmt_list:
                 entries: List[PresentationEntry] = report.entries

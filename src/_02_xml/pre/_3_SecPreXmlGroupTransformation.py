@@ -18,7 +18,7 @@ class SecPreXmlGroupTransformer:
     key_tag_separator = '$$$'
 
     # keywords of role definition that should be ignored
-    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-']
+    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-', 'role/disclosure']
 
     def __init__(self):
         pass
