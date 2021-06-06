@@ -334,22 +334,33 @@ class SecPreXmlStatementTypeEvaluator:
         'CF': StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'cashflow'],
+                    includes=['consolidated', 'statement', 'cash', 'flow'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry( # spelling error 0001052918-21-000009
+                    includes=['consoldiated','statement', 'cash', 'flow'],
                     excludes=[],
                     confidence=3),
                 EvalEntry(
-                    includes=['condensed', 'statement', 'cashflow'],
+                    includes=['condensed', 'statement', 'cash', 'flow'],
                     excludes=[],
                     confidence=3),
                 EvalEntry(
-                    includes=['consolidated', 'cashflow'],
+                    includes=['consolidated', 'cash', 'flow'],
                     excludes=[],
                     confidence=3),
                 EvalEntry(
-                    includes=['condensed', 'cashflow'],
+                    includes=['condensed', 'cash', 'flow'],
                     excludes=[],
                     confidence=3),
-
+                EvalEntry(
+                    includes=['statement', 'cash', 'flow'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'cash', 'receipt', 'disbursement'],
+                    excludes=[],
+                    confidence=3),
             ],
 
             # SonderFall für diesen hier kann man nicht so einfach excluden...
@@ -365,7 +376,12 @@ class SecPreXmlStatementTypeEvaluator:
                     includes=['statement', 'cashflow'],
                     excludes=[],
                     confidence=3), ],
-            label_list=[]
+            label_list=[
+                EvalEntry(
+                    includes=['netcashprovided','operatingactivities'],
+                    excludes=[],
+                    confidence=6),
+            ]
         )
     }
 

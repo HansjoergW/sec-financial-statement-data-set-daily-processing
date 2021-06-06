@@ -98,6 +98,7 @@ def _compare_reports(type: str, adshs_to_consider: List[str]):
     merged_groupby = pd.merge(xml_bs_group_df, zip_bs_group_df, how="outer", left_index=True, right_index=True)
     merged_groupby['equal'] = merged_groupby['report_xml'] == merged_groupby['report_zip']
     merged_groupby_diff = merged_groupby[merged_groupby.equal == False]
+    merged_groupby_diff.sort_index(inplace=True, level=['inpth'])
 
     xml_adshs_with_bs = set(xml_bs_df.adsh.unique().tolist())
     xml_adshs_without_bs = set(adshs_to_consider) - xml_adshs_with_bs
