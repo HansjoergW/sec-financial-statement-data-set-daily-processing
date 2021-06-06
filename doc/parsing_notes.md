@@ -58,6 +58,9 @@
     '0001553350-21-000261'  - role="http://lightwavelogic.com/role/lwlg-bs"
                             - role="http://lightwavelogic.com/role/lwlg-bsp"
 3.12. IS/CI sometimes only differ in the labels that are present while role and root are the same.
+3.13. There are entries which can have two CI. One is a "normal" IS with one or more comprehensive entries.
+      that one should be recognized as IS, and the second is a "normal" CI
+      '0000766704-21-000018'
 
 
 

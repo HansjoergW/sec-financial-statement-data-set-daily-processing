@@ -263,6 +263,10 @@ class SecPreXmlStatementTypeEvaluator:
         'CI': StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
+                    includes=['comprehensive', 'consolidated', 'statement', 'operation', 'loss'],
+                    excludes=['detail'],
+                    confidence=6),
+                EvalEntry(
                     includes=['comprehensive', 'consolidated', 'statement', 'income'],
                     excludes=['detail'],
                     confidence=3),
@@ -320,7 +324,7 @@ class SecPreXmlStatementTypeEvaluator:
             ],
             label_list=[
                 EvalEntry(
-                    includes=['comprehensiveincome', 'income','loss'],
+                    includes=['comprehensive'],
                     excludes=['asset'],
                     confidence=1
                 )

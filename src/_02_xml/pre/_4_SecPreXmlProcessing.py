@@ -298,6 +298,34 @@ class SecPreXmlDataProcessor:
 
         return result
 
+    def _post_process_ci(self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
+
+        if inpth == 1:
+            return self._post_process_general(stmt_type, stmt_list)
+
+        # ignore only by label
+        not_only_by_label: List[PresentationReport] = []
+        role_conf_3: List[PresentationReport] = []
+        max_role: int = 0
+
+        for report in stmt_list:
+            if report.stmt_canditates['CI'].get_confidence_sum() > 1:
+                not_only_by_label.append(report)
+            if (report.stmt_canditates['CI'].byRole == 3) and (report.stmt_canditates['CI'].get_confidence_sum() > 3):
+                role_conf_3.append(report)
+            max_role = max(max_role, report.stmt_canditates['CI'].byRole)
+
+        # in case max_role > 3 or  not more than 1 role with conf 3
+        #  -> the standard in general approach can be used
+        if (max_role > 3) or (len(role_conf_3) < 2) :
+            return self._post_process_general(stmt_type, stmt_list)
+
+        # if there is more than one entry with byrole confidence of 3, we take the one with the most labels!
+        # case: 0000766704-21-000018 -> actually two valid CIs entries > first is an IS with comprehensive Tag
+        # we just return the first two, there shoudln't be more
+
+        return role_conf_3[:2]
+
     def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
             Tuple[List[PresentationEntry], List[Tuple[str, str, str]]]:
 
@@ -312,10 +340,11 @@ class SecPreXmlDataProcessor:
             = self._post_process_assign_report_to_stmt(report_data)
 
         reportnr = 0
+
+        selected: Dict[Tuple[str, int], List[PresentationReport]] = {}
         for stmtkey, stmt_list in stmt_data.items():
             stmt, inpth = stmtkey
 
-            # todo: check if it is really necessary that a list is returned
             if stmt is 'CP':
                 stmt_list = self._post_process_cp(stmt_list)
 
@@ -326,10 +355,12 @@ class SecPreXmlDataProcessor:
                 stmt_list = self._post_process_is('IS', inpth, stmt_list)
 
             if stmt is 'CI':
-                stmt_list = self._post_process_general('CI', stmt_list)
+                stmt_list = self._post_process_ci('CI', inpth, stmt_list)
 
             if stmt is 'CF':
                 stmt_list = self._post_process_general('CF', stmt_list)
+
+            selected[stmtkey] = stmt_list
 
             for report in stmt_list:
                 entries: List[PresentationEntry] = report.entries
@@ -337,6 +368,33 @@ class SecPreXmlDataProcessor:
                 for entry in entries:
                     entry.report = reportnr
                     entry.inpth = inpth
+
+
+        if (len(selected.get(('CI', 0), [])) > 1) and (len(selected.get(('IS',0), [])) == 0):
+            # case 3.12 / 0000766704-21-000018
+            # falls zwei CIs und kein IS, CI mit mehr labels wird zum IS
+            # wird übersteuert, ohne Berücksichtigung von inpth
+
+            ci_reports = selected[('CI', 0)]
+            max_label_count: int = 0
+
+            for report in ci_reports:
+                max_label_count = max(max_label_count, len(report.loc_list))
+
+            for report in ci_reports:
+                if len(report.loc_list) == max_label_count:
+                    selected[('IS', 0)] = [report]
+                else:
+                    selected[('CI', 0)] = [report]
+
+
+        for stmtkey, stmt_list in selected.items():
+            stmt, inpth = stmtkey
+
+            for report in stmt_list:
+                entries: List[PresentationEntry] = report.entries
+                reportnr += 1
+                for entry in entries:
                     entry.stmt = stmt
 
                 results.extend(entries)

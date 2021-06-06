@@ -40,11 +40,16 @@ Spezielfälle IS:
  0001140361-21-004772 -> in Liquidation
                        
  0001213900-21-009521 -> role und root als BS, obwohl eigentlich IS -> obwohl schon anderes BS vorhanden
- 
+
+Spezialfälle CI
+ 0000750004-21-000008 -> 2 gültige CIs -> erstes wie IS, mit einem comprehensive Eintrag Länge 35, zweites Länge 8  
+ 0001453818-21-000008 -> IS nicht korrekt erkannt, daher CI nicht als IS markiert
  
 ## Fehler in Zip
  0001564590-21-009011 -> EQ inpth wird in Zip als IS inpth markiert 
-
+ 0000070866-21-000011 -> BS inpth wird in Zip als CI inpth markiert
+ 0000074260-21-000021 -> CF inpth in ZIp as CI
+ 
 ## IS
 Stand 02.06.2021
     ADSH with IS Entries in XML:  5449

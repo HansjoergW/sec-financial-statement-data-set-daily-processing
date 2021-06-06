@@ -160,7 +160,7 @@ def test_compare_EQ():
 
 def test_compare_UN():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('UN')
+    _compare_reports('UN', adshs_to_consider)
 
 
 """
