@@ -19,7 +19,7 @@ def get_pre_xml_content_by_adsh(adsh: str)-> str :
 
 def get_pre_xml_content_from_file(file: str)-> str:
     with open(file, "r", encoding="utf-8") as f:
-        return  f.read()
+        return f.read()
 
 
 def parse_content(adsh, content:  str):
@@ -41,17 +41,17 @@ if __name__ == '__main__':
     # adsh = "0001254699-21-000005" # CF   missing wegen multiple root nodes
     # adsh = "0001628280-21-002278" # CF   missing wegen multiple root nodes
 
-
-    # adsh = "0001193125-21-102032" # CF   0
-    # adsh = "0001213900-21-019100" # CF   0
-    # adsh = "0001254699-21-000005" # CF   0
-    # adsh = "0001628280-21-002278" # CF   0
-    # adsh = "0000004977-21-000047" # CF   1
-    # adsh = "0000016918-21-000010" # CF   1
-    # adsh = "0000029905-21-000010" # CF   1
-    # adsh = "0000313616-21-000045" # CF   1
-    # adsh = "0000715787-21-000009" # CF   1
-    # adsh = "0000787250-21-000007" # CF   1
+next set
+    # adsh = "0001078782-21-000120" # EQ   0
+    # adsh = "0001078782-21-000166" # EQ   0
+    # adsh = "0001078782-21-000172" # EQ   0
+    # adsh = "0001096906-21-000399" # EQ   0
+    # adsh = "0001096906-21-000417" # EQ   0
+    # adsh = "0001096906-21-000436" # EQ   0
+    # adsh = "0001096906-21-000481" # EQ   0
+    # adsh = "0001096906-21-000496" # EQ   0
+    # adsh = "0001104659-21-044701" # EQ   0
+    # adsh = "0001366744-21-000009" # EQ   0
 
     # adsh = ""
     # adsh = "" # missing IS

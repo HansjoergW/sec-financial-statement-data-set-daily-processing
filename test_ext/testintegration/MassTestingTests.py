@@ -127,6 +127,8 @@ def _compare_reports(type: str, adshs_to_consider: List[str]):
     print(f"\n{type} not in xml (first 10): ", merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
     print(f"\n{type} not in zip (first 10): ", merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10])
 
+    # todo: w/o inpth separat anzeigen
+
 
 def test_compare_CP():
     adshs_to_consider = sorted_adshs_in_both # [:100]

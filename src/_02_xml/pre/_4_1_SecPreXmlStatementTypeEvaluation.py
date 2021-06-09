@@ -173,8 +173,53 @@ class SecPreXmlStatementTypeEvaluator:
                     includes=['statement', 'stockowner', 'equity'],
                     excludes=[],
                     confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement', 'partner','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['shareholder', 'equity','type'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','changes','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','stockholder','deficit'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'changes','stockholder','deficit'],
+                    excludes=[],
+                    confidence=3),
             ],
-            root_keys=[],
+            root_keys=[
+                EvalEntry(
+                    includes=['statement', 'shareholder', 'equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'stockholder', 'equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'shareowner', 'equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'stockowner', 'equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'partner','capital'],
+                    excludes=[],
+                    confidence=3),
+            ],
             label_list=[]
         ),
 
