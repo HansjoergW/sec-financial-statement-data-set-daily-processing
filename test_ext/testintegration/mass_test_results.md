@@ -49,6 +49,7 @@ Spezialfälle CI
  0001564590-21-009011 -> EQ inpth wird in Zip als IS inpth markiert 
  0000070866-21-000011 -> BS inpth wird in Zip als CI inpth markiert
  0000074260-21-000021 -> CF inpth in ZIp as CI
+ 0001564590-21-013460 -> IS as EQ 
  
 ## CF
   ADSH with CF Entries in XML:  5385

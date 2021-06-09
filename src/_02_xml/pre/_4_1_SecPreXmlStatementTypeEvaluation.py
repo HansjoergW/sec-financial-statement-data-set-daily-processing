@@ -178,7 +178,15 @@ class SecPreXmlStatementTypeEvaluator:
                     excludes=[],
                     confidence=3),
                 EvalEntry(
+                    includes=['statement', 'members','equity'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
                     includes=['consolidated', 'statement', 'partner','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'changes', 'partner','capital'],
                     excludes=[],
                     confidence=3),
                 EvalEntry(
@@ -190,11 +198,39 @@ class SecPreXmlStatementTypeEvaluator:
                     excludes=[],
                     confidence=3),
                 EvalEntry(
-                    includes=['consolidated', 'statement','stockholder','deficit'],
+                    includes=['statement', 'changes','members','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'changes','trust','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement','stockholder','deficit'],
                     excludes=[],
                     confidence=3),
                 EvalEntry(
                     includes=['statement', 'changes','stockholder','deficit'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','shareholder','deficit'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','shareowner','deficit'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'changes','shareholder','deficit'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','capital','stock'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['consolidated', 'statement','capitalization'],
                     excludes=[],
                     confidence=3),
             ],
@@ -217,6 +253,10 @@ class SecPreXmlStatementTypeEvaluator:
                     confidence=3),
                 EvalEntry(
                     includes=['statement', 'partner','capital'],
+                    excludes=[],
+                    confidence=3),
+                EvalEntry(
+                    includes=['statement', 'members','equity'],
                     excludes=[],
                     confidence=3),
             ],
