@@ -4,7 +4,7 @@ from testintegration.MassTestingTools import read_mass_pre_xml_content, read_mas
 
 import pytest
 
-from typing import List, Dict, Tuple, Set
+from typing import List, Dict, Tuple, Set, Union
 from multiprocessing import Pool
 import logging
 import pandas as pd
@@ -34,8 +34,8 @@ adshs_in_both = adshs_in_xml.union(adshs_in_zip)
 sorted_adshs_in_both = sorted(list(adshs_in_both))
 
 
-def filter_for_adsh_and_statement(df: pd.DataFrame, adshs: List[str], stmt: str) -> pd.DataFrame:
-    return df[df.adsh.isin(adshs) & (df.stmt == stmt)].copy()
+def filter_for_adsh_and_statement(df: pd.DataFrame, adshs: List[str], stmt: str, inpth: int) -> pd.DataFrame:
+    return df[df.adsh.isin(adshs) & (df.stmt == stmt) & (df.inpth == inpth)].copy()
 
 
 # compare adshs in the data
@@ -85,90 +85,125 @@ def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[int
     return len(not_matching_df), len(not_exact_length_df)
 
 
-def _compare_reports(type: str, adshs_to_consider: List[str]):
-    xml_bs_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, type)
-    zip_bs_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, type)
+def _compare_reports(type: str, inpth: int, adshs_to_consider: List[str]) -> Dict[str, Union[str, int]]:
+    xml_df = filter_for_adsh_and_statement(xml_data_df, adshs_to_consider, type, inpth)
+    zip_df = filter_for_adsh_and_statement(zip_data_df, adshs_to_consider, type, inpth)
 
-    xml_bs_group_df = xml_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
-    zip_bs_group_df = zip_bs_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
+    xml_group_df = xml_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
+    zip_group_df = zip_df[['adsh', 'stmt', 'inpth','report']].groupby(['adsh', 'stmt', 'inpth']).count()
 
-    xml_bs_group_df.rename(columns = lambda x: x + '_xml', inplace=True)
-    zip_bs_group_df.rename(columns = lambda x: x + '_zip', inplace=True)
+    xml_group_df.rename(columns = lambda x: x + '_xml', inplace=True)
+    zip_group_df.rename(columns = lambda x: x + '_zip', inplace=True)
 
-    merged_groupby = pd.merge(xml_bs_group_df, zip_bs_group_df, how="outer", left_index=True, right_index=True)
+    merged_groupby = pd.merge(xml_group_df, zip_group_df, how="outer", left_index=True, right_index=True)
     merged_groupby['equal'] = merged_groupby['report_xml'] == merged_groupby['report_zip']
     merged_groupby_diff = merged_groupby[merged_groupby.equal == False]
     merged_groupby_diff.sort_index(inplace=True, level=['inpth'])
 
-    xml_adshs_with_bs = set(xml_bs_df.adsh.unique().tolist())
-    xml_adshs_without_bs = set(adshs_to_consider) - xml_adshs_with_bs
+    xml_adshs_with = set(xml_df.adsh.unique().tolist())
+    xml_adshs_without = set(adshs_to_consider) - xml_adshs_with
 
-    zip_adshs_with_bs = set(zip_bs_df.adsh.unique().tolist())
-    zip_adshs_without_bs = set(adshs_to_consider) - zip_adshs_with_bs
+    zip_adshs_with = set(zip_df.adsh.unique().tolist())
+    zip_adshs_without = set(adshs_to_consider) - zip_adshs_with
 
-    print("")
-    print(f"ADSH with {type} Entries in XML: ", len(xml_adshs_with_bs))
-    print(f"ADSH with {type} Entries in ZIP: ", len(zip_adshs_with_bs))
-    print(f"{type} Entries in XML       : ", len(xml_bs_df))
-    print(f"{type} Entries in ZIP       : ", len(zip_bs_df))
-    print(f"XML adshs without {type}    : ", len(xml_adshs_without_bs), " - " , xml_adshs_without_bs)
-    print(f"ZIP adshs without {type}    : ", len(zip_adshs_without_bs), " - " , zip_adshs_without_bs)
-    missing_in_both = xml_adshs_without_bs.intersection(zip_adshs_without_bs)
-    missing_in_xml = xml_adshs_without_bs - zip_adshs_without_bs
-    missing_in_zip = zip_adshs_without_bs - xml_adshs_without_bs
-    print(f"missing in both         : ", len(missing_in_both), ' - ', missing_in_both)
-    print(f"only missing in xml     : ", len(missing_in_xml), ' - ',  missing_in_xml)
-    print(f"only missing in zip     : ", len(missing_in_zip), ' - ',  missing_in_zip)
-    print(f"\nentries with unmatching tags: ", _compare_attributes(xml_bs_df, zip_bs_df))
+    missing_in_both = xml_adshs_without.intersection(zip_adshs_without)
+    missing_in_xml = xml_adshs_without - zip_adshs_without
+    missing_in_zip = zip_adshs_without - xml_adshs_without
+    nr_unmatching_tags, nr_of_add_tags_in_xml = _compare_attributes(xml_df, zip_df)
 
-    print(f"\nunequal counts:         : ", len(merged_groupby_diff))
-    print(f"{type} reports not in xml   : ", len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]))
-    print(f"{type} reports not in zip   : ", len(merged_groupby_diff[merged_groupby_diff.report_zip.isna()]))
-    print(f"\n{type} not in xml (first 10): ", merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10])
-    print(f"\n{type} not in zip (first 10): ", merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10])
+    data_dict: Dict[str, Union[str, int]] = {
+        "nr_adshs_with_in_xml" : len(xml_adshs_with),
+        "nr_adshs_with_in_zip" : len(zip_adshs_with),
+        # "nr_entries_in_xml"    : len(xml_df),
+        # "nr_entries_in_zip"    : len(zip_df),
 
-    # todo: w/o inpth separat anzeigen
+        "nr_adshs_without_in_xml": len(xml_adshs_without),
+        "first_ten_adshs_without_in_xml": str(list(xml_adshs_without)[:10]),
+        "nr_adshs_without_in_zip": len(zip_adshs_without),
+        "first_ten_adshs_without_in_zip": str(list(zip_adshs_without)[:10]),
+
+        "nr_missing_in_both" : len(missing_in_both),
+        "first_ten_missing_in_both": str(list(missing_in_both)[:10]),
+
+        "nr_missing_in_xml": len(missing_in_xml),
+        "first_ten_missing_in_xml": str(list(missing_in_xml)[:10]),
+        "nr_missing_in_zip": len(missing_in_zip),
+        "first_ten_missing_in_zip": str(list(missing_in_zip)[:10]),
+
+        "nr_unmatching_tags": nr_unmatching_tags,
+        "nr_of_add_tags_in_xml": nr_of_add_tags_in_xml,
+
+        "report_unequal_count": len(merged_groupby_diff),
+        "nr_report_not_in_xml": len(merged_groupby_diff[merged_groupby_diff.report_xml.isna()]),
+        "nr_report_not_in_zip": len(merged_groupby_diff[merged_groupby_diff.report_zip.isna()]),
+        "first_ten_report_not_in_xml":  str(merged_groupby_diff[merged_groupby_diff.report_xml.isna()][:10]),
+        "first_ten_report_not_in_zip":  str(merged_groupby_diff[merged_groupby_diff.report_zip.isna()][:10]),
+    }
+
+    return data_dict
+
+def print_data_dict(stmt:str, inpth: int, data_dict: Dict[str, Union[str, int]]):
+    print("\n----------------------------------------------------")
+    print(f"{stmt} - {inpth}")
+    print(f"ADSHs with entries in xml   : ", data_dict['nr_adshs_with_in_xml'])
+    print(f"ADSHs with entries in zip   : ", data_dict['nr_adshs_with_in_zip'])
+    # print(f"Entries in XML              : ", data_dict['nr_entries_in_xml'])
+    # print(f"Entries in ZIP              : ", data_dict['nr_entries_in_zip'])
+    print(f"Xml adshs without           : ", data_dict['nr_adshs_without_in_xml'], " - " , data_dict['first_ten_adshs_without_in_xml'])
+    print(f"Zip adshs without           : ", data_dict['nr_adshs_without_in_zip'], " - " , data_dict['first_ten_adshs_without_in_zip'])
+
+    print(f"Missing in both             : ", data_dict['nr_missing_in_both'],   ' - ', data_dict['first_ten_missing_in_both'])
+    print(f"Only missing in xml         : ", data_dict['nr_missing_in_xml'], ' - ', data_dict['first_ten_missing_in_xml'])
+    print(f"Only missing in zip         : ", data_dict['nr_missing_in_zip'], ' - ', data_dict['first_ten_missing_in_zip'])
+
+    print(f"Entries with unmatching tags: (", data_dict['nr_unmatching_tags'], " / ", data_dict['nr_of_add_tags_in_xml'], ")")
+    print("\n")
+    print(f"Unequal counts:             : ", data_dict['report_unequal_count'])
+    print(f"Reports not in xml          : ", data_dict['nr_report_not_in_xml'])
+    print(f"Reports not in zip          : ", data_dict['nr_report_not_in_zip'])
+    print(f"\nnot in xml (first 10)     : ", data_dict['first_ten_report_not_in_xml'])
+    print(f"\nnot in zip (first 10)     : ", data_dict['first_ten_report_not_in_zip'])
+
+
+def _compare_and_print(type: str, inpth: int, adshs_to_consider: List[str]):
+    data = _compare_reports(type, inpth, adshs_to_consider)
+    print_data_dict(type, inpth, data)
 
 
 def test_compare_CP():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('CP', adshs_to_consider)
-
+    _compare_and_print('CP', 0, adshs_to_consider)
 
 def test_compare_BS():
     adshs_to_consider = sorted_adshs_in_both # [:100]
     #adshs_to_consider = ["0000883984-21-000005"]
-    _compare_reports('BS', adshs_to_consider)
+    _compare_and_print('BS', 0, adshs_to_consider)
+    _compare_and_print('BS', 1, adshs_to_consider)
 
 
 def test_compare_IS():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('IS', adshs_to_consider)
+    _compare_and_print('IS', 0, adshs_to_consider)
+    _compare_and_print('IS', 1, adshs_to_consider)
 
 
 def test_compare_CI():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('CI', adshs_to_consider)
+    _compare_and_print('CI', 0, adshs_to_consider)
+    _compare_and_print('CI', 1, adshs_to_consider)
 
 
 def test_compare_CF():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('CF', adshs_to_consider)
+    _compare_and_print('CF', 0, adshs_to_consider)
+    _compare_and_print('CF', 1, adshs_to_consider)
 
 
 def test_compare_EQ():
     adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('EQ', adshs_to_consider)
+    _compare_and_print('EQ', 0, adshs_to_consider)
+    _compare_and_print('EQ', 1, adshs_to_consider)
 
-
-def test_compare_UN():
-    adshs_to_consider = sorted_adshs_in_both # [:100]
-    _compare_reports('UN', adshs_to_consider)
-
-
-"""
-
-"""
 
 
 # Tests
