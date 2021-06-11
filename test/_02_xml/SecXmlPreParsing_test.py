@@ -17,7 +17,7 @@ def test_parse():
     f.close()
 
     parser = SecPreXmlParser()
-    df = parser.parse(xml_exp_content)
+    df, errorlist = parser.parse("", xml_exp_content)
 
     assert 45 == len(df)
     assert 9 == len(df.columns)
@@ -29,7 +29,7 @@ def test_clean_for_pure_pre():
     f.close()
 
     parser = SecPreXmlParser()
-    df = parser.parse(xml_exp_content)
+    df, errorlist = parser.parse("", xml_exp_content)
     df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
 
     assert 45 == len(df_clean)
@@ -40,7 +40,7 @@ def test_complete_file_parse():
 
     with open(xml_complete_pre_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
-        df = parser.parse(xml_content)
+        df, errorlist = parser.parse("", xml_content)
         print(len(df))
 
 
@@ -50,7 +50,7 @@ def test_unsorted_loc_file_parse():
     f.close()
 
     parser = SecPreXmlParser()
-    df = parser.parse(xml_exp_content)
+    df, errorlist = parser.parse("", xml_exp_content)
     df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
 
     assert len(df_clean[df_clean.index.isin(["IS"], level="stmt")]) > 0

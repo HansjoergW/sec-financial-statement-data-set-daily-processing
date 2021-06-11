@@ -1,7 +1,7 @@
 Next
 ====
 
-CodeRefactoring für Num umsetzen
+UnitTests umschreiben für Num
 Masstest für Num umsetzen
 
 
@@ -25,6 +25,7 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 
 Done
 ====
+11.06.2021 - CodeRefactoring für Num umsetzen
 11.06.2021 - Reihenfolge testen in Mastest für Pre
 31.05.2021 - umbauen dictionaries mit https://realpython.com/python-data-classes/
 29.05.2021 - erfolgreich BS und CP parsen, nur noch sehr wenige Ausnahmen

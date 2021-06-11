@@ -1,9 +1,8 @@
 from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
-from _02_xml.pre.SecPreXmlTransformation import SecPreXmlTransformer
-from _02_xml.pre.SecPreXmlProcessing import SecPreXmlDataProcessor
+from _02_xml.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
+from _02_xml.pre._3_SecPreXmlGroupTransformation import  SecPreXmlGroupTransformer
+from _02_xml.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor
 
-
-from typing import List, Dict, Union
 import os
 
 scriptpath = os.path.realpath(__file__ + "/..")
@@ -14,6 +13,7 @@ testprexml_numbered_label = data_folder + "0000016160-21-000018-calm-20210227_pr
 
 extractor = SecPreXmlExtractor()
 transformer = SecPreXmlTransformer()
+grouptransformer = SecPreXmlGroupTransformer()
 processor = SecPreXmlDataProcessor()
 
 
@@ -21,8 +21,9 @@ def test_process():
     with open(testprexml_numbered_label, "r", encoding="utf-8") as f:
         content: str = f.read()
 
-        data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = extractor.extract("", content)
-        data_transformed: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = transformer.transform("", data)
-        data_processed = processor.process("", data_transformed)
+        data = extractor.extract("", content)
+        data_transformed= transformer.transform("", data)
+        data_grouptransformed= grouptransformer.grouptransform("", data_transformed)
+        data_processed = processor.process("", data_grouptransformed)
 
         print(len(data_processed))

@@ -27,7 +27,7 @@ def read_xml() -> pd.DataFrame:
     parser = SecNumXmlParser()
     with open(xml_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
-        df_xml = parser.parse(xml_content)
+        df_xml, errorlist = parser.parse("", xml_content)
         df_xml = parser.clean_for_financial_statement_dataset(df_xml, '0000320193-20-000096')
         df_xml.drop(['coreg', 'footnote'], axis=1, inplace=True)
         return df_xml

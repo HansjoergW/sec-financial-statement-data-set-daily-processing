@@ -1,7 +1,7 @@
 from _00_common.DBManagement import DBManager
 from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
-from _02_xml.SecXmlFileDownloading import SecXmlFileProcessor
+from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
 
 import logging
@@ -56,9 +56,9 @@ class SecXMLProcessingOrchestrator():
         self._postprocess_index_data()
 
     def _download_xml(self):
-        secxmlfilesprocessor = SecXmlFileProcessor(self.dbmanager, self.xmldir)
-        secxmlfilesprocessor.downloadNumFiles()
-        secxmlfilesprocessor.downloadPreFiles()
+        secxmlfilesdownloader = SecXmlFileDownloader(self.dbmanager, self.xmldir)
+        secxmlfilesdownloader.downloadNumFiles()
+        secxmlfilesdownloader.downloadPreFiles()
 
     def _parse_xml(self):
         secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)

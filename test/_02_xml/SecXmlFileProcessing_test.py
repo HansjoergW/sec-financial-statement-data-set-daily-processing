@@ -1,5 +1,5 @@
 from _00_common.DBManagement import DBManager
-from _02_xml.SecXmlFileDownloading import SecXmlFileProcessor
+from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 import shutil
 import pytest
 import os
@@ -18,7 +18,7 @@ def dbmgr():
     shutil.rmtree(folder)
 
 def test_download_num_xml(dbmgr: DBManager):
-    processor = SecXmlFileProcessor(dbmgr, folder)
+    processor = SecXmlFileDownloader(dbmgr, folder)
 
     processor.downloadNumFiles()
 
@@ -27,7 +27,7 @@ def test_download_num_xml(dbmgr: DBManager):
 
 
 def test_download_pre_xml(dbmgr: DBManager):
-    processor = SecXmlFileProcessor(dbmgr, folder)
+    processor = SecXmlFileDownloader(dbmgr, folder)
 
     processor.downloadPreFiles()
 
