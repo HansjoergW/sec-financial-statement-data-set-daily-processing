@@ -9,7 +9,7 @@ from typing import List,Tuple,Callable
 from time import time, sleep
 from multiprocessing import Pool
 
-class SecXmlFileProcessor:
+class SecXmlFileDownloader:
     """
     - downloads the desired sec xml files, stores them and updates the sec-processing table
     """

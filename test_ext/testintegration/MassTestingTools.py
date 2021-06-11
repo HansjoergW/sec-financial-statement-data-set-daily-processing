@@ -25,7 +25,8 @@ def convert_to_mass_report_test_df(dbmgr: DBManager, df: pd.DataFrame) -> Tuple[
     for groupname, groupdf in pre_by_adsh_grouped:
         stmt = groupdf.stmt.tolist()[0]
         inpth = groupdf.inpth.tolist()[0]
-        tags = groupdf.tag.tolist()
+        sorted_tags = groupdf[['tag','line']].sort_values(['line'])
+        tags = sorted_tags.tag.tolist()
         adsh = groupname[0]
         report = groupname[1]
 
@@ -228,5 +229,6 @@ if __name__ == '__main__':
     #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
     #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     #print(df.shape)
+    print('start xml')
     fill_mass_pre_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
 

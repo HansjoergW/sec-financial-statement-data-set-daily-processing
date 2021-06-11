@@ -61,15 +61,28 @@ def test_compare_adshs():
 
 
 def _compare_attribute(data: pd.Series):
-    xml_tag_set = set(data.loc['tagList_xml'].split(','))
-    zip_tag_set = set(data.loc['tagList_zip'].split(','))
+    xml_tag_list = data.loc['tagList_xml'].split(',')
+    zip_tag_list = data.loc['tagList_zip'].split(',')
+
+    xml_tag_set = set(xml_tag_list)
+    zip_tag_set = set(zip_tag_list)
+
+    not_in_xml_set = zip_tag_set - xml_tag_set
+    in_both_set = zip_tag_set.intersection(xml_tag_set)
+
+    both_xml_list = [x for x in xml_tag_list if x in in_both_set]
+    both_zip_list = [x for x in zip_tag_list if x in in_both_set]
+
+    in_order = sum([ x != y for x,y in zip(both_xml_list, both_zip_list)]) == 0
+
+    unequal_length = len(xml_tag_set) == len(zip_tag_set)
 
     # test für exact, oder komplett in xml vorhanden unterscheiden -> bei apply müsste man dann mit expand arbeiten
 
-    return len(zip_tag_set - xml_tag_set) == 0, len(xml_tag_set) == len(zip_tag_set)
+    return len(not_in_xml_set) == 0, unequal_length, in_order
 
 
-def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[List,List]:
+def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[List,List, List]:
     xml_idx = xml_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
     zip_idx = zip_df[['adsh', 'stmt', 'inpth', 'length','tagList']].set_index(['adsh', 'stmt', 'inpth'])
 
@@ -77,12 +90,13 @@ def _compare_attributes(xml_df: pd.DataFrame, zip_df: pd.DataFrame) -> Tuple[Lis
     zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
 
     merged_df = pd.merge(xml_idx, zip_idx, left_index=True, right_index=True)
-    merged_df[['tag_equals','tag_length_equals']] = merged_df.apply(_compare_attribute, axis = 1, result_type='expand')
+    merged_df[['tag_equals','tag_length_equals', 'tags_in_order']] = merged_df.apply(_compare_attribute, axis = 1, result_type='expand')
 
     not_matching_df = merged_df[merged_df['tag_equals'] == False]
     not_exact_length_df = merged_df[merged_df['tag_length_equals'] == False]
+    not_in_order = merged_df[merged_df['tags_in_order'] == False]
 
-    return not_matching_df.index.get_level_values('adsh').to_list(), not_exact_length_df.index.get_level_values('adsh').to_list()
+    return not_matching_df.index.get_level_values('adsh').to_list(), not_exact_length_df.index.get_level_values('adsh').to_list(), not_in_order.index.get_level_values('adsh').to_list()
 
 
 def _compare_reports(type: str, inpth: int, adshs_to_consider: List[str]) -> Dict[str, Union[str, int]]:
@@ -105,7 +119,7 @@ def _compare_reports(type: str, inpth: int, adshs_to_consider: List[str]) -> Dic
     missing_in_xml = xml_adshs_without - zip_adshs_without
     missing_in_zip = zip_adshs_without - xml_adshs_without
 
-    not_matching_list, not_exact_length_list = _compare_attributes(xml_df, zip_df)
+    not_matching_list, not_exact_length_list, not_in_order_list = _compare_attributes(xml_df, zip_df)
 
     data_dict: Dict[str, Union[str, int]] = {
         "nr_adshs_with_in_xml" : len(xml_adshs_with),
@@ -121,6 +135,8 @@ def _compare_reports(type: str, inpth: int, adshs_to_consider: List[str]) -> Dic
 
         "unmatching_tags": not_matching_list,
         "add_tags_in_xml": not_exact_length_list,
+        "tags_not_in_order": not_in_order_list,
+
     }
 
     return data_dict
@@ -136,12 +152,12 @@ def print_data_dict(stmt:str, inpth: int, data_dict: Dict[str, Union[str, int]])
     print("Zip adshs without           : ", len(data_dict['adshs_without_in_zip']), " - " , str(data_dict['adshs_without_in_zip'][:10]))
 
     print("Unequal counts:             : ", data_dict['report_unequal_count'])
-    print("Missing in both             : ", len(data_dict['missing_in_both']), ' - ', str(data_dict['missing_in_both'][:10]))
-    print("Only missing in xml         : ", len(data_dict['missing_in_xml']),  ' - ', str(data_dict['missing_in_xml'][:10]))
-    print("Only missing in zip         : ", len(data_dict['missing_in_zip']),  ' - ', str(data_dict['missing_in_zip'][:10]))
+    print("Missing in both             : ", len(data_dict['missing_in_both']),  ' - ', str(data_dict['missing_in_both'][:10]))
+    print("Only missing in xml         : ", len(data_dict['missing_in_xml']),   ' - ', str(data_dict['missing_in_xml'][:10]))
+    print("Only missing in zip         : ", len(data_dict['missing_in_zip']),   ' - ', str(data_dict['missing_in_zip'][:10]))
     print("Unmatching Tags             : ", len(data_dict['unmatching_tags']),  ' - ', str(data_dict['unmatching_tags'][:10]))
     print("Additional Tags             : ", len(data_dict['add_tags_in_xml']),  ' - ', str(data_dict['add_tags_in_xml'][:10]))
-
+    print("Not in order Tags           : ", len(data_dict['tags_not_in_order']),' - ', str(data_dict['tags_not_in_order'][:10]))
 
 def _compare_and_print(type: str, inpth: int, adshs_to_consider: List[str]):
     data = _compare_reports(type, inpth, adshs_to_consider)
@@ -151,6 +167,7 @@ def _compare_and_print(type: str, inpth: int, adshs_to_consider: List[str]):
 def test_compare_CP():
     adshs_to_consider = sorted_adshs_in_both # [:100]
     _compare_and_print('CP', 0, adshs_to_consider)
+
 
 def test_compare_BS():
     adshs_to_consider = sorted_adshs_in_both # [:100]

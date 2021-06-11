@@ -7,8 +7,7 @@ from _02_xml.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor, Presentat
 import pandas as pd
 
 from typing import Dict, List, Union, Tuple
-from dataclasses import asdict
-import pprint
+
 
 
 class SecPreXmlParser(SecXmlParserBase):

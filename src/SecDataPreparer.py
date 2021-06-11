@@ -1,7 +1,7 @@
 from _00_common.DBManagement import DBManager
 from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
-from _02_xml.SecXmlFileProcessing import SecXmlFileProcessor
+from _02_xml.SecXmlFileDownloading import SecXmlFileProcessor
 from _02_xml.SecXmlFileParsing import SecXmlParser
 
 import logging
