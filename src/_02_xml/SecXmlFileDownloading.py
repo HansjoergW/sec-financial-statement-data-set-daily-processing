@@ -32,8 +32,14 @@ class SecXmlFileDownloader:
         accessionnr = data_tuple[0]
         url = data_tuple[1]
 
-        try: size = int(data_tuple[2])
-        except ValueError: size = None
+        try:
+            if data_tuple[2] is not None:
+                size = int(data_tuple[2])
+            else:
+                size = None
+        except ValueError:
+            size = None
+
         xml_dir = data_tuple[3]
 
         if url == None:
@@ -53,7 +59,7 @@ class SecXmlFileDownloader:
     def _download_file_throttle(data_tuple: Tuple[str, str, str, str]) -> (str, str):
         # ensures that only one request per second is send
         start = time()
-        accession_nr, filename = SecXmlFileProcessor._download_file(data_tuple)
+        accession_nr, filename = SecXmlFileDownloader._download_file(data_tuple)
         end = time()
         sleep((1000-(end - start)) / 1000)
         return accession_nr, filename
@@ -75,7 +81,7 @@ class SecXmlFileDownloader:
             for i in range(0, len(missing), 100):
                 chunk = missing[i:i + 100]
 
-                update_data: List[Tuple[str]] = pool.map(SecXmlFileProcessor._download_file_throttle, chunk)
+                update_data: List[Tuple[str]] = pool.map(SecXmlFileDownloader._download_file_throttle, chunk)
                 update_funct(update_data)
 
                 logging.info("   commited chunk: " + str(i))

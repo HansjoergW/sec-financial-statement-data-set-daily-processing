@@ -45,7 +45,8 @@ class SecXmlParser:
             xml_content = f.read()
 
             try:
-                df = parser.parse(xml_content)
+                # todo: check if we should do something with the error_list
+                df, error_list = parser.parse(accessionnr, xml_content)
                 df = parser.clean_for_financial_statement_dataset(df, accessionnr)
                 df.to_csv(targetfilepath, header=True, sep="\t")
 

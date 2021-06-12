@@ -17,8 +17,7 @@ def test_transform():
         data = extractor.extract("", content)
         transformer.transform("", data)
 
-        print(len(data))
-        print(data)
+        assert 79 == len(data)
 
 
 def test_get_version_tag_name_from_href():
@@ -28,7 +27,7 @@ def test_get_version_tag_name_from_href():
     ]
 
     for testcase in testcases:
-        details = SecPreXmlTransformer._get_version_tag_name_from_href(testcase['href'])
+        tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(testcase['href'])
 
-        assert details['tag'] == testcase['tag']
-        assert details['version'] == testcase['version']
+        assert tag == testcase['tag']
+        assert version == testcase['version']
