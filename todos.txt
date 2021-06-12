@@ -1,7 +1,7 @@
 Next
 ====
 
-UnitTests umschreiben für Num
+
 Masstest für Num umsetzen
 
 
@@ -11,6 +11,7 @@ Masstest für Num umsetzen
   -> man sieht die letzte Datei
 
 - bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
+
 
 Later
 =====
@@ -22,9 +23,14 @@ Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Da
 - Reihenfolge der Spalten in den geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
 -handhaben von der sonderfälle aufgrund mass_test_results.md
 
+Anderes:
+- DataObjects auch bei Index Klassen verwenden
+
+
 
 Done
 ====
+12.06.2021 - Unit Tests für NumParsing umgeschrieben
 11.06.2021 - CodeRefactoring für Num umsetzen
            - Reihenfolge testen in Mastest für Pre
 31.05.2021 - umbauen dictionaries mit https://realpython.com/python-data-classes/

@@ -1,6 +1,6 @@
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 from _00_common.DBManagement import DBManager
-from testintegration.MassTestingTools import read_mass_pre_xml_content, read_mass_pre_zip_content
+from testintegration.pre.PreMassTestingTools import read_mass_pre_xml_content, read_mass_pre_zip_content
 
 import pytest
 
@@ -197,6 +197,22 @@ def test_compare_CF():
 def test_compare_EQ():
     adshs_to_consider = sorted_adshs_in_both # [:100]
     _compare_and_print('EQ', 0, adshs_to_consider)
+    _compare_and_print('EQ', 1, adshs_to_consider)
+
+
+def test_compare_all():
+    adshs_to_consider = sorted_adshs_in_both # [:100]
+
+    _compare_and_print('CP', 0, adshs_to_consider)
+    _compare_and_print('BS', 0, adshs_to_consider)
+    _compare_and_print('IS', 0, adshs_to_consider)
+    _compare_and_print('CF', 0, adshs_to_consider)
+    _compare_and_print('CI', 0, adshs_to_consider)
+    _compare_and_print('EQ', 0, adshs_to_consider)
+    _compare_and_print('BS', 1, adshs_to_consider)
+    _compare_and_print('IS', 1, adshs_to_consider)
+    _compare_and_print('CF', 1, adshs_to_consider)
+    _compare_and_print('CI', 1, adshs_to_consider)
     _compare_and_print('EQ', 1, adshs_to_consider)
 
 
