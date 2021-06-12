@@ -1,4 +1,4 @@
-from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
+from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
 
 from typing import List, Dict, Tuple, Union
 import os
@@ -15,14 +15,12 @@ def test_read():
     preparer = SecPreXmlExtractor()
     with open(testprexml, "r", encoding="utf-8") as f:
         content: str = f.read()
-        data: Dict[int,Dict[str, Union[str, List[Dict[str, str]]]]] = preparer.extract(content)
+        data: Dict[int, SecPreExtractPresentationLink] = preparer.extract("", content)
         print(len(data))
         print(data)
 
 
 def test_strip_file():
-    print(os.getcwd())
-    print(scriptpath)
 
     with open(xml_test_data_file, "r", encoding="utf-8") as f:
         xml_content = f.read()

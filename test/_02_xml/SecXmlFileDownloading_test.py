@@ -7,6 +7,7 @@ import os
 scriptpath = os.path.realpath(__file__ + "/..")
 folder = scriptpath + "/tmp"
 
+
 @pytest.fixture(scope="module")
 def dbmgr():
     shutil.rmtree(folder, ignore_errors=True)
@@ -16,6 +17,7 @@ def dbmgr():
     new_dbmgr.copy_uncopied_entries()
     yield new_dbmgr
     shutil.rmtree(folder)
+
 
 def test_download_num_xml(dbmgr: DBManager):
     processor = SecXmlFileDownloader(dbmgr, folder)
