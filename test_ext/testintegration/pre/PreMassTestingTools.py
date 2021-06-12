@@ -144,7 +144,7 @@ class FillMassParseContent():
         # executes the complete parsing on all of the available reports from the
         # provided year and months
         adshs: List[str] = self.testsetcreator.get_testset_by_year_and_months(self.year, self.months)
-        xml_files_info: List[Tuple[str, str, str]] = dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
+        xml_files_info: List[Tuple[str, str, str]] = self.dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info] # adsh and preXmlFile
 
         pool = Pool(8)
