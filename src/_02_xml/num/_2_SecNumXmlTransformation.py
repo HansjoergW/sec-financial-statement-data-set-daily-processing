@@ -105,8 +105,10 @@ class SecNumXmlTransformer:
 
             if unitRef in ["usd", "usdpershare", "u_iso4217usd"]:
                 unitRef = "USD"
-            if unitRef == 'number':
+            elif unitRef == 'number':
                 unitRef = 'pure'
+            else:
+                unitRef = unitRef.upper() # basically all entries are in to upper
 
             prefix = tag.prefix
             if prefix.startswith("ifrs"):

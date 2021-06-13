@@ -10,7 +10,7 @@ import zipfile
 class DataAccessTool():
     def __init__(self, workdir = './'):
         if workdir[-1] != '/':
-            data_dir = workdir + '/'
+            workdir = workdir + '/'
 
         self.workdir = workdir
         self.qtrdir = workdir + 'quarterzip/'

@@ -7,7 +7,7 @@ import os
 from typing import Dict, List, Tuple
 from multiprocessing import Pool
 
-ALL_PARSED_NUM_CONTENT_FILE = "d:/tmp/all_num.csv"
+ALL_PARSED_NUM_CONTENT_FILE = "d:/secprocessing/tmp/all_num.csv"
 
 class CreateAllNumParseContent():
 
@@ -78,12 +78,43 @@ class ReadCreatedNumXmlContent():
         pass
 
     def readContent(self, adshs: List[str] = None) -> pd.DataFrame:
-        return pd.read_csv(ALL_PARSED_NUM_CONTENT_FILE, header=0, sep="\t")
+        df = pd.read_csv(ALL_PARSED_NUM_CONTENT_FILE, header=0, sep="\t")
+        if adshs is not None:
+            df = df[df.adsh.isin(adshs)].copy()
+        return df
+
+
+class ReadNumZipContent():
+
+    def __init__(self, dataUtils: DataAccessTool, year: int, qrtr: int):
+        self.dataUtils = dataUtils
+        self.zipfilePath = self.dataUtils._get_zipfilename(year,qrtr)
+        self.zipfileName = os.path.basename(self.zipfilePath)
+
+    def readContent(self, adshs: List[str] = None) ->pd.DataFrame:
+        sub_df = self.dataUtils._read_file_from_zip(self.zipfilePath, 'sub.txt')
+        sub_df = sub_df[sub_df.form.isin(['10-K', '10-Q'])]
+        relevant_adsh = set(sub_df.adsh.tolist())
+
+        pre_df = self.dataUtils._read_file_from_zip(self.zipfilePath, 'num.txt')
+        pre_df = pre_df[pre_df.adsh.isin(relevant_adsh)]
+
+        return pre_df
 
 
 def create_all_num_xml(dbmgr: DBManager, testsetcreator: TestSetCreatorTool, year: int, months: List[int]):
     content_filler = CreateAllNumParseContent(dbmgr, testsetcreator, year, months)
     content_filler.process()
+
+
+def read_mass_num_zip_content(dataUtils: DataAccessTool, year: int, qrtr: int, adshs: List[str] = None) -> pd.DataFrame:
+    reader = ReadNumZipContent(dataUtils, year, qrtr)
+    return reader.readContent(adshs)
+
+
+def read_mass_num_xml_content(adshs: List[str] = None) -> pd.DataFrame :
+    reader = ReadCreatedNumXmlContent()
+    return reader.readContent(adshs)
 
 
 if __name__ == '__main__':
@@ -95,7 +126,6 @@ if __name__ == '__main__':
     #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
     #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     #print(df.shape)
-    print('start xml')
     create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
-    # df = ReadCreatedNumXmlContent().readContent()
+    # df = read_mass_num_xml_content()
     # print(df.shape)

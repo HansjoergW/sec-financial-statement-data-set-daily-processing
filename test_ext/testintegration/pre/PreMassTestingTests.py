@@ -1,22 +1,12 @@
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 from _00_common.DBManagement import DBManager
+
 from testintegration.pre.PreMassTestingTools import read_mass_pre_xml_content, read_mass_pre_zip_content
 
-import pytest
-
 from typing import List, Dict, Tuple, Set, Union
-from multiprocessing import Pool
-import logging
 import pandas as pd
 
 
-""" Idee::
-hier irgendwie die einzelnen Tests als Klassen ablegen.
-zB. prüfen ob Anzahl Reports identisch, Total und pro Typ -> das erste, was wir sicherstellen möchten.
-
-Die einzelnen TestAspekte müssen separiert werden, sonst gibt es ein durcheinander
-
-"""
 
 default_workdir = "d:/secprocessing"
 
