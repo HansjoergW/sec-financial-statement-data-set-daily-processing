@@ -86,3 +86,13 @@
 1.3. a context with a segment with dimension dei:LegalEntityAxis indicates that it is a "sub-company" and the
      the node content defines the "coreg" entry
 1.4. only contexts with no segment or a dei:LegalEntityAxis segment are relevant for further processing and are therefore written into the num.csv file
+
+2. Units
+2.1. Upper-Lowercase is not consistent, Currency Ids are alyways in upper. Share is sometimes Share, share, shares, Shares
+2.2. USD has many representations. z.B. USDPSHARES, UNIT12,UNIT1, USD_XBRLISHRES, UNIT_STANDARD_USD.. 
+2.3. Pure has also UNIT13, U_XBRLIPURE,
+2.4. Shares has also U_XBRLISHARES
+2.5 U_NTGR, U_XBRLI are prefixes for Uoms 
+2.6. UNIT_STANDARD_<UOM>_something
+
+UNIT mit Number evtl. pro Report.

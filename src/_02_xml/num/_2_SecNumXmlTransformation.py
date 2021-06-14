@@ -125,8 +125,10 @@ class SecNumXmlTransformer:
                 unitRef = "USD"
             elif unitRef == 'number':
                 unitRef = 'pure'
+            elif len(unitRef) == 3:
+                    unitRef = unitRef.upper() # basically all entries are in to upper
             else:
-                unitRef = unitRef.upper() # basically all entries are in to upper
+                unitRef = unitRef.lower()
 
             prefix = tag.prefix
             if prefix.startswith("ifrs"):

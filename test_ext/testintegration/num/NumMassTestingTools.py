@@ -43,7 +43,7 @@ class CreateAllNumParseContent():
         xml_files_info: List[Tuple[str, str, str]] = self.dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
         num_xml_files_info: List[Tuple[str, str]] = [(x[0], x[1]) for x in xml_files_info] # adsh and preXmlFile
 
-        pool = Pool(8)
+        pool = Pool(7)
 
         all_failed: List[SecError] = []
         all_dfs: List[pd.DataFrame] = []

@@ -25,6 +25,8 @@ def load_data():
     adshs_in_both = adshs_in_xml.union(adshs_in_zip)
     sorted_adshs_in_both = sorted(list(adshs_in_both))
 
+    # zip_data_matching_adshs_df = filter_for_adsh(zip_data_df, ['0000002178-21-000034'])
+    # xml_data_matching_adshs_df = filter_for_adsh(xml_data_df, ['0000002178-21-000034'])
     zip_data_matching_adshs_df = filter_for_adsh(zip_data_df, sorted_adshs_in_both)
     xml_data_matching_adshs_df = filter_for_adsh(xml_data_df, sorted_adshs_in_both)
 
@@ -32,11 +34,16 @@ def load_data():
 
 
 def test_save_merged_df():
-    todo: coreg und uom müssen in den index ..
-
     adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
-    zip_idx = zip_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs'])[['uom','value']]
-    xml_idx = xml_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs'])[['uom','value']]
+
+    zip_data_matching_adshs_df.loc[zip_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
+    xml_data_matching_adshs_df.loc[xml_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
+
+    zip_data_matching_adshs_df['uom'] = zip_data_matching_adshs_df.uom.str.upper()
+    xml_data_matching_adshs_df['uom'] = xml_data_matching_adshs_df.uom.str.upper()
+
+    zip_idx = zip_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'])[['value']]
+    xml_idx = xml_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'])[['value']]
 
     zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
     xml_idx.rename(columns = lambda x: x + '_xml', inplace=True)
@@ -74,16 +81,17 @@ def test_compare_content():
     ### Don't forget to recreate file!!!!
 
     merged_pure_df = pd.read_csv(merged_tmp_file)
-    merged_pure_df.set_index(['adsh','tag','version','ddate', 'qtrs'], inplace=True)
+    # merged_pure_df = merged_pure_df[merged_pure_df.adsh.isin(['0000002178-21-000034'])]
+    merged_pure_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
 
     # filtern von value spalten mit null
-    merged_df = merged_pure_df[~((merged_pure_df.uom_xml == merged_pure_df.uom_zip) & merged_pure_df.value_xml.isnull() & merged_pure_df.value_zip.isnull())]
+    merged_df = merged_pure_df[~(merged_pure_df.value_xml.isnull() & merged_pure_df.value_zip.isnull())]
     duplicated = merged_df[merged_df.index.duplicated(keep=False)]
     print()
     print("Check Duplicated Index Count: ", len(duplicated))
     print("Entries total pure merge: ", len(merged_pure_df))
 
-    merged_df['is_equal'] = ((merged_df.uom_zip == merged_df.uom_xml) & (merged_df.value_zip == merged_df.value_xml))
+    merged_df['is_equal'] = (merged_df.value_zip == merged_df.value_xml)
 
     equal_df = merged_df[merged_df.is_equal == True]
     not_equal_df = merged_df[merged_df.is_equal == False]
