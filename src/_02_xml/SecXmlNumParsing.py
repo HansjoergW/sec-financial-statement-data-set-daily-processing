@@ -35,7 +35,8 @@ class SecNumXmlParser(SecXmlParserBase):
             temp_dict['ddate'] = context_entry.enddate
             temp_dict['qtrs'] = context_entry.qtrs
             temp_dict['segments'] = context_entry.segments
-            temp_dict['coreg'] = ''
+            temp_dict['coreg'] = context_entry.coreg
+            temp_dict['isrelevant'] = context_entry.isrelevant
             temp_dict['footnote'] = ''
 
             entries.append(temp_dict)
@@ -56,7 +57,7 @@ class SecNumXmlParser(SecXmlParserBase):
         if df.shape[0] == 0:
             return df
 
-        df = (df[df.segments.isnull()]).copy()
+        df = (df[df.isrelevant]).copy()
 
         df['qtrs'] = df.qtrs.apply(int)
         df['value'] = pd.to_numeric(df['value'], errors='coerce')
@@ -66,11 +67,12 @@ class SecNumXmlParser(SecXmlParserBase):
 
         df.loc[df.version == 'company', 'version'] = adsh
 
-        df.drop(['segments'], axis=1, inplace=True)
+        df.drop(['segments','isrelevant'], axis=1, inplace=True)
         df.drop_duplicates(inplace=True)
 
         # set the indexes
-        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs'], inplace=True)
+        #df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs'], inplace=True)
+        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg','uom'], inplace=True)
 
         # and sort by the precision
         # it can happen that the same tag is represented in the reports multiple times with different precision

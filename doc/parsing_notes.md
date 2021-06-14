@@ -78,3 +78,11 @@
 7. preferredlabels
 7.1. there are also perdiodStartLabel and periodEndLabel in a CF for CashAndCashEq at beginning and end of period
 
+# Num-File-Parsing
+## Contexts
+1. content
+1.1. a context is either for a period (with start and end date) or an instant
+1.2. a context can contain segments.
+1.3. a context with a segment with dimension dei:LegalEntityAxis indicates that it is a "sub-company" and the
+     the node content defines the "coreg" entry
+1.4. only contexts with no segment or a dei:LegalEntityAxis segment are relevant for further processing and are therefore written into the num.csv file

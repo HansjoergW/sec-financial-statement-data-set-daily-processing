@@ -5,12 +5,18 @@ from dataclasses import dataclass
 
 
 @dataclass
+class SecNumExtractSegement:
+    label: str
+    dimension: str
+
+
+@dataclass
 class SecNumExtractContext:
     instanttxt: Union[str,None]
     startdatetxt: Union[str,None]
     enddatetxt: Union[str,None]
     id: str
-    segments: List[str]
+    segments: List[SecNumExtractSegement]
 
 
 @dataclass
@@ -91,10 +97,7 @@ class SecNumXmlExtractor():
             for segment in segments:
                 segment_label = segment.text
                 segment_dim = segment.get("dimension")
-                segments_list.append(segment_dim + "/" + segment_label)
-
-            if len(segments_list) == 0:
-                segments_list = None
+                segments_list.append(SecNumExtractSegement(label=segment_label, dimension=segment_dim))
 
             id = context.get("id")
             instant = context.find('instant', root.nsmap)

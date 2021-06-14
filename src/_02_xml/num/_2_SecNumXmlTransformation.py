@@ -1,5 +1,5 @@
 from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
-    SecNumExtractTag
+    SecNumExtractTag, SecNumExtractSegement
 from typing import Dict, List, Tuple, Union
 from dataclasses import dataclass
 
@@ -12,7 +12,9 @@ class SecNumTransformedContext:
     id: str
     qtrs: int
     enddate: str
-    segments: List[str]
+    coreg: str
+    isrelevant: bool
+    segments: List[SecNumExtractSegement]
 
 
 @dataclass
@@ -70,7 +72,7 @@ class SecNumXmlTransformer:
 
         return int(round(float(month_end - month_start) / 3))
 
-    def _transform_contexts(self, contexts: List[SecNumExtractContext]) -> Dict[str, SecNumTransformedContext]:
+    def _transform_contexts(self, contexts: List[SecNumExtractContext], company_namespaces: List[str]) -> Dict[str, SecNumTransformedContext]:
         context_map: Dict[str, SecNumTransformedContext] = {}
 
         for context in contexts:
@@ -87,10 +89,26 @@ class SecNumXmlTransformer:
                 enddate = self._find_last_day_of_month(instanttxt)
                 qtrs=0
 
+            coreg = ""
+            isrelevant = False
+
+            if len(context.segments) == 0:
+                isrelevant = True
+
+            for segment in context.segments:
+                if segment.dimension == "dei:LegalEntityAxis":
+                    isrelevant = True
+                    coreg = segment.label
+                    coreg = coreg.replace("Member", "")
+                    for company_namespace in company_namespaces:
+                        coreg = coreg.replace(company_namespace + ":", "")
+
             context_map[context.id] = SecNumTransformedContext(
                     id=context.id,
                     qtrs=qtrs,
                     enddate=enddate,
+                    coreg=coreg,
+                    isrelevant=isrelevant,
                     segments=context.segments)
 
         return context_map
@@ -133,7 +151,7 @@ class SecNumXmlTransformer:
     def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
         versionyear = self._eval_versionyear(data.us_gaap_ns, data.ifrs_ns)
 
-        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts)
+        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces)
         tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, versionyear, data.company_namespaces)
 
         return SecNumTransformed(
