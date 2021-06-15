@@ -122,6 +122,27 @@ class SecNumXmlExtractor():
 
         return result
 
+    read units z.B. wie in 0001564590-21-006939 trip advisor
+
+#     <unit id="U_xbrlipure">
+#     <measure>pure</measure>
+# </unit>
+# <unit id="U_tripVote_xbrlishares">
+# <divide>
+# <unitNumerator>
+# <measure>trip:Vote</measure>
+# </unitNumerator>
+# <unitDenominator>
+# <measure>shares</measure>
+# </unitDenominator>
+# </divide>
+# </unit>
+# <unit id="U_tripMarket">
+# <measure>trip:Market</measure>
+# </unit>
+# <unit id="U_tripLanguage">
+# <measure>trip:Language</measure>
+
     def _read_tags(self, root: etree._Element) -> List[SecNumExtractTag]:
 
         tags = list(root.findall('.//*[@unitRef]'))

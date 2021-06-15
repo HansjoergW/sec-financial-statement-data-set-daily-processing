@@ -33,6 +33,35 @@ def load_data():
     return adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df
 
 
+def test_save_uom_data():
+    adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
+
+    zip_data_matching_adshs_df.loc[zip_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
+    xml_data_matching_adshs_df.loc[xml_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
+
+    zip_data_matching_adshs_df['uom'] = zip_data_matching_adshs_df.uom.str.upper()
+    xml_data_matching_adshs_df['uom'] = xml_data_matching_adshs_df.uom.str.upper()
+
+    zip_idx = zip_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg'])[['uom']]
+    xml_idx = xml_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg'])[['uom']]
+
+    zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
+    xml_idx.rename(columns = lambda x: x + '_xml', inplace=True)
+
+    #dauert ewigs
+    merged_uom_df = pd.merge(xml_idx, zip_idx, how="outer", left_index=True, right_index=True)
+
+    merged_uom_df.reset_index(inplace=True)
+    uom_cols_df = merged_uom_df[['uom_zip','uom_xml']]
+
+    uom_cols_grp_count_df = uom_cols_df.groupby(['uom_zip','uom_xml']).count()
+
+    print("")
+
+
+
+
+
 def test_save_merged_df():
     adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
 

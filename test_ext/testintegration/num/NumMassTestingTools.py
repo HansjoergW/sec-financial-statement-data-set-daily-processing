@@ -117,6 +117,14 @@ def read_mass_num_xml_content(adshs: List[str] = None) -> pd.DataFrame :
     return reader.readContent(adshs)
 
 
+def read_uoms() -> List[str]:
+    reader = ReadCreatedNumXmlContent()
+    uoms = reader.readContent()['uom']
+    unique = uoms.unique().tolist()
+    unique.sort()
+    return unique
+
+
 if __name__ == '__main__':
     workdir = "d:/secprocessing/"
     dbmgr = DBManager(workdir)
@@ -126,6 +134,8 @@ if __name__ == '__main__':
     #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
     #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
     #print(df.shape)
-    create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
+    #create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
     # df = read_mass_num_xml_content()
     # print(df.shape)
+    uoms_list = read_uoms()
+    print(uoms_list)
