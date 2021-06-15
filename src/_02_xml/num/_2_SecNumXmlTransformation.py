@@ -1,5 +1,5 @@
 from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
-    SecNumExtractTag, SecNumExtractSegement
+    SecNumExtractTag, SecNumExtractSegement, SecNumExtractUnit
 from typing import Dict, List, Tuple, Union
 from dataclasses import dataclass
 
@@ -28,8 +28,15 @@ class SecNumTransformedTag:
 
 
 @dataclass
+class SecNumTransformedUnit:
+    id:str
+    uom:str
+
+
+@dataclass
 class SecNumTransformed:
     contexts_map: Dict[str, SecNumTransformedContext]
+    units_map: Dict[str, SecNumTransformedUnit]
     tag_list: List[SecNumTransformedTag]
 
 
@@ -37,7 +44,6 @@ class SecNumXmlTransformer:
 
     find_year_regex = re.compile(r"\d\d\d\d")
     clean_tag_regex = re.compile(r"[{].*?[}]")
-
 
     def __init__(self):
         pass
@@ -114,95 +120,13 @@ class SecNumXmlTransformer:
 
         return context_map
 
-    # ISO4217-USD
-    # ISO4217-USD-PER-UTR-BBL
-    # ISO4217-USD-PER-UTR-MCF
-    # ISO4217-USD-PER-XBRLI-SHARES
-    # ISO4217_USD_PER_SHARES
-    # ISO4217_USD_XBRLI_SHARES
-    # U_ISO4217AUD
-    # U_ISO4217CAD_XBRLISHARES
-    def _check_for_iso_uom(self, unitRef:str) -> Union[None, str]:
-        if unitRef.startswith("ISO4217"):
-            return unitRef[8:12]
-        if unitRef.startswith("U_ISO4217"):
-            return unitRef[9:13]
-        return None
-
-    def _check_for_unit_divide(self, unitRef:str) -> Union[None, str]:
-        if unitRef.startswith("UNIT_DIVIDE_"):
-            return unitRef.split('_')[2]
-        return None
-
-    def _check_for_unit_standard(self, unitRef:str) -> Union[None, str]:
-        if unitRef.startswith("UNIT_STANDARD_"):
-            return unitRef.split('_')[2]
-        return None
-
-    def _check_for_unit(self, unitRef:str) -> Union[None, str]:
-        if unitRef.startswith("UNIT_"):
-            return unitRef.split('_')[1]
-        return None
-
-    # CADPERSHARE immer mit 3 Zeichen vor dran
-    # CADPERSHARES
-    # CADPSHARES
-    # CAD_PER_SHARE
-    pershare_postfixes = ['PERSHARE', 'PERSHARES','PSHARES','PSHARE','_PER_SHARE']
-    def _check_for_per_schare_postfix(self, unitRef:str) -> Union[None, str]:
-        for pershare_pf in self.pershare_postfixes:
-            if unitRef.endswith(pershare_pf):
-                return unitRef[0:3]
-        return None
-
-
-    known_prefixes = ['U_XBRLI', 'U_NTGR']
-    def _check_for_known_prefixes(self, unitRef:str) -> Union[None, str]:
-
-        for known_prefix in self.known_prefixes:
-            if known_prefix in unitRef:
-                return unitRef.replace(known_prefix, "")
-        return None
-
-
-    def _evaluate_unitRef(self, unitRef: str) -> str:
-        unitRef = unitRef.upper()
-
-        evaluated = self._check_for_iso_uom(unitRef)
-        if evaluated:
-            return evaluated
-
-        evaluated = self._check_for_unit_divide(unitRef)
-        if evaluated:
-            return evaluated
-
-        evaluated = self._check_for_unit_standard(unitRef)
-        if evaluated:
-            return evaluated
-
-        evaluated = self._check_for_per_schare_postfix(unitRef)
-        if evaluated:
-            return evaluated
-
-
-        # old checks
-        if unitRef == 'number':
-            unitRef = 'pure'
-        elif len(unitRef) == 3:
-            unitRef = unitRef.upper() # basically all currency entries are in to upper
-        else:
-            unitRef = unitRef.lower()
-
-        return unitRef
-
-
     def _transform_tags(self, tags: List[SecNumExtractTag], versionyear: str, company_namespaces: List[str]) -> List[SecNumTransformedTag]:
         result: List[SecNumTransformedTag] = []
 
         for tag in tags:
             tagname = self.clean_tag_regex.sub("", tag.tagname)
 
-            unitRef = self._evaluate_unitRef(tag.unitRef)
+            # unitRef = self._evaluate_unitRef(tag.unitRef)
 
             prefix = tag.prefix
             if prefix.startswith("ifrs"):
@@ -218,10 +142,28 @@ class SecNumXmlTransformer:
                 version=version,
                 valuetxt=tag.valuetxt,
                 ctxtref=tag.ctxtRef,
-                unitref=unitRef,
+                unitref=tag.unitRef,
                 decimals=tag.decimals
             ))
 
+        return result
+
+    def _transform_units(self, units: List[SecNumExtractUnit]) -> Dict[str, SecNumTransformedUnit]:
+        result: Dict[str, SecNumTransformedUnit] = {}
+
+        for unit in units:
+            id = unit.id
+            uom = None
+
+            if unit.measure is not None:
+                uom = unit.measure
+            else:
+                uom = unit.numerator
+
+            if ":" in uom:
+                uom = uom.split(":")[1]
+
+            result[id] = SecNumTransformedUnit(id=id, uom=uom)
         return result
 
     def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
@@ -229,9 +171,93 @@ class SecNumXmlTransformer:
 
         contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces)
         tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, versionyear, data.company_namespaces)
+        units_map: Dict[str, SecNumTransformedUnit] = self._transform_units(data.units)
 
         return SecNumTransformed(
             contexts_map=contexts_map,
-            tag_list=tag_list
+            tag_list=tag_list,
+            units_map= units_map
         )
 
+
+    #
+    # # ISO4217-USD
+    # # ISO4217-USD-PER-UTR-BBL
+    # # ISO4217-USD-PER-UTR-MCF
+    # # ISO4217-USD-PER-XBRLI-SHARES
+    # # ISO4217_USD_PER_SHARES
+    # # ISO4217_USD_XBRLI_SHARES
+    # # U_ISO4217AUD
+    # # U_ISO4217CAD_XBRLISHARES
+    # def _check_for_iso_uom(self, unitRef:str) -> Union[None, str]:
+    #     if unitRef.startswith("ISO4217"):
+    #         return unitRef[8:12]
+    #     if unitRef.startswith("U_ISO4217"):
+    #         return unitRef[9:13]
+    #     return None
+    #
+    # def _check_for_unit_divide(self, unitRef:str) -> Union[None, str]:
+    #     if unitRef.startswith("UNIT_DIVIDE_"):
+    #         return unitRef.split('_')[2]
+    #     return None
+    #
+    # def _check_for_unit_standard(self, unitRef:str) -> Union[None, str]:
+    #     if unitRef.startswith("UNIT_STANDARD_"):
+    #         return unitRef.split('_')[2]
+    #     return None
+    #
+    # def _check_for_unit(self, unitRef:str) -> Union[None, str]:
+    #     if unitRef.startswith("UNIT_"):
+    #         return unitRef.split('_')[1]
+    #     return None
+    #
+    # # CADPERSHARE immer mit 3 Zeichen vor dran
+    # # CADPERSHARES
+    # # CADPSHARES
+    # # CAD_PER_SHARE
+    # pershare_postfixes = ['PERSHARE', 'PERSHARES','PSHARES','PSHARE','_PER_SHARE']
+    # def _check_for_per_schare_postfix(self, unitRef:str) -> Union[None, str]:
+    #     for pershare_pf in self.pershare_postfixes:
+    #         if unitRef.endswith(pershare_pf):
+    #             return unitRef[0:3]
+    #     return None
+    #
+    #
+    # known_prefixes = ['U_XBRLI', 'U_NTGR']
+    # def _check_for_known_prefixes(self, unitRef:str) -> Union[None, str]:
+    #
+    #     for known_prefix in self.known_prefixes:
+    #         if known_prefix in unitRef:
+    #             return unitRef.replace(known_prefix, "")
+    #     return None
+    #
+    #
+    # def _evaluate_unitRef(self, unitRef: str) -> str:
+    #     unitRef = unitRef.upper()
+    #
+    #     evaluated = self._check_for_iso_uom(unitRef)
+    #     if evaluated:
+    #         return evaluated
+    #
+    #     evaluated = self._check_for_unit_divide(unitRef)
+    #     if evaluated:
+    #         return evaluated
+    #
+    #     evaluated = self._check_for_unit_standard(unitRef)
+    #     if evaluated:
+    #         return evaluated
+    #
+    #     evaluated = self._check_for_per_schare_postfix(unitRef)
+    #     if evaluated:
+    #         return evaluated
+    #
+    #
+    #     # old checks
+    #     if unitRef == 'number':
+    #         unitRef = 'pure'
+    #     elif len(unitRef) == 3:
+    #         unitRef = unitRef.upper() # basically all currency entries are in to upper
+    #     else:
+    #         unitRef = unitRef.lower()
+    #
+    #     return unitRef

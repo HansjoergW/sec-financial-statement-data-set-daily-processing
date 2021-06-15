@@ -24,7 +24,7 @@ def parse_content(adsh, content:  str):
 
 
 if __name__ == '__main__':
-    adsh = "0001564590-21-006939" # Unit_STANDARD_<uom>_
+    adsh = "0001217160-21-000009" # Unit_STANDARD_<uom>_
     content = get_num_xml_content_by_adsh(adsh)
     #content = xml_content
     parse_content(adsh, content)

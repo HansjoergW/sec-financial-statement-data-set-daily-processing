@@ -1,6 +1,6 @@
 from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
 from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
-from _02_xml.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag
+from _02_xml.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag, SecNumTransformedUnit
 
 import pandas as pd
 
@@ -15,21 +15,20 @@ class SecNumXmlParser(SecXmlParserBase):
         super(SecNumXmlParser, self).__init__("num")
         pass
 
-
     def _read_tags(self, adsh:str, transformed_data: SecNumTransformed) -> pd.DataFrame:
 
         entries = []
-
         tag:SecNumTransformedTag
         for tag in transformed_data.tag_list:
 
             context_entry:SecNumTransformedContext = transformed_data.contexts_map[tag.ctxtref]
+            unit_entry:SecNumTransformedUnit = transformed_data.units_map[tag.unitref]
 
             temp_dict = {}
             temp_dict['adsh'] = adsh
             temp_dict['tag'] = tag.tagname
             temp_dict['version'] = tag.version
-            temp_dict['uom'] = tag.unitref
+            temp_dict['uom'] = unit_entry.uom
             temp_dict['value'] = tag.valuetxt
             temp_dict['decimals'] = tag.decimals
             temp_dict['ddate'] = context_entry.enddate

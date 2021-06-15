@@ -30,12 +30,21 @@ class SecNumExtractTag:
 
 
 @dataclass
+class SecNumExtractUnit:
+    id: str
+    measure: str
+    denumerator: str
+    numerator: str
+
+
+@dataclass
 class SecNumExtraction:
     company_namespaces: List[str]
     us_gaap_ns: str
     ifrs_ns: str
     contexts: List[SecNumExtractContext]
     tags: List[SecNumExtractTag]
+    units: List[SecNumExtractUnit]
 
 
 class SecNumXmlExtractor():
@@ -122,26 +131,34 @@ class SecNumXmlExtractor():
 
         return result
 
-    read units z.B. wie in 0001564590-21-006939 trip advisor
+    def _read_units(self, root: etree._Element) -> List[SecNumExtractUnit]:
+        units = root.findall('unit', root.nsmap)
+        result: List[SecNumExtractUnit] = []
 
-#     <unit id="U_xbrlipure">
-#     <measure>pure</measure>
-# </unit>
-# <unit id="U_tripVote_xbrlishares">
-# <divide>
-# <unitNumerator>
-# <measure>trip:Vote</measure>
-# </unitNumerator>
-# <unitDenominator>
-# <measure>shares</measure>
-# </unitDenominator>
-# </divide>
-# </unit>
-# <unit id="U_tripMarket">
-# <measure>trip:Market</measure>
-# </unit>
-# <unit id="U_tripLanguage">
-# <measure>trip:Language</measure>
+        for unit in units:
+            id = unit.get("id")
+            measure = None
+            denumerator = None
+            numerator = None
+            measure_node = unit.find('measure', root.nsmap)
+            divide_node = unit.find('divide', root.nsmap)
+
+            if measure_node is not None:
+                measure = measure_node.text
+            elif divide_node is not None:
+                numerator_child = divide_node.find('unitNumerator/measure', root.nsmap)
+                numerator = numerator_child.text
+                denumerator_child = divide_node.find('unitDenominator/measure', root.nsmap)
+                denumerator = denumerator_child.text
+
+            result.append(SecNumExtractUnit(
+                id=id,
+                measure=measure,
+                denumerator=denumerator,
+                numerator=numerator
+        ))
+        return result
+
 
     def _read_tags(self, root: etree._Element) -> List[SecNumExtractTag]:
 
@@ -153,7 +170,7 @@ class SecNumXmlExtractor():
             prefix = tag.prefix
             decimals = tag.get("decimals")
             ctxtRef = tag.get("contextRef")
-            unitRef = tag.get("unitRef").lower()
+            unitRef = tag.get("unitRef")
 
             result.append(SecNumExtractTag(
                 tagname=tag.tag,
@@ -172,13 +189,15 @@ class SecNumXmlExtractor():
         ifrs_ns = root.nsmap.get('ifrs-full', None)
         contexts:List[SecNumExtractContext] = self._read_contexts(root)
         tags: List[SecNumExtractTag] = self._read_tags(root)
+        units: List[SecNumExtractUnit] = self._read_units(root)
 
         return SecNumExtraction(
             company_namespaces = company_namespaces,
             us_gaap_ns=us_gaap_ns,
             ifrs_ns=ifrs_ns,
             contexts=contexts,
-            tags=tags
+            tags=tags,
+            units=units
         )
 
     def extract(self, adsh: str, data: str) -> SecNumExtraction:
