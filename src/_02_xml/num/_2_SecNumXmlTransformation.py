@@ -70,6 +70,27 @@ class SecNumXmlTransformer:
         last_day_of_month = calendar.monthrange(year, month)[1]
         return yearstr + monthstr + str(last_day_of_month).zfill(2)
 
+    def _find_close_last_day_of_month(self, datastr: str) -> str:
+        """finds the last day of the month in the datestring with format yyyy-mm-dd
+        and returns it as yyyymmdd """
+        yearstr = datastr[0:4]
+        monthstr = datastr[5:7]
+        daystr = datastr[8:]
+
+        year = int(yearstr)
+        month = int(monthstr)
+        day = int(daystr)
+
+        if day < 15:
+            if month == 1:
+                month = 12
+                year = year -1
+            else:
+                month = month - 1
+
+        last_day_of_month = calendar.monthrange(year, month)[1]
+        return str(year) + str(month).zfill(2) + str(last_day_of_month).zfill(2)
+
     def _calculate_qtrs(self, year_start_s: str, month_start_s: str, year_end_s: str, month_end_s: str) -> int:
         """calculates the number of quartes between the start year/month and the end year/month"""
         year_start = int(year_start_s)
@@ -90,10 +111,10 @@ class SecNumXmlTransformer:
             qtrs:int
             enddate:str
             if instanttxt is None:
-                enddate = self._find_last_day_of_month(enddatetxt)
+                enddate = self._find_close_last_day_of_month(enddatetxt)
                 qtrs = self._calculate_qtrs(startdatetxt[0:4], startdatetxt[5:7], enddatetxt[0:4], enddatetxt[5:7])
             else:
-                enddate = self._find_last_day_of_month(instanttxt)
+                enddate = self._find_close_last_day_of_month(instanttxt)
                 qtrs=0
 
             coreg = ""
@@ -153,23 +174,24 @@ class SecNumXmlTransformer:
 
         for unit in units:
             id = unit.id
+            measure = unit.measure
+            numerator = unit.numerator
+            denumerator = unit.denumerator
 
-            measure, denum  und numer müssen hier schon separat gesplittet werden
-
-            if ":" in uom:
-        uom = uom.split(":")[1]
-
+            if measure and (":" in measure):
+                measure = measure.split(":")[1]
+            if numerator and (":" in numerator):
+                numerator = numerator.split(":")[1]
+            if denumerator and (":" in denumerator):
+                denumerator = denumerator.split(":")[1]
 
             uom: str
-            if unit.measure is not None:
-                uom = unit.measure
-            elif unit.denumerator == 'shares':
-                uom = unit.numerator
+            if measure is not None:
+                uom = measure
+            elif denumerator == 'shares':
+                uom = numerator
             else:
-                uom = unit.numerator + '/' + unit.denumerator
-
-            if ":" in uom:
-                uom = uom.split(":")[1]
+                uom = numerator + '/' + denumerator
 
             result[id] = SecNumTransformedUnit(id=id, uom=uom)
         return result

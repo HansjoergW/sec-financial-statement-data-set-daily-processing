@@ -161,4 +161,4 @@ if __name__ == '__main__':
     #print(df.shape)
     create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
     # df = read_mass_num_xml_content()
-    compare_uoms(dataUtils, 2021, 1)
+    #compare_uoms(dataUtils, 2021, 1)
