@@ -117,12 +117,37 @@ def read_mass_num_xml_content(adshs: List[str] = None) -> pd.DataFrame :
     return reader.readContent(adshs)
 
 
-def read_uoms() -> List[str]:
+def read_uoms_xml() -> List[str]:
     reader = ReadCreatedNumXmlContent()
     uoms = reader.readContent()['uom']
     unique = uoms.unique().tolist()
     unique.sort()
     return unique
+
+
+def read_uoms_zip(dataUtils: DataAccessTool, year: int, qrtr: int) -> List[str]:
+    reader = ReadNumZipContent(dataUtils, year, qrtr)
+    uoms = reader.readContent()['uom']
+    unique = uoms.unique().tolist()
+    unique.sort()
+    return unique
+
+
+def compare_uoms(dataUtils: DataAccessTool, year: int, qrtr: int):
+    uoms_xml_set = set(read_uoms_xml())
+    uoms_zip_set = set(read_uoms_zip(dataUtils, year, qrtr))
+    not_in_xml = list(uoms_zip_set - uoms_xml_set)
+    not_in_zip = list(uoms_xml_set - uoms_zip_set)
+
+    not_in_xml.sort()
+    not_in_zip.sort()
+
+    print("total xml      : ", len(uoms_xml_set))
+    print("total zip      : ", len(uoms_zip_set))
+    print("not in xml     : ", len(not_in_xml))
+    print("not in zip     : ", len(not_in_zip))
+    print("list not in xml: ", not_in_xml)
+    print("list not in zip: ", not_in_zip)
 
 
 if __name__ == '__main__':
@@ -136,6 +161,4 @@ if __name__ == '__main__':
     #print(df.shape)
     create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
     # df = read_mass_num_xml_content()
-    # print(df.shape)
-    uoms_list = read_uoms()
-    print(uoms_list)
+    compare_uoms(dataUtils, 2021, 1)

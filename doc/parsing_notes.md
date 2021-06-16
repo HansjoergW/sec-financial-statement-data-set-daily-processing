@@ -88,14 +88,6 @@
 1.4. only contexts with no segment or a dei:LegalEntityAxis segment are relevant for further processing and are therefore written into the num.csv file
 
 2. Units
-2.1. Upper-Lowercase is not consistent, Currency Ids are alyways in upper. Share is sometimes Share, share, shares, Shares
-2.2. USD has many representations. z.B. USDPSHARES(11'000), UNIT12,UNIT1, USD_XBRLI*(17'000), UNIT_STANDARD_USD.. 
-2.3. Pure has also UNIT13, U_XBRLIPURE,
-2.4. Shares has also U_XBRLISHARES
-2.5. UNIT* (200'000)
-2.5. U_NTGR (8), U_XBRLI(39'000) u_iso4217 (17'000) are prefixes for Uoms 
-2.6. UNIT_STANDARD_<UOM>_something -> ~200'000
-2.7. UNIT_DIVIDE_USD_SHARES_
-2.8.  ... (u_iso4217usd, U_ISO4217BRL)
-
-UNIT mit Number evtl. pro Report.
+2.1. Units are defined in der own <unit> tags. these are referenced by unitref
+2.2. the maximum length of a unit name is 20
+2.3. units for exchange rates are written with a '/' in between

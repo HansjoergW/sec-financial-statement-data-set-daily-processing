@@ -24,11 +24,15 @@ class SecNumXmlParser(SecXmlParserBase):
             context_entry:SecNumTransformedContext = transformed_data.contexts_map[tag.ctxtref]
             unit_entry:SecNumTransformedUnit = transformed_data.units_map[tag.unitref]
 
+            uom = unit_entry.uom
+            # uom entries have a max length of 20
+            uom = uom[:min(len(uom), 20)]
+
             temp_dict = {}
             temp_dict['adsh'] = adsh
             temp_dict['tag'] = tag.tagname
             temp_dict['version'] = tag.version
-            temp_dict['uom'] = unit_entry.uom
+            temp_dict['uom'] = uom
             temp_dict['value'] = tag.valuetxt
             temp_dict['decimals'] = tag.decimals
             temp_dict['ddate'] = context_entry.enddate

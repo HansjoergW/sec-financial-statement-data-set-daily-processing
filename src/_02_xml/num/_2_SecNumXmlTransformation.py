@@ -153,12 +153,20 @@ class SecNumXmlTransformer:
 
         for unit in units:
             id = unit.id
-            uom = None
 
+            measure, denum  und numer müssen hier schon separat gesplittet werden
+
+            if ":" in uom:
+        uom = uom.split(":")[1]
+
+
+            uom: str
             if unit.measure is not None:
                 uom = unit.measure
-            else:
+            elif unit.denumerator == 'shares':
                 uom = unit.numerator
+            else:
+                uom = unit.numerator + '/' + unit.denumerator
 
             if ":" in uom:
                 uom = uom.split(":")[1]
