@@ -120,10 +120,14 @@ class SecNumXmlTransformer:
             coreg = ""
             isrelevant = False
 
+            # a context is either relevant for the num.txt file, if there is no segment present
             if len(context.segments) == 0:
                 isrelevant = True
 
-            for segment in context.segments:
+            # ... or if there is just one LegalEntityAxis segment present
+            #for segment in context.segments:
+            if len(context.segments) == 1:
+                segment = context.segments[0]
                 if segment.dimension == "dei:LegalEntityAxis":
                     isrelevant = True
                     coreg = segment.label

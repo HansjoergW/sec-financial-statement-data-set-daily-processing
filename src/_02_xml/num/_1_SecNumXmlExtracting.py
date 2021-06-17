@@ -72,10 +72,7 @@ class SecNumXmlExtractor():
         data = self.identifier_regex.sub("", data)
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
-
-
         data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
-
         data = self.link_regex.sub("", data)
         data = self.link_end_regex.sub("", data)
         data = self.remove_unicode_tag_regex.sub("", data)
