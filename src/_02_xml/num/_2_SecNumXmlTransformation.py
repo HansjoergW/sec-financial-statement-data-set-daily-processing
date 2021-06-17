@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import re
 import calendar
+from datetime import date
 
 
 @dataclass
@@ -91,14 +92,23 @@ class SecNumXmlTransformer:
         last_day_of_month = calendar.monthrange(year, month)[1]
         return str(year) + str(month).zfill(2) + str(last_day_of_month).zfill(2)
 
-    def _calculate_qtrs(self, year_start_s: str, month_start_s: str, year_end_s: str, month_end_s: str) -> int:
+    def _calculate_qtrs(self, year_start_s: str, month_start_s: str, day_start_s: str, year_end_s: str, month_end_s: str, day_end_s: str) -> int:
         """calculates the number of quartes between the start year/month and the end year/month"""
         year_start = int(year_start_s)
         year_end = int(year_end_s)
         month_start = int(month_start_s)
-        month_end = int(month_end_s) + (year_end - year_start) * 12
+        month_end = int(month_end_s)
+        day_start = int(day_start_s)
+        day_end = int(day_end_s)
 
-        return int(round(float(month_end - month_start) / 3))
+        start_date = date(year_start, month_start, day_start)
+        end_date = date(year_end, month_end, day_end)
+
+        diff_days = end_date - start_date
+        return int(round(float(diff_days.days) / 91))
+
+        # month_end = int(month_end_s) + (year_end - year_start) * 12
+        # return int(round(float(month_end - month_start) / 3))
 
     def _transform_contexts(self, contexts: List[SecNumExtractContext], company_namespaces: List[str]) -> Dict[str, SecNumTransformedContext]:
         context_map: Dict[str, SecNumTransformedContext] = {}
@@ -112,7 +122,7 @@ class SecNumXmlTransformer:
             enddate:str
             if instanttxt is None:
                 enddate = self._find_close_last_day_of_month(enddatetxt)
-                qtrs = self._calculate_qtrs(startdatetxt[0:4], startdatetxt[5:7], enddatetxt[0:4], enddatetxt[5:7])
+                qtrs = self._calculate_qtrs(startdatetxt[0:4], startdatetxt[5:7], startdatetxt[8:10], enddatetxt[0:4], enddatetxt[5:7], enddatetxt[8:10])
             else:
                 enddate = self._find_close_last_day_of_month(instanttxt)
                 qtrs=0
@@ -131,7 +141,12 @@ class SecNumXmlTransformer:
                 if segment.dimension == "dei:LegalEntityAxis":
                     isrelevant = True
                     coreg = segment.label
-                    coreg = coreg.replace("Member", "")
+                    if coreg.endswith("Member"):
+                        coreg = coreg.replace("Member", "")
+
+                    if coreg.endswith("Domain"):
+                        coreg = coreg.replace("Domain", "")
+
                     for company_namespace in company_namespaces:
                         coreg = coreg.replace(company_namespace + ":", "")
 
