@@ -1,6 +1,6 @@
 from _00_common.DBManagement import DBManager
 from _02_xml.SecXmlFileParsing import SecXmlParser
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 from typing import List, Tuple
 import pandas as pd

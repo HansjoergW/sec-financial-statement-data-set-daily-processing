@@ -49,28 +49,15 @@ class SecNumXmlTransformer:
     def __init__(self):
         pass
 
-    def _eval_versionyear(self, us_gaap_ns:str, ifrs_ns:str, dei_ns:str) -> Dict[str, str]:
+    def _eval_versionyear(self, rel_ns_map:Dict[str, str]) -> Dict[str, str]:
         result: Dict[str, str] = {}
-        if us_gaap_ns:
-            versionyear = self.find_year_regex.findall(us_gaap_ns)[0]
-            result['us-gaap'] = versionyear
 
-        if ifrs_ns:
-            versionyear = self.find_year_regex.findall(ifrs_ns)[0]
-            result['ifrs'] = versionyear
-
-        if dei_ns:
-            versionyear = self.find_year_regex.findall(dei_ns)[0]
-            result['dei'] = versionyear
+        for key, ns in rel_ns_map.items():
+            versionyear = self.find_year_regex.findall(ns)[0]
+            result[key] = versionyear
 
         return result
 
-    def _eval_versionyear_dei(self, dei_ns:str) -> str:
-        versionyear = 0
-
-        if dei_ns:
-            versionyear = self.find_year_regex.findall(dei_ns)[0]
-        return versionyear
 
     def _find_last_day_of_month(self, datastr: str) -> str:
         """finds the last day of the month in the datestring with format yyyy-mm-dd
@@ -228,7 +215,7 @@ class SecNumXmlTransformer:
         return result
 
     def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
-        ns_years:Dict[str, str] = self._eval_versionyear(data.us_gaap_ns, data.ifrs_ns, data.dei_ns)
+        ns_years: Dict[str, str] = self._eval_versionyear(data.relevant_ns_map)
 
         contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces)
         tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, ns_years, data.company_namespaces)
@@ -240,85 +227,3 @@ class SecNumXmlTransformer:
             units_map= units_map
         )
 
-
-    #
-    # # ISO4217-USD
-    # # ISO4217-USD-PER-UTR-BBL
-    # # ISO4217-USD-PER-UTR-MCF
-    # # ISO4217-USD-PER-XBRLI-SHARES
-    # # ISO4217_USD_PER_SHARES
-    # # ISO4217_USD_XBRLI_SHARES
-    # # U_ISO4217AUD
-    # # U_ISO4217CAD_XBRLISHARES
-    # def _check_for_iso_uom(self, unitRef:str) -> Union[None, str]:
-    #     if unitRef.startswith("ISO4217"):
-    #         return unitRef[8:12]
-    #     if unitRef.startswith("U_ISO4217"):
-    #         return unitRef[9:13]
-    #     return None
-    #
-    # def _check_for_unit_divide(self, unitRef:str) -> Union[None, str]:
-    #     if unitRef.startswith("UNIT_DIVIDE_"):
-    #         return unitRef.split('_')[2]
-    #     return None
-    #
-    # def _check_for_unit_standard(self, unitRef:str) -> Union[None, str]:
-    #     if unitRef.startswith("UNIT_STANDARD_"):
-    #         return unitRef.split('_')[2]
-    #     return None
-    #
-    # def _check_for_unit(self, unitRef:str) -> Union[None, str]:
-    #     if unitRef.startswith("UNIT_"):
-    #         return unitRef.split('_')[1]
-    #     return None
-    #
-    # # CADPERSHARE immer mit 3 Zeichen vor dran
-    # # CADPERSHARES
-    # # CADPSHARES
-    # # CAD_PER_SHARE
-    # pershare_postfixes = ['PERSHARE', 'PERSHARES','PSHARES','PSHARE','_PER_SHARE']
-    # def _check_for_per_schare_postfix(self, unitRef:str) -> Union[None, str]:
-    #     for pershare_pf in self.pershare_postfixes:
-    #         if unitRef.endswith(pershare_pf):
-    #             return unitRef[0:3]
-    #     return None
-    #
-    #
-    # known_prefixes = ['U_XBRLI', 'U_NTGR']
-    # def _check_for_known_prefixes(self, unitRef:str) -> Union[None, str]:
-    #
-    #     for known_prefix in self.known_prefixes:
-    #         if known_prefix in unitRef:
-    #             return unitRef.replace(known_prefix, "")
-    #     return None
-    #
-    #
-    # def _evaluate_unitRef(self, unitRef: str) -> str:
-    #     unitRef = unitRef.upper()
-    #
-    #     evaluated = self._check_for_iso_uom(unitRef)
-    #     if evaluated:
-    #         return evaluated
-    #
-    #     evaluated = self._check_for_unit_divide(unitRef)
-    #     if evaluated:
-    #         return evaluated
-    #
-    #     evaluated = self._check_for_unit_standard(unitRef)
-    #     if evaluated:
-    #         return evaluated
-    #
-    #     evaluated = self._check_for_per_schare_postfix(unitRef)
-    #     if evaluated:
-    #         return evaluated
-    #
-    #
-    #     # old checks
-    #     if unitRef == 'number':
-    #         unitRef = 'pure'
-    #     elif len(unitRef) == 3:
-    #         unitRef = unitRef.upper() # basically all currency entries are in to upper
-    #     else:
-    #         unitRef = unitRef.lower()
-    #
-    #     return unitRef

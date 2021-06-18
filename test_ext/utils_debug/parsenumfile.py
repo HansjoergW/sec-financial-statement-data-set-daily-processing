@@ -1,4 +1,4 @@
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
+from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from _00_common.DebugUtils import DataAccessByAdshTool
 
 workdir = "d:/secprocessing/"
@@ -24,7 +24,7 @@ def parse_content(adsh, content:  str):
 
 
 if __name__ == '__main__':
-    adsh = "0000009346-21-000024" #
+    adsh = "0000007039-21-000036" #
     content = get_num_xml_content_by_adsh(adsh)
     #content = xml_content
     parse_content(adsh, content)

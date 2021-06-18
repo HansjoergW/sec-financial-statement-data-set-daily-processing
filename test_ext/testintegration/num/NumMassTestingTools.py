@@ -1,7 +1,7 @@
 from _00_common.DBManagement import DBManager
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
-from _02_xml.SecXmlParsingBase import SecError
+from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from _02_xml.parsing.SecXmlParsingBase import SecError
 import pandas as pd
 import os
 from typing import Dict, List, Tuple

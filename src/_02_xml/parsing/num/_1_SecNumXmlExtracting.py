@@ -40,9 +40,7 @@ class SecNumExtractUnit:
 @dataclass
 class SecNumExtraction:
     company_namespaces: List[str]
-    us_gaap_ns: str
-    ifrs_ns: str
-    dei_ns: str
+    relevant_ns_map: Dict[str, str]
     contexts: List[SecNumExtractContext]
     tags: List[SecNumExtractTag]
     units: List[SecNumExtractUnit]
@@ -63,6 +61,8 @@ class SecNumXmlExtractor():
     link_end_regex = re.compile(r"</link.*?>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+
+    relevant_ns = ['us-gaap','ifrs_full','dei','srt','stpr']
 
     def __init__(self):
         pass
@@ -183,18 +183,20 @@ class SecNumXmlExtractor():
 
     def _extract_data(self, root: etree._Element) -> SecNumExtraction:
         company_namespaces = self._find_company_namespaces(root)
-        us_gaap_ns = root.nsmap.get('us-gaap', None)
-        ifrs_ns = root.nsmap.get('ifrs-full', None)
-        dei_ns = root.nsmap.get('dei', None)
+
+        rel_ns_map:Dict[str, str] = {}
+        for rel_ns in self.relevant_ns:
+            ns = root.nsmap.get(rel_ns, None)
+            if ns:
+                rel_ns_map[rel_ns] = ns
+
         contexts:List[SecNumExtractContext] = self._read_contexts(root)
         tags: List[SecNumExtractTag] = self._read_tags(root)
         units: List[SecNumExtractUnit] = self._read_units(root)
 
         return SecNumExtraction(
             company_namespaces = company_namespaces,
-            us_gaap_ns=us_gaap_ns,
-            ifrs_ns=ifrs_ns,
-            dei_ns=dei_ns,
+            relevant_ns_map=rel_ns_map,
             contexts=contexts,
             tags=tags,
             units=units

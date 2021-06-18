@@ -28,13 +28,18 @@ class SecNumXmlParser(SecXmlParserBase):
             # uom entries have a max length of 20
             uom = uom[:min(len(uom), 20)]
 
+            # string contains often a -, but this leads to a wrong order if we want to compare as string
+            decimals = tag.decimals
+            if decimals:
+                decimals = decimals.replace("-","")
+
             temp_dict = {}
             temp_dict['adsh'] = adsh
             temp_dict['tag'] = tag.tagname
             temp_dict['version'] = tag.version
             temp_dict['uom'] = uom
             temp_dict['value'] = tag.valuetxt
-            temp_dict['decimals'] = tag.decimals
+            temp_dict['decimals'] = decimals
             temp_dict['ddate'] = context_entry.enddate
             temp_dict['qtrs'] = context_entry.qtrs
             temp_dict['segments'] = context_entry.segments
@@ -81,7 +86,7 @@ class SecNumXmlParser(SecXmlParserBase):
         # it can happen that the same tag is represented in the reports multiple times with different precision
         # and it looks as if the "txt" data of the sec is then produced with the lower precision
         df.sort_values('decimals', inplace=True)
-        df_double_index_mask = df.index.duplicated(keep='last')
+        df_double_index_mask = df.index.duplicated(keep='first')
 
         df = df[~df_double_index_mask]
 
