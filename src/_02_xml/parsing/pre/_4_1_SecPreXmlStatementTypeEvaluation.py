@@ -1,4 +1,4 @@
-from _02_xml.pre._2_SecPreXmlTransformation import SecPreTransformLocationDetails
+from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformLocationDetails
 
 from dataclasses import dataclass
 from typing import List, Dict

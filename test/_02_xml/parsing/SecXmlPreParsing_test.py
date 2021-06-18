@@ -1,9 +1,9 @@
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
+from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 
 xml_test_data_file = scriptpath + '/data/test_pre.xml'
 xml_expected_stripped_file = scriptpath + '/data/test_pre_exp.xml'

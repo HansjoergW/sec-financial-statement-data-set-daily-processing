@@ -1,10 +1,10 @@
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
+from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 
 from typing import Dict, Tuple, Optional
 from lxml import etree, objectify
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/data/"
 
 
@@ -19,12 +19,12 @@ def test_parse():
     df, errorlist = parser.parse("", xml_exp_content)
 
     assert 1223 == len(df)
-    assert 11 == len(df.columns)
+    assert 12 == len(df.columns)
     assert 0 == len(errorlist)
 
     df_clean = parser.clean_for_financial_statement_dataset(df, "")
-    assert 566 == len(df_clean)
-    assert 5 == len(df_clean.columns)
+    assert 565 == len(df_clean)
+    assert 3 == len(df_clean.columns)
 
 
 

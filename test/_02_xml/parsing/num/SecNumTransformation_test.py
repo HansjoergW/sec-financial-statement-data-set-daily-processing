@@ -1,8 +1,8 @@
-from _02_xml.num._2_SecNumXmlTransformation import SecNumXmlTransformer
+from _02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer
 
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 datafolder = scriptpath + "/data/"
 
 
@@ -18,7 +18,7 @@ def test_find_last_day_of_month():
 def test_calculate_qtrs():
     parser = SecNumXmlTransformer()
 
-    assert parser._calculate_qtrs("19", "09","20","09") == 4
-    assert parser._calculate_qtrs("19", "06","19","09") == 1
-    assert parser._calculate_qtrs("19", "10","20", "09") == 4
-    assert parser._calculate_qtrs("19", "08", "19", "10") == 1
+    assert parser._calculate_qtrs("19", "09", "01", "20", "09", "01") == 4
+    assert parser._calculate_qtrs("19", "06", "01", "19", "09", "01") == 1
+    assert parser._calculate_qtrs("19", "10", "01", "20", "09", "01") == 4
+    assert parser._calculate_qtrs("19", "08", "01", "19", "10", "01") == 1

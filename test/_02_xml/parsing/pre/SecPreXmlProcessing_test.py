@@ -1,11 +1,11 @@
-from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
-from _02_xml.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
-from _02_xml.pre._3_SecPreXmlGroupTransformation import  SecPreXmlGroupTransformer
-from _02_xml.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor
+from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
+from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
+from _02_xml.parsing.pre._3_SecPreXmlGroupTransformation import  SecPreXmlGroupTransformer
+from _02_xml.parsing.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor
 
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"
 
 testprexml_norm = data_folder + "aapl-20200926_pre.xml"

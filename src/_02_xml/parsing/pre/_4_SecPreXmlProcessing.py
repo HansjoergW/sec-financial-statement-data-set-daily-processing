@@ -1,6 +1,6 @@
-from _02_xml.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
+from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
     SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
-from _02_xml.pre._4_1_SecPreXmlStatementTypeEvaluation import StmtConfidence, SecPreXmlStatementTypeEvaluator
+from _02_xml.parsing.pre._4_1_SecPreXmlStatementTypeEvaluation import StmtConfidence, SecPreXmlStatementTypeEvaluator
 
 from typing import Dict, Union, List, Tuple, Set
 import logging

@@ -1,7 +1,7 @@
 # coordinates the parsing of donwloaded xml files and stores the data in a new folder
-from _02_xml.SecXmlNumParsing import SecNumXmlParser
-from _02_xml.SecXmlPreParsing import SecPreXmlParser
-from _02_xml.SecXmlParsingBase import SecXmlParserBase
+from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
+from _02_xml.parsing.SecXmlParsingBase import SecXmlParserBase
 from _00_common.DBManagement import DBManager
 
 import logging

@@ -1,9 +1,9 @@
-from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
+from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
 
 from typing import List, Dict, Tuple, Union
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"
 
 xml_test_data_file = data_folder + 'test_pre.xml'

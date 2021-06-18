@@ -1,9 +1,9 @@
-from _02_xml.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
-from _02_xml.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
+from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
+from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
 
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"
 
 testprexml = data_folder + "aapl-20200926_pre.xml"

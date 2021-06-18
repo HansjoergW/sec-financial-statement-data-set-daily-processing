@@ -1,9 +1,9 @@
-from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
+from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
 from lxml import etree, objectify
 from typing import List
 import os
 
-scriptpath = os.path.realpath(__file__ + "/..")
+scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"
 
 xml_test_data_file = data_folder + 'test_num.xml'

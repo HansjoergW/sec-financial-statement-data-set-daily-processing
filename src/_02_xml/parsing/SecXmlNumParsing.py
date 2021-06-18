@@ -1,6 +1,6 @@
-from _02_xml.SecXmlParsingBase import SecXmlParserBase, SecError
-from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
-from _02_xml.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag, SecNumTransformedUnit
+from _02_xml.parsing.SecXmlParsingBase import SecXmlParserBase, SecError
+from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
+from _02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag, SecNumTransformedUnit
 
 import pandas as pd
 
@@ -75,13 +75,13 @@ class SecNumXmlParser(SecXmlParserBase):
 
         # set the indexes
         #df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs'], inplace=True)
-        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg','uom'], inplace=True)
+        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
 
         # and sort by the precision
         # it can happen that the same tag is represented in the reports multiple times with different precision
         # and it looks as if the "txt" data of the sec is then produced with the lower precision
         df.sort_values('decimals', inplace=True)
-        df_double_index_mask = df.index.duplicated(keep='first')
+        df_double_index_mask = df.index.duplicated(keep='last')
 
         df = df[~df_double_index_mask]
 

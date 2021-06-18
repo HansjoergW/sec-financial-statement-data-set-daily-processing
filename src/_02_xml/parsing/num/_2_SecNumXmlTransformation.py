@@ -1,4 +1,4 @@
-from _02_xml.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
+from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
     SecNumExtractTag, SecNumExtractSegement, SecNumExtractUnit
 from typing import Dict, List, Tuple, Union
 from dataclasses import dataclass
@@ -49,13 +49,27 @@ class SecNumXmlTransformer:
     def __init__(self):
         pass
 
-    def _eval_versionyear(self, us_gaap_ns:str, ifrs_ns:str) -> str:
-        versionyear = 0
+    def _eval_versionyear(self, us_gaap_ns:str, ifrs_ns:str, dei_ns:str) -> Dict[str, str]:
+        result: Dict[str, str] = {}
         if us_gaap_ns:
             versionyear = self.find_year_regex.findall(us_gaap_ns)[0]
+            result['us-gaap'] = versionyear
 
         if ifrs_ns:
             versionyear = self.find_year_regex.findall(ifrs_ns)[0]
+            result['ifrs'] = versionyear
+
+        if dei_ns:
+            versionyear = self.find_year_regex.findall(dei_ns)[0]
+            result['dei'] = versionyear
+
+        return result
+
+    def _eval_versionyear_dei(self, dei_ns:str) -> str:
+        versionyear = 0
+
+        if dei_ns:
+            versionyear = self.find_year_regex.findall(dei_ns)[0]
         return versionyear
 
     def _find_last_day_of_month(self, datastr: str) -> str:
@@ -160,13 +174,11 @@ class SecNumXmlTransformer:
 
         return context_map
 
-    def _transform_tags(self, tags: List[SecNumExtractTag], versionyear: str, company_namespaces: List[str]) -> List[SecNumTransformedTag]:
+    def _transform_tags(self, tags: List[SecNumExtractTag], ns_years: Dict[str, str], company_namespaces: List[str]) -> List[SecNumTransformedTag]:
         result: List[SecNumTransformedTag] = []
 
         for tag in tags:
             tagname = self.clean_tag_regex.sub("", tag.tagname)
-
-            # unitRef = self._evaluate_unitRef(tag.unitRef)
 
             prefix = tag.prefix
             if prefix.startswith("ifrs"):
@@ -175,7 +187,7 @@ class SecNumXmlTransformer:
             if prefix in company_namespaces:
                 version = 'company'
             else:
-                version = prefix + "/" + str(versionyear)
+                version = prefix + "/" + ns_years.get(prefix, "0000")
 
             result.append(SecNumTransformedTag(
                 tagname=tagname,
@@ -216,10 +228,10 @@ class SecNumXmlTransformer:
         return result
 
     def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
-        versionyear = self._eval_versionyear(data.us_gaap_ns, data.ifrs_ns)
+        ns_years:Dict[str, str] = self._eval_versionyear(data.us_gaap_ns, data.ifrs_ns, data.dei_ns)
 
         contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces)
-        tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, versionyear, data.company_namespaces)
+        tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, ns_years, data.company_namespaces)
         units_map: Dict[str, SecNumTransformedUnit] = self._transform_units(data.units)
 
         return SecNumTransformed(

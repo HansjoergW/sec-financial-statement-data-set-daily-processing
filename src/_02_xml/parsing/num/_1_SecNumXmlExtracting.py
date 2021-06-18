@@ -42,6 +42,7 @@ class SecNumExtraction:
     company_namespaces: List[str]
     us_gaap_ns: str
     ifrs_ns: str
+    dei_ns: str
     contexts: List[SecNumExtractContext]
     tags: List[SecNumExtractTag]
     units: List[SecNumExtractUnit]
@@ -184,6 +185,7 @@ class SecNumXmlExtractor():
         company_namespaces = self._find_company_namespaces(root)
         us_gaap_ns = root.nsmap.get('us-gaap', None)
         ifrs_ns = root.nsmap.get('ifrs-full', None)
+        dei_ns = root.nsmap.get('dei', None)
         contexts:List[SecNumExtractContext] = self._read_contexts(root)
         tags: List[SecNumExtractTag] = self._read_tags(root)
         units: List[SecNumExtractUnit] = self._read_units(root)
@@ -192,6 +194,7 @@ class SecNumXmlExtractor():
             company_namespaces = company_namespaces,
             us_gaap_ns=us_gaap_ns,
             ifrs_ns=ifrs_ns,
+            dei_ns=dei_ns,
             contexts=contexts,
             tags=tags,
             units=units
