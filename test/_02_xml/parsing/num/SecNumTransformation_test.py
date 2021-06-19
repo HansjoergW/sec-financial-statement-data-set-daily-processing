@@ -9,10 +9,13 @@ datafolder = scriptpath + "/data/"
 def test_find_last_day_of_month():
     parser = SecNumXmlTransformer()
 
-    assert parser._find_last_day_of_month("2019-11-25") == "20191130"
-    assert parser._find_last_day_of_month("2019-02-5") == "20190228"
-    assert parser._find_last_day_of_month("2020-02-5") == "20200229"
-    assert parser._find_last_day_of_month("2019-12-25") == "20191231"
+    assert parser._find_close_last_day_of_month("2019-11-25") == "20191130"
+    assert parser._find_close_last_day_of_month("2019-02-05") == "20190131"
+    assert parser._find_close_last_day_of_month("2020-02-05") == "20200131"
+    assert parser._find_close_last_day_of_month("2020-02-20") == "20200229"
+    assert parser._find_close_last_day_of_month("2019-12-25") == "20191231"
+    assert parser._find_close_last_day_of_month("2021-01-15") == "20201231"
+    assert parser._find_close_last_day_of_month("2021-02-15") == "20210131"
 
 
 def test_calculate_qtrs():

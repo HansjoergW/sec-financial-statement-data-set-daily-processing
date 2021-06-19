@@ -28,10 +28,14 @@ class SecNumXmlParser(SecXmlParserBase):
             # uom entries have a max length of 20
             uom = uom[:min(len(uom), 20)]
 
-            # string contains often a -, but this leads to a wrong order if we want to compare as string
             decimals = tag.decimals
             if decimals:
+                # decimal string contains often a -, but this leads to a wrong order if we want to compare as string
                 decimals = decimals.replace("-","")
+
+                # sometimes INF is used instead of 0, which also indicates an  unrounded number
+                if decimals == 'INF':
+                    decimals = '0'
 
             temp_dict = {}
             temp_dict['adsh'] = adsh

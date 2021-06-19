@@ -59,19 +59,6 @@ class SecNumXmlTransformer:
         return result
 
 
-    def _find_last_day_of_month(self, datastr: str) -> str:
-        """finds the last day of the month in the datestring with format yyyy-mm-dd
-        and returns it as yyyymmdd """
-        yearstr = datastr[0:4]
-        monthstr = datastr[5:7]
-        daystr = datastr[8:]
-
-        year = int(yearstr)
-        month = int(monthstr)
-
-        last_day_of_month = calendar.monthrange(year, month)[1]
-        return yearstr + monthstr + str(last_day_of_month).zfill(2)
-
     def _find_close_last_day_of_month(self, datastr: str) -> str:
         """finds the last day of the month in the datestring with format yyyy-mm-dd
         and returns it as yyyymmdd """
@@ -83,7 +70,7 @@ class SecNumXmlTransformer:
         month = int(monthstr)
         day = int(daystr)
 
-        if day < 15:
+        if day <= 15:
             if month == 1:
                 month = 12
                 year = year -1
