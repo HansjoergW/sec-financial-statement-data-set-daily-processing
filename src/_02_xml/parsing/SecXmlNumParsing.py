@@ -3,6 +3,7 @@ from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNu
 from _02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag, SecNumTransformedUnit
 
 import pandas as pd
+import numpy as np
 
 from typing import Dict, List, Tuple, Optional
 
@@ -65,6 +66,11 @@ class SecNumXmlParser(SecXmlParserBase):
         df = self._read_tags(adsh, transformed_data)
         return df, []
 
+    def round_half_up(self, n, decimals=0):
+        # from https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe
+        multiplier = 10 ** decimals
+        return np.floor(n*multiplier + 0.5) / multiplier
+
     def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
         if df.shape[0] == 0:
             return df
@@ -74,8 +80,13 @@ class SecNumXmlParser(SecXmlParserBase):
         df['qtrs'] = df.qtrs.apply(int)
         df['value'] = pd.to_numeric(df['value'], errors='coerce')
 
+
+        # sec rounds the values to 4 decimals
+        # sec is not using the scientific rounding method, which rounds 0.155 up to 0.16 and 0.165 down to 0.16
+        # (see https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe)
+
         # die 'values' in den txt files haben maximal 4 nachkommastellen...
-        df['value'] = df.value.round(4)
+        df['value'] = self.round_half_up(df.value, decimals=4)
 
         df.loc[df.version == 'company', 'version'] = adsh
 
