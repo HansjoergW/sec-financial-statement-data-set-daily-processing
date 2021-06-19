@@ -98,7 +98,7 @@ class SecNumXmlTransformer:
         # month_end = int(month_end_s) + (year_end - year_start) * 12
         # return int(round(float(month_end - month_start) / 3))
 
-    def _transform_contexts(self, contexts: List[SecNumExtractContext], company_namespaces: List[str]) -> Dict[str, SecNumTransformedContext]:
+    def _transform_contexts(self, contexts: List[SecNumExtractContext], company_namespaces: List[str], relevant_ns_map: Dict[str,str]) -> Dict[str, SecNumTransformedContext]:
         context_map: Dict[str, SecNumTransformedContext] = {}
 
         for context in contexts:
@@ -135,8 +135,14 @@ class SecNumXmlTransformer:
                     if coreg.endswith("Domain"):
                         coreg = coreg.replace("Domain", "")
 
+                    # it would probably also enough to check for a ":" and then just taking the part after it
+                    # instead of iterating over the namespaces
                     for company_namespace in company_namespaces:
                         coreg = coreg.replace(company_namespace + ":", "")
+
+                    for rel_ns in relevant_ns_map:
+                        coreg = coreg.replace(rel_ns + ":", "")
+
 
             context_map[context.id] = SecNumTransformedContext(
                 id=context.id,
@@ -204,7 +210,7 @@ class SecNumXmlTransformer:
     def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
         ns_years: Dict[str, str] = self._eval_versionyear(data.relevant_ns_map)
 
-        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces)
+        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts, data.company_namespaces, data.relevant_ns_map)
         tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, ns_years, data.company_namespaces)
         units_map: Dict[str, SecNumTransformedUnit] = self._transform_units(data.units)
 

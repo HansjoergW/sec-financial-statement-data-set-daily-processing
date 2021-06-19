@@ -4,7 +4,7 @@ Next
 
 Masstest für Num umsetzen
 - coreg einträge hinzufügen -> beispiel für 0000004904-21-000010
-- footnotes sind am Ende in einer eigenen Node -> siehe auch 0000004904-21-000010
+- footnotes sind am Ende in einer eigenen Node -> siehe auch 0000004904-21-000010n
 
 
 - status index file über https://www.sec.gov/Archives/edgar/monthly/index.json auswerten
