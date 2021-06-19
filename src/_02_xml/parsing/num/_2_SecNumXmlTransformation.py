@@ -93,7 +93,9 @@ class SecNumXmlTransformer:
         end_date = date(year_end, month_end, day_end)
 
         diff_days = end_date - start_date
-        return int(round(float(diff_days.days) / 91))
+        # in the mean, a quarter (leap year considered), a quarter has an average length of 365.25 days / 4
+        # with this calculation, it is possible to reproduce the quarter length provided by sec
+        return int(round(float(diff_days.days) * 4 / 365.25 ))
 
         # month_end = int(month_end_s) + (year_end - year_start) * 12
         # return int(round(float(month_end - month_start) / 3))

@@ -21,7 +21,11 @@ def test_find_last_day_of_month():
 def test_calculate_qtrs():
     parser = SecNumXmlTransformer()
 
-    assert parser._calculate_qtrs("19", "09", "01", "20", "09", "01") == 4
-    assert parser._calculate_qtrs("19", "06", "01", "19", "09", "01") == 1
-    assert parser._calculate_qtrs("19", "10", "01", "20", "09", "01") == 4
-    assert parser._calculate_qtrs("19", "08", "01", "19", "10", "01") == 1
+    assert parser._calculate_qtrs("2019", "09", "01", "2020", "09", "01") == 4
+    assert parser._calculate_qtrs("2019", "06", "01", "2019", "09", "01") == 1
+    assert parser._calculate_qtrs("2019", "10", "01", "2020", "09", "01") == 4
+    assert parser._calculate_qtrs("2019", "08", "01", "2019", "10", "01") == 1
+    assert parser._calculate_qtrs("1980", "01", "01", "2020", "12", "31") == 164
+    assert parser._calculate_qtrs("2008", "03", "31", "2021", "01", "31") == 51
+    assert parser._calculate_qtrs("2012", "02", "25", "2020", "12", "31") == 35
+
