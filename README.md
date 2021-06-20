@@ -74,6 +74,8 @@ You can also setup the DB manually by executing the ddl scripts inside the ddl i
 Last but not least, you could install the db by calling the "_create_db" method from the _00_coomon.DBManagement() class.
 But note, if you are not using flyway you will need to execute manually additional ddl scripts of newer project version.
 
+BTW, i simple and handy SQLite DB Browser is https://sqlitebrowser.org/
+
 ## First run
 In order to excute the download and the parsing of the reports, just instantiate the SecDataOrchestrator 
 form the SecData module and call the process method.
