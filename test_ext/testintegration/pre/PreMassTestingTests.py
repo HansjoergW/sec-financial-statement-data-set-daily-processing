@@ -7,7 +7,6 @@ from typing import List, Dict, Tuple, Set, Union
 import pandas as pd
 
 
-
 default_workdir = "d:/secprocessing"
 
 dbmgr = DBManager(work_dir=default_workdir)
@@ -205,13 +204,6 @@ def test_compare_all():
     _compare_and_print('CI', 1, adshs_to_consider)
     _compare_and_print('EQ', 1, adshs_to_consider)
 
-
-
-# Tests
-# 1. Adshs vergleichen
-# 2. Anzahl Statements vergleichen
-# 3. Statement typen vergleichen
-# 4. Reihenfolge vergleichen (falls in der richtingen Reihenfolge geschrieben wurde)
 
 
 if __name__ == '__main__':

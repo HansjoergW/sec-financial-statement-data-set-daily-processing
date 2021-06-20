@@ -10,6 +10,8 @@ from multiprocessing import Pool
 ALL_PARSED_NUM_CONTENT_FILE = "d:/secprocessing/tmp/all_num.csv"
 
 class CreateAllNumParseContent():
+    """parses all the num xml files for the provided year and months and stores all data inside
+     under the file name defined in ALL_PARSED_NUM_CONTENT_FILE """
 
     def __init__(self, dbmgr: DBManager, testsetcreator: TestSetCreatorTool, year: int, months: List[int]):
         self.dbmgr = dbmgr
@@ -36,9 +38,6 @@ class CreateAllNumParseContent():
             return (None, [SecError(adsh, num_xml_file, str(e))])
 
     def process(self):
-        # complete run needs about 4 minutes (first time to load data in disk-cache, afterwards about 100secs)
-        # executes the complete parsing on all of the available reports from the
-        # provided year and months
         adshs: List[str] = self.testsetcreator.get_testset_by_year_and_months(self.year, self.months)
         xml_files_info: List[Tuple[str, str, str]] = self.dbmgr.get_xml_files_info_from_sec_processing_by_adshs(adshs)
         num_xml_files_info: List[Tuple[str, str]] = [(x[0], x[1]) for x in xml_files_info] # adsh and preXmlFile
@@ -72,7 +71,8 @@ class CreateAllNumParseContent():
 
 
 class ReadCreatedNumXmlContent():
-    """ reads the prezip content for a whole quarter back from db into a dataframe"""
+    """ reads the content from the file name defined in ALL_PARSED_NUM_CONTENT_FILE back into a
+    pandas dataframe. """
 
     def __init__(self):
         pass
@@ -85,6 +85,8 @@ class ReadCreatedNumXmlContent():
 
 
 class ReadNumZipContent():
+    """ reads the content of the num file of the  original sec-zip file for the provided year and quartert into
+    a pandas dataframe"""
 
     def __init__(self, dataUtils: DataAccessTool, year: int, qrtr: int):
         self.dataUtils = dataUtils
@@ -117,7 +119,9 @@ def read_mass_num_xml_content(adshs: List[str] = None) -> pd.DataFrame :
     return reader.readContent(adshs)
 
 
+
 def read_uoms_xml() -> List[str]:
+    """ reads all unit-of-measure (uom) entries from the parsed XML data"""
     reader = ReadCreatedNumXmlContent()
     uoms = reader.readContent()['uom']
     unique = uoms.unique().tolist()
@@ -126,6 +130,7 @@ def read_uoms_xml() -> List[str]:
 
 
 def read_uoms_zip(dataUtils: DataAccessTool, year: int, qrtr: int) -> List[str]:
+    """ reads all unit-of-measure (uom) entries from the num file in the original sec-quarter zipfile"""
     reader = ReadNumZipContent(dataUtils, year, qrtr)
     uoms = reader.readContent()['uom']
     unique = uoms.unique().tolist()
@@ -134,6 +139,7 @@ def read_uoms_zip(dataUtils: DataAccessTool, year: int, qrtr: int) -> List[str]:
 
 
 def compare_uoms(dataUtils: DataAccessTool, year: int, qrtr: int):
+    """compares all uoms from the parsed xml with the uoms from the num file in the orginal sec-quarter zipfile"""
     uoms_xml_set = set(read_uoms_xml())
     uoms_zip_set = set(read_uoms_zip(dataUtils, year, qrtr))
     not_in_xml = list(uoms_zip_set - uoms_xml_set)
@@ -156,9 +162,4 @@ if __name__ == '__main__':
     dataUtils = DataAccessTool(workdir)
     testCreatorTool = TestSetCreatorTool(workdir)
 
-    #fill_mass_pre_zip(dbmgr, dataUtils, 2021, 1)
-    #df = read_mass_pre_zip_content(dbmgr, dataUtils, 2021, 1)
-    #print(df.shape)
     create_all_num_xml(dbmgr, testCreatorTool, 2021, [1,2,3])
-    # df = read_mass_num_xml_content()
-    #compare_uoms(dataUtils, 2021, 1)

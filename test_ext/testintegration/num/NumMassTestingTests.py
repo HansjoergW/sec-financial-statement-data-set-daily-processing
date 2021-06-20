@@ -17,6 +17,10 @@ dataUtils = DataAccessTool(default_workdir)
 
 
 def load_data():
+    """
+    loads the parsed num data and the data of the numfile in the original sec zipfile.
+    filters the data, so that only adshs are present, that are contained in both files.
+    """
     zip_data_df = read_mass_num_zip_content(dataUtils, 2021, 1)
     xml_data_df = read_mass_num_xml_content()
 
@@ -26,8 +30,6 @@ def load_data():
     adshs_in_both = adshs_in_xml.union(adshs_in_zip)
     sorted_adshs_in_both = sorted(list(adshs_in_both))
 
-    # zip_data_matching_adshs_df = filter_for_adsh(zip_data_df, ['0000002178-21-000034'])
-    # xml_data_matching_adshs_df = filter_for_adsh(xml_data_df, ['0000002178-21-000034'])
     zip_data_matching_adshs_df = filter_for_adsh(zip_data_df, sorted_adshs_in_both)
     xml_data_matching_adshs_df = filter_for_adsh(xml_data_df, sorted_adshs_in_both)
 
@@ -35,6 +37,8 @@ def load_data():
 
 
 def test_save_merged_df():
+    """merges the data from the num file of the original sec zipfile and the parsed num xml files together in one df,
+    so that is possible to compare the results. Stores this merged df in a new file for later analysis"""
     adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
 
     zip_data_matching_adshs_df.loc[zip_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
@@ -52,6 +56,7 @@ def test_save_merged_df():
 
 
 def test_compare_adshs():
+    """simple comparision of the adshs contained for the num-data in the zipfile with the num data from the xml files"""
     adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
     not_in_xml = adshs_in_zip - adshs_in_xml
     not_in_zip = adshs_in_xml - adshs_in_zip
@@ -75,7 +80,10 @@ def test_compare_adshs():
 
 
 def test_compare_content():
-
+    """
+    analyzes the merge file and produces a file with entries that do not contain the same value in parsed num xml data
+    and the num-file from the original zip-file.
+    """
     ### Don't forget to recreate file!!!!
 
     merged_pure_df = pd.read_csv(merged_tmp_file)

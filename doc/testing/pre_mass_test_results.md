@@ -1,14 +1,4 @@
 # 23.05.2021
-## Basic Data Zip File
-ADSH -Entries in ZIP:  5464
-
-BS	10730
-CF	5956
-CI	3073
-CP	5464
-EQ	7269
-IS	5955
-UN	448
 
 ## Allgemein / Sonderfälle
 Keine Reports mit BS, IS, CF, etc.
