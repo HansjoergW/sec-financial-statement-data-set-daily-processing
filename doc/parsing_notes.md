@@ -80,14 +80,49 @@
 
 # Num-File-Parsing
 ## Contexts
-1. content
+1. context
 1.1. a context is either for a period (with start and end date) or an instant
 1.2. a context can contain segments.
 1.3. a context with a segment with dimension dei:LegalEntityAxis indicates that it is a "sub-company" and the
      the node content defines the "coreg" entry
-1.4. only contexts with no segment or a dei:LegalEntityAxis segment are relevant for further processing and are therefore written into the num.csv file
+1.4. only contexts with no segment or ONE single dei:LegalEntityAxis segment are relevant for further processing and are 
+     therefore written into the num.csv file
+1.5. if the legalEntityAxis name ends with "Member" or "Domain", then 'Member' or 'Domain' is stripped just from the entry
+1.6. if legalEntityAxis name has a "namespace" prefix, separated by a ":", then the prefix (including colon) is removed
+1.7. the quarters are calculated from the start and end date of a period. as an approximation, the calculation is done
+     with the formula "number of days between / (365.25 / 4)"
+1.8. contexts are referenced from an entry containing tag and value by the attribute contextRef
+1.9. the "ddate" for the entry in the csv file is calcaluted either from the instant or or the enddate of the context
+1.10. the ddate is rounded to the nearest "end-of-month". Dates after the 15th day of a month are rounded to the end day of that month.
+      days lower or equal to the 15th day of a month are rounded to the end of the previous month
 
-2. Units
-2.1. Units are defined in der own <unit> tags. these are referenced by unitref
-2.2. the maximum length of a unit name is 20
-2.3. units for exchange rates are written with a '/' in between
+## Units
+2. unit
+2.1. the used unit are defined in <unit> entities
+2.2. a unit entity can either be a single measure or a relation, 
+     identified by "divide" entity with a "unitNumerator" and a "unitDenominator"
+2.3. unit measures are often prefixed by a namespace, separated by a ":". in this case, the prefix (including colon) is removed
+2.4. if a unit is a relation (indicated by the "divde" entity), then the label used for the unit is written as <unitNumerator>/<unitDenumerator>
+     unless the unitDenumerator is "shares". if the unitDenumerator is shares, then just the unitNumerator is used as label
+2.5. the maximum lenght of a unit-label is 20 characters
+2.6. unit are referenced from an entry conaining tag and value by the attribute unitRef
+
+## Version / year
+3. version / year
+3.1. there are official and "company" namespaces. Official namespaces contain the domains  ['xbrl.org', 'sec.gov','fasb.org','w3.org', 'xbrl.ifrs.org']
+3.2. if it is not an official namespace, then it is marked as "company" namespace. The version used für the company namespace
+     is the adsh number of the report, without a year
+3.2. versions based on "official" namespaces are extended with the year (separated by a /). The year is contained
+     in the namespace url (ex: http://fasb.org/us-gaap/2020-01-31) 
+
+## Values
+3. values
+3.1. the values in the csv are rounded to 4 decimals.
+3.2. the values are rounded with the standard "mathematical" and not "scientific" rounding.  (https://realpython.com/python-rounding)
+3.3. since not scientific rounding is used, the pandas, numpy and math.round functions of python cannot be used
+3.4. inside a report, the same "tag" can appear with different precision (e.g. exact number, rounded to 1000s, rounded to millions).
+     in the csv, only the most precise number is used
+3.5. the attribute decimals indicate to which digit the a value is rounded in its presentation of the report.
+     '0' or 'INF' indicate that it is the precise number, '-3' indicates that the shown value is rounded to 1000s,
+     a '-6' indicates that is rounded to millions
+     

@@ -100,6 +100,15 @@ class SecNumXmlTransformer:
         # month_end = int(month_end_s) + (year_end - year_start) * 12
         # return int(round(float(month_end - month_start) / 3))
 
+    def _clean_member_domain_from_coreg(self, coreg: str) -> str:
+        if coreg.endswith("Member"):
+            coreg = coreg[0:len(coreg)-6]
+
+        if coreg.endswith("Domain"):
+            coreg = coreg[0:len(coreg)-6]
+
+        return coreg
+
     def _transform_contexts(self, contexts: List[SecNumExtractContext], company_namespaces: List[str], relevant_ns_map: Dict[str,str]) -> Dict[str, SecNumTransformedContext]:
         context_map: Dict[str, SecNumTransformedContext] = {}
 
@@ -111,6 +120,7 @@ class SecNumXmlTransformer:
             qtrs:int
             enddate:str
             if instanttxt is None:
+                # todo: müsste man hier die anzahl qrts evtl. basierend auf find_close for start und enddate berechnen
                 enddate = self._find_close_last_day_of_month(enddatetxt)
                 qtrs = self._calculate_qtrs(startdatetxt[0:4], startdatetxt[5:7], startdatetxt[8:10], enddatetxt[0:4], enddatetxt[5:7], enddatetxt[8:10])
             else:
@@ -125,26 +135,15 @@ class SecNumXmlTransformer:
                 isrelevant = True
 
             # ... or if there is just one LegalEntityAxis segment present
-            #for segment in context.segments:
             if len(context.segments) == 1:
                 segment = context.segments[0]
                 if segment.dimension == "dei:LegalEntityAxis":
                     isrelevant = True
                     coreg = segment.label
-                    if coreg.endswith("Member"):
-                        coreg = coreg.replace("Member", "")
+                    coreg = self._clean_member_domain_from_coreg(coreg)
 
-                    if coreg.endswith("Domain"):
-                        coreg = coreg.replace("Domain", "")
-
-                    # it would probably also enough to check for a ":" and then just taking the part after it
-                    # instead of iterating over the namespaces
-                    for company_namespace in company_namespaces:
-                        coreg = coreg.replace(company_namespace + ":", "")
-
-                    for rel_ns in relevant_ns_map:
-                        coreg = coreg.replace(rel_ns + ":", "")
-
+                    if ":" in coreg:
+                        coreg = coreg.split(":")[1]
 
             context_map[context.id] = SecNumTransformedContext(
                 id=context.id,

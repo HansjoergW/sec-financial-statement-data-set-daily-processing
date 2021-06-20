@@ -1,0 +1,732 @@
+adsh	tag	version	ddate	qtrs	coreg	uom	value_xml	value_zip	is_equal
+0000013239-21-000005	StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20190630	0		USD	1156000000.0	-1000000.0	False
+0000018349-21-000014	StockRepurchaseProgramAuthorizedAmount1	us-gaap/2020	20181231	0		USD	400000000.0	150000000.0	False
+0000018349-21-000014	StockRepurchaseProgramAuthorizedAmount1	us-gaap/2020	20190630	0		USD	325000000.0	725000000.0	False
+0000025232-21-000008	CommonStockSharesAuthorized	us-gaap/2020	20190531	0		shares	300000000.0	175000000.0	False
+0000036966-21-000012	CoveredTransactions	0000036966-21-000012	20201231	0	AllAffiliates	USD	436000000.0		False
+0000036966-21-000012	CoveredTransactions	0000036966-21-000012	20201231	0	AllAffiliatesMember	USD		436000000.0	False
+0000068505-21-000008	CommonStockDividendsPerShareDeclared	us-gaap/2020	20201130	0		USD	0.64	0.71	False
+0000071829-21-000018	ReceivablesNetCurrent	us-gaap/2020	20191231	0		USD	215755000.0	216714000.0	False
+0000073756-21-000023	AllowanceForDoubtfulAccountsReceivable	us-gaap/2020	20191231	0		USD	7500000.0	2.3	False
+0000089089-21-000012	DefinedBenefitPlanAssumptionsUsedCalculatingBenefitObligationRateOfCompensationIncrease	us-gaap/2020	20201231	0		pure	0.0	0.5	False
+0000093410-21-000009	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.49	0.486	False
+0000093410-21-000009	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	0.25	0.254	False
+0000093556-21-000008	SharesIssuedPricePerShare	us-gaap/2019	20191031	0		USD	100.0	159.45	False
+0000101199-21-000024	ReinsuranceRecoverablesAllowance	us-gaap/2020	20201231	0		USD	38000.0	190000.0	False
+0000102729-21-000012	PaymentsForRepurchaseOfCommonStock	us-gaap/2020	20201231	26		USD	852040000.0		False
+0000102729-21-000012	PaymentsForRepurchaseOfCommonStock	us-gaap/2020	20201231	27		USD		852040000.0	False
+0000102729-21-000012	TreasuryStockSharesAcquired	us-gaap/2020	20201231	26		shares	6363573.0		False
+0000102729-21-000012	TreasuryStockSharesAcquired	us-gaap/2020	20201231	27		shares		6363573.0	False
+0000310826-21-000009	LifeInsuranceInForcePercentageAssumedToNet	srt/2020	20191231	0		pure	0.3	0.301	False
+0000310826-21-000009	LifeInsuranceInForcePercentageAssumedToNet	srt/2020	20201231	0		pure	0.28	0.276	False
+0000314808-21-000007	DefinedBenefitPlanPlanAssetsForeignCurrencyTranslationGainLoss	us-gaap/2020	20191231	3		USD	34100000.0	-200000.0	False
+0000320335-21-000010	LettersOfCreditOutstandingAmount	us-gaap/2020	20201130	0		USD	150000000.0	135000000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseCashAndCashEquivalents	us-gaap/2020	20200531	0		USD	21253000.0	10592000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseCommonStockOutstanding	0000320575-21-000016	20200531	0		USD	0.0	1000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseCurrentLiabilities	us-gaap/2020	20200531	0		USD	88273000.0	65799000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseDeferredIncomeTaxAssetsNoncurrent	us-gaap/2020	20200531	0		USD	10897000.0	8740000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseEquipment	us-gaap/2020	20200531	0		USD	1010612000.0	178318000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseInterestPayable	0000320575-21-000016	20200531	0		USD	3775000.0	44000.0	False
+0000320575-21-000016	FreshStartAdjustmentIncreaseDecreaseOtherAssetsNoncurrent	us-gaap/2020	20200531	0		USD	13247000.0	12199000.0	False
+0000707179-21-000016	FinancingReceivableRecordedInvestmentNonaccrualStatus	us-gaap/2020	20191231	0		USD	132431000.0	126412000.0	False
+0000708955-21-000014	OffBalanceSheetCreditLossLiability	us-gaap/2020	20191231	0		USD	12740000.0	585000.0	False
+0000714395-21-000009	NumberOfLoanSegments	0000714395-21-000009	20191231	0		segment	8.0	6.0	False
+0000726601-21-000007	OffBalanceSheetCreditLossLiability	us-gaap/2020	20191231	0		USD	815000.0	157000.0	False
+0000759944-21-000034	FinancingReceivableAllowanceForCreditLossIncludingUnfundedLendingCommitments	0000759944-21-000034	20191231	0		USD	1747000000.0	1296000000.0	False
+0000766829-21-000047	RequestedWICASurchargeIncreaseDecreasePercentage	0000766829-21-000047	20200131	0	ConnecticutWaterCompany	pure	0.026	-0.0009	False
+0000773141-21-000024	DebtInstrumentCovenantComplianceAdjustedTangibleNetWorthRatio	0000773141-21-000024	20200930	0		pure	8.0	10.0	False
+0000795266-21-000012	IncreaseInOperatingLeaseRightOfUseAssetsAndLeaseLiabilitiesDueToAdoptionOfASC842	0000795266-21-000012	20191130	0		USD	31199000.0	0.0	False
+0000796343-21-000004	OperatingLeaseRightOfUseAsset	us-gaap/2020	20191130	0		USD	0.0	519000000.0	False
+0000798949-21-000003	CapitalizedCostsProvedProperties	us-gaap/2019	20200831	0		USD	238284000.0	6539816000.0	False
+0000798949-21-000003	CapitalizedCostsSupportEquipmentAndFacilities	us-gaap/2019	20200831	0		USD	63458000.0	1285024000.0	False
+0000798949-21-000003	Land	us-gaap/2019	20200831	0		USD	32635000.0	59080000.0	False
+0000798949-21-000003	MachineryAndEquipmentGross	us-gaap/2019	20200831	0		USD	3314000.0	15577000.0	False
+0000798949-21-000003	NaturalGasGatheringSystemsAndTreatingPlants	0000798949-21-000003	20200831	0		USD	250098000.0	833788000.0	False
+0000798949-21-000003	PropertyPlantAndEquipmentOther	us-gaap/2019	20200831	0		USD	9958000.0	57427000.0	False
+0000798949-21-000003	Saltwaterdisposalsystems	0000798949-21-000003	20200831	0		USD	0.0	43541000.0	False
+0000798949-21-000014	CapitalizedCostsOfUnprovedPropertiesExcludedFromAmortizationCumulative	us-gaap/2019	20200831	0		USD	0.0	30205000.0	False
+0000798949-21-000014	CapitalizedCostsProvedProperties	us-gaap/2019	20200831	0		USD	238284000.0	6539816000.0	False
+0000798949-21-000014	CapitalizedCostsSupportEquipmentAndFacilities	us-gaap/2019	20200831	0		USD	63458000.0	1285024000.0	False
+0000798949-21-000014	EarningsPerShareBasic	us-gaap/2019	20201231	1		USD	-1.51	-0.76	False
+0000798949-21-000014	Land	us-gaap/2019	20200831	0		USD	32635000.0	59080000.0	False
+0000798949-21-000014	MachineryAndEquipmentGross	us-gaap/2019	20200831	0		USD	3314000.0	15577000.0	False
+0000798949-21-000014	NaturalGasGatheringSystemsAndTreatingPlants	0000798949-21-000014	20200831	0		USD	250098000.0	833788000.0	False
+0000798949-21-000014	PropertyPlantAndEquipmentOther	us-gaap/2019	20200831	0		USD	9958000.0	57427000.0	False
+0000818479-21-000007	NumberOfReportingUnits	us-gaap/2020	20181231	0		reporting_unit	5.0	11.0	False
+0000829323-21-000010	CommonStockSharesAuthorized	us-gaap/2020	20200930	0		shares	100000000.0	60000000.0	False
+0000829323-21-000010	CommonStockSharesAuthorized	us-gaap/2020	20201231	0		shares	150000000.0	100000000.0	False
+0000851205-21-000005	CommonStockSharesAuthorized	us-gaap/2020	20160430	0		shares	200000000.0	10000000.0	False
+0000882104-21-000035	IntangibleAssetsGrossExcludingGoodwill	us-gaap/2019	20191231	0	Noden	USD	32600000.0	10100000.0	False
+0000885508-21-000016	StockRepurchaseProgramNumberOfSharesAuthorizedToBeRepurchased	us-gaap/2019	20131031	0		shares	1700000.0	700000.0	False
+0000885725-21-000008	ShareBasedCompensationArrangementsByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageExercisePrice	us-gaap/2020	20181231	4		USD	27.0	27.26	False
+0000885725-21-000008	ShareBasedCompensationArrangementsByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageExercisePrice	us-gaap/2020	20191231	4		USD	40.0	40.2	False
+0000885725-21-000008	ShareBasedCompensationArrangementsByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageExercisePrice	us-gaap/2020	20201231	4		USD	42.0	41.79	False
+0000888491-21-000006	DirectFinancingLeaseNetInvestmentInLease	us-gaap/2020	20191231	0		USD	10877000.0	11488000.0	False
+0000888491-21-000006	MortgageLoansOnRealEstateCommercialAndConsumerNet	us-gaap/2020	20191231	0		USD	752177000.0	773563000.0	False
+0000888491-21-000006	OtherInvestments	us-gaap/2020	20191231	0		USD	412540000.0	419228000.0	False
+0000891103-21-000014	DebtInstrumentInterestRateIncreaseDecrease	us-gaap/2020	20200131	0		pure	-0.0012	-0.0013	False
+0000891103-21-000014	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20200131	0		USD	750000000.0	500000000.0	False
+0000896622-21-000005	AccountsPayableAccruedLiabilitiesAndDerivativeLiabilitiesCurrent	0000896622-21-000005	20181231	0		USD	545707000.0	525199000.0	False
+0000896622-21-000005	LongTermDebtAndCapitalLeaseObligations	us-gaap/2020	20181231	0		USD	1129238000.0	1125993000.0	False
+0000896622-21-000005	LongTermDebtAndCapitalLeaseObligationsCurrent	us-gaap/2020	20181231	0		USD	65309000.0	62678000.0	False
+0000896622-21-000005	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2020	20181231	0		USD	116862000.0	118245000.0	False
+0000896622-21-000005	PropertyPlantAndEquipmentNet	us-gaap/2020	20181231	0		USD	997489000.0	991613000.0	False
+0000909832-21-000003	SharePrice	us-gaap/2020	20201130	0		USD	384.5	391.77	False
+0000919956-21-000016	NumberOfSkilledNursingCentersParticipatingInProgram	0000919956-21-000016	20190430	0		nursing_center	4.0	11.0	False
+0000927089-21-000117	RiskWeightingForCertainAssets	0000927089-21-000117	20141231	0		pure	1.5	1.0	False
+0000927653-21-000013	CommonStockDividendsPerShareDeclared	us-gaap/2020	20200731	0		USD	0.41	0.42	False
+0000928022-21-000021	CommonStockSharesAuthorized	us-gaap/2020	20200731	0		shares	52500000.0	525000000.0	False
+0000928022-21-000021	CommonStockSharesOutstanding	us-gaap/2020	20200731	0		shares	39746967.0	397479684.0	False
+0000939930-21-000019	ComprehensiveIncomeNetOfTax	us-gaap/2020	20201231	1		USD	-14881000.0	-8740000.0	False
+0000939930-21-000019	ComprehensiveIncomeNetOfTaxAttributableToNoncontrollingInterest	us-gaap/2020	20201231	1		USD	-661000.0	-197000.0	False
+0000939930-21-000019	ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20201231	1		USD	-15542000.0	-8937000.0	False
+0000939930-21-000019	DefinedBenefitPlanPlanAssetsContributionsDuringPeriod	0000939930-21-000019	20201231	1		USD	2025000.0	1373000.0	False
+0000939930-21-000019	EarningsPerShareBasic	us-gaap/2020	20201231	1		USD	-0.54	-0.33	False
+0000939930-21-000019	EarningsPerShareDiluted	us-gaap/2020	20201231	1		USD	-0.54	-0.33	False
+0000939930-21-000019	IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments	us-gaap/2020	20201231	1		USD	-27907000.0	-11292000.0	False
+0000939930-21-000019	IncomeLossFromEquityMethodInvestments	us-gaap/2020	20201231	1		USD	7798000.0	7564000.0	False
+0000939930-21-000019	IncomeTaxExpenseBenefit	us-gaap/2020	20201231	1		USD	-6091000.0	4492000.0	False
+0000939930-21-000019	InterestExpense	us-gaap/2020	20201231	1		USD	33101000.0	24898000.0	False
+0000939930-21-000019	InvestmentIncomeInterest	us-gaap/2020	20201231	1		USD	180000.0	126000.0	False
+0000939930-21-000019	OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax	us-gaap/2020	20201231	1		USD	-952000.0	-145000.0	False
+0000939930-21-000019	OtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	20201231	1		USD	-1524000.0	-717000.0	False
+0000939930-21-000019	ProfitLoss	us-gaap/2020	20201231	1		USD	-14018000.0	-8220000.0	False
+0000939930-21-000019	RestructuringCharges	us-gaap/2020	20201231	1		USD	5009000.0	4087000.0	False
+0000944809-21-000015	Goodwill	us-gaap/2020	20191231	0		USD	709963000.0	671940000.0	False
+0001017386-21-000009	ClassOfWarrantOrRightOutstanding	us-gaap/2019	20210930	0		shares	6000.0	80000.0	False
+0001025378-21-000040	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20200229	0		USD	1850000000.0	2100000000.0	False
+0001026214-21-000033	DeferredTaxAssetsLiabilitiesNet	us-gaap/2020	20191231	0		USD	5982000000.0	5918000000.0	False
+0001030469-21-000009	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20181231	4		pure	0.364	0.3644	False
+0001030469-21-000009	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.285	0.2846	False
+0001030469-21-000009	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	0.216	0.2162	False
+0001035443-21-000044	FinanceLeaseRightOfUseAsset	us-gaap/2020	20191231	0		USD	37700000.0	39900000.0	False
+0001037976-21-000009	DeferredIncomeTaxAssetsNet	us-gaap/2020	20191231	0		USD	250900000.0	245400000.0	False
+0001037976-21-000009	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20191231	0		USD	3573400000.0	3588300000.0	False
+0001039828-21-000018	FinancingReceivableAllowanceForCreditLosses	us-gaap/2019	20191231	0		USD	17779000.0	9179000.0	False
+0001046327-21-000018	ConvertibleNotesPayable	us-gaap/2019	20200731	0		USD	700000.0	1400000.0	False
+0001062993-21-001520	ClassOfWarrantOrRightExercised	0001062993-21-001520	20200731	0		shares	81400.0	7999.0	False
+0001062993-21-001520	ProceedsFromWarrantExercises	us-gaap/2020	20200731	0		CAD	172521.0	16802.0	False
+0001078782-21-000262	CommonStockSharesIssuableUponExerciseOfWarrants	0001078782-21-000262	20190228	0		shares	1724138.0	754475.0	False
+0001078782-21-000262	SharePrice	us-gaap/2019	20190228	0		USD	2.9	2.2	False
+0001079973-21-000009	DebtInstrumentInterestRateDuringPeriod	us-gaap/2020	20200930	0		pure	0.1	0.08	False
+0001084991-21-000026	OperatingLeaseLiability	us-gaap/2020	20181231	0		USD	451000.0	0.0	False
+0001084991-21-000026	OperatingLeaseLiabilityCurrent	us-gaap/2020	20181231	0		USD	126000.0	0.0	False
+0001084991-21-000026	OperatingLeaseLiabilityNoncurrent	us-gaap/2020	20181231	0		USD	325000.0	0.0	False
+0001084991-21-000026	OperatingLeaseRightOfUseAsset	us-gaap/2020	20181231	0		USD	451000.0	0.0	False
+0001096906-21-000191	OperatingLeaseLiability	us-gaap/2020	20201031	0		USD	1620000.0	440096.0	False
+0001096906-21-000399	NetIncomeLoss	us-gaap/2020	20210131	50		USD	-12670018.0		False
+0001096906-21-000399	NetIncomeLoss	us-gaap/2020	20210131	51		USD		-12670018.0	False
+0001103021-21-000029	LiabilitiesCurrent	us-gaap/2019	20181231	0		USD	21751000.0	21539000.0	False
+0001103021-21-000029	PropertyPlantAndEquipmentNet	us-gaap/2019	20181231	0		USD	4011000.0	3072000.0	False
+0001104659-21-003586	BusinessCombinationExtensionAmountToBeDeposits	0001104659-21-003586	20201130	0		USD	67781.0	203944.0	False
+0001104659-21-004239	CommonStockCapitalSharesReservedForFutureIssuance	us-gaap/2020	20200630	0		shares	3000000.0	250000.0	False
+0001104659-21-011950	BaseRentOfMonthlyLeasePayments	0001104659-21-011950	20200630	0		USD	29000.0	14000.0	False
+0001104659-21-022074	FinancingReceivableAllowanceForCreditLosses	us-gaap/2020	20191231	0		USD	33100000.0	27000000.0	False
+0001104659-21-023996	ProceedsFromIssuanceOfCommonStock	us-gaap/2020	20200630	0	UbsSecuritiesLlcUbs	USD	37800000.0	5500000.0	False
+0001104659-21-023996	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20200630	0	UbsSecuritiesLlcUbs	shares	17420000.0	2360000.0	False
+0001104659-21-026486	ClassOfWarrantOrRightNumberOfSecuritiesCalledByWarrantsOrRights	us-gaap/2020	20190131	0		shares	224066.0	315961.0	False
+0001104659-21-027547	ShareBasedCompensationArrangementByShareBasedPaymentAwardNumberOfSharesAuthorized	us-gaap/2019	20170331	0		shares	12700000.0	9200000.0	False
+0001104659-21-029196	UnitsIssuedDuringPeriodUnitsNewIssues	0001104659-21-029196	20111031	0	UnitedStatesCopperIndexFund	shares	100000.0	40.0	False
+0001104659-21-032106	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2019	20190930	0		USD	35000000.0	30000000.0	False
+0001104659-21-032672	PercentageOfFeePayableToEachNoteHolder	0001104659-21-032672	20200930	0		pure	0.0098	0.0073	False
+0001104659-21-032672	StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20171231	0		USD	445124000.0	442556000.0	False
+0001104659-21-033389	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20200731	0		USD	7.94	7.4699	False
+0001104659-21-035024	ManagerAdvancedFundsToFundSyndicationLegalAndOtherCosts	0001104659-21-035024	20190930	0		USD	80000.0	183000.0	False
+0001104659-21-036537	BusinessInterestLimitationPercentage	0001104659-21-036537	20200331	0		pure	0.3	0.5	False
+0001104659-21-038452	ProceedsFromIssuanceOfCommonStock	us-gaap/2019	20191231	0		USD	4400000.0	9000000.0	False
+0001104659-21-038452	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2019	20191231	0		shares	13878864.0	27662518.0	False
+0001104659-21-043566	DebtInstrumentCollateralAmount	us-gaap/2020	20191231	0	ChineseGovernmentLoan	CNY	15800000.0	51900000.0	False
+0001104659-21-043566	DebtInstrumentCollateralAmount	us-gaap/2020	20191231	0	ChineseGovernmentLoan	USD	2300000.0	7400000.0	False
+0001104659-21-043971	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20201231	0		USD	785400.0	78540.0	False
+0001104659-21-044842	CommonStockSharesAuthorized	us-gaap/2020	20200131	0		shares	3000000000.0	100000000.0	False
+0001108205-21-000003	CommonStockSharesAuthorized	us-gaap/2020	20200531	0		shares	151875000.0	101250000.0	False
+0001110803-21-000015	LiabilitiesandEquityRelatedToLeases	0001110803-21-000015	20181231	0		USD	5398000000.0	5062000000.0	False
+0001110803-21-000015	LongTermDebtCurrent	us-gaap/2020	20181231	0		USD	1107000000.0	838000000.0	False
+0001110803-21-000015	OtherLiabilitiesNoncurrent	us-gaap/2020	20181231	0		USD	359000000.0	224000000.0	False
+0001110803-21-000015	PropertyPlantAndEquipmentNet	us-gaap/2020	20181231	0		USD	1075000000.0	834000000.0	False
+0001110803-21-000015	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20181231	0		USD	3083000000.0	3065000000.0	False
+0001121702-21-000010	WarrantsAndRightsOutstanding	us-gaap/2020	20191231	0		USD	15934000.0	14977000.0	False
+0001124140-21-000029	CommonStockSharesAuthorized	us-gaap/2020	20200630	0		shares	400000000.0	200000000.0	False
+0001140361-21-005373	ReductionInOvernightFederalFundsRate	0001140361-21-005373	20200229	0		pure	100.0	50.0	False
+0001140361-21-005778	OperatingLeaseRightOfUseAsset	us-gaap/2020	20200731	0		USD	309624000.0	691949000.0	False
+0001140361-21-008218	CommonStockSharesAuthorized	us-gaap/2020	20190228	0		shares	30000000.0	1000000.0	False
+0001140361-21-009989	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20191031	0		USD	29.83	42.3	False
+0001140361-21-009989	ClassOfWarrantOrRightNumberOfSecuritiesCalledByWarrantsOrRights	us-gaap/2020	20191031	0		shares	40638.0	19196.0	False
+0001161697-21-000067	LitigationSettlementAmountAwardedToOtherParty	us-gaap/2020	20191231	0		USD	60000.0	15000.0	False
+0001161697-21-000165	CommonStockSharesIssued	us-gaap/2020	20210131	0		shares	1000000.0	29111660.0	False
+0001166388-21-000028	ClassOfWarrantOrRightNumberOfSecuritiesCalledByWarrantsOrRights	us-gaap/2020	20210131	0		shares	9541000.0	6205000.0	False
+0001171759-21-000020	LeasesRightOfUseAssetsNet	0001171759-21-000020	20181231	0		USD	0.0	478268000.0	False
+0001171759-21-000020	OperatingAndFinanceLeasesLiabilityCurrent	0001171759-21-000020	20181231	0		USD	786000.0	41392000.0	False
+0001171759-21-000020	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2019	20181231	0		USD	27576000.0	20984000.0	False
+0001171759-21-000020	RetainedEarningsAccumulatedDeficit	us-gaap/2019	20181231	0		USD	376341000.0	361169000.0	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsExercisePrice	us-gaap/2020	20200630	0		USD	0.19	0.18	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsRiskFreeInterestRate	us-gaap/2020	20200630	0		pure	0.0021	0.0028	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsRiskFreeInterestRate	us-gaap/2020	20200930	0		pure	0.0024	0.0027	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsForfeituresInPeriod	us-gaap/2020	20200430	0		shares	15000.0	30000.0	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsForfeituresInPeriod	us-gaap/2020	20200731	0		shares	675000.0	3750.0	False
+0001171843-21-001378	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsForfeituresInPeriod	us-gaap/2020	20200930	0		shares	56250.0	37500.0	False
+0001171843-21-001378	ShareBasedCompensationArrangementsByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageExercisePrice	us-gaap/2020	20200630	0		USD	0.19	0.18	False
+0001171843-21-001378	SharePrice	us-gaap/2020	20200630	0		USD	0.19	0.17	False
+0001171843-21-001411	SharesIssuedPricePerShare	us-gaap/2020	20191130	0		USD	1.45	1.69	False
+0001171843-21-002006	OperatingLeaseRightOfUseAsset	us-gaap/2020	20191231	0		USD	1837000.0	1376000.0	False
+0001174947-21-000182	OperatingLeaseRightOfUseAsset	us-gaap/2020	20200930	0		USD	22150000.0	2600000.0	False
+0001178913-21-001229	ProceedsFromRelatedPartyDebt	us-gaap/2020	20190331	0		USD	30000.0	20000.0	False
+0001185185-21-000325	OperatingLeaseRightOfUseAsset	us-gaap/2020	20191231	0		USD	1087075.0	714342.0	False
+0001185185-21-000413	CommonStockSharesAuthorized	us-gaap/2020	20201031	0		shares	200000000.0	125000000.0	False
+0001185185-21-000413	ProceedsFromIssuanceOrSaleOfEquity	us-gaap/2020	20201130	0		USD	1522800.0	11837800.0	False
+0001185185-21-000413	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGross	us-gaap/2020	20200131	0		shares	15490.0	9375.0	False
+0001185185-21-000413	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageGrantDateFairValue	us-gaap/2020	20200331	0		USD	6.98	5.77	False
+0001185185-21-000413	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20201130	0		shares	528750.0	4153750.0	False
+0001193125-21-041470	CapitalizedContractCostNetCurrent	us-gaap/2020	20181231	0		USD	2348000.0	1299000.0	False
+0001193125-21-041470	CapitalizedContractCostNetCurrent	us-gaap/2020	20191231	0		USD	3247000.0	2348000.0	False
+0001193125-21-041470	CapitalizedContractCostNetNoncurrent	us-gaap/2020	20181231	0		USD	3641000.0	2291000.0	False
+0001193125-21-041470	CapitalizedContractCostNetNoncurrent	us-gaap/2020	20191231	0		USD	4949000.0	3641000.0	False
+0001193125-21-047064	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20181231	4		pure	0.269	0.2691	False
+0001193125-21-047064	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.282	0.2819	False
+0001193125-21-047064	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	2.34	2.3399	False
+0001193125-21-050735	RevenueFromContractWithCustomerExcludingAssessedTax	us-gaap/2020	20200331	1		USD	704355000.0	494099000.0	False
+0001193125-21-050735	TreasuryStockShares	us-gaap/2020	20201231	0		shares	2000000.0	1500000.0	False
+0001193125-21-054904	AssetsHeldInTrust	us-gaap/2020	20201031	0		USD	275000000.0	250000000.0	False
+0001199835-21-000148	CommonStockParOrStatedValuePerShare	us-gaap/2020	20191231	0		USD	0.6	0.001	False
+0001199835-21-000148	CommonStockSharesIssued	us-gaap/2020	20191231	0		shares	600000.0	76222042.0	False
+0001201792-21-000003	StockRepurchaseProgramRemainingNumberOfSharesAuthorizedToBeRepurchased	us-gaap/2020	20191231	0		shares	0.0	352480.0	False
+0001201792-21-000003	TreasuryStockAcquiredAverageCostPerShare	us-gaap/2020	20191231	0		USD	27.23	0.0	False
+0001212545-21-000085	AccumulatedOtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	20171231	0		USD	-4200000.0	-3100000.0	False
+0001212545-21-000085	StockholdersEquity	us-gaap/2020	20191231	0		USD	2991800000.0	3016700000.0	False
+0001213900-21-001662	ConvertibleNotesPayable	us-gaap/2020	20181031	0		USD	90000.0	6000.0	False
+0001213900-21-001662	ConvertibleNotesPayable	us-gaap/2020	20190930	0		USD	6000.0	3000.0	False
+0001213900-21-008053	NetIncomeLoss	us-gaap/2020	20191231	3		USD	-942643.0	779572.0	False
+0001213900-21-008954	DerivativePriceRiskOptionStrikePrice	us-gaap/2020	20201231	0		USD/item	9.65	10.0	False
+0001213900-21-008954	FairValueOfWarrantsDerivativeLiabilitiesFour	0001213900-21-008954	20200930	0		USD	1265000.0	1425000.0	False
+0001213900-21-008954	FairValueOfWarrantsDerivativeLiabilitiesFour	0001213900-21-008954	20201231	0		USD	4655000.0	350000.0	False
+0001213900-21-008954	SupplementalDeferredPurchasePrice	us-gaap/2020	20200930	0		USD	750000.0	22000.0	False
+0001213900-21-008954	WorkingInterestPercentage	0001213900-21-008954	20200930	0		pure	0.61	1.0	False
+0001213900-21-009647	SharesIssued	us-gaap/2020	20201231	0		shares	5333333.0	217222.0	False
+0001213900-21-010061	ConvertibleNotesPayable	us-gaap/2020	20181031	0		USD	90000.0	6000.0	False
+0001213900-21-010870	ExchangeFairMarketingValue	0001213900-21-010870	20201130	0		USD	247108.0	1386106.0	False
+0001213900-21-010870	GainsLossesOnExtinguishmentOfDebt	us-gaap/2020	20201130	0		USD	545000.0	5000.0	False
+0001213900-21-010880	BusinessAcquisitionPercentageOfVotingInterestsAcquired	us-gaap/2020	20200331	0		pure	0.7	1.0	False
+0001213900-21-011358	NetOfDiscount	0001213900-21-011358	20200630	0		USD	14000.0	6000.0	False
+0001213900-21-013996	OperatingLeaseRightOfUseAsset	us-gaap/2020	20191231	0		USD	462000.0	559863.0	False
+0001213900-21-014709	ProceedsFrompublicOfferingGross	0001213900-21-014709	20200930	0		USD	147600000000.0	11600000000.0	False
+0001213900-21-014709	PublicOfferingProceedsNet	0001213900-21-014709	20200930	0		USD	139900000000.0	11100000000.0	False
+0001213900-21-015764	EquityMethodInvestments	us-gaap/2020	20200531	0		USD	250000.0	100000.0	False
+0001213900-21-015764	InvestmentOwnershipPercentage	0001213900-21-015764	20200531	0		USD	0.25	0.01	False
+0001213900-21-016941	AdvancesFairValueDisclosure	us-gaap/2020	20201231	0		USD	11471.0	360000.0	False
+0001213900-21-017009	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20190131	0		USD	3.75	4.99	False
+0001213900-21-017009	UnregisteredSharesOfCommonStock	0001213900-21-017009	20190131	0		shares	22311.0	250000.0	False
+0001213900-21-017009	WarrantsForPurchases	0001213900-21-017009	20190131	0		shares	300000.0	65130.0	False
+0001213900-21-017307	LiabilitiesNoncurrent	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictMemberOne	USD		1720134.0	False
+0001213900-21-017307	LiabilitiesNoncurrent	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictOne	USD	1720134.0		False
+0001213900-21-017307	LoansPayableToBank	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictMemberOne	USD		1863479.0	False
+0001213900-21-017307	LoansPayableToBank	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictOne	USD	1863479.0		False
+0001213900-21-017307	LoansPayableToBank	us-gaap/2020	20201231	0	RuralCreditUnionOfXushuiDistrictMemberOne	USD		1992368.0	False
+0001213900-21-017307	LoansPayableToBank	us-gaap/2020	20201231	0	RuralCreditUnionOfXushuiDistrictOne	USD	1992368.0		False
+0001213900-21-017307	LoansPayableToBankCurrent	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictMemberOne	USD		143345.0	False
+0001213900-21-017307	LoansPayableToBankCurrent	us-gaap/2020	20191231	0	RuralCreditUnionOfXushuiDistrictOne	USD	143345.0		False
+0001213900-21-017307	LoansPayableToBankCurrent	us-gaap/2020	20201231	0	RuralCreditUnionOfXushuiDistrictMemberOne	USD		1992368.0	False
+0001213900-21-017307	LoansPayableToBankCurrent	us-gaap/2020	20201231	0	RuralCreditUnionOfXushuiDistrictOne	USD	1992368.0		False
+0001213900-21-017307	LongTermDebtPercentageBearingFixedInterestRate	us-gaap/2020	20140430	0	RuralCreditUnionOfXushuiDistrictMemberOne	pure		0.0064	False
+0001213900-21-017307	LongTermDebtPercentageBearingFixedInterestRate	us-gaap/2020	20140430	0	RuralCreditUnionOfXushuiDistrictOne	pure	0.0064		False
+0001213900-21-017307	LongTermDebtPercentageBearingFixedInterestRate	us-gaap/2020	20191130	0	RuralCreditUnionOfXushuiDistrictMemberOne	pure		0.0756	False
+0001213900-21-017307	LongTermDebtPercentageBearingFixedInterestRate	us-gaap/2020	20191130	0	RuralCreditUnionOfXushuiDistrictOne	pure	0.0756		False
+0001213900-21-017601	ShortTermBorrowings	us-gaap/2020	20200430	0		USD	500000.0	200000.0	False
+0001213900-21-018270	SaleOfStockPricePerShare	us-gaap/2020	20200430	0		USD	0.01	0.08	False
+0001213900-21-018415	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsOutstandingWeightedAverageExercisePrice	us-gaap/2020	20181231	0		USD	0.03	0.0001	False
+0001213900-21-018433	SharePrice	us-gaap/2020	20201231	0		USD	60.0	0.0001	False
+0001213900-21-018447	DebtInstrumentFaceAmount	us-gaap/2020	20201130	0		USD	10000000.0	45000000.0	False
+0001213900-21-018447	DebtInstrumentIncreaseAccruedInterest	us-gaap/2020	20201130	0		USD	30323000.0	159000.0	False
+0001213900-21-018761	SaleOfStockPricePerShare	us-gaap/2020	20201130	0		USD	10.0	10.1	False
+0001213900-21-018961	WeightedAverageNumberOfSharesRestrictedStock	us-gaap/2020	20200229	0		shares	10000.0	5000.0	False
+0001213900-21-018976	ConversionOfStockSharesConverted	0001213900-21-018976	20200831	0		shares	1818181.0	6363636.0	False
+0001213900-21-019152	GainsLossesOnExtinguishmentOfDebt	us-gaap/2020	20200731	0	OdysseyFundingLLC	USD	152349.0	207421.0	False
+0001213900-21-019152	RepaymentsOfDebt	us-gaap/2020	20191231	0	GSCapitalPartnersLlc	USD	90000.0	48000.0	False
+0001213900-21-019153	NetOfferingCost	0001213900-21-019153	20201130	0		USD	1262737.0	892037.0	False
+0001213900-21-019153	SharePriceForIssuanceOfCommonStock	0001213900-21-019153	20201130	0		USD	15.25	13.25	False
+0001213900-21-019186	LitigationSettlementAmountAwardedToOtherParty	us-gaap/2020	20190731	0		CNY	101253.4	64535.0	False
+0001213900-21-019186	LossContingencyAccrualAtCarryingValue	us-gaap/2020	20190630	0		CNY	64535.0	184490.77	False
+0001213900-21-019297	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20190630	0		USD	15.6152	15.6151	False
+0001213900-21-019311	CommonStockSharesIssued	us-gaap/2020	20201231	0		shares	338223.0	131365171.0	False
+0001217234-21-000046	TaxCutsAndJobsActOf2017IncompleteAccountingDeferredTaxAssets	0001217234-21-000046	20171231	0		USD	72500000.0	45900000.0	False
+0001234006-21-000004	CommonStockSharesOutstanding	us-gaap/2020	20200229	0		shares	86290000.0	60290000.0	False
+0001234006-21-000004	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20171031	0		USD	25000000.0	75000000.0	False
+0001255474-21-000009	AccountsPayableTradeCurrent	us-gaap/2019	20200831	0		USD	56432000.0	47168000.0	False
+0001255474-21-000009	AccountsReceivableNetCurrent	us-gaap/2019	20200831	0		USD	136962000.0	136881000.0	False
+0001255474-21-000009	AdditionalPaidInCapital	us-gaap/2019	20200831	0		USD	1189178000.0	6410410000.0	False
+0001255474-21-000009	AssetRetirementObligation	us-gaap/2019	20200831	0		USD	126741000.0	156323000.0	False
+0001255474-21-000009	Assets	us-gaap/2019	20200831	0		USD	2142728000.0	3730369000.0	False
+0001255474-21-000009	AssetsCurrent	us-gaap/2019	20200831	0		USD	207582000.0	731912000.0	False
+0001255474-21-000009	CapitalizedCostsOilAndGasProducingActivitiesGross	us-gaap/2019	20200831	0		USD	1826114000.0	4885013000.0	False
+0001255474-21-000009	CommonStockValue	us-gaap/2019	20200831	0		USD	38000.0	92000.0	False
+0001255474-21-000009	DeferredFinanceCostsNoncurrentNet	us-gaap/2019	20200831	0		USD	12784000.0	1834000.0	False
+0001255474-21-000009	DeferredIncomeTaxLiabilitiesNet	us-gaap/2019	20200831	0		USD	14501000.0	69847000.0	False
+0001255474-21-000009	Liabilities	us-gaap/2019	20200831	0		USD	953512000.0	3999927000.0	False
+0001255474-21-000009	LiabilitiesAndStockholdersEquity	us-gaap/2019	20200831	0		USD	2142728000.0	3730369000.0	False
+0001255474-21-000009	LiabilitiesCurrent	us-gaap/2019	20200831	0		USD	345728000.0	1234070000.0	False
+0001255474-21-000009	LiabilitiesNotSubjectToCompromise	0001255474-21-000009	20200831	0		USD	953512000.0	1473002000.0	False
+0001255474-21-000009	OilAndGasAccruedLeaseOperatingExpensesCurrent	0001255474-21-000009	20200831	0		USD	26738000.0	25344000.0	False
+0001255474-21-000009	OilAndGasReclamationLiabilityNoncurrent	us-gaap/2019	20200831	0		USD	121343000.0	150925000.0	False
+0001255474-21-000009	OtherAccruedLiabilitiesCurrent	us-gaap/2019	20200831	0		USD	15342000.0	14037000.0	False
+0001255474-21-000009	OtherAssetsNoncurrent	us-gaap/2019	20200831	0		USD	24933000.0	37010000.0	False
+0001255474-21-000009	OtherLiabilitiesCurrent	us-gaap/2019	20200831	0		USD	61740000.0	46327000.0	False
+0001255474-21-000009	OtherLiabilitiesNoncurrent	us-gaap/2019	20200831	0		USD	28773000.0	18160000.0	False
+0001255474-21-000009	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2019	20200831	0		USD	21213000.0	18722000.0	False
+0001255474-21-000009	PropertyPlantAndEquipmentOther	us-gaap/2019	20200831	0		USD	71315000.0	159866000.0	False
+0001255474-21-000009	RestrictedCashAndCashEquivalentsAtCarryingValue	us-gaap/2019	20200831	0		USD	26750000.0	28955000.0	False
+0001255474-21-000009	StockholdersEquity	us-gaap/2019	20200831	0		USD	1189216000.0	-269558000.0	False
+0001258602-21-000027	AssetOwnershipPercentage	0001258602-21-000027	20181231	0		pure	0.65	0.825	False
+0001258602-21-000027	FinancingReceivableUnamortizedLoanCommitmentOriginationFeeAndPremiumDiscount	us-gaap/2020	20191231	0		USD	-1246000.0	-35036000.0	False
+0001258602-21-000027	NonAccretableDiscount	0001258602-21-000027	20191231	0		USD	0.0	32398000.0	False
+0001273441-21-000007	ShareBasedCompensationArrangementByShareBasedPaymentAwardNumberOfSharesAvailableForGrant	us-gaap/2020	20120630	0		shares	23306100.0	39806100.0	False
+0001274737-21-000015	CoronavirusAidReliefAndEconomicSecuritiesCARESActProceedsFromLoan	0001274737-21-000015	20200430	0		USD	700000.0	2900000.0	False
+0001302215-21-000006	AccountsReceivableNet	us-gaap/2019	20200331	0		USD	80313000.0	80912000.0	False
+0001302215-21-000006	DeferredTaxLiabilities	us-gaap/2019	20200331	0		USD	6085000.0	5843000.0	False
+0001302215-21-000006	OtherAssets	us-gaap/2019	20200331	0		USD	38797000.0	38890000.0	False
+0001302215-21-000006	RetainedEarningsAccumulatedDeficit	us-gaap/2019	20200331	0		USD	376789000.0	377471000.0	False
+0001302215-21-000006	UnbilledReceivablesWorkInProcess	0001302215-21-000006	20200331	0		USD	39589000.0	39821000.0	False
+0001324424-21-000015	CommonStockVotingPowerPercentage	0001324424-21-000015	20190731	0	LibertyExpediaHoldings	pure	0.53	0.2	False
+0001331463-21-000052	DefinedBenefitPlanAssumptionsUsedCalculatingBenefitObligationRateOfCompensationIncrease	us-gaap/2020	20191231	0		pure	0.0	0.055	False
+0001331463-21-000052	DefinedBenefitPlanAssumptionsUsedCalculatingBenefitObligationRateOfCompensationIncrease	us-gaap/2020	20201231	0		pure	0.0	0.055	False
+0001331463-21-000052	DefinedBenefitPlanAssumptionsUsedCalculatingNetPeriodicBenefitCostRateOfCompensationIncrease	us-gaap/2020	20191231	4		pure	0.0	0.055	False
+0001331463-21-000052	DefinedBenefitPlanAssumptionsUsedCalculatingNetPeriodicBenefitCostRateOfCompensationIncrease	us-gaap/2020	20201231	4		pure	0.0	0.055	False
+0001346302-21-000026	CommonStockSharesIssued	us-gaap/2020	20191231	0		shares	204427.0	27214523.0	False
+0001347652-21-000014	FirmCapacityPerDay	0001347652-21-000014	20201231	0	Spire	dekatherm	62800.0	145600.0	False
+0001347652-21-000014	NotesReceivableNet	us-gaap/2020	20181130	0		USD	1300000.0	1500000.0	False
+0001349929-21-000004	WarrantsAndRightsOutstanding	us-gaap/2020	20181231	0		USD	168000.0	248000.0	False
+0001376339-21-000011	AdjustmentsToAdditionalPaidInCapitalShareBasedCompensationRestrictedStockUnitsRequisiteServicePeriodRecognition	us-gaap/2020	20200731	0		USD	300000.0	1300000.0	False
+0001376474-21-000072	EarningsPerShareBasicAndDiluted	us-gaap/2020	20200331	1		USD	0.0	-0.0001	False
+0001378453-21-000006	CommonStockSharesAuthorized	us-gaap/2020	20200630	0		shares	16000000.0	216000000.0	False
+0001387131-21-002996	MinimumBlockOfSharesIssuedRedeemedAgainstBullion	0001387131-21-002996	20190331	0		shares	25000.0	50000.0	False
+0001387131-21-003000	MinimumBlockOfSharesIssuedRedeemedAgainstBullion	0001387131-21-003000	20191031	0		shares	100000.0	50000.0	False
+0001398432-21-000007	ConversionOfStockSharesConverted1	us-gaap/2020	20170930	0		shares	86049332.0	42365263.0	False
+0001398432-21-000007	DebtConversionConvertedInstrumentAmount1	us-gaap/2020	20170930	0		USD	59760.0	40501.0	False
+0001400891-21-000015	EquityMethodInvestments	us-gaap/2020	20190430	0		USD	54238000.0	79128000.0	False
+0001400891-21-000015	Goodwill	us-gaap/2020	20190430	0		USD	3323365000.0	3415492000.0	False
+0001400891-21-000015	ReorganizationItems	us-gaap/2020	20190430	0		USD	-9497944000.0	7082213000.0	False
+0001401257-21-000031	CommonStockSharesAuthorized	us-gaap/2020	20201031	0		shares	296000000.0	14800000.0	False
+0001401521-21-000013	AccumulatedOtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	20171231	0		USD	-117000.0	9221000.0	False
+0001401521-21-000013	AccumulatedOtherComprehensiveIncomeLossTaxExpenseBenefit	0001401521-21-000013	20171231	0		USD	-139000.0	2823000.0	False
+0001401521-21-000013	AociBeforeTaxAttributableToParent	us-gaap/2020	20171231	0		USD	-256000.0	12044000.0	False
+0001412408-21-000024	OperatingLeaseRightOfUseAsset	us-gaap/2020	20200131	0		USD	2741000.0	0.0	False
+0001412408-21-000024	ProceedsFromIssuanceOfCommonStock	us-gaap/2020	20201031	0		USD	174800000.0	174510000.0	False
+0001415404-21-000005	OperatingLeaseLiabilityNoncurrent	us-gaap/2020	20181231	0		USD	100085000.0	0.0	False
+0001415404-21-000005	OtherAccruedLiabilitiesCurrent	us-gaap/2020	20181231	0		USD	199151000.0	181698000.0	False
+0001415404-21-000005	OtherLiabilitiesAndDeferredRevenueNoncurrent	us-gaap/2020	20181231	0		USD	76433000.0	80304000.0	False
+0001421182-21-000004	StockRepurchaseProgramAuthorizedAmount1	us-gaap/2020	20200731	0		USD	150000000.0	250000000.0	False
+0001428205-21-000051	NumberofLoanAgreementswithRelatedParty	0001428205-21-000051	20190331	0		loan	3.0	1.0	False
+0001433195-21-000024	OperatingLeaseLiability	us-gaap/2020	20181231	0		USD	20056000.0	0.0	False
+0001433195-21-000024	OperatingLeaseRightOfUseAsset	us-gaap/2020	20181231	0		USD	16945000.0	0.0	False
+0001433195-21-000024	OtherLiabilitiesNoncurrent	us-gaap/2020	20181231	0		USD	159000.0	7080000.0	False
+0001433195-21-000024	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2020	20181231	0		USD	11458000.0	11775000.0	False
+0001434728-21-000087	SaleOfStockConsiderationReceivedOnTransaction	us-gaap/2020	20200131	0		USD	10900000.0	1600000.0	False
+0001437107-21-000018	GoodwillImpairedDiscountedCashFlowDiscountRate	0001437107-21-000018	20200630	1		pure	0.1	0.105	False
+0001437749-21-002477	PercentageOfIssuedAndOutstandingSharesOfCommonStock	0001437749-21-002477	20200930	0	RoyalGold	pure	0.119	0.0	False
+0001437749-21-002627	AccruedLiabilitiesCurrent	us-gaap/2020	20201231	0		USD	8878000.0	8877715.0	False
+0001437749-21-002781	AreaOfRealEstateProperty	us-gaap/2020	20111231	0	ManhattanDrugCompany	sqft	76161.0	74898.0	False
+0001437749-21-002802	AllowanceForDoubtfulAccountsReceivable	us-gaap/2020	20191231	0		USD	2811000.0	0.0	False
+0001437749-21-003217	CommonStockSharesIssued	us-gaap/2020	20180731	0	KlondexMinesLtd	shares	180499319.0	182048945.0	False
+0001437749-21-004238	UnrecognizedTaxBenefits	us-gaap/2020	20171231	0		USD	44832000.0	58377000.0	False
+0001437749-21-004274	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20181231	0		USD	422164000.0	422222000.0	False
+0001437749-21-005174	MaximumCashAwardedToAnyParticipantInTheIncentivePlanInAnyCalendarYear	0001437749-21-005174	20200630	0		USD	4000000.0	2000000.0	False
+0001437749-21-005174	MaximumNumberOfSharesOfClassACommonStockAwardedToAnyParticipantInTheIncentivePlanInAnyCalendarYear	0001437749-21-005174	20200630	0		shares	500000.0	200000.0	False
+0001437749-21-006048	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20181231	0		USD	-102473000.0	-102495000.0	False
+0001437749-21-006480	Assets	us-gaap/2020	20181231	0		USD	47463000.0	46834000.0	False
+0001437749-21-006923	ReverseStockSplitRatioAuthorized	0001437749-21-006923	20191130	0		pure	5.0	15.0	False
+0001437749-21-006993	ProceedsFromSaleOfLandHeldforinvestment	us-gaap/2020	20200331	0		USD	1100000.0	2400000.0	False
+0001437749-21-007631	PromissoryNotesPayableCurrent	0001437749-21-007631	20191130	0		USD	7980.0	101279.0	False
+0001437749-21-007631	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20191130	0		USD	-11359307.0	-12226812.0	False
+0001437749-21-007838	AdjustmentsToAdditionalPaidInCapitalReclassificationOfDerivativeLiabilityToEquity	0001437749-21-007838	20191231	4		USD	2700000.0	4115778.0	False
+0001447362-21-000047	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20200630	0		shares	300000.0	2000000.0	False
+0001452936-21-000008	EquityMethodInvestmentOwnershipPercentage	us-gaap/2020	20170630	0	MigdalMembers	pure		0.45	False
+0001452936-21-000008	EquityMethodInvestmentOwnershipPercentage	us-gaap/2020	20170630	0	Migdals	pure	0.45		False
+0001453818-21-000008	NetAssetValuePerShare	us-gaap/2020	20200630	0		USD	2.13	5.58	False
+0001471727-21-000029	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20200630	0		USD	1.25	0.75	False
+0001471727-21-000029	ClassOfWarrantOrRightIssued	0001471727-21-000029	20200630	0		shares	1990624.0	1000000.0	False
+0001471727-21-000029	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20201130	0		shares	500000.0	35000.0	False
+0001474098-21-000053	InterestRateLIBORFloor	0001474098-21-000053	20200630	0		pure	0.0	0.0025	False
+0001477932-21-000201	ConvertibleDebt	us-gaap/2019	20200531	0		USD	44000.0	55000.0	False
+0001477932-21-000201	DerivativeLiabilities	us-gaap/2019	20200930	0		USD	132388.0	0.0	False
+0001477932-21-000201	InterestPayableCurrent	us-gaap/2019	20200930	0		USD	9000.0	81468.0	False
+0001477932-21-000268	CommonStockSharesIssued	us-gaap/2019	20201130	0		shares	2000000.0	167892919.0	False
+0001477932-21-000338	AdditionalPaidIn	0001477932-21-000338	20201031	0		USD	37679.0	17437.0	False
+0001477932-21-000338	CommonStockSharesOutstanding	us-gaap/2019	20190831	0		shares	78268780.0	85105780.0	False
+0001477932-21-000338	DebtInstrumentConvertibleConversionPrice1	us-gaap/2019	20201031	0		USD	0.7	0.65	False
+0001477932-21-000338	DebtInstrumentFairValue	us-gaap/2019	20201031	0		USD	48258.0	20176.0	False
+0001477932-21-000338	FairValueOfWarrants	0001477932-21-000338	20201031	0		USD	37679.0	17437.0	False
+0001477932-21-000338	OriginalIssueDiscountOnBeneficialConversionFeature	0001477932-21-000338	20201031	0		USD	48258.0	20176.0	False
+0001477932-21-000869	SharePrice	us-gaap/2019	20201130	0		USD	0.05	0.015	False
+0001477932-21-001185	CommonStockSharesIssued	us-gaap/2019	20201231	0		shares	95000.0	22367179.0	False
+0001477932-21-001762	DebtConversionConvertedInstrumentSharesIssued1	us-gaap/2019	20190131	0		shares	1109023.0	3007519.0	False
+0001486159-21-000017	AccountsPayableCurrent	us-gaap/2020	20201130	0		USD	9206000.0	31015000.0	False
+0001486159-21-000017	AccruedLiabilitiesCurrent	us-gaap/2020	20201130	0		USD	72513000.0	131868000.0	False
+0001486159-21-000017	AccumulatedDepreciationDepletionAndAmortizationPropertyPlantAndEquipment	us-gaap/2020	20201130	0		USD	8579696000.0	0.0	False
+0001486159-21-000017	AdvancesFromJointInterestPartnersCurrent	0001486159-21-000017	20201130	0		USD	170000.0	2725000.0	False
+0001486159-21-000017	AssetRetirementObligationsNoncurrent	us-gaap/2020	20201130	0		USD	2246000.0	45986000.0	False
+0001486159-21-000017	Assets	us-gaap/2020	20201130	0		USD	2433755000.0	2237991000.0	False
+0001486159-21-000017	CashAndCashEquivalentsAtCarryingValue	us-gaap/2020	20201130	0		USD	74071000.0	8754000.0	False
+0001486159-21-000017	CommonStockValue	us-gaap/2020	20201130	0		USD	3233000.0	200000.0	False
+0001486159-21-000017	DeferredIncomeTaxLiabilitiesNet	us-gaap/2020	20201130	0		USD	1097000.0	4431000.0	False
+0001486159-21-000017	DerivativeLiabilitiesCurrent	us-gaap/2020	20201130	0		USD	4902000.0	4969000.0	False
+0001486159-21-000017	DerivativeLiabilitiesNoncurrent	us-gaap/2020	20201130	0		USD	5316000.0	5357000.0	False
+0001486159-21-000017	DisposalGroupIncludingDiscontinuedOperationAssetsNoncurrent	us-gaap/2020	20201130	0		USD	1380000.0	5500000.0	False
+0001486159-21-000017	Goodwill	us-gaap/2020	20201130	0		USD	0.0	70534000.0	False
+0001486159-21-000017	IntangibleAssetsNetExcludingGoodwill	us-gaap/2020	20201130	0		USD	667000.0	43667000.0	False
+0001486159-21-000017	InterestPayableCurrent	us-gaap/2020	20201130	0		USD	60988000.0	478000.0	False
+0001486159-21-000017	InventoryNet	us-gaap/2020	20201130	0		USD	33729000.0	35831000.0	False
+0001486159-21-000017	InventoryNoncurrent	us-gaap/2020	20201130	0		USD	14107000.0	14520000.0	False
+0001486159-21-000017	LiabilitiesCurrent	us-gaap/2020	20201130	0		USD	640368000.0	305592000.0	False
+0001486159-21-000017	LongTermDebtCurrent	us-gaap/2020	20201130	0		USD	360640000.0	0.0	False
+0001486159-21-000017	LongTermDebtNoncurrent	us-gaap/2020	20201130	0		USD	455500000.0	795500000.0	False
+0001486159-21-000017	MinorityInterest	us-gaap/2020	20201130	0		USD	170553000.0	92816000.0	False
+0001486159-21-000017	OilAndGasPropertySuccessfulEffortMethodGross	us-gaap/2020	20201130	0		USD	9256532000.0	795247000.0	False
+0001486159-21-000017	OperatingLeaseLiabilityCurrent	us-gaap/2020	20201130	0		USD	1050000.0	1898000.0	False
+0001486159-21-000017	OperatingLeaseLiabilityNoncurrent	us-gaap/2020	20201130	0		USD	914000.0	15636000.0	False
+0001486159-21-000017	OperatingLeaseRightOfUseAsset	us-gaap/2020	20201130	0		USD	13260000.0	12463000.0	False
+0001486159-21-000017	OtherAssetsNoncurrent	us-gaap/2020	20201130	0		USD	21393000.0	18756000.0	False
+0001486159-21-000017	OtherLiabilitiesCurrent	us-gaap/2020	20201130	0		USD	412000.0	2152000.0	False
+0001486159-21-000017	PropertyPlantAndEquipmentNet	us-gaap/2020	20201130	0		USD	1988076000.0	1733419000.0	False
+0001486159-21-000017	PropertyPlantAndEquipmentOther	us-gaap/2020	20201130	0		USD	1311240000.0	938172000.0	False
+0001486159-21-000017	RestrictedCashCurrent	us-gaap/2020	20201130	0		USD	0.0	11800000.0	False
+0001486159-21-000017	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20201130	0		USD	-3995209000.0	0.0	False
+0001486159-21-000017	StockholdersEquity	us-gaap/2020	20201130	0		USD	-897167000.0	965615000.0	False
+0001486159-21-000017	TreasuryStockValue	us-gaap/2020	20201130	0		USD	36637000.0	0.0	False
+0001493152-21-000239	CommonStockSharesAuthorized	us-gaap/2020	20190331	0		shares	25000000.0	125000000000.0	False
+0001493152-21-000239	CommonStockSharesAuthorized	us-gaap/2020	20190831	0		shares	25000000.0	100000000.0	False
+0001493152-21-000811	EquityMethodInvestmentOwnershipPercentage	us-gaap/2020	20200229	0	FiftySevenSocietyInternationalLtd	pure	0.947	0.5237	False
+0001493152-21-001042	OilAndGasCommitmentsAndContracts3DSeismicSurveyWorkRequiredToBeCompletedKilometers	0001493152-21-001042	20140531	0		sqkm	500.0	400.0	False
+0001493152-21-001042	OilAndGasCommitmentsAndContracts3DSeismicSurveyWorkRequiredToBeCompletedMiles	0001493152-21-001042	20140531	0		sqmi	193.0	154.0	False
+0001493152-21-001350	CommonStockSharesAuthorized	us-gaap/2020	20190831	0		shares	100000000.0	25000000.0	False
+0001493152-21-003403	CommonStockSharesAuthorized	us-gaap/2020	20201231	0		shares	225000000.0	250000000.0	False
+0001493152-21-003775	NotesPayable	us-gaap/2020	20180531	0	CGDLLLC	USD	31217.0	150000.0	False
+0001493152-21-003793	GuaranteeObligationsCurrentCarryingValue	us-gaap/2020	20190930	0		USD	815.0	1982.0	False
+0001493152-21-004416	SharePrice	us-gaap/2020	20190831	0		USD	4.68	5.54	False
+0001493152-21-004462	CommonStockSharesAuthorized	us-gaap/2020	20200731	0		shares	500000000.0	250000000.0	False
+0001493152-21-004472	CommonStockSharesAuthorized	us-gaap/2020	20190831	0		shares	400000000.0	100000000.0	False
+0001493152-21-004676	CommonStockSharesAuthorized	us-gaap/2020	20191031	0		shares	50000000.0	75000000.0	False
+0001493152-21-004676	CommonStockSharesAuthorized	us-gaap/2020	20200731	0		shares	300000000.0	75000000.0	False
+0001493152-21-005426	CommonStockSharesAuthorized	us-gaap/2020	20190331	0		shares	3000000000.0	750000.0	False
+0001493152-21-005812	CommonStockParOrStatedValuePerShare	us-gaap/2020	20090331	0		USD	0.001	0.04	False
+0001493152-21-005812	CommonStockSharesAuthorized	us-gaap/2020	20181031	0		shares	4000000000.0	3000000000.0	False
+0001493152-21-005812	CommonStockSharesAuthorized	us-gaap/2020	20190228	0		shares	10000000000.0	15000000000.0	False
+0001493152-21-005910	ProceedsFromIssuanceOfDebt	us-gaap/2020	20180930	0		USD	26000.0	11000.0	False
+0001493152-21-005910	ProceedsFromIssuanceOfDebt	us-gaap/2020	20181231	0		USD	20000.0	3000.0	False
+0001493152-21-006199	SharesIssuedPricePerShare	us-gaap/2020	20190430	0		USD	0.03	0.1	False
+0001493152-21-006199	StockIssuedDuringPeriodValueRestrictedStockAwardGross	us-gaap/2020	20190430	0		USD	200000.0	753000.0	False
+0001493152-21-006234	OperatingLeaseRightOfUseAsset	us-gaap/2020	20200131	0		USD	20544.0	235635.0	False
+0001493152-21-006240	CommonStockSharesIssued	us-gaap/2020	20181231	0		shares	10949884000.0	5909113.0	False
+0001493152-21-006240	CommonStockSharesOutstanding	us-gaap/2020	20181231	0		shares	10949884000.0	5909113.0	False
+0001493152-21-006283	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20200630	0		shares	70203889.0	4000000000.0	False
+0001493152-21-006466	Assets	us-gaap/2020	20181231	0		USD	2611359.0	1830329.0	False
+0001493152-21-006466	LiabilitiesAndStockholdersEquity	us-gaap/2020	20181231	0		USD	2611359.0	1830329.0	False
+0001493152-21-006466	LiabilitiesCurrent	us-gaap/2020	20181231	0		USD	1088582.0	1000462.0	False
+0001493152-21-006493	CommonStockSharesAuthorized	us-gaap/2020	20200229	0		shares	75000000.0	300000000.0	False
+0001493152-21-006648	TeminationFeePercentage	0001493152-21-006648	20191231	0	LSQFundingGroupLC	pure	0.005	0.0075	False
+0001493152-21-006807	CommonStockSharesAuthorized	us-gaap/2020	20200630	0		shares	100000000.0	30000000.0	False
+0001493152-21-006810	PaymentsOfStockIssuanceCosts	us-gaap/2020	20200131	0		USD	627441.0	482901.0	False
+0001493152-21-006897	DebtConversionConvertedInstrumentAmount1	us-gaap/2020	20191231	0		USD	58728.0	25491.0	False
+0001493152-21-006897	DebtConversionConvertedInstrumentSharesIssued1	us-gaap/2020	20191231	0		shares	1468204.0	637273.0	False
+0001493152-21-006897	InterestPayableCurrentAndNoncurrent	us-gaap/2020	20191231	0		USD	4035.0	515.0	False
+0001493152-21-006897	NotesPayable	us-gaap/2020	20191231	0		USD	29000.0	10000.0	False
+0001493152-21-006979	ProceedsFromIssuanceInitialPublicOffering	us-gaap/2020	20190331	0	BTIGLLC	USD	27800000.0	2300000.0	False
+0001493152-21-007159	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20201130	0		USD	2.8	0.1	False
+0001493152-21-007159	FairValueMeasurementWithUnobservableInputsReconciliationsRecurringBasisLiabilityValue	us-gaap/2020	20201231	0		USD	5477000.0	5975000.0	False
+0001493152-21-007242	DebtInstrumentFaceAmount	us-gaap/2020	20200731	0	BankOfYingkouHarbinBranch	USD	735000.0	2200000.0	False
+0001493152-21-007447	ClassOfWarrantOrRightNumberOfSecuritiesCalledByEachWarrantOrRight	us-gaap/2020	20200229	0	DynamicCapitalLLC	shares	20063.0	30000.0	False
+0001493152-21-007516	CommonStockSharesAuthorized	us-gaap/2020	20200430	0		shares	10000000000.0	2500000000.0	False
+0001493152-21-007519	CommonStockSharesAuthorized	us-gaap/2019	20200831	0		shares	25000000.0	250000000.0	False
+0001493152-21-007526	CommonStockSharesAuthorized	us-gaap/2020	20200831	0		shares	250000000.0	50000000.0	False
+0001514281-21-000025	NumberOfIndependentDirectors	0001514281-21-000025	20200331	0		director	5.0	4.0	False
+0001514281-21-000025	NumberOfIndependentDirectors	0001514281-21-000025	20200630	0		director	4.0	3.0	False
+0001524931-21-000010	NonCashImpairment	0001524931-21-000010	20181231	4		USD	12300000.0	12336000.0	False
+0001525221-21-000008	StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20191031	0		USD	294566000.0	473000.0	False
+0001528129-21-000026	CommonStockSharesAuthorized	us-gaap/2020	20200531	0		shares	22500000.0	450000000.0	False
+0001533758-21-000006	Liabilities	us-gaap/2020	20181231	0		USD	4610383000.0	4500677000.0	False
+0001533758-21-000006	OperatingLeaseRightOfUseAsset	us-gaap/2020	20181231	0		USD	117006000.0	0.0	False
+0001533758-21-000006	OtherLiabilitiesAndDeferredRevenueNoncurrent	us-gaap/2020	20181231	0		USD	67776000.0	71647000.0	False
+0001535929-21-000025	TreasuryStockSharesAcquired	us-gaap/2020	20190331	0		shares	3593453.0	290765.0	False
+0001537028-21-000041	CommonStockSharesAuthorized	us-gaap/2020	20200229	0		shares	50000000.0	200000000.0	False
+0001537028-21-000041	CommonStockSharesOutstanding	us-gaap/2020	20200229	0		shares	3812050.0	76241045.0	False
+0001543151-21-000014	LossContingencyForeignRegulatoryFineAmount	0001543151-21-000014	20161231	0		TWD	25000000.0	150000.0	False
+0001549084-21-000012	StockholdersEquityNoteStockSplitConversionRatio1	us-gaap/2020	20200331	0		pure	0.067	0.0667	False
+0001553350-21-000027	SharebasedCompensationArrangementBySharebasedPaymentAwardAcceleratedVestingNumber	us-gaap/2020	20200131	0		shares	149564.0	751849.0	False
+0001558370-21-000661	RestructuringReserve	us-gaap/2020	20190630	0		USD	53000.0	25083000.0	False
+0001558370-21-000881	CommonStockDividendsPerShareDeclared	us-gaap/2020	20201031	0		USD	0.25	0.29	False
+0001558370-21-001156	LeaseAgreementPerTonneCharge	0001558370-21-001156	20191130	0		USD/item	11.0	22.0	False
+0001558370-21-001489	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.07	0.072	False
+0001558370-21-001489	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	-0.19	-0.186	False
+0001558370-21-001631	StockholdersEquityNoteStockSplitConversionRatio1	us-gaap/2020	20200430	0		pure	0.02	50.0	False
+0001558370-21-001774	AccountsPayableAndAccruedLiabilitiesCurrentAndNoncurrent	us-gaap/2020	20201031	0		USD	10126000000.0	10112000000.0	False
+0001558370-21-001774	AccountsReceivableNet	us-gaap/2020	20201031	0		USD	4173000000.0	4171000000.0	False
+0001558370-21-001774	DeferredIncomeTaxAssetsNet	us-gaap/2020	20201031	0		USD	1500000000.0	1499000000.0	False
+0001558370-21-001774	DeferredIncomeTaxLiabilitiesNet	us-gaap/2020	20201031	0		USD	512000000.0	519000000.0	False
+0001558370-21-001774	LoansAndLeasesReceivableNetReportedAmount	us-gaap/2020	20201031	0		USD	29723000000.0	29750000000.0	False
+0001558370-21-001774	LoansPledgedAsCollateral	us-gaap/2020	20201031	0		USD	4699000000.0	4703000000.0	False
+0001558370-21-001774	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20201031	0		USD	31611000000.0	31646000000.0	False
+0001558370-21-001778	AccountsPayableAndAccruedLiabilitiesCurrentAndNoncurrent	us-gaap/2020	20201031	0		USD	921800000.0	922300000.0	False
+0001558370-21-001778	DeferredIncomeTaxAssetsNet	us-gaap/2020	20201031	0		USD	27800000.0	27100000.0	False
+0001558370-21-001778	DeferredIncomeTaxLiabilitiesNet	us-gaap/2020	20201031	0		USD	340100000.0	345900000.0	False
+0001558370-21-001778	DepositsWithheldFromDealersAndMerchantsAvailableForPotentialLosses	0001558370-21-001778	20201031	0		USD	128300000.0	114800000.0	False
+0001558370-21-001778	FinancingReceivableAllowanceForCreditLosses	us-gaap/2020	20201031	0		USD	148800000.0	129100000.0	False
+0001558370-21-001778	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20201031	0		USD	2865400000.0	2891600000.0	False
+0001558370-21-001821	StockholdersEquityNoteStockSplitConversionRatio1	us-gaap/2020	20180430	0		pure	2.7324	2.7323	False
+0001558370-21-001925	FinancingReceivableRecordedInvestmentNonaccrualStatus	us-gaap/2020	20191231	0		USD	45204000.0	28232000.0	False
+0001558370-21-002180	FinancingReceivableAllowanceForCreditLosses	us-gaap/2020	20191031	0		USD	4096000.0	4594000.0	False
+0001558370-21-002310	LoansAndLeasesReceivableAllowance	us-gaap/2019	20191231	0		USD	98628000.0	72751000.0	False
+0001558370-21-002464	LongTermPurchaseCommitmentAmount	us-gaap/2020	20190430	0		USD	47900000.0	21000000.0	False
+0001558370-21-002469	AccountsReceivableNetCurrent	us-gaap/2019	20181231	0		USD	6839000.0	6792000.0	False
+0001558370-21-002469	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2019	20181231	0		USD	2618000.0	2330000.0	False
+0001558370-21-002476	CommonStockSharesAuthorized	us-gaap/2020	20190831	0		shares	60000000.0	100000000.0	False
+0001558370-21-002578	AccountsPayableAndAccruedLiabilitiesCurrent	us-gaap/2020	20190930	0		USD	115305000.0	112578000.0	False
+0001558370-21-002578	Assets	us-gaap/2020	20190930	0		USD	594436000.0	1166630000.0	False
+0001558370-21-002578	AssetsCurrent	us-gaap/2020	20190930	0		USD	92811000.0	84787000.0	False
+0001558370-21-002578	CapitalizedCostsOfUnprovedPropertiesExcludedFromAmortizationCumulative	us-gaap/2020	20190930	0		USD	108954000.0	438365000.0	False
+0001558370-21-002578	CapitalizedCostsProvedProperties	us-gaap/2020	20190930	0		USD	380364000.0	2155288000.0	False
+0001558370-21-002578	CommonStockValue	us-gaap/2020	20190930	0		USD	2000.0	16000.0	False
+0001558370-21-002578	LiabilitiesCurrent	us-gaap/2020	20190930	0		USD	123047000.0	378978000.0	False
+0001558370-21-002578	OperatingLeaseRightOfUseAsset	us-gaap/2020	20190930	0		USD	3394000.0	3694000.0	False
+0001558370-21-002578	StockholdersEquity	us-gaap/2020	20190930	0		USD	327129000.0	30477000.0	False
+0001558370-21-002641	ClassOfWarrantOrRightExercisePriceOfWarrantsOrRights1	us-gaap/2020	20201031	0		USD	3.94	0.0001	False
+0001558370-21-002641	ClassOfWarrantOrRightNumberOfSecuritiesCalledByWarrantsOrRights	us-gaap/2020	20201031	0		shares	7614.0	2179487.0	False
+0001558370-21-002664	CommonStockSharesAuthorized	us-gaap/2019	20200531	0		shares	400000000.0	200000000.0	False
+0001558370-21-002664	ShareBasedCompensationArrangementByShareBasedPaymentAwardMaximumNumberOfSharesPerEmployee	us-gaap/2019	20200531	0		shares	1000000.0	250000.0	False
+0001558370-21-002768	CommonStockSharesOutstanding	us-gaap/2020	20200131	0		shares	4603460.0	69053548.0	False
+0001558370-21-002878	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20181231	4		pure	0.135	0.1347	False
+0001558370-21-002878	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.192	0.1918	False
+0001558370-21-002878	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	0.182	0.1821	False
+0001558370-21-002931	CommonStockSharesAuthorized	us-gaap/2020	20200630	0		shares	50000000.0	25000000.0	False
+0001558370-21-003089	ConcentrationOfRiskNumberOfProductCategoriesIncludedInBidding	0001558370-21-003089	20201031	0		item	15.0	13.0	False
+0001558370-21-003132	LongTermDebtCurrent	us-gaap/2020	20210131	0		USD	11800000.0	18146353.0	False
+0001558370-21-003264	PaymentsForRepurchaseOfCommonStock	us-gaap/2019	20210131	92		USD	23932000000.0		False
+0001558370-21-003264	PaymentsForRepurchaseOfCommonStock	us-gaap/2019	20210131	93		USD		23932000000.0	False
+0001558370-21-003264	TreasuryStockSharesAcquired	us-gaap/2019	20210131	92		shares	149000000.0		False
+0001558370-21-003264	TreasuryStockSharesAcquired	us-gaap/2019	20210131	93		shares		149000000.0	False
+0001558370-21-003460	CommonStockSharesOutstanding	us-gaap/2020	20201130	0		shares	22800000.0	159800000.0	False
+0001558370-21-003619	CommonStockSharesAuthorized	us-gaap/2019	20181231	0		shares	150000000.0	250000000.0	False
+0001558370-21-003774	ClassOfWarrantOrRightNumberOfSecuritiesCalledByWarrantsOrRights	us-gaap/2020	20200531	0		shares	1063939.0	335982.0	False
+0001558370-21-003774	ProceedsFromIssuanceOfWarrants	us-gaap/2020	20200531	0		USD	3700.0	1200.0	False
+0001558370-21-003815	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	0.0	0.0013	False
+0001558370-21-003823	ShareBasedCompensationArrangementByShareBasedPaymentAwardNumberOfSharesAuthorized	us-gaap/2020	20201231	0		shares	26898554.0	18162573.0	False
+0001558370-21-003848	LiquidityRequirement	0001558370-21-003848	20200331	0		USD	10000000.0	15000000.0	False
+0001558370-21-003848	StockRepurchaseProgramAveragePricePerShare	0001558370-21-003848	20201231	4		USD	1.93	1.67	False
+0001558370-21-003848	StockRepurchasedDuringPeriodShares	us-gaap/2019	20201231	4		shares	250197.0	200803.0	False
+0001562762-21-000061	ProfitLoss	us-gaap/2020	20191231	1		USD	20746000.0	22052000.0	False
+0001562762-21-000063	CommonStockSharesOutstanding	us-gaap/2020	20191231	0		shares	90595197.0	90595176.0	False
+0001562762-21-000136	CallOptionValue	0001562762-21-000136	20190131	0		USD	113046.0	13239.0	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsExpectedVolatilityRate	us-gaap/2020	20190131	0		pure	0.9079	0.9075	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsExpectedVolatilityRate	us-gaap/2020	20190228	0		pure	0.909	0.9088	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGrantDateIntrinsicValue	us-gaap/2020	20190131	0		USD	0.75	0.88	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGrantDateIntrinsicValue	us-gaap/2020	20190228	0		USD	0.84	0.75	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGrantDateIntrinsicValue	us-gaap/2020	20200331	0		USD	0.43	0.47	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGross	us-gaap/2020	20190228	0		shares	15000.0	50000.0	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageGrantDateFairValue	us-gaap/2020	20190228	0		USD	1.05	1.0	False
+0001562762-21-000136	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodWeightedAverageGrantDateFairValue	us-gaap/2020	20200331	0		USD	0.65	0.7	False
+0001564590-21-004320	ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsRiskFreeInterestRate	us-gaap/2020	20201031	0		pure	0.0081	0.0087	False
+0001564590-21-005866	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20191231	0		USD	400000000.0	550000000.0	False
+0001564590-21-005866	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20201231	0		USD	80000000.0	1250000000.0	False
+0001564590-21-006372	NotesReceivableNet	us-gaap/2020	20191231	0		USD	7122000000.0	7126700000.0	False
+0001564590-21-006372	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20191231	0		USD	1587900000.0	1591400000.0	False
+0001564590-21-006390	DebtInstrumentUnamortizedDiscountPremiumNet	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	3054000.0		False
+0001564590-21-006390	DebtInstrumentUnamortizedDiscountPremiumNet	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		3054000.0	False
+0001564590-21-006390	LongTermDebt	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	534658000.0		False
+0001564590-21-006390	LongTermDebt	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		534658000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalAfterYearFive	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	191940000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalAfterYearFive	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		191940000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	124100000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		124100000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFive	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	44853000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFive	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		44853000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFour	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	14217000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFour	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		14217000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearThree	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	65137000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearThree	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		65137000.0	False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearTwo	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShare	USD	97465000.0		False
+0001564590-21-006390	LongTermDebtMaturitiesRepaymentsOfPrincipalInYearTwo	us-gaap/2020	20201231	0	UnconsolidatedInvestmentsinPartnershipProRataShareMember	USD		97465000.0	False
+0001564590-21-007196	PartnersCapitalAccountDistributions	us-gaap/2020	20180430	0	OperatingPartnershipAsGeneralPartnerOrManaging	USD	4300000.0		False
+0001564590-21-007196	PartnersCapitalAccountDistributions	us-gaap/2020	20180430	0	OperatingPartnershipAsGeneralPartnerOrManagingMember	USD		4300000.0	False
+0001564590-21-007296	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20190630	0		shares	4750000.0	712500.0	False
+0001564590-21-007621	CommonStockSharesOutstanding	us-gaap/2020	20201130	0		shares	23000000.0	22984745.0	False
+0001564590-21-007800	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	-1.04	-1.039	False
+0001564590-21-008842	InterestExpenseDeductionPercentageOfAdjustedTaxableIncome	0001564590-21-008842	20200331	0		pure	0.3	0.5	False
+0001564590-21-009491	CommonStockSharesAuthorized	us-gaap/2020	20180930	0		shares	120000000.0	90000000.0	False
+0001564590-21-009500	LoansAndLeasesReceivableAllowance	us-gaap/2020	20191231	0		USD	328007000.0	87469000.0	False
+0001564590-21-009500	OffBalanceSheetCreditLossLiability	us-gaap/2020	20191231	0		USD	29947000.0	5599000.0	False
+0001564590-21-009872	CommonStockSharesAuthorized	us-gaap/2020	20201130	0		shares	30000000.0	60000000.0	False
+0001564590-21-009893	Goodwill	us-gaap/2020	20190630	0		USD	339911400.0	119529202.0	False
+0001564590-21-009901	CommonStockSharesAuthorized	us-gaap/2020	20191031	0		shares	750000000.0	500000000.0	False
+0001564590-21-011792	StockRepurchaseProgramAuthorizedAmount1	us-gaap/2020	20201031	0		USD	50000000.0	23800000.0	False
+0001564590-21-011948	StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20190331	0		USD	199006000.0	669790000.0	False
+0001564590-21-012614	InterestExpenseDeductionPercentageOfAdjustedTaxableIncomeCARESAct	0001564590-21-012614	20200331	0		pure	0.3	0.5	False
+0001564590-21-012639	ClassOfWarrantOrRightExercisedDuringPeriod	0001564590-21-012639	20190531	0		shares	380000.0	64440.0	False
+0001564590-21-012694	CommonStockParOrStatedValuePerShare	us-gaap/2020	20180228	0		USD	0.001	0.01	False
+0001564590-21-012829	CustomerSecuritiesForWhichEntityHasRightToSellOrRepledgeFairValue	us-gaap/2020	20201231	0		USD	3915000000.0	4035000000.0	False
+0001564590-21-013026	ProfitLoss	us-gaap/2020	20201231	1		USD	-8604000.0	-13238000.0	False
+0001564590-21-013134	CommonStockSharesAuthorized	us-gaap/2020	20190430	0		shares	20000000.0	10000000.0	False
+0001564590-21-013144	CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents	us-gaap/2020	20200131	0		USD	58991000.0	80690000.0	False
+0001564590-21-013653	CommonStockSharesAuthorized	us-gaap/2020	20180630	0		shares	25000000.0	10000000.0	False
+0001564590-21-014150	IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest	us-gaap/2020	20201231	4		USD	-20700000.0	-30600000.0	False
+0001564590-21-014190	OperatingLeaseAnnualIncreaseInRentalPercentage	0001564590-21-014190	20200531	0		pure	0.05	0.0667	False
+0001564590-21-015962	CommonStockSharesAuthorized	us-gaap/2020	20190630	0		shares	125000000.0	250000000.0	False
+0001564590-21-015962	CommonStockSharesOutstanding	us-gaap/2020	20200731	0		shares	105083291.0	10508302.0	False
+0001564590-21-016621	UnrecognizedTaxBenefitsPeriodIncreaseDecrease	us-gaap/2020	20201231	4		USD	592000.0	-391000.0	False
+0001564590-21-017097	ProceedsFromIssuanceOfCommonStockNetOfIssuanceCosts	0001564590-21-017097	20200229	0		USD	6100000.0	8600000.0	False
+0001564590-21-017097	SharePrice	us-gaap/2020	20200229	0		USD	4.1	4.0	False
+0001564590-21-017126	CommonStockSharesOutstanding	us-gaap/2020	20201130	0		shares	2084596.0	31268943.0	False
+0001579910-21-000005	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2020	20190731	0		shares	396000.0	3960560.0	False
+0001579910-21-000005	StockIssuedDuringPeriodValueNewIssues	us-gaap/2020	20190731	0		USD	3000000.0	10000000.0	False
+0001582568-21-000014	StockIssuedDuringPeriodSharesNewIssues	us-gaap/2019	20180731	0		shares	1775750.0	1494134.0	False
+0001594062-21-000026	GeneralAndAdministrativeRelatedParty	0001594062-21-000026	20201231	1		USD	218533.0	171008.0	False
+0001599298-21-000011	CommonStockSharesOutstanding	us-gaap/2020	20200930	0		shares	335900000.0	67200000.0	False
+0001601712-21-000057	FinancingReceivableAllowanceForCreditLosses	us-gaap/2020	20191231	0		USD	8623000000.0	5602000000.0	False
+0001603923-21-000013	AccumulatedOtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	20191130	0		USD	0.0	-1697000000.0	False
+0001603923-21-000013	FreshStartAdjustmentIncreaseDecreaseCurrentAssets	us-gaap/2020	20191130	0		USD	3491000000.0	3878000000.0	False
+0001603923-21-000013	FreshStartAdjustmentIncreaseDecreaseCurrentMaturitiesOfLongTermDebt	us-gaap/2020	20191130	0		USD	13000000.0	319000000.0	False
+0001603923-21-000013	FreshStartAdjustmentIncreaseDecreasePropertyAndEquipmentNet	us-gaap/2020	20191130	0		USD	2127000000.0	1838000000.0	False
+0001603923-21-000013	FreshStartAdjustmentIncreaseDecreasePropertyandEquipmentGross	0001603923-21-000013	20191130	0		USD	2127000000.0	7445000000.0	False
+0001603978-21-000015	AccruedOther	0001603978-21-000015	20191231	0		USD		1696.0	False
+0001603978-21-000015	AccruedOther	0001603978-21-000015	20201231	0		USD		12697.0	False
+0001603978-21-000015	AccruedOther	aqb/0000	20191231	0		USD	1696.0		False
+0001603978-21-000015	AccruedOther	aqb/0000	20201231	0		USD	12697.0		False
+0001603978-21-000015	AccruedTaxes	0001603978-21-000015	20191231	0		USD		68831.0	False
+0001603978-21-000015	AccruedTaxes	0001603978-21-000015	20201231	0		USD		86052.0	False
+0001603978-21-000015	AccruedTaxes	aqb/0000	20191231	0		USD	68831.0		False
+0001603978-21-000015	AccruedTaxes	aqb/0000	20201231	0		USD	86052.0		False
+0001603978-21-000015	AcquisitionOfEquipmentUnderDebtAgreement	0001603978-21-000015	20181231	4		USD		74068.0	False
+0001603978-21-000015	AcquisitionOfEquipmentUnderDebtAgreement	aqb/0000	20181231	4		USD	74068.0		False
+0001603978-21-000015	AuthorizedShares	0001603978-21-000015	20201231	0		shares		85000000.0	False
+0001603978-21-000015	AuthorizedShares	aqb/0000	20201231	0		shares	85000000.0		False
+0001603978-21-000015	DeemedDividend	0001603978-21-000015	20181231	4		USD		1822873.0	False
+0001603978-21-000015	DeemedDividend	aqb/0000	20181231	4		USD	1822873.0		False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	0001603978-21-000015	20181231	4		USD		5116533.0	False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	0001603978-21-000015	20191231	4		USD		272417.0	False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	0001603978-21-000015	20201231	4		USD		2318709.0	False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	aqb/0000	20181231	4		USD	5116533.0		False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	aqb/0000	20191231	4		USD	272417.0		False
+0001603978-21-000015	ExerciseofWarrantsforCommonStock	aqb/0000	20201231	4		USD	2318709.0		False
+0001603978-21-000015	GrossAssetsHeldforsaleNotPartofDisposalGroupCurrent	0001603978-21-000015	20191231	0		USD		248000.0	False
+0001603978-21-000015	GrossAssetsHeldforsaleNotPartofDisposalGroupCurrent	aqb/0000	20191231	0		USD	248000.0		False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	0001603978-21-000015	20181231	4		USD		-1492282.0	False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	0001603978-21-000015	20191231	4		USD		-1256149.0	False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	0001603978-21-000015	20201231	4		USD		-4334486.0	False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	aqb/0000	20181231	4		USD	-1492282.0		False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	aqb/0000	20191231	4		USD	-1256149.0		False
+0001603978-21-000015	IncomeTaxExpenseBenefitBeforeValuationAllowance	aqb/0000	20201231	4		USD	-4334486.0		False
+0001603978-21-000015	LossOnAssetHeldForSale	0001603978-21-000015	20191231	4		USD		149800.0	False
+0001603978-21-000015	LossOnAssetHeldForSale	aqb/0000	20191231	4		USD	149800.0		False
+0001603978-21-000015	OperatingLeasePaymentsDueLongTerm	0001603978-21-000015	20191231	0		USD		838885.0	False
+0001603978-21-000015	OperatingLeasePaymentsDueLongTerm	0001603978-21-000015	20201231	0		USD		755313.0	False
+0001603978-21-000015	OperatingLeasePaymentsDueLongTerm	aqb/0000	20191231	0		USD	838885.0		False
+0001603978-21-000015	OperatingLeasePaymentsDueLongTerm	aqb/0000	20201231	0		USD	755313.0		False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	0001603978-21-000015	20181231	4		USD		95001.0	False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	0001603978-21-000015	20191231	4		USD		160675.0	False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	0001603978-21-000015	20201231	4		USD		349847.0	False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	aqb/0000	20181231	4		USD	95001.0		False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	aqb/0000	20191231	4		USD	160675.0		False
+0001603978-21-000015	PaymentsForDepositsOnEquipmentPurchases	aqb/0000	20201231	4		USD	349847.0		False
+0001603978-21-000015	ProceedsPaymentsForLegalSettlementsInvestingActivities	0001603978-21-000015	20200331	0		USD		1000000.0	False
+0001603978-21-000015	ProceedsPaymentsForLegalSettlementsInvestingActivities	0001603978-21-000015	20201231	4		USD		1014008.0	False
+0001603978-21-000015	ProceedsPaymentsForLegalSettlementsInvestingActivities	aqb/0000	20200331	0		USD	1000000.0		False
+0001603978-21-000015	ProceedsPaymentsForLegalSettlementsInvestingActivities	aqb/0000	20201231	4		USD	1014008.0		False
+0001603978-21-000015	ProductionCostsOperating	0001603978-21-000015	20181231	4		USD		2626353.0	False
+0001603978-21-000015	ProductionCostsOperating	0001603978-21-000015	20191231	4		USD		3573858.0	False
+0001603978-21-000015	ProductionCostsOperating	0001603978-21-000015	20201231	4		USD		6680012.0	False
+0001603978-21-000015	ProductionCostsOperating	aqb/0000	20181231	4		USD	2626353.0		False
+0001603978-21-000015	ProductionCostsOperating	aqb/0000	20191231	4		USD	3573858.0		False
+0001603978-21-000015	ProductionCostsOperating	aqb/0000	20201231	4		USD	6680012.0		False
+0001607062-21-000063	DebtConversionConvertedInstrumentAmount1	us-gaap/2020	20201130	0		USD	20000.0	15000.0	False
+0001625285-21-000006	WeightedAverageNumberOfShareOutstandingBasicAndDiluted	us-gaap/2019	20200430	2		shares	6.2400000000024e+24	6240000.0	False
+0001628280-21-001867	StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest	us-gaap/2020	20171231	0		USD	-161000000.0	9109000000.0	False
+0001628280-21-002563	FiniteLivedIntangibleAssetsNet	us-gaap/2020	20181231	0		USD	2310091000.0	2333296000.0	False
+0001628280-21-002563	OtherLiabilitiesNoncurrent	us-gaap/2020	20181231	0		USD	541491000.0	629763000.0	False
+0001628280-21-002577	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20200430	0		USD	250000000.0	300000000.0	False
+0001628280-21-003277	SaleOfStockPricePerShare	us-gaap/2020	20200430	0		USD	1.43	1.34	False
+0001628280-21-003574	TreasuryStockSharesAcquired	us-gaap/2020	20191231	4		shares	12016083.0	6385887.0	False
+0001628280-21-003659	DebtSecuritiesHeldToMaturityAllowanceForCreditLoss	us-gaap/2020	20191231	0		USD	70000.0	0.0	False
+0001628280-21-003705	FinanceLeaseWeightedAverageDiscountRatePercent	us-gaap/2020	20191231	0		pure	0.048	0.0475	False
+0001628280-21-005660	ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodGross	us-gaap/2020	20191130	0		shares	2549556.0	5556.0	False
+0001628280-21-005933	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20181231	4		pure	0.221	0.2213	False
+0001628280-21-005933	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	0.226	0.2261	False
+0001628280-21-005933	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20201231	4		pure	0.367	0.3667	False
+0001628280-21-006164	CommonStockSharesAuthorized	us-gaap/2020	20200131	0		shares	40000000.0	200000000.0	False
+0001630805-21-000004	ProceedsFromDivestitureOfBusinessesPortionReleasedFromEscrow	0001630805-21-000004	20200331	0		USD	4500000.0	3500000.0	False
+0001632970-21-000028	MaximumPercentageOfFeesAndExpensesAssociatedWithAcquisition	0001632970-21-000028	20201231	19		pure	0.06		False
+0001632970-21-000028	MaximumPercentageOfFeesAndExpensesAssociatedWithAcquisition	0001632970-21-000028	20201231	20		pure		0.06	False
+0001637761-21-000056	AccruedLiabilitiesCurrent	us-gaap/2019	20191231	0		USD	5306000.0	5444000.0	False
+0001637761-21-000056	Assets	us-gaap/2019	20191231	0		USD	150777000.0	141718000.0	False
+0001637761-21-000056	Liabilities	us-gaap/2019	20191231	0		USD	41017000.0	31958000.0	False
+0001637761-21-000056	LiabilitiesAndStockholdersEquity	us-gaap/2019	20191231	0		USD	150777000.0	141718000.0	False
+0001637761-21-000056	LiabilitiesCurrent	us-gaap/2019	20191231	0		USD	32420000.0	30478000.0	False
+0001637761-21-000056	OperatingLeaseLiabilityCurrent	us-gaap/2019	20191231	0		USD	2080000.0	0.0	False
+0001637761-21-000056	OperatingLeaseLiabilityNoncurrent	us-gaap/2019	20191231	0		USD	8367000.0	0.0	False
+0001637761-21-000056	OperatingLeaseRightOfUseAsset	us-gaap/2019	20191231	0		USD	9059000.0	0.0	False
+0001637761-21-000056	OtherLiabilitiesNoncurrent	us-gaap/2019	20191231	0		USD	230000.0	1480000.0	False
+0001640334-21-000581	CommonStockSharesAuthorized	us-gaap/2019	20191031	0		shares	300000000.0	450000000.0	False
+0001644440-21-000023	RightOfUseAssetObtainedInExchangeForOperatingLeaseLiability	us-gaap/2020	20191231	4		USD	5900000.0	46700000.0	False
+0001645873-21-000080	DebtInstrumentCovenantLeverageRatioMaximum	0001645873-21-000080	20200331	0		pure	0.5	0.55	False
+0001647513-21-000017	EscrowDeposit	us-gaap/2020	20171231	0	Greenfield	USD	18800000.0		False
+0001647513-21-000017	EscrowDeposit	us-gaap/2020	20171231	0	GreenfieldMember	USD		18800000.0	False
+0001650962-21-000039	FinanceLeaseWeightedAverageDiscountRatePercent	us-gaap/2020	20191231	0		pure	0.048	0.0483	False
+0001654151-21-000003	EffectiveIncomeTaxRateReconciliationAtFederalStatutoryIncomeTaxRate	us-gaap/2020	20171231	0		pure	0.21	0.35	False
+0001654954-21-001365	AccountsPayableTradeCurrent	us-gaap/2019	20201231	0		USD	104000.0	19201000.0	False
+0001654954-21-001365	BusinessCombinationRecognizedIdentifiableAssetsAcquiredAndLiabilitiesAssumedNet	us-gaap/2019	20201231	0		USD	51169000.0	986000.0	False
+0001654954-21-001365	Cash	us-gaap/2019	20201231	0		USD	206000.0	624572000.0	False
+0001654954-21-001365	CustomerDepositsCurrent	us-gaap/2019	20201231	0		USD	117195000.0	967256000.0	False
+0001654954-21-001365	DeferredIncomeTaxLiabilitiesNet	us-gaap/2019	20201231	0		USD	1399000.0	3680000.0	False
+0001654954-21-001365	FinanceLeaseLiabilityCurrent	us-gaap/2019	20201231	0		USD	338000.0	14195000.0	False
+0001654954-21-001365	FinanceLeaseRightOfUseAsset	us-gaap/2019	20201231	0		USD	338000.0	14391000.0	False
+0001654954-21-001365	Goodwill	us-gaap/2019	20201231	0		USD	1928000.0	6202000.0	False
+0001654954-21-001365	IntangibleAssetsCurrent	us-gaap/2019	20201231	0		USD	532000.0	10356000.0	False
+0001654954-21-001365	Liabilities	us-gaap/2019	20201231	0		USD	610000.0	1248096000.0	False
+0001654954-21-001365	OtherAccruedLiabilitiesCurrent	us-gaap/2019	20201231	0		USD	610000.0	6083000.0	False
+0001654954-21-001365	OtherAssetsCurrent	us-gaap/2019	20201231	0		USD	9000.0	15749000.0	False
+0001654954-21-001365	OtherReceivablesNetCurrent	us-gaap/2019	20201231	0		USD	849000.0	59082000.0	False
+0001654954-21-001365	PropertyPlantAndEquipmentNet	us-gaap/2019	20201231	0		USD	10987000.0	17989000.0	False
+0001654954-21-001365	SecuritiesSoldUnderAgreementsToRepurchase	us-gaap/2019	20201231	0		USD	28500000.0	144402000.0	False
+0001654954-21-001365	TaxesPayableCurrent	us-gaap/2019	20201231	0		USD	415000.0	3936000.0	False
+0001654954-21-001365	TradingSecurities	us-gaap/2019	20201231	0		USD	50684000.0	345313000.0	False
+0001654954-21-001695	LegalFees	us-gaap/2020	20191231	1		USD	6725.0	6000.0	False
+0001654954-21-001695	OperatingExpenses	us-gaap/2020	20191231	1		USD	25850.0	25125.0	False
+0001654954-21-001695	OperatingIncomeLoss	us-gaap/2020	20191231	1		USD	-25850.0	-25125.0	False
+0001656936-21-000011	MinorityInterestDecreaseFromRedemptions	us-gaap/2020	20201231	4		USD	1392468000.0	7532000.0	False
+0001664703-21-000017	OperatingLeaseLiabilityCurrent	us-gaap/2020	20191231	0		USD	5535000.0	0.0	False
+0001666071-21-000029	ProceedsfromIssuanceInitialPublicOfferingGross	0001666071-21-000029	20180131	0		USD	75700000.0	5500000.0	False
+0001666071-21-000029	SaleOfStockNumberOfSharesIssuedInTransaction	us-gaap/2019	20180131	0		shares	5821355.0	421355.0	False
+0001678463-21-000010	CommonStockParOrStatedValuePerShare	us-gaap/2020	20160930	0		USD	0.001	0.01	False
+0001678463-21-000010	CommonStockSharesAuthorized	us-gaap/2020	20160930	0		shares	190000000.0	1000.0	False
+0001679268-21-000006	LineOfCreditFacilityMaximumBorrowingCapacity	us-gaap/2020	20200229	0		USD	350000000.0	180000000.0	False
+0001691303-21-000010	CommonStockDividendsPerShareDeclaredQuarterly	0001691303-21-000010	20201231	14		USD	0.05		False
+0001691303-21-000010	CommonStockDividendsPerShareDeclaredQuarterly	0001691303-21-000010	20201231	15		USD		0.05	False
+0001691303-21-000010	PaymentsOfDividends	us-gaap/2020	20201231	14		USD	39500000.0		False
+0001691303-21-000010	PaymentsOfDividends	us-gaap/2020	20201231	15		USD		39500000.0	False
+0001692427-21-000007	CommonStockSharesAuthorized	us-gaap/2020	20201130	0		shares	11250000.0	225000000.0	False
+0001698990-21-000003	AssetRetirementObligation	us-gaap/2019	20180731	0		USD	4501000.0	0.0	False
+0001698990-21-000003	CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents	us-gaap/2019	20180731	0		USD	0.0	23000.0	False
+0001704715-21-000026	OperatingLeaseLiabilityNoncurrent	us-gaap/2020	20181231	0		USD	6904000.0	0.0	False
+0001705873-21-000010	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20181231	4		pure	0.23	0.226	False
+0001705873-21-000010	EffectiveIncomeTaxRateContinuingOperations	us-gaap/2020	20191231	4		pure	-5.23	-5.229	False
+0001715768-21-000035	CommonStockSharesOutstanding	us-gaap/2019	20200131	0		shares	4171571.0	50325662.0	False
+0001718405-21-000029	DeferredTaxAssetsNet	us-gaap/2020	20200531	0		USD	193000000.0	94100000.0	False
+0001731289-21-000006	CommonStockSharesOutstanding	us-gaap/2020	20200531	0		shares	360904478.0	151831441.0	False
+0001747009-21-000006	NumberOfReportingUnits	us-gaap/2020	20200229	0		reporting_unit	7.0	6.0	False
+0001748790-21-000012	AccountsReceivableNetCurrent	us-gaap/2020	20200630	0		USD	1609000000.0	1616000000.0	False
+0001748790-21-000012	DeferredIncomeTaxAssetsNet	us-gaap/2020	20200630	0		USD	137000000.0	135000000.0	False
+0001748790-21-000012	RetainedEarningsAccumulatedDeficit	us-gaap/2020	20200630	0		USD	241000000.0	246000000.0	False
+0001748824-21-000012	StockRepurchasedAndRetiredDuringPeriodShares	us-gaap/2020	20190228	0		shares	4100000.0	3886625.0	False
+0001753706-21-000006	Goodwill	us-gaap/2020	20200630	0		USD	113170000.0	122202000.0	False
+0001770787-21-000009	AccruedExpensesandOtherLiabilitiesCurrent	0001770787-21-000009	20191231	0		USD	24349000.0	24448000.0	False
+0001770787-21-000009	Assets	us-gaap/2020	20191231	0		USD	45604000.0	605923000.0	False
+0001770787-21-000009	Liabilities	us-gaap/2020	20191231	0		USD	78139000.0	185840000.0	False
+0001770787-21-000009	PrepaidExpenseAndOtherAssetsCurrent	us-gaap/2020	20191231	0		USD	7599000.0	8033000.0	False
+0001775625-21-000025	WeightedAverageNumberOfDilutedSharesOutstanding	us-gaap/2020	20191231	1		shares	381917030.0	382517729.0	False
+0001796022-21-000007	AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue	us-gaap/2020	20201231	1		USD	3916000.0	3206000.0	False
+0001796022-21-000007	EarningsPerShareDiluted	us-gaap/2020	20201231	1		USD	0.84	0.87	False
+0001796022-21-000007	MinorityInterestDecreaseFromDistributionsToNoncontrollingInterestHolders	us-gaap/2020	20201231	1		USD	1330000.0	1318000.0	False
+0001796022-21-000007	NetIncomeLoss	us-gaap/2020	20201231	1		USD	24788000.0	25578000.0	False
+0001796022-21-000007	NetIncomeLossAvailableToCommonStockholdersDiluted	us-gaap/2020	20201231	1		USD	27556000.0	28469000.0	False
+0001796022-21-000007	OtherComprehensiveIncomeLossNetOfTax	us-gaap/2020	20201231	1		USD	298000.0	446000.0	False
+0001796022-21-000007	ProfitLoss	us-gaap/2020	20201231	1		USD	105705000.0	107389000.0	False
+0001798100-21-000011	CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents	us-gaap/2020	20191231	0		USD	1556000.0	169319000.0	False
+0001798100-21-000011	RealEstateAccumulatedDepreciation	us-gaap/2020	20191231	0		USD	0.0	132000.0	False
+0001798100-21-000011	RealEstateGrossAtCarryingValue	us-gaap/2020	20191231	0		USD	223005000.0	224053000.0	False
+0001799208-21-000013	OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansBenefitPlanImprovementTaxEffect	us-gaap/2020	20191231	4		USD	-800000.0	-900000.0	False
+0001799208-21-000013	PaymentsForUnderwritingExpenseAndStockIssuanceCosts	0001799208-21-000013	20200630	0		USD	131900000.0	900000.0	False
+0001801075-21-000005	FinancingReceivableModifiedNumberOfContractsCOVID19	0001801075-21-000005	20201231	0		loan	8.0	93.0	False

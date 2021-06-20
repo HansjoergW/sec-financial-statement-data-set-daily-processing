@@ -80,7 +80,6 @@ class SecNumXmlParser(SecXmlParserBase):
         df['qtrs'] = df.qtrs.apply(int)
         df['value'] = pd.to_numeric(df['value'], errors='coerce')
 
-
         # sec rounds the values to 4 decimals
         # sec is not using the scientific rounding method, which rounds 0.155 up to 0.16 and 0.165 down to 0.16
         # (see https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe)
@@ -94,7 +93,6 @@ class SecNumXmlParser(SecXmlParserBase):
         df.drop_duplicates(inplace=True)
 
         # set the indexes
-        #df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs'], inplace=True)
         df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
 
         # and sort by the precision

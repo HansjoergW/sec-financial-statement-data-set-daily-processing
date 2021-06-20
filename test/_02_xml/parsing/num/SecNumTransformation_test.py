@@ -29,3 +29,17 @@ def test_calculate_qtrs():
     assert parser._calculate_qtrs("2008", "03", "31", "2021", "01", "31") == 51
     assert parser._calculate_qtrs("2012", "02", "25", "2020", "12", "31") == 35
 
+
+def test_clean_member():
+    parser = SecNumXmlTransformer()
+
+    assert parser._clean_member_domain_from_coreg("xyMember") == "xy"
+    assert parser._clean_member_domain_from_coreg("xyDomain") == "xy"
+    assert parser._clean_member_domain_from_coreg("xyMemberDomain") == "xyMember"
+    assert parser._clean_member_domain_from_coreg("xyMemberab") == "xyMemberab"
+    assert parser._clean_member_domain_from_coreg("xyDomainab") == "xyDomainab"
+    assert parser._clean_member_domain_from_coreg("xyMemberDomainab") == "xyMemberDomainab"
+    assert parser._clean_member_domain_from_coreg("xyMemberMember") == "xyMember"
+    assert parser._clean_member_domain_from_coreg("xyDomainDomain") == "xyDomain"
+
+
