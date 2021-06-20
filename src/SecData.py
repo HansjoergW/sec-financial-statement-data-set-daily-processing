@@ -9,7 +9,7 @@ from datetime import datetime, date
 import dateutil
 
 
-class SecXMLProcessingOrchestrator():
+class SecDataOrchestrator():
 
     def __init__(self, workdir: str, current_year: int = None, current_month: int = None, months: int = 4):
         if workdir[-1] != '/':
@@ -81,6 +81,8 @@ class SecXMLProcessingOrchestrator():
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
-    orchestrator = SecXMLProcessingOrchestrator(workdir_default, 2021, 4, 4)
+    # orchestrator = SecDataOrchestrator(workdir_default)
+    orchestrator = SecDataOrchestrator(workdir_default, 2021, 4, 4)
+
     orchestrator.process()
-    #orchestrator.process_xml_data()
+

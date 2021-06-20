@@ -45,9 +45,42 @@ Unit Tests
 
 
 # Setup and first run
+## Setup the Python environment
+The simplest way to setup the environment is do use the conda envinronment.yml file, provided that you have miniconda or anaconda installed.
+just execute
 
-setup
-- conda env
-- flyway script
+    conda env create --file environment.yml
 
-setup without flyway
+This will create a new conda python environment based on Python 3.7 with the name "sec_processing".
+
+If you wanna setup your environment manually, create a new python 3.7 environment and install the packages
+- pandas
+- lxml
+- requests
+- pytest
+
+## Setup the SQLLite DB
+If you have the flyway CLI installed, just call
+
+    flyway migrate
+    
+from the root folder of the project. 
+Note, you might want to change the location of the sqllite-db file.
+Just open the flyway.conf file and change the target folder
+
+    flyway.url=jdbc:sqlite:D:/secprocessing/sec_processing.db
+
+You can also setup the DB manually by executing the ddl scripts inside the ddl in the appropriate order.
+Last but not least, you could install the db by calling the "_create_db" method from the _00_coomon.DBManagement() class.
+But note, if you are not using flyway you will need to execute manually additional ddl scripts of newer project version.
+
+## First run
+In order to excute the download and the parsing of the reports, just instantiate the SecDataOrchestrator 
+form the SecData module and call the process method.
+Note: when creating an instance of the SecDataOrchestrator, you have to provide the folder, in which the sqlite-db file was created.
+If you don't any additional information, then the SecDataOrchestrator will start to download and parse the 
+reports from the following and the 3 previous months.
+
+
+
+
