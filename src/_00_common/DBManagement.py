@@ -60,10 +60,8 @@ class DBManager():
     def insert_index_file(self, name:str, processdate:str):
         conn = self.get_connection()
         try:
-            sql = '''INSERT INTO {} ('sec_feed_file','status', 'processdate') VALUES('{}','progress','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
+            sql = '''INSERT INTO {} ('sec_feed_file', 'processdate') VALUES('{}','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
             conn.execute(sql)
-            update_sql = '''UPDATE {} SET status = 'done' WHERE status == 'progress' and sec_feed_file != '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, name)
-            conn.execute(update_sql)
             conn.commit()
         finally:
             conn.close()
@@ -72,6 +70,15 @@ class DBManager():
         conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def update_status_index_file(self, name:str, status:str):
+        conn = self.get_connection()
+        try:
+            sql = '''UPDATE {} SET 'status' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, status, name)
             conn.execute(sql)
             conn.commit()
         finally:
