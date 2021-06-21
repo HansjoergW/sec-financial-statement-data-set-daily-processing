@@ -1,4 +1,4 @@
-from _00_common.SecFileUtils import download_url_to_file
+from _00_common.SecFileUtils import download_url_to_file, read_content_from_zip
 
 import os
 import logging
@@ -106,7 +106,11 @@ class SecIndexFileParser():
         """
         logging.info("Parsing RSS feed %s", self.feed_file)
 
-        root = etree.parse(self.feed_file).getroot()
+        content = read_content_from_zip(self.feed_file)
+        data = bytes(bytearray(content, encoding='utf-8'))
+        parser = etree.XMLParser(huge_tree=True)
+        root: etree._Element = etree.fromstring(data, parser)
+
         # 'items' elements contain the filing details for each company listed
         items = list(root.iter('item'))
         logging.debug('%d items found in RSS feed', len(items))

@@ -3,6 +3,7 @@ from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 from _02_xml.parsing.SecXmlParsingBase import SecXmlParserBase
 from _00_common.DBManagement import DBManager
+from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 
 import logging
 import datetime
@@ -41,19 +42,22 @@ class SecXmlParser:
 
         targetfilepath = data_dir + accessionnr + '_' + parser.get_type() + ".csv"
 
-        with open(xml_file, "r", encoding="utf-8") as f:
-            xml_content = f.read()
+        xml_content = read_content_from_zip(xml_file)
 
-            try:
-                # todo: check if we should do something with the error_list
-                df, error_list = parser.parse(accessionnr, xml_content)
-                df = parser.clean_for_financial_statement_dataset(df, accessionnr)
-                df.to_csv(targetfilepath, header=True, sep="\t")
+        # with open(xml_file, "r", encoding="utf-8") as f:
+        #     xml_content = f.read()
 
-                return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)))
-            except Exception as e:
-                logging.exception("failed to parse data: " + xml_file, e)
-                return (None, accessionnr, str(e))
+        try:
+            # todo: check if we should do something with the error_list
+            df, error_list = parser.parse(accessionnr, xml_content)
+            df = parser.clean_for_financial_statement_dataset(df, accessionnr)
+            write_df_to_zip(df, targetfilepath)
+            # df.to_csv(targetfilepath, header=True, sep="\t")
+
+            return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)))
+        except Exception as e:
+            logging.exception("failed to parse data: " + xml_file, e)
+            return (None, accessionnr, str(e))
 
     def _parse(self, parser: SecXmlParserBase, select_funct: Callable, update_funct: Callable):
         pool = Pool(8)

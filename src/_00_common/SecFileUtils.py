@@ -1,7 +1,7 @@
 import requests
 import logging
 from time import sleep
-import io
+from pathlib import Path
 import os
 import pandas as pd
 import zipfile
@@ -15,8 +15,9 @@ def download_url_to_file(file_url:str, target_file:str, expected_size: int = Non
         if len(content) != expected_size:
             raise Exception("wrong length downloaded")
 
-    with io.open(target_file, 'w', newline="\n") as file:
-        file.write(content)
+    # with io.open(target_file, 'w', newline="\n") as file:
+    #     file.write(content)
+    write_content_to_zip(content, target_file)
 
 
 def get_url_content(file_url:str) -> str:
@@ -53,20 +54,23 @@ def write_df_to_zip(df:pd.DataFrame, filename:str):
 def read_df_from_zip(filename:str) -> pd.DataFrame:
     if _check_if_zipped(filename):
         with zipfile.ZipFile(filename + ".zip", "r") as zf:
-            return pd.read_csv(zf.open(filename), header=0, delimiter="\t")
+            file = Path(filename).name
+            return pd.read_csv(zf.open(file), header=0, delimiter="\t")
     else:
         return pd.read_csv(filename, header=0, delimiter="\t")
 
 
 def write_content_to_zip(content:str, filename:str):
     with zipfile.ZipFile(filename + ".zip", mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr(filename, content)
+        file = Path(filename).name
+        zf.writestr(file, content)
 
 
 def read_content_from_zip(filename:str) -> str:
     if _check_if_zipped(filename):
         with zipfile.ZipFile(filename + ".zip", mode="r") as zf:
-            return zf.read(filename).decode("utf-8")
+            file = Path(filename).name
+            return zf.read(file).decode("utf-8")
     else:
         with open(filename, "r", encoding="utf-8") as f:
             return f.read()

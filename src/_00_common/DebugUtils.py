@@ -1,4 +1,5 @@
 from _00_common.DBManagement import DBManager
+from _00_common.SecFileUtils import read_content_from_zip, read_df_from_zip
 from _02_xml.SecXmlFileParsing import SecXmlParser
 from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
@@ -37,21 +38,19 @@ class DataAccessTool():
 
     def get_pre_xml_content_by_adsh(self, adsh: str):
         adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
-        with open(xmlpre, "r", encoding="utf-8") as f:
-            return f.read()
+        return read_content_from_zip(xmlpre)
 
     def get_num_xml_content_by_adsh(self, adsh: str):
         adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
-        with open(xmlnum, "r", encoding="utf-8") as f:
-            return f.read()
+        return read_content_from_zip(xmlnum)
 
     def get_pre_csv_as_df_by_adsh(self, adsh: str) -> pd.DataFrame:
         adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
-        return pd.read_csv(csvpre, header=0, delimiter="\t")
+        return read_df_from_zip(csvpre)
 
     def get_num_csv_as_df_by_adsh(self, adsh: str) -> pd.DataFrame:
         adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
-        return pd.read_csv(csvnum, header=0, delimiter="\t")
+        return read_df_from_zip(csvnum)
 
 
 class DataAccessByAdshTool():
