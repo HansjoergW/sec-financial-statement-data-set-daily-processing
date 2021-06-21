@@ -51,7 +51,6 @@ class SecIndexFilePostProcessor():
             name = item['name']
             size = item['size']
             if name.endswith("htm.xml"):
-                print("found for: " + path)
                 new_url = path + name
                 return new_url, size, data_tuple[0]
         return None, None, data_tuple[0]

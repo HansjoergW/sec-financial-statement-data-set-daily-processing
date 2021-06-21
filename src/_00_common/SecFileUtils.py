@@ -33,10 +33,9 @@ def get_url_content(file_url:str) -> str:
             break
         except requests.exceptions.RequestException as err:
             if current_try >= max_tries:
-                logging.exception("RequestException:%s", err)
+                logging.info(f"RequestException: failed to download {file_url}")
                 raise err
             else:
-                logging.info("failed try " + str(current_try))
                 sleep(1)
 
     return response.text

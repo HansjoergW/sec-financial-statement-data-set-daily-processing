@@ -42,30 +42,51 @@ class SecDataOrchestrator():
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
 
+    def _log_main_header(self, title:str):
+        logging.info("==============================================================")
+        logging.info(title)
+        logging.info("==============================================================")
+
+    def _log_sub_header(self, title:str):
+        logging.info("")
+        logging.info("--------------------------------------------------------------")
+        logging.info(title)
+        logging.info("--------------------------------------------------------------")
+
+
     def _download_index_data(self):
+        self._log_sub_header('download xbrl-rss index file data')
         secindexprocessor = SecIndexFileProcessor(self.dbmanager, self.start_year, self.current_year, self.start_month, self.current_month, self.feeddir)
         secindexprocessor.download_sec_feeds()
 
     def _postprocess_index_data(self):
+        self._log_sub_header('add missing num-data file urls')
         secindexpostprocessor = SecIndexFilePostProcessor(self.dbmanager)
         secindexpostprocessor.add_missing_xbrlinsurl()
+        self._log_sub_header('check for duplicates')
         secindexpostprocessor.check_for_duplicated()
 
     def process_index_data(self):
+        self._log_main_header("Process xbrl-rss index files")
         self._download_index_data()
         self._postprocess_index_data()
 
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(self.dbmanager, self.xmldir)
+        self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()
+        self._log_sub_header('download pre xml files')
         secxmlfilesdownloader.downloadPreFiles()
 
     def _parse_xml(self):
         secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)
+        self._log_sub_header('parse num xml files')
         secxmlfileparser.parseNumFiles()
+        self._log_sub_header('parse pre xml files')
         secxmlfileparser.parsePreFiles()
 
     def process_xml_data(self):
+        self._log_main_header("Process xbrl data files")
         # todo: sollte in eigene xml preprocessor klasse
         # move new entries in sec_feeds to sec_processing
         entries = self.dbmanager.copy_uncopied_entries()
@@ -82,7 +103,7 @@ class SecDataOrchestrator():
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
-    orchestrator = SecDataOrchestrator(workdir_default, 2021, 5, 1)
+    orchestrator = SecDataOrchestrator(workdir_default, 2021, 6, 4)
 
     orchestrator.process()
 
