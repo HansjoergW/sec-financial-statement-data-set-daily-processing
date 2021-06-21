@@ -69,11 +69,6 @@ class SecIndexFileParser():
         xbrl_def_size = None
         xbrl_lab_size = None
         xbrl_pre_size = None
-        xbrl_ins_lastchanged = None
-        xbrl_cal_lastchanged = None
-        xbrl_def_lastchanged = None
-        xbrl_lab_lastchanged = None
-        xbrl_pre_lastchanged = None
 
         for xbrl_file in xbrl_files:
             xbrl_type = xbrl_file.attrib['{' + self.namespace + '}type']

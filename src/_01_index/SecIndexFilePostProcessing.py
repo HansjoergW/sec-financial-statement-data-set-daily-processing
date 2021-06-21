@@ -3,18 +3,18 @@ from _00_common.DBManagement import DBManager
 from typing import List, Tuple
 import requests
 import logging
-import re
 import json
 
 from time import time, sleep
 from multiprocessing import Pool
 
-# Idee: verarbeiten der Daten in der DB, wenn sie mal dort, d.h. auch vervollständigen, etc.
-# listet alle filenamen sauber
-files = re.compile(r"\"name\":\"(.*?)\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-
-
 class SecIndexFilePostProcessor():
+    """ earlier, it was common that the number xml was individual xml file which was also listed in the
+    sec-feed file. However, today it is possible and gets more common that the number information is directly
+    contained in the html itself. In these cases the sec does create the number xml file out of the html
+     file (ending with htm.xm). However, this file does not appear in the IndexFile.
+     Therefore it is necessary to get the index.json for a report and search for a file ending with
+     htm.xml. This file is then the replacement for the old number xml ('xbrlInsUrl')"""
 
     def __init__(self, dbmanager: DBManager):
         self.dbmanager = dbmanager
