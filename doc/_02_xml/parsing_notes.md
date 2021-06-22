@@ -13,15 +13,15 @@
 2.1. several presentation arc can reference the same loc element. in this case the presentation should have different preferredLabels (ex. total and terse)
 
 3. parent-child relation - line calculation
-3.1. there are reports which add a running number to every occurence of to and from label, so the
-     hierarchy cannot be evaluated without removing this suffixes. Problem these reports will appear as if they
+3.1. there are reports which add a running number to every occurrence of to and from label, so the
+     hierarchy cannot be evaluated without removing this suffixes, otherwise, these reports will appear as if they
      have many root nodes within a presentation (0000018255-21-000004)
-3.2. it can be that the same to-label can exist under different parent-labels, as well as under the 
-     same parent label. Therefore, in order to create a "key_tag" for that entry, the attributes to, from and order
+3.2. it is possible that the same to-label can exist under different parent-labels, as well as under the 
+     same parent label. Therefore, in order to create a unique "key_tag" for that entry, the attributes to, from and order
      have to be used
-3.3. there are some rare cases of statements (2 statements in 5500 reports for q1 2021) in a report for which have ambiguous parent-child defnition, meaning
-     that the from-node could be connect to more than one to-node. In this case, the ambiguous entries have
-     to be removed from the structure.
+3.3. there are some rare cases of statements (2 statements in 5500 reports for q1 2021) in a report for which have
+     ambiguous parent-child definition, meaning that the from-node could be connect to more than one to-node. 
+     In this case, the ambiguous entries have to be removed from the structure.
      examples: 0001562762-21-000101 # StatementConsolidatedStatementsOfStockholdersEquity
                0001564590-21-012964 # StatementConsolidatedStatementsOfCashFlows
 3.4. there are some rare cases of statements (4 statements in 5500 reports for q1 2021) that contain multiple root_nodes.
@@ -61,8 +61,6 @@
 3.13. There are entries which can have two CI. One is a "normal" IS with one or more comprehensive entries.
       that one should be recognized as IS, and the second is a "normal" CI
       '0000766704-21-000018'
-
-
 
 5. calculating labels and version
 5.1. label name and version is calculated from loc element:

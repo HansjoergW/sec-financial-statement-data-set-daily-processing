@@ -54,7 +54,7 @@ class SecIndexFileParser():
 
         logging.info('Downloaded RSS feed: %s', self.feed_file)
 
-    def _parse_xbrlfiles(self, edgar_sub_elem: etree.Element, edgar_ns: Dict[str, str]) -> Tuple[str]:
+    def _parse_xbrlfiles(self, edgar_sub_elem: etree.Element, edgar_ns: Dict[str, str]) -> Tuple[str,str,str,str,str,str,str,str,str,str]:
 
         ed_xbrl = './/edgar:xbrlFile'
         xbrl_files = edgar_sub_elem.findall(ed_xbrl, namespaces=edgar_ns)
