@@ -150,7 +150,7 @@ class DBManager():
     def find_unparsed_numFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is not like "parsed%"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
             return conn.execute(sql).fetchall()
         finally:
@@ -159,7 +159,7 @@ class DBManager():
     def find_unparsed_preFiles(self) -> List[Tuple[str, str]]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is not "parsed"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is not like "parsed%"'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
             return conn.execute(sql).fetchall()
         finally:
@@ -180,6 +180,15 @@ class DBManager():
             sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
             conn.commit()
+        finally:
+            conn.close()
+
+    def find_ready_to_zip_adshs(self) -> pd.DataFrame:
+        conn = self.get_connection()
+        try:
+            sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and processZipDate is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+
+            return pd.read_sql_query(sql, conn)
         finally:
             conn.close()
 
