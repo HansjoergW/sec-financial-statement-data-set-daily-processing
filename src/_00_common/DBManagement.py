@@ -201,6 +201,14 @@ class DBManager():
         finally:
             conn.close()
 
+    def read_all_copied(self) -> pd.DataFrame:
+        conn = self.get_connection()
+        try:
+            sql = '''SELECT * FROM {} WHERE status is 'copied' '''.format(SEC_FEED_TBL_NAME)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self.get_connection()
         try:
