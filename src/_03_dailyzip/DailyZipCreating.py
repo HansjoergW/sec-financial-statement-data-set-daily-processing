@@ -1,15 +1,23 @@
 from _00_common.DBManagement import DBManager
 from _00_common.SecFileUtils import read_df_from_zip
-from typing import List
+from typing import List, Tuple
 
 import pandas as pd
 import numpy as np
+import zipfile
+import math
+import os
 
 class DailyZipCreator:
 
-    def __init__(self, dbmanager: DBManager):
+    def __init__(self, dbmanager: DBManager, daily_zip_dir: str = "./tmp/daily/"):
         self.dbmanager = dbmanager
         self.copied_df = dbmanager.read_all_copied()
+
+        if daily_zip_dir[-1] != '/':
+            daily_zip_dir = daily_zip_dir + '/'
+
+        self.daily_zip_dir = daily_zip_dir
 
     def _read_ready_entries(self) -> pd.DataFrame:
         return self.dbmanager.find_ready_to_zip_adshs()
@@ -104,14 +112,36 @@ class DailyZipCreator:
         dfs = [read_df_from_zip(file) for file in filelist]
         return pd.concat(dfs).to_csv(sep="\t", header=True, index=False)
 
-    def _create_daily_zip(self, date:str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame):
+    def _create_daily_content(self, date:str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame)-> Tuple[str, str, str]:
         sub_content = entries_sub_df.to_csv(sep="\t", header=True, index=False)
         pre_content = self._read_csvfiles(entries.csvPreFile.tolist())
         num_content = self._read_csvfiles(entries.csvNumFile.tolist())
-        print("")
+        return sub_content, pre_content, num_content
 
-        # alle files zippen
-        pass
+    def _get_qrtr(self, filing_date: str) -> str:
+        year = filing_date[6:]
+        month = filing_date[0:2]
+        month_int = int(month)
+        qtr = math.floor((month_int - 1) / 3) + 1
+
+        return year + "q" + str(qtr)
+
+    def _store_to_zip(self, filing_date: str, sub: str, pre: str, num: str) -> str:
+        qrtr = self._get_qrtr(filing_date)
+        qtr_dir = os.path.join(self.daily_zip_dir, qrtr)
+        os.makedirs(os.path.join(qtr_dir), exist_ok=True)
+
+        year = filing_date[6:]
+        month = filing_date[0:2]
+        day = filing_date[3:5]
+        zipfile_name = year+month+day+".zip"
+        zipfile_path = os.path.join(qtr_dir, zipfile_name)
+        with zipfile.ZipFile(zipfile_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr('sub.txt', sub)
+            zf.writestr('pre.txt', pre)
+            zf.writestr('num.txt', num)
+
+        return zipfile_name
 
     def _iterate_filing_dates(self):
         entries_ready = self._read_ready_entries()
@@ -120,38 +150,16 @@ class DailyZipCreator:
         grouped = entries_ready.groupby('filingDate')
         for entry, df in grouped:
             adshs = df.accessionNumber.tolist()
-            self._create_daily_zip(entry, df, entries_sub[entries_sub.adsh.isin(adshs)])
-            print(entry, len(df), df.columns)
-            # update db eintrag für alle Files
+            sub, pre, num = self._create_daily_content(entry, df, entries_sub[entries_sub.adsh.isin(adshs)])
+            zf_name = self._store_to_zip(entry, sub,pre, num)
 
+            print(zf_name, len(df))
+
+            # todo: tracking Update DB
+            # todo: parallelisieren
 
 
 if __name__ == '__main__':
     dbm = DBManager("d:/secprocessing")
-    creator = DailyZipCreator(dbm)
+    creator = DailyZipCreator(dbm, "d:/tmp/daily/")
     creator._iterate_filing_dates()
-
-    print()
-
-
-""" 
-adsh	cik	name	sic	fye	form	period	fy	fp	filed	accepted
-0001493152-21-000456	715446	ANIXA BIOSCIENCES INC		1031	10-K	20201031	2020	FY	20210107	07.01.2021 16:16
-0001437749-21-000341	76267	PARK AEROSPACE CORP		229	10-Q	20201130	2021	Q3	20210107	07.01.2021 13:20
-0001564590-21-000486	1687221	REV GROUP, INC.		1031	10-K	20201031	2020	FY	20210107	07.01.2021 07:11
-
-edgar:accessionNumber	
-edgar:cikNumber	/ no leading zeros
-edgar:companyName	/ upper case
-edgar:assignedSic
-edgar:fiscalYearEnd	 / MMDD /  "with leading zero / 0228 ->rounded to 0229 in leap year
-edgar:formType
-edgar:period			edgar:fillingDate	edgar:acceptanceDatetime
-
-fy: / "actual year for 10K /year for next 10K"	
-fp: / "FY for 10K / actual Quarter"
-
-edgar:fillingDate01.07.2021
-edgar:acceptanceDatetime /	"like: 20210107161557 / rounded to minutes"
-
-"""
