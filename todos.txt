@@ -1,6 +1,15 @@
 Next
 ====
 
+- Dateien zum parsen werden mit 'not like' nicht mehr selektiert, für pre und num
+
+- beim leeren durchlaufen lassen gibt es einen Fehler im DailyZipCreating Zeile
+  vermutlich weil Inhalt leer ist -> abfangen
+    File "C:\ieu\projects\sec_processing\src\_03_dailyzip\DailyZipCreating.py", line 95, in _read_feed_entries_for_adshs
+      sub_entries.loc[sub_entries.form == '10-K','fp'] = 'FY'
+
+
+
 - bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 
