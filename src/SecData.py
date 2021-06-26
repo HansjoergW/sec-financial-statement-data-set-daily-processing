@@ -3,6 +3,7 @@ from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
 from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
+from _03_dailyzip.DailyZipCreating import DailyZipCreator
 
 import logging
 from datetime import datetime, date
@@ -19,6 +20,7 @@ class SecDataOrchestrator():
         self.feeddir = workdir + "feed/"
         self.xmldir = workdir + "xml/"
         self.csvdir = workdir + "csv/"
+        self.dailyzipdir = workdir + "daily/"
 
         self.dbmanager = DBManager(work_dir=workdir)
 
@@ -95,15 +97,20 @@ class SecDataOrchestrator():
         self._download_xml()
         self._parse_xml()
 
+    def create_daily_zip(self):
+        self._log_main_header("Create daily zip files")
+        zip_creator = DailyZipCreator(self.dbmanager, self.dailyzipdir)
+        zip_creator.process()
+
     def process(self):
         self.process_index_data()
         self.process_xml_data()
+        self.create_daily_zip()
 
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
     orchestrator = SecDataOrchestrator(workdir_default, 2021, 6, 4)
-
     orchestrator.process()
 

@@ -1,12 +1,15 @@
 from _00_common.DBManagement import DBManager
 from _00_common.SecFileUtils import read_df_from_zip
 from typing import List, Tuple
+from multiprocessing import Pool
 
 import pandas as pd
 import numpy as np
 import zipfile
 import math
 import os
+import datetime
+import logging
 
 class DailyZipCreator:
 
@@ -18,6 +21,7 @@ class DailyZipCreator:
             daily_zip_dir = daily_zip_dir + '/'
 
         self.daily_zip_dir = daily_zip_dir
+        self.processdate = datetime.date.today().isoformat()
 
     def _read_ready_entries(self) -> pd.DataFrame:
         return self.dbmanager.find_ready_to_zip_adshs()
@@ -51,7 +55,7 @@ class DailyZipCreator:
                                       'filingDate': 'filed',
                                       'acceptanceDatetime': 'accepted'}, inplace=True)
 
-        # convertions
+        # simple conversions
         sub_entries['cik'] = sub_entries.cik.astype(int)
         sub_entries['name'] = sub_entries.name.str.upper()
 
@@ -143,23 +147,36 @@ class DailyZipCreator:
 
         return zipfile_name
 
-    def _iterate_filing_dates(self):
+    def _process_date(self, data: Tuple[str, pd.DataFrame, pd.DataFrame]):
+        filing_date: str = data[0]
+        group_df: pd.DataFrame = data[1]
+        entries_sub: pd.DataFrame = data[2]
+
+        try:
+            adshs = group_df.accessionNumber.tolist()
+            sub, pre, num = self._create_daily_content(filing_date, group_df, entries_sub[entries_sub.adsh.isin(adshs)])
+            zf_name = self._store_to_zip(filing_date, sub,pre, num)
+            update_data = [(zf_name, self.processdate, x) for x in adshs]
+            self.dbmanager.updated_ziped_entries(update_data)
+        except Exception as e:
+            logging.warning(f"failed to process {filing_date}", e)
+
+    def process(self):
+        pool = Pool(8)
+
+
         entries_ready = self._read_ready_entries()
-        entries_sub = self._read_feed_entries_for_adshs(entries_ready.accessionNumber.tolist()).copy()
-
+        adsh_to_process = entries_ready.accessionNumber.tolist()
+        entries_sub = self._read_feed_entries_for_adshs(adsh_to_process).copy()
         grouped = entries_ready.groupby('filingDate')
-        for entry, df in grouped:
-            adshs = df.accessionNumber.tolist()
-            sub, pre, num = self._create_daily_content(entry, df, entries_sub[entries_sub.adsh.isin(adshs)])
-            zf_name = self._store_to_zip(entry, sub,pre, num)
 
-            print(zf_name, len(df))
+        logging.info("found {} reports in {} dates to process".format(len(adsh_to_process), len(grouped)))
 
-            # todo: tracking Update DB
-            # todo: parallelisieren
+        param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [(*entry, entries_sub) for entry in grouped]
+        pool.map(self._process_date, param_list)
 
 
 if __name__ == '__main__':
     dbm = DBManager("d:/secprocessing")
     creator = DailyZipCreator(dbm, "d:/tmp/daily/")
-    creator._iterate_filing_dates()
+    creator.process()

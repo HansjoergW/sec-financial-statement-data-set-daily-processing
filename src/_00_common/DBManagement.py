@@ -174,7 +174,7 @@ class DBManager():
         finally:
             conn.close()
 
-    def update_parsed_pre_file(self, update_data: List[Tuple[str]]):
+    def update_parsed_pre_file(self, update_data: List[Tuple[str, str, str, str]]):
         conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
@@ -189,6 +189,15 @@ class DBManager():
             sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and processZipDate is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
 
             return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
+    def updated_ziped_entries(self, update_data: List[Tuple[str, str, str]]):
+        conn = self.get_connection()
+        try:
+            sql = '''UPDATE {} SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            conn.executemany(sql, update_data)
+            conn.commit()
         finally:
             conn.close()
 
