@@ -14,6 +14,19 @@ of this file is similar to the quarterly zip files of the Financial Statement Da
 Detailed documentation is available in the subfolders of the doc folder.
 
 
+# Executing the whole process
+The main class to start the whole process is the "SecDataOrchestrator" which is in the SecData module that is placed
+directly in the source folder. In order to start the whole process an instance of the class has to be created.
+
+The first parameter in its constructor is the root direcotry into which all the data shall be created or downloaded.
+Also, the SQLite DB file will be created in this folder.
+
+If no additional parameters are provided, the process will start to download data for the current month and the
+preceding four months. 
+With the optional parameters 'year', 'month' and 'months' you can adjust the period and the starting last month
+and year for which data shall be downloaded.
+
+
 # General Aspects
 ## Robustness
 A very important aspect of the code is to be robust in several ways. First, since there will be a alot of url requests
@@ -28,7 +41,7 @@ executed from the same IP, the sec.gov site will start to block this calls with 
 maximum requests per second, and, as written above, also repeats calls if they should have failed.
 
 ## Conserving disk space
-Since a lot of data will be downloaded, this data will be stored always in a compressed manner.
+Since a lot of data will be downloaded, the downloaded and creatd files are stored in a compressed manner.
 
 
 # Ensuring quality

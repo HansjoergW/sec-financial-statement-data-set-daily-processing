@@ -8,7 +8,7 @@ import json
 from time import time, sleep
 from multiprocessing import Pool
 
-class SecIndexFilePostProcessor():
+class SecIndexFilePostProcessor:
     """ earlier, it was common that the number xml was individual xml file which was also listed in the
     sec-feed file. However, today it is possible and gets more common that the number information is directly
     contained in the html itself. In these cases the sec does create the number xml file out of the html

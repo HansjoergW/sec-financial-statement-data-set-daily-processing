@@ -43,6 +43,7 @@ class DailyZipCreator:
         feed_entries = self.dbmanager.read_all_copied()
         feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
 
+
         sub_entries = feed_entries[['accessionNumber','cikNumber', 'companyName','assignedSic','fiscalYearEnd','formType','period','filingDate','acceptanceDatetime']].copy()
 
         # rename to sub-file column names
@@ -54,6 +55,9 @@ class DailyZipCreator:
                                       'formType': 'form',
                                       'filingDate': 'filed',
                                       'acceptanceDatetime': 'accepted'}, inplace=True)
+
+        if len(sub_entries) == 0:
+            return sub_entries
 
         # simple conversions
         sub_entries['cik'] = sub_entries.cik.astype(int)

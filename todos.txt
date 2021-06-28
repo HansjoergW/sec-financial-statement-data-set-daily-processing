@@ -1,38 +1,24 @@
 Next
 ====
 
-- Dateien zum parsen werden mit 'not like' nicht mehr selektiert, für pre und num
 
-- beim leeren durchlaufen lassen gibt es einen Fehler im DailyZipCreating Zeile
-  vermutlich weil Inhalt leer ist -> abfangen
-    File "C:\ieu\projects\sec_processing\src\_03_dailyzip\DailyZipCreating.py", line 95, in _read_feed_entries_for_adshs
-      sub_entries.loc[sub_entries.form == '10-K','fp'] = 'FY'
-
-
-
-- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 
 Later
 =====
 
-Ziel: laufendes herunterladen der neuen Reports als XML und bereitstellen der Daten als CSV Datei
-- extract evaluate_statement_in als eigener Schritt vor Process
-- generation der sub.txt dateien, soweit sinnvoll
-- zippen von xml dateien
-- Reihenfolge der Spalten in den geparsten CSVs in der selben Reihenfolge wie original, damit es änlicher iwrd
--handhaben von der sonderfälle aufgrund mass_test_results.md
-
-Anderes:
-- DataObjects auch bei Index Klassen verwenden
+- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
 
 num file
 - footnotes sind am Ende in einer eigenen Node -> siehe auch 0000004904-21-000010n
-
+- möglichst alle Infos bis zum Schluss mitnehmen und erst dann finale Version für SEC Zip builden
+  -> DDdate auf Ende Datum berechnen, erst wenn die genauste Präzision für ein tag und ein bestimmtes Datum
+     gefiltert wurden
 
 
 Done
 ====
+27.06.2021 - final fixes für kompletten lauf mit daily zip creation
 12.06.2021 - Unit Tests für NumParsing umgeschrieben
 11.06.2021 - CodeRefactoring für Num umsetzen
            - Reihenfolge testen in Mastest für Pre
