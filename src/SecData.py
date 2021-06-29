@@ -1,6 +1,7 @@
 from _00_common.DBManagement import DBManager
 from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
 from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
+from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
 from _03_dailyzip.DailyZipCreating import DailyZipCreator
@@ -73,6 +74,11 @@ class SecDataOrchestrator:
         self._download_index_data()
         self._postprocess_index_data()
 
+    def _preprocess_xml(self):
+        self._log_sub_header('preprocess xml files')
+        secxmlfilepreprocessor = SecXmlFilePreprocessor(self.dbmanager)
+        secxmlfilepreprocessor.copy_entries_to_processing_table()
+
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(self.dbmanager, self.xmldir)
         self._log_sub_header('download num xml files')
@@ -89,11 +95,8 @@ class SecDataOrchestrator:
 
     def process_xml_data(self):
         self._log_main_header("Process xbrl data files")
-        # todo: sollte in eigene xml preprocessor klasse
-        # move new entries in sec_feeds to sec_processing
-        entries = self.dbmanager.copy_uncopied_entries()
-        logging.info("{} entries copied into processing table".format(entries))
 
+        self._preprocess_xml()
         self._download_xml()
         self._parse_xml()
 

@@ -44,15 +44,11 @@ class SecXmlParser:
 
         xml_content = read_content_from_zip(xml_file)
 
-        # with open(xml_file, "r", encoding="utf-8") as f:
-        #     xml_content = f.read()
-
         try:
             # todo: check if we should do something with the error_list
             df, error_list = parser.parse(accessionnr, xml_content)
             df = parser.clean_for_financial_statement_dataset(df, accessionnr)
             write_df_to_zip(df, targetfilepath)
-            # df.to_csv(targetfilepath, header=True, sep="\t")
 
             return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)))
         except Exception as e:
