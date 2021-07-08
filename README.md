@@ -83,6 +83,7 @@ Note: when creating an instance of the SecDataOrchestrator, you have to provide 
 If you don't any additional information, then the SecDataOrchestrator will start to download and parse the 
 reports from the following and the 3 previous months.
 
-
+#Documentation of the code
+Detailed documentation of the code is in the 'doc' folder.
 
 

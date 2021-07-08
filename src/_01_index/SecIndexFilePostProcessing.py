@@ -36,7 +36,7 @@ class SecIndexFilePostProcessor:
                 break
             except requests.exceptions.RequestException as err:
                 if current_try >= 4:
-                    logging.exception("RequestException:%s", err)
+                    logging.warning("failed to download from: {}".format(json_file))
                     return None, None, data_tuple[0]
                 else:
                     logging.info("failed try " + str(current_try))
@@ -82,7 +82,7 @@ class SecIndexFilePostProcessor:
             missing = self.dbmanager.find_missing_xbrl_ins_urls()
 
         if len(missing) > 0:
-            logging.info("Failed to addmissing for " + str(len(missing)))
+            logging.info("Failed to add missing for " + str(len(missing)))
 
     def check_for_duplicated(self):
         duplicated_adshs: List[str] = self.dbmanager.find_duplicated_adsh()
