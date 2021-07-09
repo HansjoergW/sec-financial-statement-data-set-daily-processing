@@ -3,6 +3,12 @@ Next
 - beim index file downloaden muss auch so was wie ein loop hin. auch hier kann das downloaden der xbrl-rss files
   mehrmals fehlschlagen und es sollte ein zweiter loop darum gebaut werden.
 
+- unit_usd ist in den daten, anstatt usd -> 20210210.zip
+
+- sub muss noch verglichen werden
+
+- saubere, automatische Lösung um ganzes Quartal zu vergleichen.
+
 
 Later
 =====
