@@ -15,6 +15,7 @@ class DataAccessTool():
 
         self.workdir = workdir
         self.qtrdir = workdir + 'quarterzip/'
+        self.dailyzipdir = workdir + 'daily/'
         self.dbmgr = DBManager(workdir)
 
     def _read_file_from_zip(self, zipfile_to_read: str, file_to_read: str) -> pd.DataFrame:
@@ -35,6 +36,9 @@ class DataAccessTool():
 
     def get_num_by_adsh_from_quarter(self, year: int, qrtr: int, adsh: str) -> pd.DataFrame:
         return self._get_by_adsh_from_quarter(year, qrtr, adsh, "num.txt")
+
+    def get_sub_by_adsh_from_quarter(self, year: int, qrtr: int, adsh: str) -> pd.DataFrame:
+        return self._get_by_adsh_from_quarter(year, qrtr, adsh, "sub.txt")
 
     def get_pre_xml_content_by_adsh(self, adsh: str):
         adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
@@ -98,6 +102,23 @@ class TestSetCreatorTool():
                 return result
         finally:
             conn.close()
+
+    def get_daily_zips_by_year_and_montsh(self, year: int, months: List[int], count: int = None) -> List[str]:
+
+        conn = self.tool.dbmgr.get_connection()
+        months = ','.join([str(month) for month in months])
+
+        try:
+            sql = '''SELECT DISTINCT dailyZipFile from sec_report_processing WHERE filingYear = {} and filingMonth in ({})'''.format(year, months)
+            selection: List[Tuple[str]] = conn.execute(sql).fetchall()
+            result:List[str] = [x[0] for x in selection]
+            if count is not None:
+                return result[:count]
+            else:
+                return result
+        finally:
+            conn.close()
+
 
 
 class ReparseTool():
