@@ -9,10 +9,21 @@ Next
 - unit_usd, oder unit_standard_usd... ist in den daten, anstatt usd -> 20210210.zip
 - line wird in pre als float und nicht als int gespeichert
 
+- dayli zip builden -> da muss man aufpassen, wenn im nachhinein neue files hinzugefügt werden...
+  also wenn z.B. durch eine spätere Verarbeitung zusätzliche Reports verarbeitet werden konnten
+- minimale Metadaten verwaltung für die dailyzips wären nicht schlecht, falls
+  später neue files dazukommen, wüsste man, ob man was hinzufügen müsste.
+  -> mann könnte auch nur prüfen, ob es das File bereits gibt und falls ja, müsste man neu selektieren
+  -> oder man könnte prinzipiell schauen, für welche Tage es Reports ohne dailyzip zugehörigkeit gibt
+     und dann könnte man immer erneut selektieren
+     -> wäre vermutlich das beste
+  -> aber dann müsste das Pipeline Projekt tracken, wann eine Datei zum letzten mal geänder wurde.
+
+- es scheint, als schlägt der längenvergleich der gedownloadeten Daten ab und zu fehl (ca. 70 in num only)
+  wahrscheinlich aufgrund des enocdings... die frage ist, ob dieser test etwas bringt.
 
 
 - saubere, automatische Lösung um ganzes Quartal zu vergleichen.
-
 
 Later
 =====

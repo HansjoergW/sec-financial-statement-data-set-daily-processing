@@ -18,7 +18,7 @@ class ReadSubZipContent:
         self.zipfileName = os.path.basename(self.zipfilePath)
 
     def read_df(self, adshs: List[str] = None) -> pd.DataFrame:
-        sub_df = self.dataUtils._read_file_from_zip(self.zipfilePath, 'sub.txt')
+        sub_df = self.dataUtils._read_file_from_zip(self.zipfilePath, 'sub.txt', read_as_str=True)
         sub_df = sub_df[sub_df.form.isin(['10-K', '10-Q'])]
 
         if adshs is not None:
@@ -42,7 +42,7 @@ class ReadSubXmlContent:
 
         df_list = []
         for daily_zip in daily_zips:
-            sub_df = self.testsetCreator.tool._read_file_from_zip(daily_zip, "sub.txt")
+            sub_df = self.testsetCreator.tool._read_file_from_zip(daily_zip, "sub.txt", read_as_str=True)
             df_list.append(sub_df)
 
         return pd.concat(df_list)

@@ -18,9 +18,11 @@ class DataAccessTool():
         self.dailyzipdir = workdir + 'daily/'
         self.dbmgr = DBManager(workdir)
 
-    def _read_file_from_zip(self, zipfile_to_read: str, file_to_read: str) -> pd.DataFrame:
+    def _read_file_from_zip(self, zipfile_to_read: str, file_to_read: str, read_as_str = False) -> pd.DataFrame:
         with zipfile.ZipFile(zipfile_to_read, "r") as myzip:
-            return pd.read_csv(myzip.open(file_to_read), header=0, delimiter="\t")
+            if read_as_str:
+                return pd.read_csv(myzip.open(file_to_read), header=0, delimiter="\t", dtype=str)
+            return pd.read_csv(myzip.open(file_to_read), header=0, delimiter="\t", dtype=str)
 
     def _get_zipfilename(self,  year: int, qrtr: int) -> str:
         return self.qtrdir + str(year)+ 'q' + str(qrtr) + '.zip'

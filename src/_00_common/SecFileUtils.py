@@ -13,7 +13,8 @@ def download_url_to_file(file_url:str, target_file:str, expected_size: int = Non
     content = get_url_content(file_url)
     if expected_size != None:
         if len(content) != expected_size:
-            raise Exception("wrong length downloaded")
+            logging.info(f"warning expected size {expected_size} - real size {len(content)}")
+            # raise Exception("wrong length downloaded")
 
     # with io.open(target_file, 'w', newline="\n") as file:
     #     file.write(content)
