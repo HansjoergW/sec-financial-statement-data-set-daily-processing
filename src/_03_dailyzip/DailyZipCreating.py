@@ -15,7 +15,6 @@ class DailyZipCreator:
 
     def __init__(self, dbmanager: DBManager, daily_zip_dir: str = "./tmp/daily/"):
         self.dbmanager = dbmanager
-        self.copied_df = dbmanager.read_all_copied()
 
         if daily_zip_dir[-1] != '/':
             daily_zip_dir = daily_zip_dir + '/'
@@ -27,6 +26,11 @@ class DailyZipCreator:
         return self.dbmanager.find_ready_to_zip_adshs()
 
     def _read_feed_entries_for_adshs(self, adshs: List[str]) -> pd.DataFrame:
+        feed_entries = self.dbmanager.read_all_copied()
+        feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
+        return self._process_df(feed_entries)
+
+    def _process_df(self, df: pd.DataFrame) -> pd.DataFrame:
         # adsh:     edgar:accessionNumber
         # cik:      edgar:cikNumber	/ no leading zeros
         # name:     edgar:companyName	/ upper case
@@ -40,11 +44,7 @@ class DailyZipCreator:
         # filed:    edgar:fillingDate yyyyMMdd
         # accepted: edgar:acceptanceDatetime /	"like: 20210107161557 / rounded to minutes"
 
-        feed_entries = self.dbmanager.read_all_copied()
-        feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
-
-
-        sub_entries = feed_entries[['accessionNumber','cikNumber', 'companyName','assignedSic','fiscalYearEnd','formType','period','filingDate','acceptanceDatetime']].copy()
+        sub_entries = df[['accessionNumber','cikNumber', 'companyName','assignedSic','fiscalYearEnd','formType','period','filingDate','acceptanceDatetime']].copy()
 
         # rename to sub-file column names
         sub_entries.rename(columns = {'accessionNumber': 'adsh',
@@ -108,7 +108,8 @@ class DailyZipCreator:
         # accepted -> 20210107161557 rounded to minutes
         # 20210107132023-> 07.01.2021 13:20:00.0
         sub_entries['accepted'] = pd.to_datetime(sub_entries.accepted, format='%Y%m%d%H%M%S')
-        sub_entries['accepted'] = sub_entries.accepted.dt.strftime('%d.%m.%Y %H:%M:00.0')
+        sub_entries['accepted'] = sub_entries.accepted.dt.round('min')
+        sub_entries['accepted'] = sub_entries.accepted.dt.strftime('%Y-%m-%d %H:%M:00.0')
 
         # drop helper columns
         sub_entries.drop(columns=['period_year', 'period_month', 'period_day', 'fye_month',

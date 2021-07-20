@@ -1,5 +1,6 @@
 from _00_common.DBManagement import DBManager
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
+from _03_dailyzip.DailyZipCreating import DailyZipCreator
 
 from typing import List
 import os
@@ -56,6 +57,19 @@ def read_sub_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year: int,
 def read_sub_xml_content(dbmgr: DBManager,testsetCreator: TestSetCreatorTool, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
     reader = ReadSubXmlContent(dbmgr, testsetCreator, year, qrtr)
     return reader.read_df(adshs)
+
+
+def read_and_parse_direct_from_table(dbmgr: DBManager, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
+    df = dbmgr.read_by_year_and_quarter(year, qrtr)
+    if adshs is not None:
+        df = df[df.accessionNumber.isin(adshs)]
+
+    dailyZipCreator = DailyZipCreator(dbmgr)
+    result = dailyZipCreator._process_df(df)
+    result['cik'] = result.cik.astype(str)
+    result['fy'] = result.fy.astype(str)
+    return result
+
 
 
 

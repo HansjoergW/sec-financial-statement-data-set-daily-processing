@@ -210,6 +210,19 @@ class DBManager():
         finally:
             conn.close()
 
+    def read_by_year_and_quarter(self, year:int, qrtr: int) -> pd.DataFrame:
+        months: List = [1,2,3]
+        offset = ((qrtr - 1) * 3)
+        months = [str(x + offset) for x in months]
+        month_str = ",".join(months)
+
+        conn = self.get_connection()
+        try:
+            sql = '''SELECT * FROM {} WHERE filingYear = {} and filingMonth in ({})  '''.format(SEC_FEED_TBL_NAME, year, month_str)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
     def read_all_copied(self) -> pd.DataFrame:
         conn = self.get_connection()
         try:

@@ -1,7 +1,7 @@
 from _00_common.DBManagement import DBManager
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 
-from testintegration.sub.SubMassTestingTools import read_sub_zip_content, read_sub_xml_content
+from testintegration.sub.SubMassTestingTools import read_sub_zip_content, read_sub_xml_content, read_and_parse_direct_from_table
 
 from typing import List, Dict, Tuple
 
@@ -15,7 +15,6 @@ dataUtils = DataAccessTool(default_workdir)
 testsetCreator = TestSetCreatorTool(default_workdir)
 
 cols = ['adsh', 'cik', 'name', 'sic', 'fye', 'form', 'period', 'filed', 'accepted', 'fy', 'fp']
-compare_cols = [x for x in cols if x is not "adsh"]
 
 
 def read_quarter_data(year: int, qrtr: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -28,7 +27,25 @@ def read_quarter_data(year: int, qrtr: int) -> Tuple[pd.DataFrame, pd.DataFrame]
     return sub_zip_df, sub_xml_df
 
 
+def read_quarter_data_direct_from_db(year: int, qrtr: int, adshs: List[str] = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    sub_zip_df = read_sub_zip_content(dbmgr, dataUtils, year, qrtr, adshs)[cols]
+
+    sub_zip_df.rename(lambda x: x + "_zip", axis = 1, inplace=True)
+
+    sub_xml_df = read_and_parse_direct_from_table(dbmgr, year, qrtr, adshs)
+    sub_xml_df.rename(lambda x: x + "_xml", axis = 1, inplace=True)
+
+    return sub_zip_df, sub_xml_df
+
+
 def merge(sub_zip_df: pd.DataFrame, sub_xml_df: pd.DataFrame) -> pd.DataFrame:
+    # ignore 0229 fiscal ending
+    mask = sub_zip_df.fye_zip == '0229'
+    sub_zip_df.loc[mask, 'fye_zip'] = '0228'
+
+    mask = sub_xml_df.fye_xml == '0229'
+    sub_xml_df.loc[mask, 'fye_xml'] = '0228'
+
     return pd.merge(sub_zip_df, sub_xml_df, how = "outer", left_on=['adsh_zip'], right_on=['adsh_xml'])
 
 
@@ -53,16 +70,28 @@ def compare_cols(merged_df: pd.DataFrame):
         print(comp_col, len(inequal_adshs), inequal_adshs)
 
 
-sub_zip_df, sub_xml_df = read_quarter_data(2021, 1)
-merged_df = merge(sub_zip_df, sub_xml_df)
-compare_adsh(merged_df=merged_df)
-compare_cols(merged_df=merged_df)
+def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
+    sub_zip_df = dfs[0]
+    sub_xml_df = dfs[1]
+    merged_df = merge(sub_zip_df, sub_xml_df)
+    compare_adsh(merged_df=merged_df)
+    compare_cols(merged_df=merged_df)
+
+    print(len(sub_zip_df))
+    print(len(sub_xml_df))
+    print(sub_xml_df.columns)
+
+
+# compare_processed_content(read_quarter_data(2021, 1))
+
+adshs = ['0001140361-21-000322', '0001564590-21-000354']
+compare_processed_content(read_quarter_data_direct_from_db(2021, 1, adshs))
+
+
+
+
 #
 # accepted format ist ganz anders, ausserdem stimmen die Minuten z.T. nicht
 #
 # es benötigt noch eine funktion, um das sub direkt ab tabelle berechnen können, so dass nicht alles immer wieder neu berechnet werden muss.
 # variante wäre noch vergleichsspalten einzufügen, dann könnte man später einfacher per filter unterschiede suchen, oder auch prüfen, ob gewisse zeilen komplett anders sind
-
-print(len(sub_zip_df))
-print(len(sub_xml_df))
-print(sub_xml_df.columns)
