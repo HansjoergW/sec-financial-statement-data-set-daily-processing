@@ -63,6 +63,7 @@ class DailyZipCreator:
         sub_entries['cik'] = sub_entries.cik.astype(int)
         sub_entries['name'] = sub_entries.name.str.upper()
 
+
         # check for Null Values in fye
         # there are some entries, which don't have a fye entry. if it is a 10-k, then this is the month and year of period
         sub_entries.loc[sub_entries.fye.isnull() & (sub_entries.form == '10-K'), 'fye'] = sub_entries.period.str.slice(4,8)
@@ -70,12 +71,26 @@ class DailyZipCreator:
         sub_entries.loc[sub_entries.fye.isnull(), 'fye'] = "0000"
 
         # create helper columns
+        sub_entries['period_date'] = pd.to_datetime(sub_entries.period, format='%Y%m%d')
         sub_entries['period_year'] = sub_entries.period.str.slice(0,4).astype(int)
         sub_entries['period_month'] = sub_entries.period.str.slice(4,6).astype(int)
         sub_entries['period_day'] = sub_entries.period.str.slice(6,8).astype(int)
 
+        # round period to end of date
+        sub_entries.period = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
+
         sub_entries['fye_month'] = sub_entries.fye.str.slice(0,2).astype(int)
         sub_entries['fye_day'] = sub_entries.fye.str.slice(2,4).astype(int)
+
+        # sollten immer ende monat sein, fye muss deshalb noch korrigiert werden. Es gibt die funkction map in dataframes, die das relativ einfach lösen könnte
+        #
+        # https://stackoverflow.com/questions/20250771/remap-values-in-pandas-column-with-a-dict
+
+        month_end = {1: 31, 2: 28, 3:31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9:30, 10: 31, 11: 30, 12: 31}
+        sub_entries['fye_day'] = sub_entries.fye_month.map(month_end)
+        sub_entries['fye'] = sub_entries.fye_month * 100 + sub_entries.fye_day
+        sub_entries['fye'] = sub_entries.fye.astype(str).str.zfill(4)
+
         # correction for 29 of feb in order to not run into problems later on
         sub_entries.loc[(sub_entries.fye_month==2) & (sub_entries.fye_day==29), 'fye_day'] = 28
 
@@ -89,12 +104,12 @@ class DailyZipCreator:
         sub_entries.loc[sub_entries.fye == '0000','fy'] = 0 # cannot be calculated, if there was no fye entry
 
         # fp
-        sub_entries['period_date'] = pd.to_datetime(sub_entries.period, format='%Y%m%d')
-        sub_entries['fye_date'] = pd.to_datetime(sub_entries.fy*10000+sub_entries.fye_month*100+sub_entries.fye_day,format='%Y%m%d', errors='coerce')
+        #  date when the last fiscal year ended
+        sub_entries['fye_date_prev'] = pd.to_datetime((sub_entries.fy - 1 ) *10000+sub_entries.fye_month*100+sub_entries.fye_day, format='%Y%m%d', errors='coerce')
 
         sub_entries['fye_period_diff'] = 0
 
-        sub_entries.loc[sub_entries.fye != '0000', 'fye_period_diff'] = (sub_entries.fye_date - sub_entries.period_date) / np.timedelta64(1,'D')
+        sub_entries.loc[sub_entries.fye != '0000', 'fye_period_diff'] = (sub_entries.period_date - sub_entries.fye_date_prev) / np.timedelta64(1,'D')
 
         sub_entries.loc[sub_entries.form == '10-K','fp'] = 'FY'
         sub_entries.loc[sub_entries.form != '10-K' ,'fp'] = 'Q' + (sub_entries.fye_period_diff / 91.5).round().astype(str).str.slice(0,1)
@@ -113,7 +128,7 @@ class DailyZipCreator:
 
         # drop helper columns
         sub_entries.drop(columns=['period_year', 'period_month', 'period_day', 'fye_month',
-                                  'fye_day', 'is_fye_same_year', 'fye_date', 'period_date', 'fye_period_diff'], inplace=True)
+                                  'fye_day', 'is_fye_same_year', 'fye_date_prev', 'period_date', 'fye_period_diff'], inplace=True)
 
         return sub_entries
 
