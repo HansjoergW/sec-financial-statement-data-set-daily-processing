@@ -77,7 +77,9 @@ class DailyZipCreator:
         sub_entries['period_day'] = sub_entries.period.str.slice(6,8).astype(int)
 
         # round period to end of date
-        sub_entries.period = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
+        mask = (sub_entries.period_day <= 15) | ((sub_entries.period_day == 16) & sub_entries.period_month.isin([1,3,5,7,8,10,12]))
+        sub_entries.loc[mask,'period_date'] = sub_entries.period_date - pd.DateOffset(months=1)
+        sub_entries['period'] = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
 
         sub_entries['fye_month'] = sub_entries.fye.str.slice(0,2).astype(int)
         sub_entries['fye_day'] = sub_entries.fye.str.slice(2,4).astype(int)
@@ -86,7 +88,7 @@ class DailyZipCreator:
         #
         # https://stackoverflow.com/questions/20250771/remap-values-in-pandas-column-with-a-dict
 
-        month_end = {1: 31, 2: 28, 3:31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9:30, 10: 31, 11: 30, 12: 31}
+        month_end = {0:0, 1: 31, 2: 28, 3:31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9:30, 10: 31, 11: 30, 12: 31}
         sub_entries['fye_day'] = sub_entries.fye_month.map(month_end)
         sub_entries['fye'] = sub_entries.fye_month * 100 + sub_entries.fye_day
         sub_entries['fye'] = sub_entries.fye.astype(str).str.zfill(4)

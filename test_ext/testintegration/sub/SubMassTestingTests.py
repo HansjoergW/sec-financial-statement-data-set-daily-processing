@@ -84,9 +84,9 @@ def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
 
 # compare_processed_content(read_quarter_data(2021, 1))
 
-mit fye ist etwas ziemlich verbockt, wenn ohne liste erscheinen alle als falsch...
+#mit fye ist etwas ziemlich verbockt, wenn ohne liste erscheinen alle als falsch...
 
-adshs = ['0001558370-21-000043', '0001005286-21-000009', '0001003078-21-000006'] # wrong fiscal year ending / period
+adshs = ['0001411059-21-000008', '0000882104-21-000035'] # wrong fiscal year ending / period
 #adshs = None
 compare_processed_content(read_quarter_data_direct_from_db(2021, 1, adshs))
 
@@ -94,3 +94,8 @@ compare_processed_content(read_quarter_data_direct_from_db(2021, 1, adshs))
 
 # variante wäre noch vergleichsspalten einzufügen, dann könnte man später einfacher per filter unterschiede suchen,
 # oder auch prüfen, ob gewisse zeilen komplett anders sind
+
+"""
+Results
+in zip andere period, aber aufgrund daten in feed korrekt: ['0001411059-21-000008', '0000882104-21-000035']
+"""
