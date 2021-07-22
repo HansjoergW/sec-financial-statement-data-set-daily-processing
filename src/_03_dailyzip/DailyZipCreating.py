@@ -62,6 +62,7 @@ class DailyZipCreator:
         # simple conversions
         sub_entries['cik'] = sub_entries.cik.astype(int)
         sub_entries['name'] = sub_entries.name.str.upper()
+        sub_entries['name'] = sub_entries.name.str.replace('\\','', regex=False)
 
 
         # check for Null Values in fye

@@ -57,25 +57,29 @@ def compare_adsh(merged_df: pd.DataFrame):
     print("not in xml: ", len(adshs_not_in_xml), adshs_not_in_xml)
 
 
-def compare_cols(merged_df: pd.DataFrame):
-    same_adsh_df = merged_df[(~merged_df.adsh_zip.isnull()) & (~merged_df.adsh_xml.isnull())]
+def compare_cols(merged_df: pd.DataFrame) -> pd.DataFrame:
+    same_adsh_df = merged_df[(~merged_df.adsh_zip.isnull()) & (~merged_df.adsh_xml.isnull())].copy()
 
     compare_cols = [x for x in cols if x is not "adsh"]
     for comp_col in compare_cols:
         xml_col = comp_col + '_xml'
         zip_col = comp_col + '_zip'
-
-        inequal_df = same_adsh_df[~(same_adsh_df[xml_col] == same_adsh_df[zip_col])][['adsh_xml', xml_col, zip_col]]
+        comp_col_name = comp_col + '_comp'
+        same_adsh_df[comp_col_name] = (same_adsh_df[xml_col] == same_adsh_df[zip_col])
+        inequal_df = same_adsh_df[~same_adsh_df[comp_col_name]][['adsh_xml', xml_col, zip_col]]
         inequal_adshs = inequal_df.adsh_xml.to_list()
         print(comp_col, len(inequal_adshs), inequal_adshs)
 
+    return same_adsh_df
 
 def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
     sub_zip_df = dfs[0]
     sub_xml_df = dfs[1]
     merged_df = merge(sub_zip_df, sub_xml_df)
     compare_adsh(merged_df=merged_df)
-    compare_cols(merged_df=merged_df)
+    comp_result_df = compare_cols(merged_df=merged_df)
+
+    # fy_result = comp_result_df[['fy_zip','fye_zip','period_zip','fy_xml','fye_xml','period_xml','fy_comp','fye_comp']]
 
     print(len(sub_zip_df))
     print(len(sub_xml_df))
@@ -86,11 +90,15 @@ def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
 
 #mit fye ist etwas ziemlich verbockt, wenn ohne liste erscheinen alle als falsch...
 
-adshs = ['0001411059-21-000008', '0000882104-21-000035'] # wrong fiscal year ending / period
-#adshs = None
+adshs = ['0001005286-21-000009', '0000320193-21-000010', '0000004127-21-000013', '0001564590-21-006654'] # wrong fiscal year ending
+adshs = None
 compare_processed_content(read_quarter_data_direct_from_db(2021, 1, adshs))
 
-# fye und period müssen auf monatsende gerundet werden
+# fye muss vor fy geklärt werden
+# fy noch nicht ganz klar, aufgrund von was
+
+# ist das dort, wo mehr anzahl tage drin sind? also nach 1.7 nächstes jahr?
+# vor 1.7 aktuelles jahr
 
 # variante wäre noch vergleichsspalten einzufügen, dann könnte man später einfacher per filter unterschiede suchen,
 # oder auch prüfen, ob gewisse zeilen komplett anders sind
