@@ -25,3 +25,29 @@ there are 29 entries not matching. Some zip entries seem to be wrong. If it is a
 then the period end shouldn't be the fye ending. 
 this seems to be corrected in some way b
 but this is also true in the opposite direction. i
+
+
+### fy
+
+
+
+## sonstiges
+
+laut Kapitel 6 in EFM können verschiedene Angaben aus den Fillings an folgenden Stellen stehen
+
+AmendmentDescription 6.5.20 dei
+DocumentPeriodEndDate 6.5.20 cover
+DocumentType 6.5.20 dei
+AmendmentFlag 6.5.20 dei
+
+DocumentFiscalPeriodFocus 6.5.20 dei
+DocumentFiscalYearFocus 6.5.20 dei
+
+EntityCurrentReportingStatus 6.5.21 cover
+EntityFilerCategory 6.5.21 cover
+EntityPublicFloat 6.5.21 cover
+EntityRegistrantName 6.5.21 cover
+EntityVoluntaryFilers 6.5.21 cover
+EntityWellKnownSeasonedIssuer 6.5.21 cover
+
+CurrentFiscalYearEndDate 6.5.21 dei

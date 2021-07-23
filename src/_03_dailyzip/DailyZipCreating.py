@@ -81,6 +81,11 @@ class DailyZipCreator:
         mask = (sub_entries.period_day <= 15) | ((sub_entries.period_day == 16) & sub_entries.period_month.isin([1,3,5,7,8,10,12]))
         sub_entries.loc[mask,'period_date'] = sub_entries.period_date - pd.DateOffset(months=1)
         sub_entries['period'] = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
+        # after calculation of the period, the values might have changed
+        sub_entries['period_year'] = sub_entries.period.str.slice(0,4).astype(int)
+        sub_entries['period_month'] = sub_entries.period.str.slice(4,6).astype(int)
+        sub_entries['period_day'] = sub_entries.period.str.slice(6,8).astype(int)
+
 
         sub_entries['fye_month'] = sub_entries.fye.str.slice(0,2).astype(int)
         sub_entries['fye_day'] = sub_entries.fye.str.slice(2,4).astype(int)
@@ -107,6 +112,9 @@ class DailyZipCreator:
         sub_entries.loc[sub_entries.is_fye_same_year,'fy'] = sub_entries.period_year
         sub_entries.loc[sub_entries.is_fye_same_year == False,'fy'] = sub_entries.period_year + 1
         sub_entries.fy = sub_entries.fy.astype(int)
+        # if a 10-K ends in the first three months, then its fy is the one from last year
+        mask_10k_firstq = (sub_entries.form == '10-K') & (sub_entries.fye_month.isin([1,2,3]))
+        sub_entries.loc[mask_10k_firstq, 'fy'] = sub_entries.fy -1
 
         sub_entries.loc[sub_entries.fye == '0000','fy'] = 0 # cannot be calculated, if there was no fye entry
 
