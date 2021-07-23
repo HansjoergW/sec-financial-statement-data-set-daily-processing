@@ -79,7 +79,7 @@ def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
     compare_adsh(merged_df=merged_df)
     comp_result_df = compare_cols(merged_df=merged_df)
 
-    fy_result = comp_result_df[['adsh_zip','form_zip','fp_zip','fy_zip','fye_zip','period_zip','fy_xml','fye_xml','period_xml','fy_comp','fye_comp', 'fp_comp']]
+    fy_result = comp_result_df[['adsh_zip','form_zip','fp_zip','fy_zip','fye_zip','period_zip','fp_xml','fy_xml','fye_xml','period_xml','fy_comp','fye_comp', 'fp_comp']]
     # fy_result[(fy_result.fy_comp==False) & (fy_result.fye_comp==True)]
     # fy_result[ (fy_result.fye_comp==True) &(fy_result.form_zip=='10-K')]
     print(len(sub_zip_df))
@@ -89,36 +89,7 @@ def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
 
 # compare_processed_content(read_quarter_data(2021, 1))
 
-#mit fye ist etwas ziemlich verbockt, wenn ohne liste erscheinen alle als falsch...
-
-adshs = ['0001104659-21-037157'] # 10-k mit fye ende jahr -> falsches fywrong fiscal year ending
+# adshs = ['0000909832-21-000003']
 adshs = None
 compare_processed_content(read_quarter_data_direct_from_db(2021, 1, adshs))
 
-# fye muss vor fy geklärt werden
-# fy noch nicht ganz klar, aufgrund von was
-
-# ist das dort, wo mehr anzahl tage drin sind? also nach 1.7 nächstes jahr?
-# vor 1.7 aktuelles jahr
-
-# variante wäre noch vergleichsspalten einzufügen, dann könnte man später einfacher per filter unterschiede suchen,
-# oder auch prüfen, ob gewisse zeilen komplett anders sind
-
-"""
-Results
-
-fy -> falls 10-K im ersten Quartal endet, dann von vorherigem Jahr
-für Qs nicht klar. es gibt wiedersprüchliches.
-z.B. beide haben Q3 Ende Jahr, aber unterschiedlichen Jahres Fokus
-0001489096-21-000029,10-Q,Q3,2020,0331,20201231
-0001019056-21-000102,10-Q,Q3,2021,0331,20201231
-Der 2. Eintrag steht im z.B. im Widerspruchmit dem folgenden 10K, dieser hat Jahr 2020
-
-Frage: könnte es sein, dass der folgende 10K im Fall 2 zum im widersrpruch steht?
-
-
-
-
-
-in zip andere period, aber aufgrund daten in feed korrekt: ['0001411059-21-000008', '0000882104-21-000035']
-"""

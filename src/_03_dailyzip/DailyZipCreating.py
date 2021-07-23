@@ -81,6 +81,9 @@ class DailyZipCreator:
         mask = (sub_entries.period_day <= 15) | ((sub_entries.period_day == 16) & sub_entries.period_month.isin([1,3,5,7,8,10,12]))
         sub_entries.loc[mask,'period_date'] = sub_entries.period_date - pd.DateOffset(months=1)
         sub_entries['period'] = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
+        # Nach Korrektur neu setzen
+        sub_entries['period_date'] = pd.to_datetime(sub_entries.period, format='%Y%m%d')
+
         # after calculation of the period, the values might have changed
         sub_entries['period_year'] = sub_entries.period.str.slice(0,4).astype(int)
         sub_entries['period_month'] = sub_entries.period.str.slice(4,6).astype(int)
@@ -108,19 +111,24 @@ class DailyZipCreator:
 
         sub_entries['is_fye_same_year'] = (sub_entries.form == '10-K') | ((sub_entries.fye_month*100+sub_entries.fye_day) >= (sub_entries.period_month*100+sub_entries.period_day))
 
-        # fy
-        sub_entries.loc[sub_entries.is_fye_same_year,'fy'] = sub_entries.period_year
-        sub_entries.loc[sub_entries.is_fye_same_year == False,'fy'] = sub_entries.period_year + 1
-        sub_entries.fy = sub_entries.fy.astype(int)
+        # fy_real -> year when the next fiscal year ends
+        sub_entries.loc[sub_entries.is_fye_same_year,'fy_real'] = sub_entries.period_year
+        sub_entries.loc[sub_entries.is_fye_same_year == False,'fy_real'] = sub_entries.period_year + 1
+        sub_entries.fy_real = sub_entries.fy_real.astype(int)
+
+        # fy -> as it seems is the previous year, if the year ends in the first quarter,
+        # at least that is always true for 10-K
+        sub_entries.fy = sub_entries.fy_real
         # if a 10-K ends in the first three months, then its fy is the one from last year
         mask_10k_firstq = (sub_entries.form == '10-K') & (sub_entries.fye_month.isin([1,2,3]))
-        sub_entries.loc[mask_10k_firstq, 'fy'] = sub_entries.fy -1
+        mask_10k_firstq = (sub_entries.fye_month.isin([1,2,3]))
+        sub_entries.loc[mask_10k_firstq, 'fy'] = sub_entries.fy - 1
 
         sub_entries.loc[sub_entries.fye == '0000','fy'] = 0 # cannot be calculated, if there was no fye entry
 
         # fp
         #  date when the last fiscal year ended
-        sub_entries['fye_date_prev'] = pd.to_datetime((sub_entries.fy - 1 ) *10000+sub_entries.fye_month*100+sub_entries.fye_day, format='%Y%m%d', errors='coerce')
+        sub_entries['fye_date_prev'] = pd.to_datetime((sub_entries.fy_real - 1 ) *10000+sub_entries.fye_month*100+sub_entries.fye_day, format='%Y%m%d', errors='coerce')
 
         sub_entries['fye_period_diff'] = 0
 

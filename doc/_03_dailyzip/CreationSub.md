@@ -28,7 +28,24 @@ but this is also true in the opposite direction. i
 
 
 ### fy
+fy -> falls 10-K im ersten Quartal endet, dann von vorherigem Jahr
 
+für Qs nicht klar. es gibt wiedersprüchliches.
+z.B. beide haben Q3 Ende Jahr, aber unterschiedlichen Jahres Fokus
+0001489096-21-000029,10-Q,Q3,2020,0331,20201231
+0001019056-21-000102,10-Q,Q3,2021,0331,20201231
+
+Bsp: Modular Medical, Inc., Quartale stimmen nicht mit Jahr
+0001019056-20-000470 Q1 2020-06-30  2021
+0001019056-20-000551 Q2 2020-09-30  2021
+0001019056-21-000102 Q3 2020-12-31  2021
+0001019056-21-000387 FY 2021-03-31  2020
+
+
+### fp
+22 Einträge stimmen nicht überein.
+- Fälle, bei denen kein fye vorhanden ist (0000) (Q0)
+- Fälle, bei denen in 10-Q gleiches PeriodenEnde wie fye hat (Q4)
 
 
 ## sonstiges
