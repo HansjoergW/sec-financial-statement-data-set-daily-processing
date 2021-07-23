@@ -79,7 +79,8 @@ def compare_processed_content(dfs: Tuple[pd.DataFrame, pd.DataFrame]):
     compare_adsh(merged_df=merged_df)
     comp_result_df = compare_cols(merged_df=merged_df)
 
-    # fy_result = comp_result_df[['fy_zip','fye_zip','period_zip','fy_xml','fye_xml','period_xml','fy_comp','fye_comp']]
+    fy_result = comp_result_df[['adsh_zip','form_zip','fy_zip','fye_zip','period_zip','fy_xml','fye_xml','period_xml','fy_comp','fye_comp']]
+    # fy_result[(fy_result.fy_comp==True) & (fy_result.fye_comp==False)]
 
     print(len(sub_zip_df))
     print(len(sub_xml_df))

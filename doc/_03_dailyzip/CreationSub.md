@@ -20,4 +20,8 @@ There 15 entries which show different sic numbers, than the ones presented in th
 ### period
 there are two entries which show a different period
 
-
+### fye
+there are 29 entries not matching. Some zip entries seem to be wrong. If it is a 10-Q, 
+then the period end shouldn't be the fye ending. 
+this seems to be corrected in some way b
+but this is also true in the opposite direction. i
