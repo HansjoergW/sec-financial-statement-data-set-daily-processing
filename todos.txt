@@ -1,12 +1,14 @@
 Next
 ====
 - sub muss noch verglichen werden, unbedingt!!!
-
+ - Daily Zips müssen komplett neu generiert werden.
 
 - beim index file downloaden muss auch so was wie ein loop hin. auch hier kann das downloaden der xbrl-rss files
   mehrmals fehlschlagen und es sollte ein zweiter loop darum gebaut werden.
 
 - unit_usd, oder unit_standard_usd... ist in den daten, anstatt usd -> 20210210.zip
+  -> scheint als wäre das nur aufgrund
+
 - line wird in pre als float und nicht als int gespeichert
 
 - dayli zip builden -> da muss man aufpassen, wenn im nachhinein neue files hinzugefügt werden...

@@ -118,7 +118,7 @@ class DailyZipCreator:
 
         # fy -> as it seems is the previous year, if the year ends in the first quarter,
         # at least that is always true for 10-K
-        sub_entries.fy = sub_entries.fy_real
+        sub_entries['fy'] = sub_entries.fy_real
         # if a 10-K ends in the first three months, then its fy is the one from last year
         mask_10k_firstq = (sub_entries.form == '10-K') & (sub_entries.fye_month.isin([1,2,3]))
         mask_10k_firstq = (sub_entries.fye_month.isin([1,2,3]))
