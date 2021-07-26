@@ -1,31 +1,47 @@
 Next
 ====
-- sub muss noch verglichen werden, unbedingt!!!
- - Daily Zips müssen komplett neu generiert werden.
+
+- es gibt bis jetzt rund 84 Files, die nicht gedownloaded werden können.
+  die müsste man irgendwie excluden, sonst dauert die Verarbeitung immer wie länger
+  Anfrage an Sec webmaster@sec.gov
+  - Auflisten der Fälle
+  - Prüfen ob die Dinger wirklich nicht auch im Primary Financial Statement Dataset sind
+  - 80 Fälle sind allein von letzter Woche (19.07.-23.07.2021)
+  - vergleich mit "guten files" aus der gleichen Periode
+
+  => Liste sollte getrackt werden, um zu prüfen, ob die im Nachhinein evtl. korrigiert werden
+     -> ist noch entscheidend für das Ergänzen der Daily-Zip Dateien
 
 - beim index file downloaden muss auch so was wie ein loop hin. auch hier kann das downloaden der xbrl-rss files
   mehrmals fehlschlagen und es sollte ein zweiter loop darum gebaut werden.
-
-- unit_usd, oder unit_standard_usd... ist in den daten, anstatt usd -> 20210210.zip
-  -> scheint als wäre das nur aufgrund
+  -> evtl. verbessert sich hier das ganze durch die Angabe des User-Agent-Header
 
 - line wird in pre als float und nicht als int gespeichert
+  -> scheint eher ein problem des ladens zu sein, bzw. es müsste ein konkreter fall untersucht werden
+     bei ein paar stichproben sind die linien immer nur als int abgelegt
 
-- dayli zip builden -> da muss man aufpassen, wenn im nachhinein neue files hinzugefügt werden...
+- daily zip builden -> da muss man aufpassen, wenn im nachhinein neue files hinzugefügt werden...
   also wenn z.B. durch eine spätere Verarbeitung zusätzliche Reports verarbeitet werden konnten
 - minimale Metadaten verwaltung für die dailyzips wären nicht schlecht, falls
   später neue files dazukommen, wüsste man, ob man was hinzufügen müsste.
   -> mann könnte auch nur prüfen, ob es das File bereits gibt und falls ja, müsste man neu selektieren
+
   -> oder man könnte prinzipiell schauen, für welche Tage es Reports ohne dailyzip zugehörigkeit gibt
      und dann könnte man immer erneut selektieren
-     -> wäre vermutlich das beste
-  -> aber dann müsste das Pipeline Projekt tracken, wann eine Datei zum letzten mal geänder wurde.
+     -> wäre vermutlich das einfachste
+
+  -> aber dann müsste das Pipeline Projekt tracken, wann eine Datei zum letzten mal geändert wurde.
 
 - es scheint, als schlägt der längenvergleich der gedownloadeten Daten ab und zu fehl (ca. 70 in num only)
   wahrscheinlich aufgrund des enocdings... die frage ist, ob dieser test etwas bringt.
+  Ist es wirklich so, oder ist es ein anderes problem
 
+- es kommt auch ab und zu zu sonstinge Excpeptions, die sporadisch auftauchen und dann den Prozess
+  "abstürzen lassen".
 
-- saubere, automatische Lösung um ganzes Quartal zu vergleichen.
+- saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
+
+- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
 
 Later
 =====

@@ -8,9 +8,9 @@ import zipfile
 
 # downloads the content of a url and stores it into a file
 # tries to download the file multiple times, if the download fails
-def download_url_to_file(file_url:str, target_file:str, expected_size: int = None):
+def download_url_to_file(file_url:str, target_file:str, expected_size: int = None, max_tries: int = 6, sleep_time: int = 1):
 
-    content = get_url_content(file_url)
+    content = get_url_content(file_url, max_tries, sleep_time)
     if expected_size != None:
         if len(content) != expected_size:
             logging.info(f"warning expected size {expected_size} - real size {len(content)}")
@@ -21,15 +21,15 @@ def download_url_to_file(file_url:str, target_file:str, expected_size: int = Non
     write_content_to_zip(content, target_file)
 
 
-def get_url_content(file_url:str) -> str:
-    max_tries = 6
-
+def get_url_content(file_url:str, max_tries: int = 6, sleep_time: int = 1) -> str:
+    # preventing 403
+    # https://stackoverflow.com/questions/68131406/downloading-files-from-sec-gov-via-edgar-using-python-3-9
     response = None
     current_try = 0
     while current_try < max_tries:
         current_try += 1
         try:
-            response = requests.get(file_url, timeout=10)
+            response = requests.get(file_url, timeout=10, headers={'User-Agent': 'private user hansjoerg.wingeier@gmail.com'}, stream=True)
             response.raise_for_status()
             break
         except requests.exceptions.RequestException as err:
@@ -37,7 +37,7 @@ def get_url_content(file_url:str) -> str:
                 logging.info(f"RequestException: failed to download {file_url}")
                 raise err
             else:
-                sleep(1)
+                sleep(sleep_time)
 
     return response.text
 

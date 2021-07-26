@@ -50,7 +50,7 @@ class SecIndexFileParser():
         if not os.path.isdir(self.feed_dir):
             os.makedirs(self.feed_dir)
 
-        download_url_to_file(edgar_filings_feed, self.feed_file)
+        download_url_to_file(edgar_filings_feed, self.feed_file, 10, 2)
 
         logging.info('Downloaded RSS feed: %s', self.feed_file)
 
