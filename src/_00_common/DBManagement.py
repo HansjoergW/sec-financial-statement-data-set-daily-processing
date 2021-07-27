@@ -186,7 +186,14 @@ class DBManager():
     def find_ready_to_zip_adshs(self) -> pd.DataFrame:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and processZipDate is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            # select days which have entries that are not in a daily zip file
+            sql = '''SELECT DISTINCT filingDate FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and processZipDate is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            datesToZip: List[Tuple[str]] = conn.execute(sql).fetchall()
+            datesToZip = [dateToZip[0] for dateToZip in datesToZip]
+            zipdates = ','.join("'" + zipdate + "'" for zipdate in datesToZip)
+
+            # select all entries which belong to the found zipdates above
+            sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and filingDate in({}) '''.format(SEC_REPORT_PROCESSING_TBL_NAME, zipdates)
 
             return pd.read_sql_query(sql, conn)
         finally:

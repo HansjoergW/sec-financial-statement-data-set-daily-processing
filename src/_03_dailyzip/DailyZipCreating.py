@@ -12,6 +12,15 @@ import datetime
 import logging
 
 class DailyZipCreator:
+    """
+    This class will find all the filing dates for which there are entries in the processing table that to have
+    processed num and pre file, but haven't packed into a daily zip file.
+    It will then select all the entries that have one of the found filing dates, regardless, if the entry
+    already was packed into a dailyzip file for his filing date.
+    That means, that a dailyzip could be recreated, if a previously failed to process entry can now be recreated.
+    So it is important to keep track of the day/time when the dailyzip file was created, since its content could
+    change.
+    """
 
     def __init__(self, dbmanager: DBManager, daily_zip_dir: str = "./tmp/daily/"):
         self.dbmanager = dbmanager
