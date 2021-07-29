@@ -5,10 +5,10 @@ Next
   -> evtl. verbessert sich hier das ganze durch die Angabe des User-Agent-Header
 
 - es scheint, als schlägt der längenvergleich der gedownloadeten Daten ab und zu fehl (ca. 70 in num only)
-  wahrscheinlich aufgrund des enocdings... die frage ist, ob dieser test etwas bringt.
+  wahrscheinlich aufgrund des encodings... die frage ist, ob dieser test etwas bringt.
   Ist es wirklich so, oder ist es ein anderes problem
 
-- es kommt auch ab und zu zu sonstinge Excpeptions, die sporadisch auftauchen und dann den Prozess
+- es kommt auch ab und zu zu sonstige Exceptions, die sporadisch auftauchen und dann den Prozess
   "abstürzen lassen".
 
 - saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
@@ -29,6 +29,7 @@ num file
 
 Done
 ====
+27.07.2021 - dailyzips neu erzeugen, falls neue Einträge für ein filingdate auftauchen
 27.06.2021 - final fixes für kompletten lauf mit daily zip creation
 12.06.2021 - Unit Tests für NumParsing umgeschrieben
 11.06.2021 - CodeRefactoring für Num umsetzen
