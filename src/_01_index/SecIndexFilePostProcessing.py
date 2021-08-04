@@ -26,12 +26,14 @@ class SecIndexFilePostProcessor:
 
         json_file = path + "index.json"
 
+        # todo: warum wird hier nicht die "normale" download Methode aus SecFileUtils verwendet?
+
         response = None
         current_try = 0
         while current_try < 4:
             current_try += 1
             try:
-                response = requests.get(json_file, timeout=10)
+                response = requests.get(json_file, timeout=10, headers={'User-Agent': 'private user hansjoerg.wingeier@gmail.com'}, stream=True)
                 response.raise_for_status()
                 break
             except requests.exceptions.RequestException as err:

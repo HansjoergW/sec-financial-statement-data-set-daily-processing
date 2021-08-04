@@ -13,6 +13,8 @@ Next
 
 - saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
 
+- in SecIndexFilePostProcessing: warum wird hier nicht die "normale" download Methode aus SecFileUtils verwendet?
+
 - User-Agent für Datendownload muss noch konfigurierbar gemacht werden
 
 Later
