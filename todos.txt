@@ -1,5 +1,8 @@
 Next
 ====
+- Trading Symbol -> siehe separates Notizen-File
+
+
 - beim index file downloaden muss auch so was wie ein loop hin. auch hier kann das downloaden der xbrl-rss files
   mehrmals fehlschlagen und es sollte ein zweiter loop darum gebaut werden.
   -> evtl. verbessert sich hier das ganze durch die Angabe des User-Agent-Header

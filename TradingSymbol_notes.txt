@@ -1,0 +1,91 @@
+'0000107140-20-000068'
+
+Problem: TradingSymbol ist in den Quarterly Zips nicht vorhanden...
+D.h., man kann es nicht aus den Zips lesen, selbst wenn es in die dailyZips integriert wird, oder?
+ausser wir gehen davon aus, dass wir immer das letzte bekannte tradingsymbol verwenden..
+falls wir keine aktuelle daten haben, sind die Daten vermutlich eh nicht mehr unter yahoo vorhanden..
+spielt dann also keine Rolle mehr..
+-> versuchen Trading Symbol mitzunehmen ist vermutlich am einfachsten, weil auch die SharesOutstanding dann
+direkt verlinkt werden können.
+
+
+
+
+kann mehr als ein Trading Symbol haben
+
+
+TradingSymbol,
+Security12bTitle,
+SecurityExchangeName
+-> haben keinen unitRef!
+
+
+
+Class A
+-------
+
+    <context id="c20200501to20201031_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000107140</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementClassOfStockAxis">jwa:ClassACommonStockParValue100PerShareMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-05-01</startDate>
+            <endDate>2020-10-31</endDate>
+        </period>
+    </context>
+
+    <dei:Security12bTitle
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember"
+      id="Fact_9e337fa0682244568eddd784b4d9ec48">Class A Common Stock, par value $1.00 per share</dei:Security12bTitle>
+    <dei:TradingSymbol
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember"
+      id="Fact_d7cc42f5dfd04eb08acf1f3e133a8b44">JW.A</dei:TradingSymbol>
+    <dei:SecurityExchangeName
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember"
+      id="Fact_4cc4ee845abe4770a40f9c0d664da1ad">NYSE</dei:SecurityExchangeName>
+
+
+
+
+    <context id="c20201130_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000107140</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementClassOfStockAxis">jwa:ClassACommonStockParValue100PerShareMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2020-11-30</instant>
+        </period>
+    </context>
+	<dei:EntityCommonStockSharesOutstanding
+      contextRef="c20201130_StatementClassOfStockAxis_ClassACommonStockParValue100PerShareMember"
+      decimals="0"
+      id="Fact_01c9f7f5f14547949194934ac20417a6"
+      unitRef="U001">46938043</dei:EntityCommonStockSharesOutstanding>
+
+
+ClassB
+-------
+
+
+   <dei:Security12bTitle
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassBCommonStockParValue100PerShareMember"
+      id="Fact_f8f62ff143ac4fafa45bda983d5148df">Class B Common Stock, par value $1.00 per share</dei:Security12bTitle>
+    <dei:TradingSymbol
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassBCommonStockParValue100PerShareMember"
+      id="Fact_3ccea7d2b52a4cd0a464e5a04cc15297">JW.B</dei:TradingSymbol>
+    <dei:SecurityExchangeName
+      contextRef="c20200501to20201031_StatementClassOfStockAxis_ClassBCommonStockParValue100PerShareMember"
+      id="Fact_f94ed40d269a43878476ab41f9a967da">NYSE</dei:SecurityExchangeName>
+
+
+
+    <dei:EntityCommonStockSharesOutstanding
+      contextRef="c20201130_StatementClassOfStockAxis_ClassBCommonStockParValue100PerShareMember"
+      decimals="0"
+      id="Fact_5cc575cc08b84f7ab301dd7d4afea39d"
+      unitRef="U001">9072148</dei:EntityCommonStockSharesOutstanding>

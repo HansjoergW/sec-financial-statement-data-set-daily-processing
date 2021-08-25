@@ -216,7 +216,6 @@ class DailyZipCreator:
     def process(self):
         pool = Pool(8)
 
-
         entries_ready = self._read_ready_entries()
         adsh_to_process = entries_ready.accessionNumber.tolist()
         entries_sub = self._read_feed_entries_for_adshs(adsh_to_process).copy()
