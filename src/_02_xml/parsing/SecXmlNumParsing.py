@@ -23,11 +23,14 @@ class SecNumXmlParser(SecXmlParserBase):
         for tag in transformed_data.tag_list:
 
             context_entry:SecNumTransformedContext = transformed_data.contexts_map[tag.ctxtref]
-            unit_entry:SecNumTransformedUnit = transformed_data.units_map[tag.unitref]
 
-            uom = unit_entry.uom
-            # uom entries have a max length of 20
-            uom = uom[:min(len(uom), 20)]
+            uom = None
+            if tag.unitref is not None:
+                unit_entry:SecNumTransformedUnit = transformed_data.units_map[tag.unitref]
+
+                uom = unit_entry.uom
+                # uom entries have a max length of 20
+                uom = uom[:min(len(uom), 20)]
 
             decimals = tag.decimals
             if decimals:
@@ -77,15 +80,22 @@ class SecNumXmlParser(SecXmlParserBase):
 
         df = (df[df.isrelevant]).copy()
 
+        df['uom_ext'] = df['uom']
+
+        # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
+        df.loc[df.tag == 'EntityCommonStockSharesOutstanding', 'uom_ext'] = df[df.tag == 'EntityCommonStockSharesOutstanding'].uom + "_" + df[df.tag == 'EntityCommonStockSharesOutstanding'].segments.apply(lambda x: x[0].label)
+        df.loc[df.tag == 'TradingSymbol', 'uom_ext'] = df[df.tag == 'TradingSymbol'].segments.apply(lambda x: x[0].label)
+        df.loc[df.tag == 'SecurityExchangeName', 'uom_ext'] = df[df.tag == 'SecurityExchangeName'].segments.apply(lambda x: x[0].label)
+
         df['qtrs'] = df.qtrs.apply(int)
-        df['value'] = pd.to_numeric(df['value'], errors='coerce')
+        df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')
 
         # sec rounds the values to 4 decimals
         # sec is not using the scientific rounding method, which rounds 0.155 up to 0.16 and 0.165 down to 0.16
         # (see https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe)
 
         # die 'values' in den txt files haben maximal 4 nachkommastellen...
-        df['value'] = self.round_half_up(df.value, decimals=4)
+        df.loc[~df.decimals.isnull(), 'value'] = self.round_half_up( df.loc[~df.decimals.isnull(), 'value'], decimals=4)
 
         df.loc[df.version == 'company', 'version'] = adsh
 
@@ -93,7 +103,7 @@ class SecNumXmlParser(SecXmlParserBase):
         df.drop_duplicates(inplace=True)
 
         # set the indexes
-        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
+        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom_ext'], inplace=True)
 
         # and sort by the precision
         # it can happen that the same tag is represented in the reports multiple times with different precision

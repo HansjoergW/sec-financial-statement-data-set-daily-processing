@@ -161,6 +161,12 @@ class SecNumXmlExtractor():
     def _read_tags(self, root: etree._Element) -> List[SecNumExtractTag]:
 
         tags = list(root.findall('.//*[@unitRef]'))
+        tags_secexchange = list(root.findall('.//dei:SecurityExchangeName', root.nsmap))
+        tags_tradingsymbol = list(root.findall('.//dei:TradingSymbol', root.nsmap))
+
+        tags.extend(tags_secexchange)
+        tags.extend(tags_tradingsymbol)
+
         result: List[SecNumExtractTag] = []
 
         for tag in tags:

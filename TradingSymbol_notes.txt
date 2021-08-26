@@ -13,6 +13,10 @@ direkt verlinkt werden können.
 
 kann mehr als ein Trading Symbol haben
 
+1. müsste man segment für sharesoutstanding und für security, tradingsymbol, exchangename mitnhemen
+ --> problem -> wo und wie, weil plötzlich mergen mit prexml dann nicht mehr funzt..
+ --> müsste man dann separat behandeln..
+
 
 TradingSymbol,
 Security12bTitle,

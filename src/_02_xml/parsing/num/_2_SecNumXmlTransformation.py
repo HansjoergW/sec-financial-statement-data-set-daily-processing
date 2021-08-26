@@ -134,7 +134,7 @@ class SecNumXmlTransformer:
             if len(context.segments) == 0:
                 isrelevant = True
 
-            # ... or if there is just one LegalEntityAxis segment present
+            # ... or if there is just one LegalEntityAxis or StatementClassOfStockAxis segment present
             if len(context.segments) == 1:
                 segment = context.segments[0]
                 if segment.dimension == "dei:LegalEntityAxis":
@@ -144,6 +144,10 @@ class SecNumXmlTransformer:
 
                     if ":" in coreg:
                         coreg = coreg.split(":")[1]
+
+                #
+                if segment.dimension == "us-gaap:StatementClassOfStockAxis":
+                    isrelevant = True
 
             context_map[context.id] = SecNumTransformedContext(
                 id=context.id,
