@@ -41,6 +41,10 @@ class SecNumXmlParser(SecXmlParserBase):
                 if decimals == 'INF':
                     decimals = '0'
 
+            segments = context_entry.segments
+            if len(segments) == 0:
+                segments = None
+
             temp_dict = {}
             temp_dict['adsh'] = adsh
             temp_dict['tag'] = tag.tagname
@@ -50,7 +54,7 @@ class SecNumXmlParser(SecXmlParserBase):
             temp_dict['decimals'] = decimals
             temp_dict['ddate'] = context_entry.enddate
             temp_dict['qtrs'] = context_entry.qtrs
-            temp_dict['segments'] = context_entry.segments
+            temp_dict['segments'] = segments
             temp_dict['coreg'] = context_entry.coreg
             temp_dict['isrelevant'] = context_entry.isrelevant
             temp_dict['footnote'] = ''
@@ -83,9 +87,11 @@ class SecNumXmlParser(SecXmlParserBase):
         df['uom_ext'] = df['uom']
 
         # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
-        df.loc[df.tag == 'EntityCommonStockSharesOutstanding', 'uom_ext'] = df[df.tag == 'EntityCommonStockSharesOutstanding'].uom + "_" + df[df.tag == 'EntityCommonStockSharesOutstanding'].segments.apply(lambda x: x[0].label)
-        df.loc[df.tag == 'TradingSymbol', 'uom_ext'] = df[df.tag == 'TradingSymbol'].segments.apply(lambda x: x[0].label)
-        df.loc[df.tag == 'SecurityExchangeName', 'uom_ext'] = df[df.tag == 'SecurityExchangeName'].segments.apply(lambda x: x[0].label)
+
+
+        df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        df.loc[(df.tag == 'TradingSymbol')  & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        df.loc[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
 
         df['qtrs'] = df.qtrs.apply(int)
         df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')

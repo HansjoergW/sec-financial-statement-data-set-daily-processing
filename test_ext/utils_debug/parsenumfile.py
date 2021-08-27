@@ -25,7 +25,8 @@ def parse_content(adsh, content:  str):
 
 if __name__ == '__main__':
     #adsh = "0000107140-20-000068" # working für trading, stocks
-    adsh = "0001213900-21-014067" # failing for trading, stock
+    #adsh = "0001213900-21-014067" # failing for trading, stock
+    adsh = "0001558370-21-002458"
     content = get_num_xml_content_by_adsh(adsh)
     #content = xml_content
     parse_content(adsh, content)
