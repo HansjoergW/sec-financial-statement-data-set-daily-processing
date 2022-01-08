@@ -15,6 +15,13 @@ import dateutil
 class SecDataOrchestrator:
 
     def __init__(self, workdir: str, year: int = None, month: int = None, months: int = 4):
+        """
+        month is only considered, if year is set. if year is not set, current year and current month are used
+        :param workdir:
+        :param year:
+        :param month:
+        :param months:
+        """
         if workdir[-1] != '/':
             workdir = workdir + '/'
 
@@ -28,15 +35,18 @@ class SecDataOrchestrator:
         self.dbmanager = DBManager(work_dir=workdir)
 
         self.today = datetime.today()
-        if month is None:
-            self.current_month = self.today.month
-        else:
-            self.current_month = month
 
         if year is None:
             self.current_year = self.today.year
+            self.current_month = self.today.month
+            if month is not None:
+                logging.info("set 'month' is ignored, since 'year' is not set")
         else:
             self.current_year = year
+            if month is None:
+                self.current_month = self.today.month
+            else:
+                self.current_month = month
 
         current_date = date(self.current_year, self.current_month, 1)
         delta_month = dateutil.relativedelta.relativedelta(months=months)
@@ -122,6 +132,6 @@ class SecDataOrchestrator:
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
-    orchestrator = SecDataOrchestrator(workdir_default, 2021, months=13)
+    orchestrator = SecDataOrchestrator(workdir_default, months=12)
     orchestrator.process()
 

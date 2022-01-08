@@ -1,3 +1,4 @@
+
 Next
 ====
 - Trading Symbol -> siehe separates Notizen-File
