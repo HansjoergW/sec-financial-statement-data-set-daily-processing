@@ -1,3 +1,25 @@
+Setup:
+------
+Probleme beim Finden der Files aus Tests und Imports aus Src wenn die Projekte aus Python gestartet werden.
+- Verzeichnisse mit __init__.py sind immer module roots, d.h., der Foldername ist Package name
+
+- wenn also src in init file hat, dann wäre das package auch src.
+
+- IntelliJ fügt alle src roots then pfaden bei (ist eine configuration in run/dbg) config
+  wenn also Module unterhalb des src-Folders verwendet werden sollen, diese aber nicht über mit import src... importiert
+  werden sollen, müssen die Subfolder des src folders auch als source-root gekennzeichnet werden
+
+- damit aber im test folder der "normale src code" gefunden werden kann, muss der gesamte src folder auch als
+  "source root" konfiguriert werden. Keine Ahnung wieso.
+
+- wenn aus den test folder nicht andere testscripts referenziert werden, dann müssen diese folder auch nicht
+  als test-source referenziert werden
+
+
+
+
+
+
 Allgemein:
 ----------
 Performance Fragen:

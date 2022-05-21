@@ -48,7 +48,10 @@ class SecIndexFileProcessor:
             sec_file = SecIndexFileParser(year, month, feed_dir=self.feed_dir)
 
             filename = sec_file.feed_filename
-            last_modified = json_content[filename]
+            last_modified = json_content.get(filename, None)
+            if last_modified is None:
+                logging.warning(f'file {filename} is not present')
+                continue
 
             indexfiles_df = self.dbmanager.read_all_index_files()
             status_ser = indexfiles_df[indexfiles_df.sec_feed_file == filename].status
