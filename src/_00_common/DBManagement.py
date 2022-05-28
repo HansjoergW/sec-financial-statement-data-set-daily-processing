@@ -9,6 +9,7 @@ testdata_path = scriptpath + '/testdata/'
 
 SEC_FEED_TBL_NAME = "sec_feeds"
 SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
+SEC_FULL_INDEX_FILE_TBL_NAME = "sec_fullindex_file"
 SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
 
 SEC_FEED_TBL_COLS = (
@@ -47,6 +48,25 @@ class DBManager():
             curr.executescript(script)
             conn.commit()
         conn.close()
+
+    # ---- fullindex files ----
+    def read_all_fullindex_files(self) -> pd.DataFrame:
+        conn = self.get_connection()
+        try:
+            sql = '''SELECT * FROM {}'''.format(SEC_FULL_INDEX_FILE_TBL_NAME)
+            return pd.read_sql_query(sql, conn)
+        finally:
+            conn.close()
+
+    def insert_fullindex_file(self, year: int, qrtr: int, processdate:str):
+        conn = self.get_connection()
+        try:
+            sql = '''INSERT INTO {} ('year', 'quarter', 'processdate') VALUES('{}','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, year, qrtr, processdate)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
+
 
     # ---- index files / sec-feed-file table
     def read_all_index_files(self) -> pd.DataFrame:

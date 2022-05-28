@@ -7,6 +7,7 @@ import datetime
 from typing import Dict, List
 import json
 import re
+import shutil
 
 from dataclasses import dataclass, field
 
@@ -18,10 +19,13 @@ class FiledReportEntry:
     type: str
     filed: str
     filename: str
+    adsh: str = field(init=False)
     reportjson: str = field(init=False)
 
     def __post_init__(self):
-        self.reportjson = self.filename.replace("-","")[:-4] + "/index.json"
+        cleaned_filename = self.filename.replace("-","")[:-4]
+        self.reportjson = cleaned_filename + "/index.json"
+        self.adsh = cleaned_filename[cleaned_filename.rfind("/") + 1:]
         self.filed = self.filed.replace("-","")
 
 
@@ -48,10 +52,18 @@ class SecFullIndexFileProcessor:
         self.current_qrtr = month_to_qrtr[datetime.datetime.now().month]
         self.current_check = self.current_year * 10 + self.current_qrtr
 
+        self.full_index_status_df = dbmanager.read_all_fullindex_files()
+
     def _get_file_for_qrtr(self, year, qrtr):
         return get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
 
     def get_next_index_file_iter(self):
+        """
+        Creates an iterator that iterates over all quarterly full index file starting with the configured
+        start_year and start_qrtr
+        it returns the year, quarter, content of the full index file of that quarter
+        """
+
         current_iter_year = self.start_year
         current_iter_qrtr = self.start_qrtr
 
@@ -66,19 +78,43 @@ class SecFullIndexFileProcessor:
             if (current_iter_year * 10 + current_iter_qrtr) > self.current_check:
                 break
 
-    def parse_index_files(self):
+    def parsed_index_file_iter(self):
         for year, qrtr, content in self.get_next_index_file_iter():
             last_date_received = last_date_received_matcher.search(content).group(0)
             last_date_received = last_date_received.split(":")[1].strip()
             ten_report_entries = ten_report_matcher.findall(content)
+
+            # check whether the entry already was processed and didn't have any updates
+            # so only entries are returned that either are new or which content has changed
+            entry_df = self.full_index_status_df[(self.full_index_status_df.year == year) & (self.full_index_status_df.quarter == qrtr)]
+            if not entry_df.empty:
+                if entry_df.iloc[0].state == last_date_received:
+                    logging.info("- already processed {}/{} -> skip ".format(qrtr, year))
+                    continue
+                else:
+                    logging.info("- updates for {}/{} -> skip ".format(qrtr, year))
+            else:
+                logging.info("- new file for {}/{} -> skip ".format(qrtr, year))
 
             ten_report_entries_splitted = [x.split('|') for x in ten_report_entries]
             ten_report_entries = [FiledReportEntry(x[0], x[1], x[2], x[3], x[4]) for x in ten_report_entries_splitted]
 
             yield year, qrtr, last_date_received, ten_report_entries
 
-            nächstes: prüfen, ob eine datei nicht bereits komplett verarbeitet worden ist.
-            -> vermutlich neue tabelle, die das trackt.
+    def process(self):
+
+        for year, qrtr, last_date_received, ten_report_entries in self.parsed_index_file_iter():
+            # als nächstes lesen, was schon alles da ist
+            #existing_adshs = self.dbmanager.get_adsh_by_feed_file(sec_file.feed_filename)
+            print("")
+            #hier wird es noch ein wenig komplizierter, weil wir das index json für  jeden eintrag lesen müssen.
+            # in der alten Variante war das im Feedfile enthalten...
+            # was ist mit den zusätzlichen infos, wie period? wird diese benötigt? in der processtabelle wird nur mit
+            #dem fileddate gearbeitet..
+            # ACHTUNG: adsh ist in sec_report_processing Tabelle mit '-' abgebildet.
+
+
+
 
 
 
@@ -87,7 +123,11 @@ class SecFullIndexFileProcessor:
 
 
 if __name__ == '__main__':
-    new_dbmgr = DBManager(work_dir="./tmp")
-    # new_dbmgr._create_db()
-    processor = SecFullIndexFileProcessor(new_dbmgr, 2019, 2)
-    processor.parse_index_files()
+    folder = "./tmp"
+    try:
+        new_dbmgr = DBManager(work_dir=folder)
+        new_dbmgr._create_db()
+        processor = SecFullIndexFileProcessor(new_dbmgr, 2019, 2)
+        processor.process()
+    finally:
+        shutil.rmtree(folder)
