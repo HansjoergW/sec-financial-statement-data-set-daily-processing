@@ -9,24 +9,26 @@ import json
 import re
 import shutil
 
-from dataclasses import dataclass, field
+import pandas as pd
+
+from dataclasses import dataclass, field, asdict
 
 
 @dataclass
 class FiledReportEntry:
-    cik: str
-    name: str
-    type: str
-    filed: str
+    cikNumber: str
+    companyName: str
+    formType: str
+    filingDate: str
     filename: str
-    adsh: str = field(init=False)
+    accessionNumber: str = field(init=False)
     reportjson: str = field(init=False)
 
     def __post_init__(self):
-        cleaned_filename = self.filename.replace("-","")[:-4]
+        filename_no_ext = self.filename[:-4]
+        cleaned_filename = filename_no_ext.replace("-","")
         self.reportjson = cleaned_filename + "/index.json"
-        self.adsh = cleaned_filename[cleaned_filename.rfind("/") + 1:]
-        self.filed = self.filed.replace("-","")
+        self.accessionNumber = filename_no_ext[filename_no_ext.rfind("/") + 1:]
 
 
 ten_report_matcher = re.compile(r".*[|]10-[KQ][|].*")
@@ -97,26 +99,39 @@ class SecFullIndexFileProcessor:
                 logging.info("- new file for {}/{} -> skip ".format(qrtr, year))
 
             ten_report_entries_splitted = [x.split('|') for x in ten_report_entries]
-            ten_report_entries = [FiledReportEntry(x[0], x[1], x[2], x[3], x[4]) for x in ten_report_entries_splitted]
-
-            yield year, qrtr, last_date_received, ten_report_entries
+            ten_report_entries = [asdict(FiledReportEntry(x[0], x[1], x[2], x[3], x[4])) for x in ten_report_entries_splitted]
+            ten_report_entries_df = pd.DataFrame(ten_report_entries)
+            yield year, qrtr, last_date_received, ten_report_entries_df
 
     def process(self):
 
-        for year, qrtr, last_date_received, ten_report_entries in self.parsed_index_file_iter():
-            # als nächstes lesen, was schon alles da ist
-            #existing_adshs = self.dbmanager.get_adsh_by_feed_file(sec_file.feed_filename)
-            print("")
-            #hier wird es noch ein wenig komplizierter, weil wir das index json für  jeden eintrag lesen müssen.
-            # in der alten Variante war das im Feedfile enthalten...
-            # was ist mit den zusätzlichen infos, wie period? wird diese benötigt? in der processtabelle wird nur mit
-            #dem fileddate gearbeitet..
-            # ACHTUNG: adsh ist in sec_report_processing Tabelle mit '-' abgebildet.
+        for year, qrtr, last_date_received, ten_report_entries_df in self.parsed_index_file_iter():
+            pseudo_sec_feed_file =  f"fullindex-{year}-QTR{qrtr}.json"
 
+            # read the entries that already were processed
+            existing_adshs = self.dbmanager.get_adsh_by_feed_file(pseudo_sec_feed_file)
+            new_entries_df = ten_report_entries_df[~ten_report_entries_df.accessionNumber.isin(existing_adshs)]
 
+            new_entries_save_df = new_entries_df[['accessionNumber', 'companyName', 'formType','filingDate','cikNumber']].copy()
 
+            # filingDate -> as Date
+            new_entries_save_df['filingDate'] = pd.to_datetime(new_entries_save_df.filingDate, format="%Y-%m-%d")
+            # calculate filingMonth, filingYear
+            new_entries_save_df['filingMonth'] = new_entries_save_df.filingDate.dt.month
+            new_entries_save_df['filingYear'] = new_entries_save_df.filingDate.dt.year
+            # set sec_feed_file
+            new_entries_save_df['sec_feed_file'] = pseudo_sec_feed_file
 
+            # das nächste problem ist es die Namen der Dateien zu finden, das geht nur über
+            # einen zusätzlices laden der json index datei pro report..
+            # das müsste dann wieder parallel gemacht werden.
 
+            es sind noch duplicated indexes vorhanden, wir müssen gleich vorgehen, wie beim alten
+            d.h., shauen, wie sec_file.parse_sec_rss_feeds das df erzeugt
+
+            # updaten -> status table
+            self.dbmanager.insert_feed_info(new_entries_save_df)
+            self.dbmanager.update_status_index_file(pseudo_sec_feed_file, last_date_received)
 
 
 
