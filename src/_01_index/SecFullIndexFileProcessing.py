@@ -4,7 +4,7 @@ from _01_index.SecIndexFileParsing import SecIndexFileParser
 
 import logging
 import datetime
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import json
 import re
 import shutil
@@ -12,7 +12,9 @@ import shutil
 import pandas as pd
 
 from dataclasses import dataclass, field, asdict
+from multiprocessing import Pool
 
+from time import time, sleep
 
 @dataclass
 class FiledReportEntry:
@@ -22,12 +24,12 @@ class FiledReportEntry:
     filingDate: str
     filename: str
     accessionNumber: str = field(init=False)
-    reportjson: str = field(init=False)
+    reportJson: str = field(init=False)
 
     def __post_init__(self):
         filename_no_ext = self.filename[:-4]
         cleaned_filename = filename_no_ext.replace("-","")
-        self.reportjson = cleaned_filename + "/index.json"
+        self.reportJson = cleaned_filename + "/index.json"
         self.accessionNumber = filename_no_ext[filename_no_ext.rfind("/") + 1:]
 
 
@@ -94,16 +96,18 @@ class SecFullIndexFileProcessor:
                     logging.info("- already processed {}/{} -> skip ".format(qrtr, year))
                     continue
                 else:
-                    logging.info("- updates for {}/{} -> skip ".format(qrtr, year))
+                    logging.info("- updates for {}/{} ".format(qrtr, year))
             else:
-                logging.info("- new file for {}/{} -> skip ".format(qrtr, year))
+                logging.info("- new file for {}/{} ".format(qrtr, year))
 
             ten_report_entries_splitted = [x.split('|') for x in ten_report_entries]
             ten_report_entries = [asdict(FiledReportEntry(x[0], x[1], x[2], x[3], x[4])) for x in ten_report_entries_splitted]
             ten_report_entries_df = pd.DataFrame(ten_report_entries)
             yield year, qrtr, last_date_received, ten_report_entries_df
 
-    def process(self):
+    def find_new_reports(self):
+
+        hier full_index tablle verwenden und nicht die bestehende "missbrauchen"
 
         for year, qrtr, last_date_received, ten_report_entries_df in self.parsed_index_file_iter():
             pseudo_sec_feed_file =  f"fullindex-{year}-QTR{qrtr}.json"
@@ -112,7 +116,7 @@ class SecFullIndexFileProcessor:
             existing_adshs = self.dbmanager.get_adsh_by_feed_file(pseudo_sec_feed_file)
             new_entries_df = ten_report_entries_df[~ten_report_entries_df.accessionNumber.isin(existing_adshs)]
 
-            new_entries_save_df = new_entries_df[['accessionNumber', 'companyName', 'formType','filingDate','cikNumber']].copy()
+            new_entries_save_df = new_entries_df[['accessionNumber', 'companyName', 'formType','filingDate','cikNumber', 'reportJson']].copy()
 
             # filingDate -> as Date
             new_entries_save_df['filingDate'] = pd.to_datetime(new_entries_save_df.filingDate, format="%Y-%m-%d")
@@ -122,22 +126,64 @@ class SecFullIndexFileProcessor:
             # set sec_feed_file
             new_entries_save_df['sec_feed_file'] = pseudo_sec_feed_file
 
-            # das nächste problem ist es die Namen der Dateien zu finden, das geht nur über
-            # einen zusätzlices laden der json index datei pro report..
-            # das müsste dann wieder parallel gemacht werden.
+            new_entries_save_df.drop_duplicates('accessionNumber', inplace=True)
+            new_entries_save_df.set_index('accessionNumber', inplace=True)
 
-            es sind noch duplicated indexes vorhanden, wir müssen gleich vorgehen, wie beim alten
-            d.h., shauen, wie sec_file.parse_sec_rss_feeds das df erzeugt
+            logging.info("   read entries: {}".format(len(new_entries_save_df)))
 
             # updaten -> status table
             self.dbmanager.insert_feed_info(new_entries_save_df)
             self.dbmanager.update_status_index_file(pseudo_sec_feed_file, last_date_received)
 
 
+    @staticmethod
+    def _find_xbrl_files(data_tuple: Tuple[str]) -> (str, str, str):
+        pass
+
+    @staticmethod
+    def _find_main_file_throttle(data_tuple: Tuple[str]) -> (str, str):
+        # ensures that only one request per second is send
+        start = time()
+        new_url, size, accession_nr = SecFullIndexFileProcessor._find_xbrl_files(data_tuple)
+        end = time()
+        sleep((1000-(end - start)) / 1000)
+        return new_url, size, accession_nr
+
+    def complete_xbrl_file_information(self):
+        # das nächste problem ist es die Namen der Dateien zu finden, das geht nur über
+        # einen zusätzlices laden der json index datei pro report..
+        # das müsste dann wieder parallel gemacht werden.
+        pool = Pool(8)
+
+        last_missing:int = None
+        missing: List[Tuple[str]] = self.dbmanager.find_missing_xbrl_ins_urls()
+        while (last_missing is None) or (last_missing > len(missing)):
+            last_missing = len(missing)
+            logging.info("missing entries " + str(len(missing)))
+
+            for i in range(0, len(missing), 100):
+                chunk = missing[i:i + 100]
+                update_data: List[Tuple[str, str, str]] = pool.map(SecFullIndexFileProcessor._find_main_file_throttle, chunk)
+                self.dbmanager.update_xbrl_ins_urls(update_data)
+                logging.info("commited chunk: " + str(i))
+
+            missing = self.dbmanager.find_missing_xbrl_ins_urls()
+
+        if len(missing) > 0:
+            logging.info("Failed to add missing for " + str(len(missing)))
+
+
+    def process(self):
+        self.find_new_reports()
+        self.complete_xbrl_file_information()
+
 
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                        datefmt='%Y-%m-%d:%H:%M:%S',
+                        level=logging.DEBUG)
     folder = "./tmp"
     try:
         new_dbmgr = DBManager(work_dir=folder)
