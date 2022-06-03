@@ -1,6 +1,6 @@
 from _00_common.DBManagement import DBManager
-from _01_index.SecIndexFileProcessing import SecIndexFileProcessor
-from _01_index.SecIndexFilePostProcessing import SecIndexFilePostProcessor
+from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
+from _01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
 from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
@@ -12,15 +12,13 @@ from datetime import datetime, date
 import dateutil
 
 
+month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
+
+
 class SecDataOrchestrator:
 
-    def __init__(self, workdir: str, year: int = None, month: int = None, months: int = 4):
+    def __init__(self, workdir: str, start_year: int = None, start_qrtr: int = None):
         """
-        month is only considered, if year is set. if year is not set, current year and current month are used
-        :param workdir:
-        :param year:
-        :param month:
-        :param months:
         """
         if workdir[-1] != '/':
             workdir = workdir + '/'
@@ -36,23 +34,17 @@ class SecDataOrchestrator:
 
         self.today = datetime.today()
 
-        if year is None:
-            self.current_year = self.today.year
-            self.current_month = self.today.month
-            if month is not None:
-                logging.info("set 'month' is ignored, since 'year' is not set")
+        if start_year is None:
+            self.start_year = self.today.year
+            self.start_qrtr = month_to_qrtr[self.today.month]
+            if start_qrtr is not None:
+                logging.info("set 'start_qrtr' is ignored, since 'start_year' is not set")
         else:
-            self.current_year = year
-            if month is None:
-                self.current_month = self.today.month
+            self.start_year = start_year
+            if start_qrtr is None:
+                self.start_qrtr = 1
             else:
-                self.current_month = month
-
-        current_date = date(self.current_year, self.current_month, 1)
-        delta_month = dateutil.relativedelta.relativedelta(months=months)
-        start_date = current_date - delta_month
-        self.start_month = start_date.month
-        self.start_year = start_date.year
+                self.start_qrtr = start_qrtr
 
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
@@ -68,21 +60,20 @@ class SecDataOrchestrator:
         logging.info(title)
         logging.info("--------------------------------------------------------------")
 
-
     def _download_index_data(self):
-        self._log_sub_header('download xbrl-rss index file data')
-        secindexprocessor = SecIndexFileProcessor(self.dbmanager, self.start_year, self.current_year, self.start_month, self.current_month, self.feeddir)
-        secindexprocessor.download_sec_feeds()
+        self._log_sub_header('looking new reports')
+        secfullindexprocessor = SecFullIndexFileProcessor(self.dbmanager, self.start_year, self.start_qrtr)
+        secfullindexprocessor.process()
 
     def _postprocess_index_data(self):
-        self._log_sub_header('add missing num-data file urls')
-        secindexpostprocessor = SecIndexFilePostProcessor(self.dbmanager)
-        secindexpostprocessor.add_missing_xbrlinsurl()
+        self._log_sub_header('add xbrl file urls')
+        secfullindexpostprocessor = SecFullIndexFilePostProcessor(self.dbmanager)
+        secfullindexpostprocessor.process()
         self._log_sub_header('check for duplicates')
-        secindexpostprocessor.check_for_duplicated()
+        secfullindexpostprocessor.check_for_duplicated()
 
     def process_index_data(self):
-        self._log_main_header("Process xbrl-rss index files")
+        self._log_main_header("Process xbrl full index files")
         self._download_index_data()
         self._postprocess_index_data()
 
@@ -132,6 +123,6 @@ class SecDataOrchestrator:
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
-    orchestrator = SecDataOrchestrator(workdir_default, months=12)
+    orchestrator = SecDataOrchestrator(workdir_default, 2022, 1)
     orchestrator.process()
 

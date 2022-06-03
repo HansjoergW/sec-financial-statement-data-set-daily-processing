@@ -1,8 +1,9 @@
 import os
 import sqlite3
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Optional
 import pandas as pd
 import glob
+from dataclasses import dataclass
 
 scriptpath = os.path.realpath(__file__ + "/..")
 testdata_path = scriptpath + '/testdata/'
@@ -19,6 +20,26 @@ SEC_FEED_TBL_COLS = (
     'xbrlInsUrl', 'xbrlCalUrl', 'xbrlDefUrl', 'xbrlLabUrl', 'xbrlPreUrl',
     'sec_feed_file'
 )
+
+
+@dataclass
+class XbrlFile:
+    name : str
+    url: str
+    lastChange: str
+    size: int
+
+
+@dataclass
+class XbrlFiles:
+    accessionNumber: str
+    sec_feed_file: str
+    xbrlIns: Optional[XbrlFile]
+    xbrlPre: Optional[XbrlFile]
+    xbrlCal: Optional[XbrlFile]
+    xbrlDef: Optional[XbrlFile]
+    xbrlLab: Optional[XbrlFile]
+    xbrlZip: Optional[XbrlFile]
 
 
 class DBManager():
@@ -282,10 +303,10 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[Tuple[str, str, str, str]]:
+    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[Tuple[str, str, str, str, str]]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
+            sql = '''SELECT accessionNumber, sec_feed_file, xbrlInsUrl, xbrlPreUrl, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
                 SEC_FEED_TBL_NAME)
 
             return conn.execute(sql).fetchall()
@@ -299,6 +320,41 @@ class DBManager():
                 SEC_FEED_TBL_NAME)
 
             return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
+
+        def expand(info: XbrlFile):
+            if info is None:
+                return (None, None, None)
+            return (info.url, info.lastChange, info.size)
+
+        update_data = [
+            (
+             *expand(file.xbrlIns),
+             *expand(file.xbrlCal),
+             *expand(file.xbrlLab),
+             *expand(file.xbrlDef),
+             *expand(file.xbrlPre),
+             *expand(file.xbrlZip),
+             file.accessionNumber,
+             file.sec_feed_file
+             )
+            for file in xbrlfiles
+        ]
+
+        conn = self.get_connection()
+        try:
+            sql = '''UPDATE {} SET  xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
+                                    xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
+                                    xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
+                                    xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
+                                    xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
+                                    xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?,
+                     WHERE accessionNumber = ? and sec_feed_file = ?'''.format(SEC_FEED_TBL_NAME)
+            conn.executemany(sql, update_data)
+            conn.commit()
         finally:
             conn.close()
 
