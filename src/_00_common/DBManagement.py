@@ -61,12 +61,29 @@ class DBManager():
     def insert_fullindex_file(self, year: int, qrtr: int, processdate:str):
         conn = self.get_connection()
         try:
-            sql = '''INSERT INTO {} ('year', 'quarter', 'processdate') VALUES('{}','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, year, qrtr, processdate)
+            sql = '''INSERT INTO {} ('year', 'quarter', 'processdate') VALUES({}, {}, '{}') '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, year, qrtr, processdate)
             conn.execute(sql)
             conn.commit()
         finally:
             conn.close()
 
+    def update_fullindex_file(self, year: int, qrtr: int, processdate:str):
+        conn = self.get_connection()
+        try:
+            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  year == {} AND quarter == {}  '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, processdate, year, qrtr)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def update_status_fullindex_file(self, year: int, qrtr: int, status:str):
+        conn = self.get_connection()
+        try:
+            sql = '''UPDATE {} SET 'state' = '{}' WHERE  year == {} AND quarter == {} '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, status, year, qrtr)
+            conn.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
 
     # ---- index files / sec-feed-file table
     def read_all_index_files(self) -> pd.DataFrame:
@@ -262,6 +279,16 @@ class DBManager():
         conn = self.get_connection()
         try:
             df.to_sql(SEC_FEED_TBL_NAME, conn, if_exists="append", chunksize=1000)
+        finally:
+            conn.close()
+
+    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[Tuple[str, str, str, str]]:
+        conn = self.get_connection()
+        try:
+            sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
+                SEC_FEED_TBL_NAME)
+
+            return conn.execute(sql).fetchall()
         finally:
             conn.close()
 

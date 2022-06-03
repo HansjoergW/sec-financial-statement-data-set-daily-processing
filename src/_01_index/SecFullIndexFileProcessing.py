@@ -4,7 +4,7 @@ from _01_index.SecIndexFileParsing import SecIndexFileParser
 
 import logging
 import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 import json
 import re
 import shutil
@@ -33,6 +33,23 @@ class FiledReportEntry:
         self.accessionNumber = filename_no_ext[filename_no_ext.rfind("/") + 1:]
 
 
+@dataclass
+class XbrlFile:
+    url: str
+    lastChange: str
+    size: int
+
+
+@dataclass
+class XbrlFiles:
+    accessionNumber: str
+    xbrlIns: Optional[XbrlFile]
+    xbrlPre: Optional[XbrlFile]
+    xbrlCal: Optional[XbrlFile]
+    xbrlDef: Optional[XbrlFile]
+    xbrlLab: Optional[XbrlFile]
+
+
 ten_report_matcher = re.compile(r".*[|]10-[KQ][|].*")
 last_date_received_matcher = re.compile(r"Last Data Received:.*")
 month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
@@ -43,6 +60,7 @@ class SecFullIndexFileProcessor:
     - downloads the desired sec files, parses them and adds the information into the db.
     - uses the fullindex to find new data
     """
+    edgar_archive_root_url = "https://www.sec.gov/Archives/"
     full_index_root_url = "https://www.sec.gov/Archives/edgar/full-index/"
 
     def __init__(self, dbmanager: DBManager, start_year: int, start_qrtr: int = 1, feed_dir: str = "./tmp/"):
@@ -97,8 +115,10 @@ class SecFullIndexFileProcessor:
                     continue
                 else:
                     logging.info("- updates for {}/{} ".format(qrtr, year))
+                    self.dbmanager.update_fullindex_file(year, qrtr, self.processdate)
             else:
                 logging.info("- new file for {}/{} ".format(qrtr, year))
+                self.dbmanager.insert_fullindex_file(year, qrtr, self.processdate)
 
             ten_report_entries_splitted = [x.split('|') for x in ten_report_entries]
             ten_report_entries = [asdict(FiledReportEntry(x[0], x[1], x[2], x[3], x[4])) for x in ten_report_entries_splitted]
@@ -106,8 +126,6 @@ class SecFullIndexFileProcessor:
             yield year, qrtr, last_date_received, ten_report_entries_df
 
     def find_new_reports(self):
-
-        hier full_index tablle verwenden und nicht die bestehende "missbrauchen"
 
         for year, qrtr, last_date_received, ten_report_entries_df in self.parsed_index_file_iter():
             pseudo_sec_feed_file =  f"fullindex-{year}-QTR{qrtr}.json"
@@ -133,15 +151,34 @@ class SecFullIndexFileProcessor:
 
             # updaten -> status table
             self.dbmanager.insert_feed_info(new_entries_save_df)
-            self.dbmanager.update_status_index_file(pseudo_sec_feed_file, last_date_received)
+            self.dbmanager.update_status_fullindex_file(year, qrtr, last_date_received)
 
 
     @staticmethod
-    def _find_xbrl_files(data_tuple: Tuple[str]) -> (str, str, str):
-        pass
+    def _find_xbrl_files(data: Tuple[str, str, str, str]) -> XbrlFiles:
+        adsh = data[0]
+        report_json = data[3]
+
+        index_json_url = SecFullIndexFileProcessor.edgar_archive_root_url + report_json
+
+        # pre ist immer mit "_pre.xml"
+        # num ist entweder mit selben namen wie "_pre.xml" einfach mit ".xml" oder dann Endung mit "_htm.xml" manchmal auch noch mit 10q oder 10k im Text
+        #
+        # Variante wäre es, das xbrl zip runterzuladen und zu speichern, da ist auch die taxonomy und struktur definiert
+        # -> im xsd Evtl. könnte das beim folgenden parsen nützlich sein
+
+        try:
+            content = get_url_content(index_json_url)
+            json_content = json.loads(content)
+            struktur ist "directory/item/->Liste mit [last-modified, name, type, size]" wobei size auch leer sein kann
+            suchen nach -xbrl.zip, *.xml
+            print("*")
+            return None
+        except:
+            return XbrlFiles(adsh, None, None, None, None, None)
 
     @staticmethod
-    def _find_main_file_throttle(data_tuple: Tuple[str]) -> (str, str):
+    def _find_main_file_throttle(data_tuple: Tuple[str, str, str, str]) -> Tuple[str, str, str]:
         # ensures that only one request per second is send
         start = time()
         new_url, size, accession_nr = SecFullIndexFileProcessor._find_xbrl_files(data_tuple)
@@ -155,8 +192,8 @@ class SecFullIndexFileProcessor:
         # das müsste dann wieder parallel gemacht werden.
         pool = Pool(8)
 
-        last_missing:int = None
-        missing: List[Tuple[str]] = self.dbmanager.find_missing_xbrl_ins_urls()
+        last_missing: int = None
+        missing: List[Tuple[str, str, str, str]] = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
         while (last_missing is None) or (last_missing > len(missing)):
             last_missing = len(missing)
             logging.info("missing entries " + str(len(missing)))
@@ -167,11 +204,10 @@ class SecFullIndexFileProcessor:
                 self.dbmanager.update_xbrl_ins_urls(update_data)
                 logging.info("commited chunk: " + str(i))
 
-            missing = self.dbmanager.find_missing_xbrl_ins_urls()
+            missing = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
 
         if len(missing) > 0:
             logging.info("Failed to add missing for " + str(len(missing)))
-
 
     def process(self):
         self.find_new_reports()
@@ -179,16 +215,30 @@ class SecFullIndexFileProcessor:
 
 
 
-
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
                         datefmt='%Y-%m-%d:%H:%M:%S',
                         level=logging.DEBUG)
-    folder = "./tmp"
-    try:
-        new_dbmgr = DBManager(work_dir=folder)
-        new_dbmgr._create_db()
-        processor = SecFullIndexFileProcessor(new_dbmgr, 2019, 2)
-        processor.process()
-    finally:
-        shutil.rmtree(folder)
+    test_reports = [
+        "edgar/data/1000045/000095017022000940/index.json",
+        "edgar/data/1000209/000095017022003603/index.json",
+        "edgar/data/1000228/000100022822000016/index.json",
+        "edgar/data/1000229/000095017022001087/index.json",
+        "edgar/data/1000230/000143774922006521/index.json",
+        "edgar/data/1000298/000155837022003437/index.json",
+        "edgar/data/1000623/000100062322000016/index.json",
+        "edgar/data/1000683/000121390022016788/index.json"
+        ]
+
+    adsh = None
+    report_index_json_url = test_reports[0]
+    SecFullIndexFileProcessor._find_xbrl_files((adsh, None, None, report_index_json_url))
+
+    # folder = "./tmp"
+    # try:
+    #     new_dbmgr = DBManager(work_dir=folder)
+    #     new_dbmgr._create_db()
+    #     processor = SecFullIndexFileProcessor(new_dbmgr, 2022, 1)
+    #     processor.process()
+    # finally:
+    #     shutil.rmtree(folder)
