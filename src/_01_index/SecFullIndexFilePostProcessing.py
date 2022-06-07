@@ -65,13 +65,15 @@ class SecFullIndexFilePostProcessor:
                 ins_file = relevant_entries['pre'].name.replace("_pre", "")
                 relevant_entries['ins'] = relevant_entries[ins_file]
 
-            return XbrlFiles(adsh, sec_feed_file,
+            period = relevant_entries['pre'].name.replace("_pre.xml", "")[-8:]
+
+            return XbrlFiles(adsh, sec_feed_file, period,
                              relevant_entries['ins'], relevant_entries['pre'],
                              relevant_entries['cal'], relevant_entries['def'],
                              relevant_entries['lab'], relevant_entries['xbrlzip'])
 
         except:
-            return XbrlFiles(adsh, sec_feed_file, None, None, None, None, None, None)
+            return XbrlFiles(adsh, sec_feed_file, None, None, None, None, None, None, None)
 
     @staticmethod
     def _find_main_file_throttle(data_tuple: Tuple[str, str, str, str, str]) -> XbrlFiles:
@@ -131,6 +133,8 @@ if __name__ == '__main__':
         "edgar/data/1000683/000121390022016788/index.json"
     ]
 
-    adsh = None
-    report_index_json_url = test_reports[1]
-    SecFullIndexFilePostProcessor._find_xbrl_files((adsh, None, None, None, report_index_json_url))
+    print("https://www.sec.gov/Archives/edgar/data/1000045/000095017021004287/nick-20210930_pre.xml".replace("_pre.xml", "")[-8:])
+
+    # adsh = None
+    # report_index_json_url = test_reports[1]
+    # SecFullIndexFilePostProcessor._find_xbrl_files((adsh, None, None, None, None, report_index_json_url))

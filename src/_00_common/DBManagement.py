@@ -34,6 +34,7 @@ class XbrlFile:
 class XbrlFiles:
     accessionNumber: str
     sec_feed_file: str
+    period: Optional[str]
     xbrlIns: Optional[XbrlFile]
     xbrlPre: Optional[XbrlFile]
     xbrlCal: Optional[XbrlFile]
@@ -331,7 +332,7 @@ class DBManager():
             return (info.url, info.lastChange, info.size)
 
         update_data = [
-            (
+            (file.period,
              *expand(file.xbrlIns),
              *expand(file.xbrlCal),
              *expand(file.xbrlLab),
@@ -346,12 +347,13 @@ class DBManager():
 
         conn = self.get_connection()
         try:
-            sql = '''UPDATE {} SET  xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
+            sql = '''UPDATE {} SET  period = ?,
+                                    xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
                                     xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
                                     xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
                                     xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
                                     xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
-                                    xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?,
+                                    xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
                      WHERE accessionNumber = ? and sec_feed_file = ?'''.format(SEC_FEED_TBL_NAME)
             conn.executemany(sql, update_data)
             conn.commit()

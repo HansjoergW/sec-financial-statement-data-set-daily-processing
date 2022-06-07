@@ -123,6 +123,6 @@ class SecDataOrchestrator:
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
-    orchestrator = SecDataOrchestrator(workdir_default, 2022, 1)
+    orchestrator = SecDataOrchestrator(workdir_default, 2022, 2)
     orchestrator.process()
 
