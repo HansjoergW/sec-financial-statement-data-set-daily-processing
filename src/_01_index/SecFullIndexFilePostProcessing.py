@@ -1,14 +1,15 @@
-from _00_common.DBManagement import DBManager, XbrlFile, XbrlFiles
+from _00_common.DBManagement import DBManager, XbrlFile, XbrlFiles, BasicFeedData
 from _00_common.SecFileUtils import get_url_content
 
 from time import time, sleep
 from multiprocessing import Pool
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Callable
 
 from dataclasses import dataclass, field, asdict
 
 import json
 import logging
+
 
 class SecFullIndexFilePostProcessor:
     """
@@ -22,13 +23,11 @@ class SecFullIndexFilePostProcessor:
         self.dbmanager = dbmanager
 
     @staticmethod
-    def _find_xbrl_files(data: Tuple[str, str, str, str, str]) -> XbrlFiles:
-        adsh = data[0]
-        sec_feed_file = data[1]
-        report_json = data[4]
-        report_path = report_json[:report_json.rfind('/') + 1]
+    def _find_xbrl_files(rowdata: BasicFeedData, known_fye: str) -> XbrlFiles:
 
-        index_json_url = SecFullIndexFilePostProcessor.edgar_archive_root_url + report_json
+        report_path = rowdata.reportJson[:rowdata.reportJson.rfind('/') + 1]
+
+        index_json_url = SecFullIndexFilePostProcessor.edgar_archive_root_url + rowdata.reportJson
 
         try:
             content = get_url_content(index_json_url)
@@ -67,38 +66,54 @@ class SecFullIndexFilePostProcessor:
 
             period = relevant_entries['pre'].name.replace("_pre.xml", "")[-8:]
 
-            return XbrlFiles(adsh, sec_feed_file, period,
-                             relevant_entries['ins'], relevant_entries['pre'],
-                             relevant_entries['cal'], relevant_entries['def'],
-                             relevant_entries['lab'], relevant_entries['xbrlzip'])
+            # if we have a 10-K, the fye is the month and date of the period
+            if rowdata.formType is "10-K":
+                fiscal_year_end = period[-4:]
+            else: # 10-Q
+                # otherwise we try to map it from entries we found in our database (which will be in general the
+                # fye of the last former 10-K)
+                fiscal_year_end = known_fye
+
+            return XbrlFiles(accessionNumber=rowdata.accessionNumber,
+                             sec_feed_file=rowdata.sec_feed_file,
+                             fiscal_year_end=fiscal_year_end,
+                             period=period,
+                             xbrlIns=relevant_entries['ins'], xbrlPre=relevant_entries['pre'],
+                             xbrlCal=relevant_entries['cal'], xbrlDef=relevant_entries['def'],
+                             xbrlLab=relevant_entries['lab'], xbrlZip=relevant_entries['xbrlzip'])
 
         except:
-            return XbrlFiles(adsh, sec_feed_file, None, None, None, None, None, None, None)
+            return XbrlFiles(rowdata.accessionNumber, rowdata.sec_feed_file, None, None, None, None, None, None, None, None)
 
     @staticmethod
-    def _find_main_file_throttle(data_tuple: Tuple[str, str, str, str, str]) -> XbrlFiles:
+    def _find_main_file_throttle(data: Tuple[BasicFeedData, str]) -> XbrlFiles:
+        rowdata = data[0]
+        known_fye = data[1]
         # ensures that only one request per second is send
         start = time()
-        xbrlfiles: XbrlFiles = SecFullIndexFilePostProcessor._find_xbrl_files(data_tuple)
+        xbrlfiles: XbrlFiles = SecFullIndexFilePostProcessor._find_xbrl_files(rowdata, known_fye)
         end = time()
         sleep((1000-(end - start)) / 1000)
         return xbrlfiles
 
+
     def complete_xbrl_file_information(self):
-        # das nächste problem ist es die Namen der Dateien zu finden, das geht nur über
-        # einen zusätzlices laden der json index datei pro report..
-        # das müsste dann wieder parallel gemacht werden.
+
         pool = Pool(8)
 
+        last_knwon_fye_dict: Dict[str, str] = self.dbmanager.read_last_known_fiscalyearend()
+
         last_missing: int = None
-        missing: List[Tuple[str, str, str, str, str]] = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
+        missing: List[BasicFeedData] = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
         while (last_missing is None) or (last_missing > len(missing)):
             last_missing = len(missing)
             logging.info("missing entries " + str(len(missing)))
 
             for i in range(0, len(missing), 100):
                 chunk = missing[i:i + 100]
-                update_data: List[XbrlFiles] = pool.map(SecFullIndexFilePostProcessor._find_main_file_throttle, chunk)
+                # add the last known fiscal year end value for the cik, in case we need it
+                chunk_data = [(entry, last_knwon_fye_dict.get(entry.cikNumber, None)) for entry in chunk]
+                update_data: List[XbrlFiles] = pool.map(SecFullIndexFilePostProcessor._find_main_file_throttle, chunk_data)
                 self.dbmanager.update_xbrl_infos(update_data)
                 logging.info("commited chunk: " + str(i))
 
@@ -121,20 +136,35 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
                         datefmt='%Y-%m-%d:%H:%M:%S',
                         level=logging.DEBUG)
-    test_reports = [
-        "edgar/data/1000045/000095017022000940/index.json",
-        "edgar/data/1358633/000173112220000705/index.json", # direct ins file
-        "edgar/data/1000209/000095017022003603/index.json",
-        "edgar/data/1000228/000100022822000016/index.json",
-        "edgar/data/1000229/000095017022001087/index.json",
-        "edgar/data/1000230/000143774922006521/index.json",
-        "edgar/data/1000298/000155837022003437/index.json",
-        "edgar/data/1000623/000100062322000016/index.json",
-        "edgar/data/1000683/000121390022016788/index.json"
-    ]
 
-    print("https://www.sec.gov/Archives/edgar/data/1000045/000095017021004287/nick-20210930_pre.xml".replace("_pre.xml", "")[-8:])
+    #folder = "./tmp"
+    #new_dbmgr = DBManager(work_dir=folder)
+    # processor = SecFullIndexFilePostProcessor(new_dbmgr)
+    # processor.process()
 
-    # adsh = None
+    dbm = DBManager(work_dir="d:/secprocessing/")
+    lastye: Dict[str, str] = dbm.read_last_known_fiscalyearend()
+
+    conn = dbm.get_connection()
+    sql = '''SELECT accessionNumber, cikNumber FROM sec_feeds WHERE fiscalYearEnd is null'''
+    results = conn.execute(sql).fetchall()
+
+    mapped = [(lastye.get(x[1], None), x[0]) for x in results]
+
+    found = [x for x in mapped if x[0] is not None]
+    not_found = [x for x in mapped if x[0] is None]
+    conn.close()
+
+    conn = dbm.get_connection()
+    sql = '''UPDATE sec_feeds SET fiscalYearEnd = ? WHERE accessionNumber = ?'''
+    conn.executemany(sql, found)
+    conn.commit()
+    conn.close()
+
+    print("found: ", len(found))
+    print("not found: ", len(not_found))
+
+
+# adsh = None
     # report_index_json_url = test_reports[1]
     # SecFullIndexFilePostProcessor._find_xbrl_files((adsh, None, None, None, None, report_index_json_url))

@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import List, Tuple, Set, Optional
+from typing import List, Tuple, Set, Optional, Dict
 import pandas as pd
 import glob
 from dataclasses import dataclass
@@ -34,6 +34,7 @@ class XbrlFile:
 class XbrlFiles:
     accessionNumber: str
     sec_feed_file: str
+    fiscal_year_end: Optional[str]
     period: Optional[str]
     xbrlIns: Optional[XbrlFile]
     xbrlPre: Optional[XbrlFile]
@@ -41,6 +42,15 @@ class XbrlFiles:
     xbrlDef: Optional[XbrlFile]
     xbrlLab: Optional[XbrlFile]
     xbrlZip: Optional[XbrlFile]
+
+
+@dataclass
+class BasicFeedData:
+    accessionNumber: str
+    sec_feed_file: str
+    formType: str
+    cikNumber: str
+    reportJson: str
 
 
 class DBManager():
@@ -276,6 +286,26 @@ class DBManager():
         finally:
             conn.close()
 
+    def read_last_known_fiscalyearend(self) -> Dict[str, str]:
+        conn = self.get_connection()
+        try:
+            sql = '''
+            SELECT cikNumber, fiscalYearEnd 
+            FROM (
+                 SELECT cikNumber, fiscalYearEnd 
+                 FROM sec_feeds 
+                 WHERE formType = "10-K" and fiscalYearEnd is not null 
+                 ORDER BY cikNumber, period desc
+                 ) as x 
+            GROUP BY cikNumber;
+            '''
+            # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
+            df = pd.read_sql_query(sql, conn)
+            return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
+
+        finally:
+            conn.close()
+
     def read_by_year_and_quarter(self, year:int, qrtr: int) -> pd.DataFrame:
         months: List = [1,2,3]
         offset = ((qrtr - 1) * 3)
@@ -304,13 +334,16 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[Tuple[str, str, str, str, str]]:
+    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, sec_feed_file, xbrlInsUrl, xbrlPreUrl, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
+            sql = '''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
                 SEC_FEED_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            c.execute(sql)
+            results = c.fetchall()
+            return [BasicFeedData(**dict(x)) for x in results]
         finally:
             conn.close()
 
@@ -333,6 +366,7 @@ class DBManager():
 
         update_data = [
             (file.period,
+             file.fiscal_year_end,
              *expand(file.xbrlIns),
              *expand(file.xbrlCal),
              *expand(file.xbrlLab),
@@ -348,6 +382,7 @@ class DBManager():
         conn = self.get_connection()
         try:
             sql = '''UPDATE {} SET  period = ?,
+                                    fiscalYearEnd = ?, 
                                     xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
                                     xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
                                     xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
