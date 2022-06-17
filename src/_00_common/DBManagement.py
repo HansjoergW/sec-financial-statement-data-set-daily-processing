@@ -52,6 +52,13 @@ class BasicFeedData:
     cikNumber: str
     reportJson: str
 
+@dataclass
+class UpdateNumParsing:
+    accessionNumber: str
+    csvNumFile: str
+    numParseDate: str
+    numParseState: str
+    fiscalYearEnd: str
 
 class DBManager():
 
@@ -234,10 +241,11 @@ class DBManager():
         finally:
             conn.close()
 
-    def update_parsed_num_file(self, update_data: List[Tuple[str]]):
+    def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
         conn = self.get_connection()
+        update_data = [(x.csvNumFile, x.numParseDate, x.numParseState, x.fiscalYearEnd, x.accessionNumber) for x in updatelist]
         try:
-            sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+            sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
             conn.executemany(sql, update_data)
             conn.commit()
         finally:

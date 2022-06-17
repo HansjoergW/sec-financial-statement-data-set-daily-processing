@@ -163,9 +163,12 @@ class SecNumXmlExtractor():
         tags = list(root.findall('.//*[@unitRef]'))
         tags_secexchange = list(root.findall('.//dei:SecurityExchangeName', root.nsmap))
         tags_tradingsymbol = list(root.findall('.//dei:TradingSymbol', root.nsmap))
+        tags_fiscalyearend = list(root.findall('.//dei:CurrentFiscalYearEndDate', root.nsmap))
+
 
         tags.extend(tags_secexchange)
         tags.extend(tags_tradingsymbol)
+        tags.extend(tags_fiscalyearend)
 
         result: List[SecNumExtractTag] = []
 

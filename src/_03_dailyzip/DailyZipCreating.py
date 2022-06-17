@@ -231,3 +231,4 @@ if __name__ == '__main__':
     dbm = DBManager("d:/secprocessing")
     creator = DailyZipCreator(dbm, "d:/tmp/daily/")
     creator.process()
+

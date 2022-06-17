@@ -78,9 +78,9 @@ class SecNumXmlParser(SecXmlParserBase):
         multiplier = 10 ** decimals
         return np.floor(n*multiplier + 0.5) / multiplier
 
-    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
+    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> Tuple[pd.DataFrame, Optional[str]]:
         if df.shape[0] == 0:
-            return df
+            return df, None
 
         df = (df[df.isrelevant]).copy()
 
@@ -88,10 +88,19 @@ class SecNumXmlParser(SecXmlParserBase):
 
         # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
 
-
         df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'TradingSymbol')  & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+
+        # current fiscal year end appears in the form --MM-dd, so we remove the dashes
+        df.loc[(df.tag == 'CurrentFiscalYearEndDate'), 'value'] = df[df.tag == 'CurrentFiscalYearEndDate'].value.str.replace('-','')
+
+        # check wether a currentfiscalyearenddate is present -> we return that as a separate information
+        cfyed_df = df[(df.tag == 'CurrentFiscalYearEndDate')]
+        if len(cfyed_df) > 0:
+            fiscalYearEnd = cfyed_df.value.iloc[0]
+        else:
+            fiscalYearEnd = None
 
         df['qtrs'] = df.qtrs.apply(int)
         df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')
@@ -119,4 +128,17 @@ class SecNumXmlParser(SecXmlParserBase):
 
         df = df[~df_double_index_mask]
 
-        return df
+        return df, fiscalYearEnd
+
+
+if __name__ == '__main__':
+    example_file = "c:/ieu/projects/sec_processing/test/_02_xml/data/0001078782-21-000058-none-20201130.xml"
+    with open(example_file, "r", encoding="utf-8") as f:
+        xml_exp_content = f.read()
+    f.close()
+
+    parser = SecNumXmlParser()
+    data, errors = parser.parse("0001078782-21-000058", xml_exp_content)
+
+    result, fye = parser.clean_for_financial_statement_dataset(data)
+    print("")
