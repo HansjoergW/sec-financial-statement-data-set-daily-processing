@@ -1,6 +1,6 @@
 from _00_common.DBManagement import DBManager
 from _00_common.SecFileUtils import read_df_from_zip
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from multiprocessing import Pool
 
 import pandas as pd
@@ -34,12 +34,20 @@ class DailyZipCreator:
     def _read_ready_entries(self) -> pd.DataFrame:
         return self.dbmanager.find_ready_to_zip_adshs()
 
-    def _read_feed_entries_for_adshs(self, adshs: List[str]) -> pd.DataFrame:
+    def _read_feed_entries_for_adshs(self, adshsAndFye: pd.DataFrame) -> pd.DataFrame:
         feed_entries = self.dbmanager.read_all_copied()
+        adshs = adshsAndFye.accessionNumber.tolist()
         feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
-        return self._process_df(feed_entries)
 
-    def _process_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        adshsAndFye['fiscalYearEnd'] = adshsAndFye.copy().fiscalYearEnd.str.strip()
+        adshsAndFye.set_index('accessionNumber', inplace=True)
+        fye_dict: Dict[str, str] = adshsAndFye.to_dict()['fiscalYearEnd']
+
+        return self._process_df(feed_entries, fye_dict)
+
+    def _process_df(self, df: pd.DataFrame, fye_dict: Dict[str, str]) -> pd.DataFrame:
+        # fye contains the fiscalYearEnd information that were read from the num-xml file
+        #
         # adsh:     edgar:accessionNumber
         # cik:      edgar:cikNumber	/ no leading zeros
         # name:     edgar:companyName	/ upper case
@@ -54,6 +62,13 @@ class DailyZipCreator:
         # accepted: edgar:acceptanceDatetime /	"like: 20210107161557 / rounded to minutes"
 
         sub_entries = df[['accessionNumber','cikNumber', 'companyName','assignedSic','fiscalYearEnd','formType','period','filingDate','acceptanceDatetime']].copy()
+
+        # we prefer the fye information from the num file, so first we add the information from the fye_dict
+        # as a new column
+        sub_entries['numFye'] = sub_entries.accessionNumber.map(fye_dict)
+        # the we replace the existing fiscalYearEnd info with the numFye column, if the numFye contains data
+        sub_entries.loc[~sub_entries.numFye.isnull(), 'fiscalYearEnd'] = sub_entries['numFye']
+        sub_entries.drop(columns=['numFye'], inplace=True)
 
         # rename to sub-file column names
         sub_entries.rename(columns = {'accessionNumber': 'adsh',
@@ -217,11 +232,11 @@ class DailyZipCreator:
         pool = Pool(8)
 
         entries_ready = self._read_ready_entries()
-        adsh_to_process = entries_ready.accessionNumber.tolist()
-        entries_sub = self._read_feed_entries_for_adshs(adsh_to_process).copy()
+        adsh_and_fye_to_process = entries_ready[['accessionNumber', 'fiscalYearEnd']]
+        entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
         grouped = entries_ready.groupby('filingDate')
 
-        logging.info("found {} reports in {} dates to process".format(len(adsh_to_process), len(grouped)))
+        logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
 
         param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [(*entry, entries_sub) for entry in grouped]
         pool.map(self._process_date, param_list)

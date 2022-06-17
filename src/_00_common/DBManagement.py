@@ -270,7 +270,7 @@ class DBManager():
             zipdates = ','.join("'" + zipdate + "'" for zipdate in datesToZip)
 
             # select all entries which belong to the found zipdates above
-            sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and filingDate in({}) '''.format(SEC_REPORT_PROCESSING_TBL_NAME, zipdates)
+            sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile, fiscalYearEnd FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and filingDate in({}) '''.format(SEC_REPORT_PROCESSING_TBL_NAME, zipdates)
 
             return pd.read_sql_query(sql, conn)
         finally:
