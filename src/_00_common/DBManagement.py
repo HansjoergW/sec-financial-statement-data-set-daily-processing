@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import List, Tuple, Set, Optional, Dict
+from typing import List, Tuple, Set, Optional, Dict, TypeVar
 import pandas as pd
 import glob
 from dataclasses import dataclass
@@ -13,13 +13,7 @@ SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
 SEC_FULL_INDEX_FILE_TBL_NAME = "sec_fullindex_file"
 SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
 
-SEC_FEED_TBL_COLS = (
-    'companyName', 'formType', 'filingDate', 'cikNumber',
-    'accessionNumber', 'fileNumber', 'acceptanceDatetime',
-    'period', 'assistantDirector', 'assignedSic', 'fiscalYearEnd',
-    'xbrlInsUrl', 'xbrlCalUrl', 'xbrlDefUrl', 'xbrlLabUrl', 'xbrlPreUrl',
-    'sec_feed_file'
-)
+T = TypeVar("T")
 
 
 @dataclass
@@ -60,6 +54,8 @@ class UpdateNumParsing:
     numParseState: str
     fiscalYearEnd: str
 
+
+# noinspection SqlResolve
 class DBManager():
 
     def __init__(self, work_dir="edgar/"):
@@ -88,177 +84,134 @@ class DBManager():
             conn.commit()
         conn.close()
 
-    # ---- fullindex files ----
-    def read_all_fullindex_files(self) -> pd.DataFrame:
+    def _execute_read_as_df(self, sql: str) -> pd.DataFrame:
         conn = self.get_connection()
         try:
-            sql = '''SELECT * FROM {}'''.format(SEC_FULL_INDEX_FILE_TBL_NAME)
             return pd.read_sql_query(sql, conn)
         finally:
             conn.close()
 
-    def insert_fullindex_file(self, year: int, qrtr: int, processdate:str):
+    def _execute_single(self, sql: str):
         conn = self.get_connection()
         try:
-            sql = '''INSERT INTO {} ('year', 'quarter', 'processdate') VALUES({}, {}, '{}') '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, year, qrtr, processdate)
             conn.execute(sql)
             conn.commit()
         finally:
             conn.close()
+
+    def _execute_many(self, sql: str, params):
+        conn = self.get_connection()
+        try:
+            conn.executemany(sql, params)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def _execute_fetchall(self, sql: str) -> List[T]:
+        conn = self.get_connection()
+        try:
+            return conn.execute(sql).fetchall()
+        finally:
+            conn.close()
+
+    def _execute_fetchall_typed(self, sql, T) -> List[T]:
+        conn = self.get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            c.execute(sql)
+            results = c.fetchall()
+            return [T(**dict(x)) for x in results]
+        finally:
+            conn.close()
+
+    # ---- fullindex files ----
+    def read_all_fullindex_files(self) -> pd.DataFrame:
+        sql = '''SELECT * FROM {}'''.format(SEC_FULL_INDEX_FILE_TBL_NAME)
+        return self._execute_read_as_df(sql)
+
+    def insert_fullindex_file(self, year: int, qrtr: int, processdate:str):
+        sql = '''INSERT INTO {} ('year', 'quarter', 'processdate') VALUES({}, {}, '{}') '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, year, qrtr, processdate)
+        self._execute_single(sql)
 
     def update_fullindex_file(self, year: int, qrtr: int, processdate:str):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  year == {} AND quarter == {}  '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, processdate, year, qrtr)
-            conn.execute(sql)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  year == {} AND quarter == {}  '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, processdate, year, qrtr)
+        self._execute_single(sql)
 
     def update_status_fullindex_file(self, year: int, qrtr: int, status:str):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET 'state' = '{}' WHERE  year == {} AND quarter == {} '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, status, year, qrtr)
-            conn.execute(sql)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET 'state' = '{}' WHERE  year == {} AND quarter == {} '''.format(SEC_FULL_INDEX_FILE_TBL_NAME, status, year, qrtr)
+        self._execute_single(sql)
 
     # ---- index files / sec-feed-file table
     def read_all_index_files(self) -> pd.DataFrame:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT * FROM {}'''.format(SEC_INDEX_FILE_TBL_NAME)
-            return pd.read_sql_query(sql, conn)
-        finally:
-            conn.close()
+       sql = '''SELECT * FROM {}'''.format(SEC_INDEX_FILE_TBL_NAME)
+       return self._execute_read_as_df(sql)
 
     def insert_index_file(self, name:str, processdate:str):
-        conn = self.get_connection()
-        try:
-            sql = '''INSERT INTO {} ('sec_feed_file', 'processdate') VALUES('{}','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
-            conn.execute(sql)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''INSERT INTO {} ('sec_feed_file', 'processdate') VALUES('{}','{}') '''.format(SEC_INDEX_FILE_TBL_NAME, name, processdate)
+        self._execute_single(sql)
 
     def update_index_file(self, name:str, processdate:str):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
-            conn.execute(sql)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, processdate, name)
+        self._execute_single(sql)
 
     def update_status_index_file(self, name:str, status:str):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET 'status' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, status, name)
-            conn.execute(sql)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET 'status' = '{}' WHERE  sec_feed_file == '{}' '''.format(SEC_INDEX_FILE_TBL_NAME, status, name)
+        self._execute_single(sql)
 
     # - processing file / sec-report-processing table
     def read_all_processing(self) -> pd.DataFrame:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT * FROM {}'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            return pd.read_sql_query(sql, conn)
-        finally:
-            conn.close()
+        sql = '''SELECT * FROM {}'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_read_as_df(sql)
 
     def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
         conn = self.get_connection()
         adshs = ','.join("'" + adsh + "'" for adsh in adshs)
-        try:
-            sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(adshs)
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+
+        sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(adshs)
+        return self._execute_fetchall(sql)
 
     def get_files_for_adsh(self, adsh: str) -> Tuple[str, str, str, str, str]:
         conn = self.get_connection()
         try:
             sql = '''SELECT accessionNumber, xmlPreFile, xmlNumFile, csvPreFile, csvNumFile FROM {} where accessionNumber = '{}' '''.format(SEC_REPORT_PROCESSING_TBL_NAME, adsh)
-            return conn.execute(sql).fetchone()
+            return conn.execute(sql).fetchone() # !! Attention: fetchone !!
         finally:
             conn.close()
-
 
     def find_missing_xmlNumFiles(self) -> List[Tuple[str, str]]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, xbrlInsUrl, insSize FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, xbrlInsUrl, insSize FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall(sql)
 
     def find_missing_xmlPreFiles(self) -> List[Tuple[str, str]]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, xbrlPreUrl, preSize FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, xbrlPreUrl, preSize FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall(sql)
 
     def update_processing_xml_num_file(self, update_data: List[Tuple[str]]):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET xmlNumFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET xmlNumFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     def update_processing_xml_pre_file(self, update_data: List[Tuple[str]]):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET xmlPreFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET xmlPreFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     def find_unparsed_numFiles(self) -> List[Tuple[str, str]]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall(sql)
 
     def find_unparsed_preFiles(self) -> List[Tuple[str, str]]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall(sql)
 
     def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
-        conn = self.get_connection()
         update_data = [(x.csvNumFile, x.numParseDate, x.numParseState, x.fiscalYearEnd, x.accessionNumber) for x in updatelist]
-        try:
-            sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+
+        sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     def update_parsed_pre_file(self, update_data: List[Tuple[str, str, str, str]]):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     def find_ready_to_zip_adshs(self) -> pd.DataFrame:
         conn = self.get_connection()
@@ -271,48 +224,33 @@ class DBManager():
 
             # select all entries which belong to the found zipdates above
             sql = '''SELECT accessionNumber, filingDate, csvPreFile, csvNumfile, fiscalYearEnd FROM {} WHERE preParseState like "parsed%" and numParseState like "parsed%" and filingDate in({}) '''.format(SEC_REPORT_PROCESSING_TBL_NAME, zipdates)
-
             return pd.read_sql_query(sql, conn)
         finally:
             conn.close()
 
     def updated_ziped_entries(self, update_data: List[Tuple[str, str, str]]):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     # - report metadata / sec-feed table
     def read_all(self) -> pd.DataFrame:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT * FROM {}'''.format(SEC_FEED_TBL_NAME)
-            return pd.read_sql_query(sql, conn)
-        finally:
-            conn.close()
+        sql = '''SELECT * FROM {}'''.format(SEC_FEED_TBL_NAME)
+        return self._execute_read_as_df(sql)
 
     def read_last_known_fiscalyearend(self) -> Dict[str, str]:
-        conn = self.get_connection()
-        try:
-            sql = '''
-            SELECT cikNumber, fiscalYearEnd 
-            FROM (
-                 SELECT cikNumber, fiscalYearEnd 
-                 FROM sec_feeds 
-                 WHERE formType = "10-K" and fiscalYearEnd is not null 
-                 ORDER BY cikNumber, period desc
-                 ) as x 
-            GROUP BY cikNumber;
-            '''
-            # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
-            df = pd.read_sql_query(sql, conn)
-            return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
-
-        finally:
-            conn.close()
+        sql = '''
+        SELECT cikNumber, fiscalYearEnd 
+        FROM (
+             SELECT cikNumber, fiscalYearEnd 
+             FROM sec_feeds 
+             WHERE formType = "10-K" and fiscalYearEnd is not null 
+             ORDER BY cikNumber, period desc
+             ) as x 
+        GROUP BY cikNumber;
+        '''
+        # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
+        df = self._execute_read_as_df(sql)
+        return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
 
     def read_by_year_and_quarter(self, year:int, qrtr: int) -> pd.DataFrame:
         months: List = [1,2,3]
@@ -320,20 +258,12 @@ class DBManager():
         months = [str(x + offset) for x in months]
         month_str = ",".join(months)
 
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT * FROM {} WHERE filingYear = {} and filingMonth in ({})  '''.format(SEC_FEED_TBL_NAME, year, month_str)
-            return pd.read_sql_query(sql, conn)
-        finally:
-            conn.close()
+        sql = '''SELECT * FROM {} WHERE filingYear = {} and filingMonth in ({})  '''.format(SEC_FEED_TBL_NAME, year, month_str)
+        return self._execute_read_as_df(sql)
 
     def read_all_copied(self) -> pd.DataFrame:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT * FROM {} WHERE status is 'copied' '''.format(SEC_FEED_TBL_NAME)
-            return pd.read_sql_query(sql, conn)
-        finally:
-            conn.close()
+        sql = '''SELECT * FROM {} WHERE status is 'copied' '''.format(SEC_FEED_TBL_NAME)
+        return self._execute_read_as_df(sql)
 
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self.get_connection()
@@ -343,27 +273,13 @@ class DBManager():
             conn.close()
 
     def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
-                SEC_FEED_TBL_NAME)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-            c.execute(sql)
-            results = c.fetchall()
-            return [BasicFeedData(**dict(x)) for x in results]
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
+            SEC_FEED_TBL_NAME)
+        return self._execute_fetchall_typed(sql, BasicFeedData)
 
     def find_missing_xbrl_ins_urls(self) -> List[Tuple[str]]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl FROM {} WHERE xbrlInsUrl is NULL'''.format(
-                SEC_FEED_TBL_NAME)
-
-            return conn.execute(sql).fetchall()
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl FROM {} WHERE xbrlInsUrl is NULL'''.format(SEC_FEED_TBL_NAME)
+        return self._execute_fetchall(sql)
 
     def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
 
@@ -387,76 +303,52 @@ class DBManager():
             for file in xbrlfiles
         ]
 
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET  period = ?,
-                                    fiscalYearEnd = ?, 
-                                    xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
-                                    xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
-                                    xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
-                                    xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
-                                    xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
-                                    xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
-                     WHERE accessionNumber = ? and sec_feed_file = ?'''.format(SEC_FEED_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET  period = ?,
+                                fiscalYearEnd = ?, 
+                                xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
+                                xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
+                                xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
+                                xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
+                                xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
+                                xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
+                 WHERE accessionNumber = ? and sec_feed_file = ?'''.format(SEC_FEED_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str, str, str]]):
-        conn = self.get_connection()
-        try:
-            sql = '''UPDATE {} SET xbrlInsUrl = ?, insSize = ? WHERE accessionNumber = ?'''.format(SEC_FEED_TBL_NAME)
-            conn.executemany(sql, update_data)
-            conn.commit()
-        finally:
-            conn.close()
+        sql = '''UPDATE {} SET xbrlInsUrl = ?, insSize = ? WHERE accessionNumber = ?'''.format(SEC_FEED_TBL_NAME)
+        self._execute_many(sql, update_data)
 
     def get_adsh_by_feed_file(self, feed_file_name:str) -> Set[str]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber FROM sec_feeds where sec_feed_file == '{}' '''.format(feed_file_name)
-            result: List[Tuple[str]] = conn.execute(sql).fetchall()
-            return set([x[0] for x in result])
-        finally:
-            conn.close()
+        sql = '''SELECT accessionNumber FROM sec_feeds where sec_feed_file == '{}' '''.format(feed_file_name)
+        result: List[Tuple[str]] = self._execute_fetchall(sql)
+        return set([x[0] for x in result])
 
     def find_duplicated_adsh(self) -> List[str]:
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM sec_feeds WHERE status is null GROUP BY accessionNumber'''
-            duplicated_df = pd.read_sql_query(sql, conn)
+        sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM sec_feeds WHERE status is null GROUP BY accessionNumber'''
+        duplicated_df = self._execute_read_as_df(sql)
 
-            duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
-            return duplicated_df.accessionNumber.tolist()
-
-        finally:
-            conn.close()
+        duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
+        return duplicated_df.accessionNumber.tolist()
 
     def mark_duplicated_adsh(self, adsh: str):
-        conn = self.get_connection()
-        try:
-            sql = '''SELECT accessionNumber, sec_feed_file FROM sec_feeds WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(adsh)
-            result: List[Tuple[str]] = conn.execute(sql).fetchall()
+        sql = '''SELECT accessionNumber, sec_feed_file FROM sec_feeds WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(adsh)
+        result: List[Tuple[str]] = self._execute_fetchall(sql)
 
-            update_sql =  '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(SEC_FEED_TBL_NAME)
-            conn.executemany(update_sql, result[1:])
-            conn.commit()
-        finally:
-            conn.close()
+        update_sql =  '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(SEC_FEED_TBL_NAME)
+        self._execute_many(update_sql, result[1:])
 
     # copies entries from the feed table to the processing table if they are not already present
     def copy_uncopied_entries(self) -> int:
+        sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
+        to_copy_df = self._execute_read_as_df(sql)
+
+        to_copy_df['filingMonth'] = pd.to_numeric(to_copy_df.filingDate.str.slice(0,2), downcast="integer")
+        to_copy_df['filingDay'] = pd.to_numeric(to_copy_df.filingDate.str.slice(3,5), downcast="integer")
+        to_copy_df['filingYear'] = pd.to_numeric(to_copy_df.filingDate.str.slice(6,10), downcast="integer")
+
         conn = self.get_connection()
         try:
-            sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
-            to_copy_df =  pd.read_sql_query(sql, conn)
-
-            to_copy_df['filingMonth'] = pd.to_numeric(to_copy_df.filingDate.str.slice(0,2), downcast="integer")
-            to_copy_df['filingDay'] = pd.to_numeric(to_copy_df.filingDate.str.slice(3,5), downcast="integer")
-            to_copy_df['filingYear'] = pd.to_numeric(to_copy_df.filingDate.str.slice(6,10), downcast="integer")
-
             to_copy_df.to_sql(SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
 
             update_sql =  '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(SEC_FEED_TBL_NAME)

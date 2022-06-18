@@ -104,7 +104,7 @@ class SecFullIndexFilePostProcessor:
         last_knwon_fye_dict: Dict[str, str] = self.dbmanager.read_last_known_fiscalyearend()
 
         last_missing: int = None
-        missing: List[BasicFeedData] = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
+        missing: List[BasicFeedData] = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre2()
         while (last_missing is None) or (last_missing > len(missing)):
             last_missing = len(missing)
             logging.info("missing entries " + str(len(missing)))
@@ -117,7 +117,7 @@ class SecFullIndexFilePostProcessor:
                 self.dbmanager.update_xbrl_infos(update_data)
                 logging.info("commited chunk: " + str(i))
 
-            missing = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre()
+            missing = self.dbmanager.find_entries_with_missing_xbrl_ins_or_pre2()
 
         if len(missing) > 0:
             logging.info("Failed to add missing for " + str(len(missing)))
@@ -137,32 +137,34 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d:%H:%M:%S',
                         level=logging.DEBUG)
 
-    #folder = "./tmp"
+    folder = "./tmp"
     #new_dbmgr = DBManager(work_dir=folder)
-    # processor = SecFullIndexFilePostProcessor(new_dbmgr)
-    # processor.process()
+    #new_dbmgr._create_db()
+    new_dbmgr = DBManager(work_dir="d:/secprocessing/")
+    processor = SecFullIndexFilePostProcessor(new_dbmgr)
+    processor.process()
 
-    dbm = DBManager(work_dir="d:/secprocessing/")
-    lastye: Dict[str, str] = dbm.read_last_known_fiscalyearend()
-
-    conn = dbm.get_connection()
-    sql = '''SELECT accessionNumber, cikNumber FROM sec_feeds WHERE fiscalYearEnd is null'''
-    results = conn.execute(sql).fetchall()
-
-    mapped = [(lastye.get(x[1], None), x[0]) for x in results]
-
-    found = [x for x in mapped if x[0] is not None]
-    not_found = [x for x in mapped if x[0] is None]
-    conn.close()
-
-    conn = dbm.get_connection()
-    sql = '''UPDATE sec_feeds SET fiscalYearEnd = ? WHERE accessionNumber = ?'''
-    conn.executemany(sql, found)
-    conn.commit()
-    conn.close()
-
-    print("found: ", len(found))
-    print("not found: ", len(not_found))
+    # dbm = DBManager(work_dir="d:/secprocessing/")
+    # lastye: Dict[str, str] = dbm.read_last_known_fiscalyearend()
+    #
+    # conn = dbm.get_connection()
+    # sql = '''SELECT accessionNumber, cikNumber FROM sec_feeds WHERE fiscalYearEnd is null'''
+    # results = conn.execute(sql).fetchall()
+    #
+    # mapped = [(lastye.get(x[1], None), x[0]) for x in results]
+    #
+    # found = [x for x in mapped if x[0] is not None]
+    # not_found = [x for x in mapped if x[0] is None]
+    # conn.close()
+    #
+    # conn = dbm.get_connection()
+    # sql = '''UPDATE sec_feeds SET fiscalYearEnd = ? WHERE accessionNumber = ?'''
+    # conn.executemany(sql, found)
+    # conn.commit()
+    # conn.close()
+    #
+    # print("found: ", len(found))
+    # print("not found: ", len(not_found))
 
 
 # adsh = None
