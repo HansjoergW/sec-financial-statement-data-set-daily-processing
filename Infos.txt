@@ -15,8 +15,10 @@ Probleme beim Finden der Files aus Tests und Imports aus Src wenn die Projekte a
 - wenn aus den test folder nicht andere testscripts referenziert werden, dann müssen diese folder auch nicht
   als test-source referenziert werden
 
-
-
+Libraries
+---------
+pip install pathos
+- https://github.com/uqfoundation/pathos
 
 
 
