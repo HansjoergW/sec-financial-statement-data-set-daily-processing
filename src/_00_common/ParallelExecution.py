@@ -26,7 +26,6 @@ class ParallelExecutor(Generic[IT, PT, OT]):
         if max_calls_per_sec > 0:
             self.min_roundtrip_time = float(processes) / max_calls_per_sec
 
-        print(self.min_roundtrip_time)
         self.get_entries_function: Optional[Callable[[], List[IT]]] = None
         self.process_element_function: Optional[Callable[[IT], PT]] = None
         self.post_process_chunk_function: Optional[Callable[[List[PT]], List[OT]]] = None
@@ -45,12 +44,12 @@ class ParallelExecutor(Generic[IT, PT, OT]):
         result: PT = self.process_element_function(data)
         end = time()
         if self.min_roundtrip_time > 0:
-            sleep_time = self.min_roundtrip_time - (end - start)
+            sleep_time = max(0.0, self.min_roundtrip_time - (end - start))
             sleep(sleep_time)
 
         return result
 
-    def execute(self) -> List[OT]:
+    def execute(self) -> Tuple[List[OT], List[IT]]:
         pool = Pool(self.processes)
 
         last_missing = None
@@ -64,15 +63,12 @@ class ParallelExecutor(Generic[IT, PT, OT]):
             for i in range(0, len(missing), self.chunksize):
                 chunk = missing[i:i + self.chunksize]
                 processed: List[PT] = pool.map(self.process_throttled, chunk)
-                result_list.extend(self.post_process_chunk_function(processed))
+                result_list.append(self.post_process_chunk_function(processed))
                 logging.info(f"{self.intend}commited chunk: {i}")
 
             missing = self.get_entries_function()
 
-        if len(missing) > 0:
-            logging.info(f"{self.intend}Failed to add missing for {len(missing)}")
-
-        return result_list
+        return result_list, missing
 
 
 if __name__ == '__main__':
@@ -107,4 +103,3 @@ if __name__ == '__main__':
             print(executor.execute())
 
     MyTestClass().process()
-

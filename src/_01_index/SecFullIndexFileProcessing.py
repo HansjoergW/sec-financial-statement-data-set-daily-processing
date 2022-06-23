@@ -105,8 +105,6 @@ class SecFullIndexFileProcessor:
             yield year, qrtr, last_date_received, ten_report_entries_df
 
     def find_new_reports(self):
-
-
         for year, qrtr, last_date_received, ten_report_entries_df in self.parsed_index_file_iter():
             pseudo_sec_feed_file =  f"fullindex-{year}-QTR{qrtr}.json"
 
