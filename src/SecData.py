@@ -61,7 +61,7 @@ class SecDataOrchestrator:
         logging.info("--------------------------------------------------------------")
 
     def _download_index_data(self):
-        self._log_sub_header('looking new reports')
+        self._log_sub_header('looking for new reports')
         secfullindexprocessor = SecFullIndexFileProcessor(self.dbmanager, self.start_year, self.start_qrtr)
         secfullindexprocessor.process()
 

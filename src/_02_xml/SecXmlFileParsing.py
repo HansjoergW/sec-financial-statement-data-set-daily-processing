@@ -1,21 +1,16 @@
 # coordinates the parsing of donwloaded xml files and stores the data in a new folder
+import datetime
+import logging
+import os
+
+from _00_common.DBManagement import DBManager, UpdateNumParsing, UnparsedFile, UpdatePreParsing
+from _00_common.ParallelExecution import ParallelExecutor
+from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
-from _02_xml.parsing.SecXmlParsingBase import SecXmlParserBase
-from _00_common.DBManagement import DBManager, UpdateNumParsing
-from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
-
-import logging
-import datetime
-import os
-import pandas as pd
-
-from typing import List,Tuple,Callable
-from multiprocessing import Pool
 
 
 class SecXmlParser:
-
     numparser = SecNumXmlParser()
     preparser = SecPreXmlParser()
 
@@ -34,104 +29,82 @@ class SecXmlParser:
             os.makedirs(self.data_dir)
 
     # --- Pre Parsing
-    @staticmethod
-    def _parse_pre_file(data_tuple: Tuple[str]) -> (pd.DataFrame, str):
-        accessionnr: str = data_tuple[0]
-        xml_file: str = data_tuple[1]
-        data_dir: str = data_tuple[2]
+    def _parse_pre_file(self, data: UnparsedFile) -> UpdatePreParsing:
 
         parser = SecXmlParser.preparser
 
-        targetfilepath = data_dir + accessionnr + '_' + parser.get_type() + ".csv"
+        targetfilepath = self.data_dir + data.accessionNumber + '_' + parser.get_type() + ".csv"
 
-        xml_content = read_content_from_zip(xml_file)
+        xml_content = read_content_from_zip(data.file)
 
         try:
             # todo: check if we should do something with the error_list
-            df, error_list = parser.parse(accessionnr, xml_content)
-            df = parser.clean_for_financial_statement_dataset(df, accessionnr)
+            df, error_list = parser.parse(data.accessionNumber, xml_content)
+            df = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
             write_df_to_zip(df, targetfilepath)
+            return UpdatePreParsing(
+                accessionNumber=data.accessionNumber,
+                csvPreFile=targetfilepath,
+                preParseDate=self.processdate,
+                preParseState='parsed:' + str(len(df))
+            )
 
-            return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)))
         except Exception as e:
-            logging.exception("failed to parse data: " + xml_file, e)
-            return (None, accessionnr, str(e))
-
-    def _parse(self, select_funct: Callable, update_funct: Callable):
-        pool = Pool(8)
-
-        missing: List[Tuple[str, str]] = select_funct()
-        missing: List[Tuple[str, str, str, str]] = [(*entry, self.data_dir) for entry in missing]
-        logging.info("   missing entries " + str(len(missing)))
-
-        for i in range(0, len(missing), 100):
-            chunk = missing[i:i + 100]
-
-            update_data: List[Tuple[str]] = pool.map(SecXmlParser._parse_pre_file, chunk)
-            update_data = [(entry[0], self.processdate, entry[2], entry[1]) for entry in update_data]
-
-            update_funct(update_data)
-
-            logging.info("   commited chunk: " + str(i))
-
-        # todo failed berechnen oder aus update_data extrahieren
+            logging.exception("failed to parse data: " + data.file, e)
+            return UpdatePreParsing(
+                accessionNumber=data.accessionNumber,
+                csvPreFile=None,
+                preParseDate=self.processdate,
+                preParseState=str(e))
 
     def parsePreFiles(self):
         logging.info("parsing Pre Files")
-        self._parse(self.dbmanager.find_unparsed_preFiles, self.dbmanager.update_parsed_pre_file)
+
+        executor = ParallelExecutor[UnparsedFile, UpdatePreParsing, type(None)]()  # no limitation in speed
+
+        executor.set_get_entries_function(self.dbmanager.find_unparsed_preFiles)
+        executor.set_process_element_function(self._parse_pre_file)
+        executor.set_post_process_chunk_function(self.dbmanager.update_parsed_pre_file)
+
+        executor.execute()
+        # todo failed berechnen oder aus update_data extrahieren
 
     # --- Num parsing
-    @staticmethod
-    def _parse_num_file(data_tuple: Tuple[str, str, str]) -> (pd.DataFrame, str):
-        accessionnr: str = data_tuple[0]
-        xml_file: str = data_tuple[1]
-        data_dir: str = data_tuple[2]
+    def _parse_num_file(self, data: UnparsedFile) -> UpdateNumParsing:
 
         parser = SecXmlParser.numparser
 
-        targetfilepath = data_dir + accessionnr + '_' + parser.get_type() + ".csv"
+        targetfilepath = self.data_dir + data.accessionNumber + '_' + parser.get_type() + ".csv"
 
-        xml_content = read_content_from_zip(xml_file)
+        xml_content = read_content_from_zip(data.file)
 
         try:
-            # todo: check if we should do something with the error_list
-            df, error_list = parser.parse(accessionnr, xml_content)
-            df, fye = parser.clean_for_financial_statement_dataset(df, accessionnr)
+            df, error_list = parser.parse(data.accessionNumber, xml_content)
+            df, fye = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
 
             write_df_to_zip(df, targetfilepath)
+            return UpdateNumParsing(accessionNumber=data.accessionNumber,
+                                    csvNumFile=targetfilepath,
+                                    numParseDate=self.processdate,
+                                    numParseState='parsed:' + str(len(df)),
+                                    fiscalYearEnd=fye)
 
-            return (targetfilepath, accessionnr, 'parsed:'+ str(len(df)), fye)
         except Exception as e:
-            logging.exception("failed to parse data: " + xml_file, e)
-            return (None, accessionnr, str(e), None)
+            logging.exception("failed to parse data: " + data.file, e)
+            return UpdateNumParsing(accessionNumber=data.accessionNumber,
+                                    csvNumFile=None,
+                                    numParseDate=self.processdate,
+                                    numParseState=str(e),
+                                    fiscalYearEnd=None)
 
     def parseNumFiles(self):
         logging.info("parsing Num Files")
 
-        pool = Pool(8)
+        executor = ParallelExecutor[UnparsedFile, UpdateNumParsing, type(None)]()  # no limitation in speed
 
-        missing: List[Tuple[str, str]] = self.dbmanager.find_unparsed_numFiles()
-        missing: List[Tuple[str, str, str]] = [(*entry, self.data_dir) for entry in missing]
-        logging.info("   missing entries " + str(len(missing)))
+        executor.set_get_entries_function(self.dbmanager.find_unparsed_numFiles)
+        executor.set_process_element_function(self._parse_num_file)
+        executor.set_post_process_chunk_function(self.dbmanager.update_parsed_num_file)
 
-        for i in range(0, len(missing), 100):
-            chunk = missing[i:i + 100]
-
-            parse_results: List[Tuple[str, str, str, str]] = pool.map(SecXmlParser._parse_num_file, chunk)
-
-            update_data = [UpdateNumParsing(accessionNumber=x[1],
-                                            csvNumFile=x[0],
-                                            numParseDate=self.processdate,
-                                            numParseState=x[2],
-                                            fiscalYearEnd=x[3]) for x in parse_results]
-
-            self.dbmanager.update_parsed_num_file(update_data)
-
-            logging.info("   commited chunk: " + str(i))
-
+        executor.execute()
         # todo failed berechnen oder aus update_data extrahieren
-
-
-
-
-

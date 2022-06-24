@@ -46,13 +46,36 @@ class BasicFeedData:
     cikNumber: str
     reportJson: str
 
+
 @dataclass
 class UpdateNumParsing:
     accessionNumber: str
-    csvNumFile: str
+    csvNumFile: Optional[str]
     numParseDate: str
     numParseState: str
-    fiscalYearEnd: str
+    fiscalYearEnd: Optional[str]
+
+
+@dataclass
+class UpdatePreParsing:
+    accessionNumber: str
+    csvPreFile: Optional[str]
+    preParseDate: str
+    preParseState: str
+
+
+@dataclass
+class MissingFile:
+    accessionNumber: str
+    url: str
+    fileSize: str
+    file: Optional[str] = None
+
+
+@dataclass
+class UnparsedFile:
+    accessionNumber: str
+    file: str
 
 
 # noinspection SqlResolve
@@ -179,29 +202,31 @@ class DBManager():
         finally:
             conn.close()
 
-    def find_missing_xmlNumFiles(self) -> List[Tuple[str, str]]:
-        sql = '''SELECT accessionNumber, xbrlInsUrl, insSize FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-        return self._execute_fetchall(sql)
+    def find_missing_xmlNumFiles(self) -> List[MissingFile]:
+        sql = '''SELECT accessionNumber, xbrlInsUrl as url, insSize as fileSize FROM {} WHERE xmlNumFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall_typed(sql, MissingFile)
 
-    def find_missing_xmlPreFiles(self) -> List[Tuple[str, str]]:
-        sql = '''SELECT accessionNumber, xbrlPreUrl, preSize FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-        return self._execute_fetchall(sql)
+    def find_missing_xmlPreFiles(self) -> List[MissingFile]:
+        sql = '''SELECT accessionNumber, xbrlPreUrl as url, preSize as fileSize FROM {} WHERE xmlPreFile is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall_typed(sql, MissingFile)
 
-    def update_processing_xml_num_file(self, update_data: List[Tuple[str]]):
+    def update_processing_xml_num_file(self, update_list: List[MissingFile]):
+        update_data = [(x.file, x.accessionNumber) for x in update_list]
         sql = '''UPDATE {} SET xmlNumFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
         self._execute_many(sql, update_data)
 
-    def update_processing_xml_pre_file(self, update_data: List[Tuple[str]]):
+    def update_processing_xml_pre_file(self, update_list: List[MissingFile]):
+        update_data = [(x.file, x.accessionNumber) for x in update_list]
         sql = '''UPDATE {} SET xmlPreFile = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
         self._execute_many(sql, update_data)
 
-    def find_unparsed_numFiles(self) -> List[Tuple[str, str]]:
-        sql = '''SELECT accessionNumber, xmlNumFile FROM {} WHERE csvNumFile is NULL and numParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-        return self._execute_fetchall(sql)
+    def find_unparsed_numFiles(self) -> List[UnparsedFile]:
+        sql = '''SELECT accessionNumber, xmlNumFile as file FROM {} WHERE csvNumFile is NULL and numParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def find_unparsed_preFiles(self) -> List[Tuple[str, str]]:
-        sql = '''SELECT accessionNumber, xmlPreFile FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
-        return self._execute_fetchall(sql)
+        sql = '''SELECT accessionNumber, xmlPreFile as file FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
+        return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
         update_data = [(x.csvNumFile, x.numParseDate, x.numParseState, x.fiscalYearEnd, x.accessionNumber) for x in updatelist]
@@ -209,7 +234,9 @@ class DBManager():
         sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
         self._execute_many(sql, update_data)
 
-    def update_parsed_pre_file(self, update_data: List[Tuple[str, str, str, str]]):
+    def update_parsed_pre_file(self, updatelist: List[UpdatePreParsing]):
+        update_data = [(x.csvPreFile, x.preParseDate, x.preParseState, x.accessionNumber) for x in updatelist]
+
         sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(SEC_REPORT_PROCESSING_TBL_NAME)
         self._execute_many(sql, update_data)
 
