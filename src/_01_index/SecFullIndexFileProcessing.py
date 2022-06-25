@@ -1,15 +1,13 @@
-from _00_common.DBManagement import DBManager
-from _00_common.SecFileUtils import get_url_content
-
-import logging
 import datetime
-from typing import Dict, List, Tuple, Optional
+import logging
 import re
 import shutil
-
+from dataclasses import dataclass, field, asdict
+from typing import Protocol, Set
 import pandas as pd
 
-from dataclasses import dataclass, field, asdict
+from _00_common.DBManagement import DBManager
+from _00_common.SecFileUtils import get_url_content
 
 
 @dataclass
@@ -24,14 +22,29 @@ class FiledReportEntry:
 
     def __post_init__(self):
         filename_no_ext = self.filename[:-4]
-        cleaned_filename = filename_no_ext.replace("-","")
+        cleaned_filename = filename_no_ext.replace("-", "")
         self.reportJson = cleaned_filename + "/index.json"
         self.accessionNumber = filename_no_ext[filename_no_ext.rfind("/") + 1:]
 
 
-ten_report_matcher = re.compile(r".*[|]10-[KQ][|].*")
-last_date_received_matcher = re.compile(r"Last Data Received:.*")
-month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
+class DataAccessor(Protocol):
+    def read_all_fullindex_files(self) -> pd.DataFrame:
+        """ read all entries from the fullindex file table"""
+
+    def insert_fullindex_file(self, year: int, qrtr: int, processdate: str):
+        """ insert a new entry into the fullindex file table"""
+
+    def update_fullindex_file(self, year: int, qrtr: int, processdate: str):
+        """ update an entry in the full index file table"""
+
+    def get_adsh_by_feed_file(self, feed_file_name: str) -> Set[str]:
+        """ get all accessionNumber that are known inside a certain feed_file"""
+
+    def update_status_fullindex_file(self, year: int, qrtr: int, status: str):
+        """ update the status of a fullindex file """
+
+    def insert_feed_info(self, df: pd.DataFrame):
+        """ add new entries to the known reports table """
 
 
 class SecFullIndexFileProcessor:
@@ -39,10 +52,13 @@ class SecFullIndexFileProcessor:
     - downloads the desired sec files, parses them and adds the information into the db.
     - uses the fullindex to find new data
     """
+    ten_report_matcher = re.compile(r".*[|]10-[KQ][|].*")
+    last_date_received_matcher = re.compile(r"Last Data Received:.*")
+    month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
     full_index_root_url = "https://www.sec.gov/Archives/edgar/full-index/"
 
-    def __init__(self, dbmanager: DBManager, start_year: int, start_qrtr: int = 1, feed_dir: str = "./tmp/"):
+    def __init__(self, dbmanager: DataAccessor, start_year: int, start_qrtr: int = 1, feed_dir: str = "./tmp/"):
         self.dbmanager = dbmanager
         self.start_year = start_year
         self.start_qrtr = start_qrtr
@@ -50,7 +66,7 @@ class SecFullIndexFileProcessor:
         self.processdate = datetime.date.today().isoformat()
 
         self.current_year = datetime.datetime.now().year
-        self.current_qrtr = month_to_qrtr[datetime.datetime.now().month]
+        self.current_qrtr = self.month_to_qrtr[datetime.datetime.now().month]
         self.current_check = self.current_year * 10 + self.current_qrtr
 
         self.full_index_status_df = dbmanager.read_all_fullindex_files()
@@ -81,13 +97,14 @@ class SecFullIndexFileProcessor:
 
     def parsed_index_file_iter(self):
         for year, qrtr, content in self.get_next_index_file_iter():
-            last_date_received = last_date_received_matcher.search(content).group(0)
+            last_date_received = self.last_date_received_matcher.search(content).group(0)
             last_date_received = last_date_received.split(":")[1].strip()
-            ten_report_entries = ten_report_matcher.findall(content)
+            ten_report_entries = self.ten_report_matcher.findall(content)
 
             # check whether the entry already was processed and didn't have any updates
             # so only entries are returned that either are new or which content has changed
-            entry_df = self.full_index_status_df[(self.full_index_status_df.year == year) & (self.full_index_status_df.quarter == qrtr)]
+            entry_df = self.full_index_status_df[
+                (self.full_index_status_df.year == year) & (self.full_index_status_df.quarter == qrtr)]
             if not entry_df.empty:
                 if entry_df.iloc[0].state == last_date_received:
                     logging.info("- already processed {}/{} -> skip ".format(qrtr, year))
@@ -100,19 +117,21 @@ class SecFullIndexFileProcessor:
                 self.dbmanager.insert_fullindex_file(year, qrtr, self.processdate)
 
             ten_report_entries_splitted = [x.split('|') for x in ten_report_entries]
-            ten_report_entries = [asdict(FiledReportEntry(x[0], x[1], x[2], x[3], x[4])) for x in ten_report_entries_splitted]
+            ten_report_entries = [asdict(FiledReportEntry(x[0], x[1], x[2], x[3], x[4])) for x in
+                                  ten_report_entries_splitted]
             ten_report_entries_df = pd.DataFrame(ten_report_entries)
             yield year, qrtr, last_date_received, ten_report_entries_df
 
     def find_new_reports(self):
         for year, qrtr, last_date_received, ten_report_entries_df in self.parsed_index_file_iter():
-            pseudo_sec_feed_file =  f"fullindex-{year}-QTR{qrtr}.json"
+            pseudo_sec_feed_file = f"fullindex-{year}-QTR{qrtr}.json"
 
             # read the entries that already were processed
             existing_adshs = self.dbmanager.get_adsh_by_feed_file(pseudo_sec_feed_file)
             new_entries_df = ten_report_entries_df[~ten_report_entries_df.accessionNumber.isin(existing_adshs)]
 
-            new_entries_save_df = new_entries_df[['accessionNumber', 'companyName', 'formType','filingDate','cikNumber', 'reportJson']].copy()
+            new_entries_save_df = new_entries_df[
+                ['accessionNumber', 'companyName', 'formType', 'filingDate', 'cikNumber', 'reportJson']].copy()
 
             # filingDate -> as Date
             new_entries_save_df['filingDate'] = pd.to_datetime(new_entries_save_df.filingDate, format="%Y-%m-%d")

@@ -2,10 +2,28 @@ from _00_common.DBManagement import DBManager, XbrlFile, XbrlFiles, BasicFeedDat
 from _00_common.SecFileUtils import get_url_content
 from _00_common.ParallelExecution import ParallelExecutor
 
-from typing import Dict, List
+from typing import Dict, List, Protocol
 
 import json
 import logging
+
+
+class DataAccessor(Protocol):
+
+    def read_last_known_fiscalyearend(self) -> Dict[str, str]:
+        """ reads the last known fiscalYearValue per cik from its 10-K reports"""
+
+    def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
+        """ select entries for which the urls for there ins and pre xbrl files are not known """
+
+    def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
+        """ update the information for th xbrl files in an entry """
+
+    def find_duplicated_adsh(self) -> List[str]:
+        """ find entries which have the same accessionNumber """
+
+    def mark_duplicated_adsh(self, adsh: str):
+        """ mark duplicated entries """
 
 
 class SecFullIndexFilePostProcessor:
@@ -16,7 +34,7 @@ class SecFullIndexFilePostProcessor:
 
     edgar_archive_root_url = "https://www.sec.gov/Archives/"
 
-    def __init__(self, dbmanager: DBManager):
+    def __init__(self, dbmanager: DataAccessor):
         self.dbmanager = dbmanager
 
         # read that last known fye day/month values
