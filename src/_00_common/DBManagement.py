@@ -1,11 +1,9 @@
 from _00_common.DBBase import DB
 from dataclasses import dataclass
-from typing import List, Tuple, Set, Optional, Dict, TypeVar
+from typing import List, Tuple, Set, Optional, Dict
 
 import pandas as pd
 
-
-T = TypeVar("T")
 
 @dataclass
 class XbrlFile:
@@ -73,7 +71,7 @@ class UnparsedFile:
 class DBManager(DB):
 
     def __init__(self, work_dir="edgar/"):
-        super(DB, self).__init__(work_dir)
+        super().__init__(work_dir)
 
     # ---- fullindex files ----
     def read_all_fullindex_files(self) -> pd.DataFrame:

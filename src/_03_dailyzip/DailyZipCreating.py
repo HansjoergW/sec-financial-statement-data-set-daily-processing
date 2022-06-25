@@ -39,7 +39,7 @@ class DailyZipCreator:
         adshs = adshsAndFye.accessionNumber.tolist()
         feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
 
-        adshsAndFye['fiscalYearEnd'] = adshsAndFye.copy().fiscalYearEnd.str.strip()
+        adshsAndFye['fiscalYearEnd'] = adshsAndFye.fiscalYearEnd.str.strip()
         adshsAndFye.set_index('accessionNumber', inplace=True)
         fye_dict: Dict[str, str] = adshsAndFye.to_dict()['fiscalYearEnd']
 
@@ -232,7 +232,7 @@ class DailyZipCreator:
         pool = Pool(8)
 
         entries_ready = self._read_ready_entries()
-        adsh_and_fye_to_process = entries_ready[['accessionNumber', 'fiscalYearEnd']]
+        adsh_and_fye_to_process = entries_ready[['accessionNumber', 'fiscalYearEnd']].copy()
         entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
         grouped = entries_ready.groupby('filingDate')
 
