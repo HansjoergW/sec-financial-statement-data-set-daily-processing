@@ -1,11 +1,17 @@
 from _00_common.DBManagement import DBManager
 
 import logging
+from typing import Protocol
 
+
+class DataAccess(Protocol):
+
+    def copy_uncopied_entries(self) -> int:
+        """ copy new entries from the report overview table to the report process table """
 
 class SecXmlFilePreprocessor:
 
-    def __init__(self, dbmanager: DBManager):
+    def __init__(self, dbmanager: DataAccess):
         self.dbmanager = dbmanager
 
     def copy_entries_to_processing_table(self):

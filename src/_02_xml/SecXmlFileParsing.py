@@ -1,20 +1,36 @@
-# coordinates the parsing of donwloaded xml files and stores the data in a new folder
+# coordinates the parsing of downloaded xml files and stores the data in a new folder
 import datetime
 import logging
 import os
+from typing import Protocol, List, Tuple
 
-from _00_common.DBManagement import DBManager, UpdateNumParsing, UnparsedFile, UpdatePreParsing
+from _00_common.DBManagement import UpdateNumParsing, UnparsedFile, UpdatePreParsing
 from _00_common.ParallelExecution import ParallelExecutor
 from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 
+class DataAccess(Protocol):
+
+    def find_unparsed_numFiles(self) -> List[UnparsedFile]:
+        """ find report entries for which the xmlnumfiles have not been parsed """
+
+    def find_unparsed_preFiles(self) -> List[UnparsedFile]:
+        """ find report entries for which the xmlprefiles have not been parsed """
+
+    def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
+        """ update the report entry with the parsed result file """
+
+    def update_parsed_pre_file(self, updatelist: List[UpdatePreParsing]):
+        """ update the report entry with the parsed result file """
+
+
 class SecXmlParser:
     numparser = SecNumXmlParser()
     preparser = SecPreXmlParser()
 
-    def __init__(self, dbmanager: DBManager, data_dir: str = "./tmp/data/", use_process_date_in_path: bool = True):
+    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/data/", use_process_date_in_path: bool = True):
         self.dbmanager = dbmanager
         self.processdate = datetime.date.today().isoformat()
         self.data_dir = data_dir

@@ -67,6 +67,13 @@ class UnparsedFile:
     file: str
 
 
+@dataclass
+class UpdateDailyZip:
+    accessionNumber: str
+    dailyZipFile: str
+    processZipDate: str
+
+
 # noinspection SqlResolve
 class DBManager(DB):
 
@@ -119,7 +126,6 @@ class DBManager(DB):
         return self._execute_read_as_df(sql)
 
     def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
-        conn = self.get_connection()
         adshs = ','.join("'" + adsh + "'" for adsh in adshs)
 
         sql = '''SELECT accessionNumber, xmlNumFile, xmlPreFile from sec_report_processing WHERE accessionNumber in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(
@@ -160,7 +166,7 @@ class DBManager(DB):
             DB.SEC_REPORT_PROCESSING_TBL_NAME)
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
-    def find_unparsed_preFiles(self) -> List[Tuple[str, str]]:
+    def find_unparsed_preFiles(self) -> List[UnparsedFile]:
         sql = '''SELECT accessionNumber, xmlPreFile as file FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(
             DB.SEC_REPORT_PROCESSING_TBL_NAME)
         return self._execute_fetchall_typed(sql, UnparsedFile)
@@ -197,7 +203,9 @@ class DBManager(DB):
         finally:
             conn.close()
 
-    def updated_ziped_entries(self, update_data: List[Tuple[str, str, str]]):
+    def updated_ziped_entries(self, update_list: List[UpdateDailyZip]):
+        update_data = [(x.dailyZipFile, x.processZipDate, x.accessionNumber) for x in update_list]
+
         sql = '''UPDATE {} SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?'''.format(
             DB.SEC_REPORT_PROCESSING_TBL_NAME)
         self._execute_many(sql, update_data)

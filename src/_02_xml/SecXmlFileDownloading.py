@@ -1,10 +1,26 @@
 import datetime
 import logging
 import os
+from typing import Protocol, List
 
-from _00_common.DBManagement import DBManager, MissingFile
+from _00_common.DBManagement import MissingFile
 from _00_common.ParallelExecution import ParallelExecutor
 from _00_common.SecFileUtils import download_url_to_file
+
+
+class DataAccessor(Protocol):
+
+    def find_missing_xmlNumFiles(self) -> List[MissingFile]:
+        """ find report entries in the process table for which the xml-num-file has not yet been downloaded """
+
+    def find_missing_xmlPreFiles(self) -> List[MissingFile]:
+        """ find report entries in the process table for which the xml-pre-file has not yet been downloaded """
+
+    def update_processing_xml_num_file(self, update_list: List[MissingFile]):
+        """ update the entry of a formerly missing xml-num-file and update it with the name of the downloaded file """
+
+    def update_processing_xml_pre_file(self, update_list: List[MissingFile]):
+        """ update the entry of a formerly missing xml-pre-file and update it with the name of the downloaded file """
 
 
 class SecXmlFileDownloader:
@@ -12,7 +28,7 @@ class SecXmlFileDownloader:
     - downloads the desired sec xml files, stores them and updates the sec-processing table
     """
 
-    def __init__(self, dbmanager: DBManager, xml_dir: str = "./tmp/xml/"):
+    def __init__(self, dbmanager: DataAccessor, xml_dir: str = "./tmp/xml/"):
         self.dbmanager = dbmanager
         self.processdate = datetime.date.today().isoformat()
 
