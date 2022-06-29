@@ -100,26 +100,6 @@ class DBManager(DB):
             DB.SEC_FULL_INDEX_FILE_TBL_NAME, status, year, qrtr)
         self._execute_single(sql)
 
-    # ---- index files / sec-feed-file table
-    def read_all_index_files(self) -> pd.DataFrame:
-        sql = '''SELECT * FROM {}'''.format(DB.SEC_INDEX_FILE_TBL_NAME)
-        return self._execute_read_as_df(sql)
-
-    def insert_index_file(self, name: str, processdate: str):
-        sql = '''INSERT INTO {} ('sec_feed_file', 'processdate') VALUES('{}','{}') '''.format(DB.SEC_INDEX_FILE_TBL_NAME,
-                                                                                              name, processdate)
-        self._execute_single(sql)
-
-    def update_index_file(self, name: str, processdate: str):
-        sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(DB.SEC_INDEX_FILE_TBL_NAME,
-                                                                                            processdate, name)
-        self._execute_single(sql)
-
-    def update_status_index_file(self, name: str, status: str):
-        sql = '''UPDATE {} SET 'status' = '{}' WHERE  sec_feed_file == '{}' '''.format(DB.SEC_INDEX_FILE_TBL_NAME, status,
-                                                                                       name)
-        self._execute_single(sql)
-
     # - processing file / sec-report-processing table
     def read_all_processing(self) -> pd.DataFrame:
         sql = '''SELECT * FROM {}'''.format(DB.SEC_REPORT_PROCESSING_TBL_NAME)
@@ -212,7 +192,7 @@ class DBManager(DB):
 
     # - report metadata / sec-feed table
     def read_all(self) -> pd.DataFrame:
-        sql = '''SELECT * FROM {}'''.format(DB.SEC_FEED_TBL_NAME)
+        sql = '''SELECT * FROM {}'''.format(DB.SEC_REPORTS_TBL_NAME)
         return self._execute_read_as_df(sql)
 
     def read_last_known_fiscalyearend(self) -> Dict[str, str]:
@@ -220,12 +200,12 @@ class DBManager(DB):
         SELECT cikNumber, fiscalYearEnd 
         FROM (
              SELECT cikNumber, fiscalYearEnd 
-             FROM sec_feeds 
+             FROM {} 
              WHERE formType = "10-K" and fiscalYearEnd is not null 
              ORDER BY cikNumber, period desc
              ) as x 
         GROUP BY cikNumber;
-        '''
+        '''.format(DB.SEC_REPORTS_TBL_NAME)
         # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
         df = self._execute_read_as_df(sql)
         return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
@@ -236,29 +216,29 @@ class DBManager(DB):
         months = [str(x + offset) for x in months]
         month_str = ",".join(months)
 
-        sql = '''SELECT * FROM {} WHERE filingYear = {} and filingMonth in ({})  '''.format(DB.SEC_FEED_TBL_NAME, year,
+        sql = '''SELECT * FROM {} WHERE filingYear = {} and filingMonth in ({})  '''.format(DB.SEC_REPORTS_TBL_NAME, year,
                                                                                             month_str)
         return self._execute_read_as_df(sql)
 
     def read_all_copied(self) -> pd.DataFrame:
-        sql = '''SELECT * FROM {} WHERE status is 'copied' '''.format(DB.SEC_FEED_TBL_NAME)
+        sql = '''SELECT * FROM {} WHERE status is 'copied' '''.format(DB.SEC_REPORTS_TBL_NAME)
         return self._execute_read_as_df(sql)
 
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self.get_connection()
         try:
-            df.to_sql(DB.SEC_FEED_TBL_NAME, conn, if_exists="append", chunksize=1000)
+            df.to_sql(DB.SEC_REPORTS_TBL_NAME, conn, if_exists="append", chunksize=1000)
         finally:
             conn.close()
 
     def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
         sql = '''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
-            DB.SEC_FEED_TBL_NAME)
+            DB.SEC_REPORTS_TBL_NAME)
         return self._execute_fetchall_typed(sql, BasicFeedData)
 
     def find_missing_xbrl_ins_urls(self) -> List[Tuple[str]]:
         sql = '''SELECT accessionNumber, xbrlInsUrl, xbrlPreUrl FROM {} WHERE xbrlInsUrl is NULL'''.format(
-            DB.SEC_FEED_TBL_NAME)
+            DB.SEC_REPORTS_TBL_NAME)
         return self._execute_fetchall(sql)
 
     def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
@@ -291,38 +271,38 @@ class DBManager(DB):
                                 xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
                                 xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
                                 xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
-                 WHERE accessionNumber = ? and sec_feed_file = ?'''.format(DB.SEC_FEED_TBL_NAME)
+                 WHERE accessionNumber = ? and sec_feed_file = ?'''.format(DB.SEC_REPORTS_TBL_NAME)
         self._execute_many(sql, update_data)
 
     # TODO: korrekterweise muesste man hier die WHERE neu zusätzlich mit sec_feed_file ergänzen
     def update_xbrl_ins_urls(self, update_data: List[Tuple[str, str, str]]):
-        sql = '''UPDATE {} SET xbrlInsUrl = ?, insSize = ? WHERE accessionNumber = ?'''.format(DB.SEC_FEED_TBL_NAME)
+        sql = '''UPDATE {} SET xbrlInsUrl = ?, insSize = ? WHERE accessionNumber = ?'''.format(DB.SEC_REPORTS_TBL_NAME)
         self._execute_many(sql, update_data)
 
     def get_adsh_by_feed_file(self, feed_file_name: str) -> Set[str]:
-        sql = '''SELECT accessionNumber FROM sec_feeds where sec_feed_file == '{}' '''.format(feed_file_name)
+        sql = '''SELECT accessionNumber FROM {} where sec_feed_file == '{}' '''.format(DB.SEC_REPORTS_TBL_NAME, feed_file_name)
         result: List[Tuple[str]] = self._execute_fetchall(sql)
         return set([x[0] for x in result])
 
     def find_duplicated_adsh(self) -> List[str]:
-        sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM sec_feeds WHERE status is null GROUP BY accessionNumber'''
+        sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM {} WHERE status is null GROUP BY accessionNumber'''.format(DB.SEC_REPORTS_TBL_NAME)
         duplicated_df = self._execute_read_as_df(sql)
 
         duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
         return duplicated_df.accessionNumber.tolist()
 
     def mark_duplicated_adsh(self, adsh: str):
-        sql = '''SELECT accessionNumber, sec_feed_file FROM sec_feeds WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(
-            adsh)
+        sql = '''SELECT accessionNumber, sec_feed_file FROM {} WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(
+            DB.SEC_REPORTS_TBL_NAME, adsh)
         result: List[Tuple[str]] = self._execute_fetchall(sql)
 
         update_sql = '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(
-            DB.SEC_FEED_TBL_NAME)
+            DB.SEC_REPORTS_TBL_NAME)
         self._execute_many(update_sql, result[1:])
 
     # copies entries from the feed table to the processing table if they are not already present
     def copy_uncopied_entries(self) -> int:
-        sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM sec_feeds WHERE status is null and xbrlInsUrl is not null'''
+        sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM {} WHERE status is null and xbrlInsUrl is not null'''.format(DB.SEC_REPORTS_TBL_NAME)
         to_copy_df = self._execute_read_as_df(sql)
 
         to_copy_df['filingMonth'] = pd.to_numeric(to_copy_df.filingDate.str.slice(0, 2), downcast="integer")
@@ -334,7 +314,7 @@ class DBManager(DB):
             to_copy_df.to_sql(DB.SEC_REPORT_PROCESSING_TBL_NAME, conn, index=False, if_exists="append", chunksize=1000)
 
             update_sql = '''UPDATE {} SET status = 'copied' WHERE accessionNumber = ? and status is null '''.format(
-                DB.SEC_FEED_TBL_NAME)
+                DB.SEC_REPORTS_TBL_NAME)
             adshs = to_copy_df.accessionNumber.values.tolist()
             tupleslist = [tuple(x.split()) for x in adshs]
 
@@ -345,3 +325,22 @@ class DBManager(DB):
         finally:
             conn.close()
 
+    # ---- index files / sec-feed-file table
+    # def read_all_index_files(self) -> pd.DataFrame:
+    #     sql = '''SELECT * FROM {}'''.format(DB.SEC_INDEX_FILE_TBL_NAME)
+    #     return self._execute_read_as_df(sql)
+    #
+    # def insert_index_file(self, name: str, processdate: str):
+    #     sql = '''INSERT INTO {} ('sec_feed_file', 'processdate') VALUES('{}','{}') '''.format(DB.SEC_INDEX_FILE_TBL_NAME,
+    #                                                                                           name, processdate)
+    #     self._execute_single(sql)
+    #
+    # def update_index_file(self, name: str, processdate: str):
+    #     sql = '''UPDATE {} SET 'processdate' = '{}' WHERE  sec_feed_file == '{}' '''.format(DB.SEC_INDEX_FILE_TBL_NAME,
+    #                                                                                         processdate, name)
+    #     self._execute_single(sql)
+    #
+    # def update_status_index_file(self, name: str, status: str):
+    #     sql = '''UPDATE {} SET 'status' = '{}' WHERE  sec_feed_file == '{}' '''.format(DB.SEC_INDEX_FILE_TBL_NAME, status,
+    #                                                                                    name)
+    #     self._execute_single(sql)

@@ -16,10 +16,10 @@ class DB(ABC):
     It provides some basic functionality
     """
 
-    SEC_FEED_TBL_NAME = "sec_feeds"
+    SEC_REPORTS_TBL_NAME = "sec_reports"
+    SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
     SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
     SEC_FULL_INDEX_FILE_TBL_NAME = "sec_fullindex_file"
-    SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
 
     TESTDATA_PATH = os.path.realpath(__file__ + "/..") + '/testdata/'
 

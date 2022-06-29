@@ -1,96 +1,13 @@
-rss feed scheint nicht mehr vorhanden zu sein
-Alternative
-
--doku https://www.sec.gov/os/accessing-edgar-data
--entry full index -> pro quartal https://www.sec.gov/Archives/edgar/full-index/2022/QTR2/
--gibt es auch als daily index https://www.sec.gov/Archives/edgar/daily-index/2022/QTR2/
--escheint als gibt es full-index, bzw. daily-index immer ein index.json, dass den Inhalt (dirs, files) und die letzte mutation des objekts enthält.
--die files des aktuellen quarters sind auch im root enthalten (full-index/...idx)
--https://www.sec.gov/Archives/edgar/full-index/2022/QTR2/index.json
--xbrl.idx scheint am kompaktesten zu sein
-
-crawler-idx
------------
--pro quarter
--scheint, als würde das die neuen reports enthalten (einstiegseite auf übersicht)
--das ganze hat aber weniger infos, als das was ich bis jetzt verwendet habe
-
-
-ist aber nicht xml
-==================
-Description:           Crawler Index of EDGAR Dissemination Feed by Company Name
-Last Data Received:    May 19, 2022
-Comments:              webmaster@sec.gov
-
-
-
-
-Company Name                                                  Form Type   CIK         Date Filed  URL
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-006 - Series of IPOSharks Venture Master Fund, LLC            D           1894348     2022-04-08  https://www.sec.gov/Archives/edgar/data/1894348/0001892986-22-000003-index.htm
-01Fintech LP                                                  D           1928541     2022-05-13  https://www.sec.gov/Archives/edgar/data/1928541/0001928541-22-000001-index.htm
-07 Carbon Capture, LP                                         D           1921663     2022-04-05  https://www.sec.gov/Archives/edgar/data/1921663/0001921663-22-000001-index.htm
-0x99 Capital, LP                                              D           1923487     2022-04-25  https://www.sec.gov/Archives/edgar/data/1923487/0001923487-22-000001-index.htm
-0xCord Inc.                                                   D           1924345     2022-04-21  https://www.sec.gov/Archives/edgar/data/1924345/0001924345-22-000001-index.htm
-1 800 FLOWERS COM INC                                         10-Q        1084869     2022-05-06  https://www.sec.gov/Archives/edgar/data/1084869/0001437749-22-011213-index.htm
-===================
-
-
-Report Verzeichnis sollte wieder via die Datein lesen können
-https://www.sec.gov/Archives/edgar/data/1084869/000143774922011213/index.json
-=======================
-Man könnte auch über XBRL.idx file:
-Description:           XBRL Index of EDGAR Dissemination Feed
-Last Data Received:    May 19, 2022
-Comments:              webmaster@sec.gov
-Anonymous FTP:         ftp://ftp.sec.gov/edgar/
-
-
-
-
-CIK|Company Name|Form Type|Date Filed|Filename
---------------------------------------------------------------------------------
-1000045|NICHOLAS FINANCIAL INC|8-K/A|2022-05-17|edgar/data/1000045/0000950170-22-010155.txt
-1000045|NICHOLAS FINANCIAL INC|8-K|2022-05-10|edgar/data/1000045/0000950170-22-009069.txt
-1000177|NORDIC AMERICAN TANKERS Ltd|20-F|2022-05-11|edgar/data/1000177/0001140361-22-018634.txt
-1000209|MEDALLION FINANCIAL CORP|10-Q|2022-05-05|edgar/data/1000209/0000950170-22-007799.txt
-1000209|MEDALLION FINANCIAL CORP|8-K|2022-04-29|edgar/data/1000209/0001193125-22-130889.txt
-1000209|MEDALLION FINANCIAL CORP|8-K|2022-05-02|edgar/data/1000209/0001193125-22-136807.txt
-1000209|MEDALLION FINANCIAL CORP|8-K|2022-05-02|edgar/data/1000209/0001193125-22-136840.txt
-==============================
-
-über forms.idx wäre auch möglich
-
-Description:           Master Index of EDGAR Dissemination Feed by Form Type
-Last Data Received:    May 19, 2022
-Comments:              webmaster@sec.gov
-Anonymous FTP:         ftp://ftp.sec.gov/edgar/
-
-
-
-
-Form Type   Company Name                                                  CIK         Date Filed  File Name
----------------------------------------------------------------------------------------------------------------------------------------------
-1-A         ADPI Fund I, LLC                                              1921843     2022-04-29  edgar/data/1921843/0001477932-22-002727.txt
-1-A         ASI Aviation, Inc.                                            1669368     2022-05-18  edgar/data/1669368/0001493152-22-014292.txt
-1-A         Aeris Biotechnologies, Inc.                                   1907923     2022-04-25  edgar/data/1907923/0001829126-22-008698.txt
-1-A         Allied Corp.                                                  1575295     2022-04-06  edgar/data/1575295/0001477932-22-002106.txt
-1-A         Ally Robotics, Inc.                                           1923771     2022-04-26  edgar/data/1923771/0001104659-22-050354.txt
-1-A         Ark7 Properties LLC                                           1815395     2022-04-26  edgar/data/1815395/0001829126-22-008823.txt
-1-A         Ark7 Properties Plus LLC                                      1923734     2022-04-27  edgar/data/1923734/0001829126-22-008883.txt
-
-
+- DB Logik aufteilen -> Test/Debug Logik in eigene Klassen
+- Unit Tests updaten
+- Dokumentation
+- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
+- alles in ein Package packen und auf pipy hochloaden
 
 **************************************************************************************
 
 Next
 ====
-- Trading Symbol -> siehe separates Notizen-File
-
-
-- beim index file downloaden muss auch so was wie ein loop hin. auch hier kann das downloaden der xbrl-rss files
-  mehrmals fehlschlagen und es sollte ein zweiter loop darum gebaut werden.
-  -> evtl. verbessert sich hier das ganze durch die Angabe des User-Agent-Header
 
 - es scheint, als schlägt der längenvergleich der gedownloadeten Daten ab und zu fehl (ca. 70 in num only)
   wahrscheinlich aufgrund des encodings... die frage ist, ob dieser test etwas bringt.
@@ -101,9 +18,6 @@ Next
 
 - saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
 
-- in SecIndexFilePostProcessing: warum wird hier nicht die "normale" download Methode aus SecFileUtils verwendet?
-
-- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
 
 Later
 =====

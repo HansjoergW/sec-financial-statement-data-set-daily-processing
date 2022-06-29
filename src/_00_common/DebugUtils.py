@@ -1,5 +1,6 @@
-from _00_common.DBManagement import DBManager
+from _00_common.DBManagement import DBManager, UnparsedFile, UpdatePreParsing
 from _00_common.SecFileUtils import read_content_from_zip, read_df_from_zip
+from _00_common.ParallelExecution import ParallelExecutor
 from _02_xml.SecXmlFileParsing import SecXmlParser
 from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
@@ -122,7 +123,6 @@ class TestSetCreatorTool():
             conn.close()
 
 
-
 class ReparseTool():
 
     def __init__(self, workdir: str):
@@ -134,13 +134,20 @@ class ReparseTool():
 
         select_funct = lambda : pre_xml_files_info
 
-        def update_function(data:List[Tuple[str, str, str, str]]):
+        def update_function(data:List[UpdatePreParsing]):
             for entry in data:
                 print(entry)
 
-        preParser = SecPreXmlParser()
+        # tbd: check if correctly changed
         xmlParser = SecXmlParser(None, targetFolder, False)
-        xmlParser._parse(preParser, select_funct, update_function)
+
+        executor = ParallelExecutor[UnparsedFile, UpdatePreParsing, type(None)]()  # no limitation in speed
+
+        executor.set_get_entries_function(select_funct)
+        executor.set_process_element_function(xmlParser._parse_pre_file)
+        executor.set_post_process_chunk_function(update_function)
+
+        executor.execute()
 
 
 if __name__ == '__main__':
@@ -152,4 +159,3 @@ if __name__ == '__main__':
     adsh_tool.get_num_xml_content()
     adsh_tool.get_pre_csv_as_df()
     adsh_tool.get_num_csv_as_df()
-
