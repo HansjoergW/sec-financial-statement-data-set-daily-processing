@@ -9,7 +9,7 @@ from typing import List, Tuple, Dict, Protocol
 import numpy as np
 import pandas as pd
 
-from _00_common.DBManagement import DBManager, UpdateDailyZip
+from _03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
 from _00_common.SecFileUtils import read_df_from_zip
 
 
@@ -270,6 +270,6 @@ class DailyZipCreator:
 
 
 if __name__ == '__main__':
-    dbm = DBManager("d:/secprocessing")
+    dbm = DailyZipCreatingDA("d:/secprocessing")
     creator = DailyZipCreator(dbm, "d:/tmp/daily/")
     creator.process()

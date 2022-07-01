@@ -1,15 +1,17 @@
-import requests
 import logging
-from time import sleep
-from pathlib import Path
 import os
-import pandas as pd
 import zipfile
+from pathlib import Path
+from time import sleep
+
+import pandas as pd
+import requests
+
 
 # downloads the content of a url and stores it into a file
 # tries to download the file multiple times, if the download fails
-def download_url_to_file(file_url:str, target_file:str, expected_size: int = None, max_tries: int = 6, sleep_time: int = 1):
-
+def download_url_to_file(file_url: str, target_file: str, expected_size: int = None, max_tries: int = 6,
+                         sleep_time: int = 1):
     content = get_url_content(file_url, max_tries, sleep_time)
     if expected_size != None:
         if len(content) != expected_size:
@@ -21,7 +23,7 @@ def download_url_to_file(file_url:str, target_file:str, expected_size: int = Non
     write_content_to_zip(content, target_file)
 
 
-def get_url_content(file_url:str, max_tries: int = 6, sleep_time: int = 1) -> str:
+def get_url_content(file_url: str, max_tries: int = 6, sleep_time: int = 1) -> str:
     # preventing 403
     # https://stackoverflow.com/questions/68131406/downloading-files-from-sec-gov-via-edgar-using-python-3-9
     response = None
@@ -29,7 +31,8 @@ def get_url_content(file_url:str, max_tries: int = 6, sleep_time: int = 1) -> st
     while current_try < max_tries:
         current_try += 1
         try:
-            response = requests.get(file_url, timeout=10, headers={'User-Agent': 'private user hansjoerg.wingeier@gmail.com'}, stream=True)
+            response = requests.get(file_url, timeout=10,
+                                    headers={'User-Agent': 'private user hansjoerg.wingeier@gmail.com'}, stream=True)
             response.raise_for_status()
             break
         except requests.exceptions.RequestException as err:
@@ -46,12 +49,12 @@ def _check_if_zipped(path: str) -> bool:
     return os.path.isfile(path + ".zip")
 
 
-def write_df_to_zip(df:pd.DataFrame, filename:str):
+def write_df_to_zip(df: pd.DataFrame, filename: str):
     csv_content = df.to_csv(sep='\t', header=True)
     write_content_to_zip(csv_content, filename)
 
 
-def read_df_from_zip(filename:str) -> pd.DataFrame:
+def read_df_from_zip(filename: str) -> pd.DataFrame:
     if _check_if_zipped(filename):
         with zipfile.ZipFile(filename + ".zip", "r") as zf:
             file = Path(filename).name
@@ -60,13 +63,13 @@ def read_df_from_zip(filename:str) -> pd.DataFrame:
         return pd.read_csv(filename, header=0, delimiter="\t")
 
 
-def write_content_to_zip(content:str, filename:str):
+def write_content_to_zip(content: str, filename: str):
     with zipfile.ZipFile(filename + ".zip", mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         file = Path(filename).name
         zf.writestr(file, content)
 
 
-def read_content_from_zip(filename:str) -> str:
+def read_content_from_zip(filename: str) -> str:
     if _check_if_zipped(filename):
         with zipfile.ZipFile(filename + ".zip", mode="r") as zf:
             file = Path(filename).name

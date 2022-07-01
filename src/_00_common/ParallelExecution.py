@@ -10,8 +10,8 @@ IT = TypeVar("IT")  # input type of the list to split
 PT = TypeVar("PT")  # processed type of the list to split
 OT = TypeVar("OT")  # PostProcessed Type
 
-
 class ParallelExecutor(Generic[IT, PT, OT]):
+
     """
     this helper class supports in parallel processing of entries that are provided as a list, for instance to
     download and process data.. like downloading and processing sec filing reports.
@@ -37,22 +37,31 @@ class ParallelExecutor(Generic[IT, PT, OT]):
     """
 
     def __init__(self,
-                processes: int = 8,
-                chunksize: int = 100,
-                max_calls_per_sec: int = 0,
-                intend: str = "    "):
+                 processes: int = 8,
+                 chunksize: int = 100,
+                 max_calls_per_sec: int = 0,
+                 intend: str = "    ",
+                 execute_serial: bool = False):
         """
         :param processes: number of parallel processes
         :param chunksize: size of chunk - think of it as a commit
         :param max_calls_per_sec: how many calls may be made per second (for all processes)
+        :param execute_serial: for easier debugging, this flag ensures that all data are processed in the main thread
         """
 
         self.processes = processes
         self.chunksize = chunksize
         self.intend = intend
+        self.execute_serial = execute_serial
         self.min_roundtrip_time = 0
+        self.max_calls_per_sec = max_calls_per_sec
         if max_calls_per_sec > 0:
-            self.min_roundtrip_time = float(processes) / max_calls_per_sec
+            if execute_serial:
+                self.min_roundtrip_time = 1 / max_calls_per_sec
+            else:
+                self.min_roundtrip_time = float(processes) / max_calls_per_sec
+
+        self.pool = Pool(self.processes)
 
         self.get_entries_function: Optional[Callable[[], List[IT]]] = None
         self.process_element_function: Optional[Callable[[IT], PT]] = None
@@ -89,8 +98,16 @@ class ParallelExecutor(Generic[IT, PT, OT]):
 
         return result
 
+    def _execute_parallel(self, chunk: List[IT]) -> List[PT]:
+        return self.pool.map(self.process_throttled, chunk)
+
+    def _execute_serial(self, chunk: List[IT]) -> List[PT]:
+        results: List[PT] = []
+        for entry in chunk:
+            results.append(self.process_throttled(entry))
+        return results
+
     def execute(self) -> Tuple[List[OT], List[IT]]:
-        pool = Pool(self.processes)
 
         last_missing = None
         missing: List[IT] = self.get_entries_function()
@@ -109,7 +126,13 @@ class ParallelExecutor(Generic[IT, PT, OT]):
 
             for i in range(0, len(missing), chunk_entries):
                 chunk = missing[i:i + chunk_entries]
-                processed: List[PT] = pool.map(self.process_throttled, chunk)
+
+                processed: List[PT]
+
+                if self.execute_serial:
+                    processed = self._execute_serial(chunk)
+                else:
+                    processed = self._execute_parallel(chunk)
 
                 # post process the chunk and add the result to the result_list. it is olso ok to return nothing
                 result_list.append(self.post_process_chunk_function(processed))
@@ -146,11 +169,12 @@ if __name__ == '__main__':
             return input
 
         def process(self):
-            executor = ParallelExecutor[str, str, str](max_calls_per_sec=160)
+            executor = ParallelExecutor[str, str, str](max_calls_per_sec=250)
             executor.set_get_entries_function(self.get_unprocessed_entries)
             executor.set_process_element_function(self.process_element)
             executor.set_post_process_chunk_function(self.post_process)
 
-            print(executor.execute())
+            logging.info(executor.execute())
+            executor.pool.close()
 
     MyTestClass().process()

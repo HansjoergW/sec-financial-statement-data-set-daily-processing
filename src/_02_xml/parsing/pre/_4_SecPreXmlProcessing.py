@@ -46,7 +46,7 @@ class SecPreXmlDataProcessor:
             this is done 'inplace'"""
 
         # building parent child relation from the from and to attributes of the preArc entries
-        parent_child_dict: Dict[str, Dict[int, str]] = {}
+        parent_child_dict: Dict[str, Dict[float, str]] = {}
         preArc_by_keytag_dict: Dict[str, SecPreTransformPresentationArcDetails] = {}
         for preArc in preArc_list:
             order_nr = preArc.order_nr
@@ -222,16 +222,6 @@ class SecPreXmlDataProcessor:
                     if sum_of_confidence > max_sum_of_confidence:
                         max_sum_of_confidence = sum_of_confidence
                         max_sum_of_confidence_stmt = stmt_key
-
-                # if len(conf_of_3_list) == 1:
-                #     stmt = conf_of_3_list[0]
-                # else:
-                #     if len(conf_of_3_list) > 1:
-                #         logging.info(
-                #             "{} has confidence of 2 for several statement types {}".format(reportinfo.adsh,
-                #                                                                            conf_of_3_list))
-                #
-                #     stmt = max_sum_of_confidence_stmt
 
                 stmt = max_sum_of_confidence_stmt
 

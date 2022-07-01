@@ -1,5 +1,3 @@
-from _00_common.DBManagement import DBManager
-
 import logging
 from typing import Protocol
 
@@ -8,6 +6,7 @@ class DataAccess(Protocol):
 
     def copy_uncopied_entries(self) -> int:
         """ copy new entries from the report overview table to the report process table """
+
 
 class SecXmlFilePreprocessor:
 

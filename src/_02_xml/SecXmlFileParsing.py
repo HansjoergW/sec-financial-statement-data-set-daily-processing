@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Protocol, List, Tuple
 
-from _00_common.DBManagement import UpdateNumParsing, UnparsedFile, UpdatePreParsing
+from _02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, UnparsedFile, UpdatePreParsing
 from _00_common.ParallelExecution import ParallelExecutor
 from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser

@@ -4,10 +4,11 @@ import re
 import shutil
 from dataclasses import dataclass, field, asdict
 from typing import Protocol, Set
+
 import pandas as pd
 
-from _00_common.DBManagement import DBManager
 from _00_common.SecFileUtils import get_url_content
+from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 
 
 @dataclass
@@ -165,7 +166,7 @@ if __name__ == '__main__':
                         level=logging.DEBUG)
     folder = "./tmp"
     try:
-        new_dbmgr = DBManager(work_dir=folder)
+        new_dbmgr = IndexProcessingDA(work_dir=folder)
         new_dbmgr._create_db()
         processor = SecFullIndexFileProcessor(new_dbmgr, 2022, 1)
         processor.process()

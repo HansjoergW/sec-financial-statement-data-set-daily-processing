@@ -1,11 +1,16 @@
-from _00_common.DBManagement import DBManager
 from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
 from _01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
+from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
+from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
+from _02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
+from _02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
+from _02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from _03_dailyzip.DailyZipCreating import DailyZipCreator
 from _04_seczip.SecZipDownloading import SecZipDownloader
+from _03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
 import logging
 from datetime import datetime, date
@@ -29,8 +34,6 @@ class SecDataOrchestrator:
         self.csvdir = workdir + "csv/"
         self.dailyzipdir = workdir + "daily/"
         self.seczipdir = workdir + "quarterzip/"
-
-        self.dbmanager = DBManager(work_dir=workdir)
 
         self.today = datetime.today()
 
@@ -62,12 +65,12 @@ class SecDataOrchestrator:
 
     def _download_index_data(self):
         self._log_sub_header('looking for new reports')
-        secfullindexprocessor = SecFullIndexFileProcessor(self.dbmanager, self.start_year, self.start_qrtr)
+        secfullindexprocessor = SecFullIndexFileProcessor(IndexProcessingDA(self.workdir), self.start_year, self.start_qrtr)
         secfullindexprocessor.process()
 
     def _postprocess_index_data(self):
         self._log_sub_header('add xbrl file urls')
-        secfullindexpostprocessor = SecFullIndexFilePostProcessor(self.dbmanager)
+        secfullindexpostprocessor = SecFullIndexFilePostProcessor(IndexPostProcessingDA(self.workdir))
         secfullindexpostprocessor.process()
         self._log_sub_header('check for duplicates')
         secfullindexpostprocessor.check_for_duplicated()
@@ -79,18 +82,18 @@ class SecDataOrchestrator:
 
     def _preprocess_xml(self):
         self._log_sub_header('preprocess xml files')
-        secxmlfilepreprocessor = SecXmlFilePreprocessor(self.dbmanager)
+        secxmlfilepreprocessor = SecXmlFilePreprocessor(XmlFilePreProcessingDA(self.workdir))
         secxmlfilepreprocessor.copy_entries_to_processing_table()
 
     def _download_xml(self):
-        secxmlfilesdownloader = SecXmlFileDownloader(self.dbmanager, self.xmldir)
+        secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.xmldir)
         self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()
         self._log_sub_header('download pre xml files')
         secxmlfilesdownloader.downloadPreFiles()
 
     def _parse_xml(self):
-        secxmlfileparser = SecXmlParser(self.dbmanager, self.csvdir)
+        secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
         self._log_sub_header('parse num xml files')
         secxmlfileparser.parseNumFiles()
         self._log_sub_header('parse pre xml files')
@@ -105,7 +108,7 @@ class SecDataOrchestrator:
 
     def create_daily_zip(self):
         self._log_main_header("Create daily zip files")
-        zip_creator = DailyZipCreator(self.dbmanager, self.dailyzipdir)
+        zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
         zip_creator.process()
 
     def download_seczip(self):

@@ -1,7 +1,7 @@
-- DB Logik aufteilen -> Test/Debug Logik in eigene Klassen
+- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
 - Unit Tests updaten
 - Dokumentation
-- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
+
 - alles in ein Package packen und auf pipy hochloaden
 
 **************************************************************************************

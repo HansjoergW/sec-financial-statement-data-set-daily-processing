@@ -2,7 +2,7 @@ import glob
 import os
 import sqlite3
 from abc import ABC
-from typing import List, TypeVar
+from typing import List, TypeVar, Dict
 
 import pandas as pd
 
@@ -36,14 +36,22 @@ class DB(ABC):
         """
         ddl_folder = os.path.realpath(__file__ + "/../../../ddl")
         sqlfiles = list(glob.glob(ddl_folder + "/*.sql"))
-        sorted(sqlfiles)
+
+        indexes_dict: Dict[int, str] = {}
+        for sqlfile in sqlfiles:
+            index = int(sqlfile[sqlfile.rfind('\\V') + 2:sqlfile.find('__')])
+            indexes_dict[index] = sqlfile
+
+        indexes = list(indexes_dict.keys())
+        indexes.sort()
 
         if not os.path.isdir(self.work_dir):
             os.makedirs(self.work_dir)
 
         conn = self.get_connection()
         curr = conn.cursor()
-        for sqlfile in sqlfiles:
+        for index in indexes:
+            sqlfile = indexes_dict[index]
             script = open(sqlfile, 'r').read()
             curr.executescript(script)
             conn.commit()

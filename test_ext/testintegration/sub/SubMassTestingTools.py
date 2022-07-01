@@ -1,4 +1,4 @@
-from _00_common.DBManagement import DBManager
+from _00_common.DBDebugUtils import DBDebugDA
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 from _03_dailyzip.DailyZipCreating import DailyZipCreator
 
@@ -12,7 +12,7 @@ class ReadSubZipContent:
     """ prepares the most important information from pre.txt in the zip file in order for
         easier comparisson with the parsed content"""
 
-    def __init__(self, dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qrtr: int):
+    def __init__(self, dbmgr: DBDebugDA, dataUtils: DataAccessTool, year: int, qrtr: int):
         self.dbmgr = dbmgr
         self.dataUtils = dataUtils
         self.zipfilePath = self.dataUtils._get_zipfilename(year,qrtr)
@@ -30,7 +30,7 @@ class ReadSubZipContent:
 
 class ReadSubXmlContent:
 
-    def __init__(self, dbmgr: DBManager, testsetCreator: TestSetCreatorTool, year: int, qrtr: int):
+    def __init__(self, dbmgr: DBDebugDA, testsetCreator: TestSetCreatorTool, year: int, qrtr: int):
         self.dbmgr = dbmgr
         self.testsetCreator = testsetCreator
         self.year = year
@@ -49,17 +49,17 @@ class ReadSubXmlContent:
         return pd.concat(df_list)
 
 
-def read_sub_zip_content(dbmgr: DBManager, dataUtils: DataAccessTool, year: int, qtr: int, adshs: List[str] = None) -> pd.DataFrame:
+def read_sub_zip_content(dbmgr: DBDebugDA, dataUtils: DataAccessTool, year: int, qtr: int, adshs: List[str] = None) -> pd.DataFrame:
     reader = ReadSubZipContent(dbmgr, dataUtils, year, qtr)
     return reader.read_df(adshs)
 
 
-def read_sub_xml_content(dbmgr: DBManager,testsetCreator: TestSetCreatorTool, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
+def read_sub_xml_content(dbmgr: DBDebugDA,testsetCreator: TestSetCreatorTool, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
     reader = ReadSubXmlContent(dbmgr, testsetCreator, year, qrtr)
     return reader.read_df(adshs)
 
 
-def read_and_parse_direct_from_table(dbmgr: DBManager, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
+def read_and_parse_direct_from_table(dbmgr: DBDebugDA, year: int, qrtr:int, adshs: List[str] = None) -> pd.DataFrame:
     df = dbmgr.read_by_year_and_quarter(year, qrtr)
     if adshs is not None:
         df = df[df.accessionNumber.isin(adshs)]

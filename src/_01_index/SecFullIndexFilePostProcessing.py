@@ -1,11 +1,10 @@
-from _00_common.DBManagement import DBManager, XbrlFile, XbrlFiles, BasicFeedData
-from _00_common.SecFileUtils import get_url_content
-from _00_common.ParallelExecution import ParallelExecutor
-
-from typing import Dict, List, Protocol
-
 import json
 import logging
+from typing import Dict, List, Protocol
+
+from _00_common.ParallelExecution import ParallelExecutor
+from _00_common.SecFileUtils import get_url_content
+from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA, XbrlFile, XbrlFiles, BasicFeedData
 
 
 class DataAccessor(Protocol):
@@ -131,7 +130,7 @@ if __name__ == '__main__':
     folder = "./tmp"
     # new_dbmgr = DBManager(work_dir=folder)
     # new_dbmgr._create_db()
-    new_dbmgr = DBManager(work_dir="d:/secprocessing/")
+    new_dbmgr = IndexPostProcessingDA(work_dir="d:/secprocessing/")
     processor = SecFullIndexFilePostProcessor(new_dbmgr)
     processor.process()
 

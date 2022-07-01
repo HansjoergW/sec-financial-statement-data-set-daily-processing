@@ -1,10 +1,13 @@
-import _00_common.SecFileUtils as sfu
-import pytest
-import shutil
 import os
+import shutil
+
 import pandas as pd
+import pytest
+
+import _00_common.SecFileUtils as sfu
 
 folder = "./tmp/"
+
 
 @pytest.fixture(scope="module")
 def wrap():
@@ -13,7 +16,8 @@ def wrap():
     yield ""
     shutil.rmtree(folder)
 
-def test_write_read_content_to_zip(wrap:str):
+
+def test_write_read_content_to_zip(wrap: str):
     filename = folder + "mycontent.txt"
     writecontent = "some content"
     sfu.write_content_to_zip("some content", filename)
@@ -23,7 +27,7 @@ def test_write_read_content_to_zip(wrap:str):
     assert writecontent == readcontent
 
 
-def test_write_read_df_to_zip(wrap:str):
+def test_write_read_df_to_zip(wrap: str):
     filename = folder + "acsv.csv"
     d = {'col1': [1, 2], 'col2': [3, 4]}
     df = pd.DataFrame(data=d)
@@ -34,4 +38,3 @@ def test_write_read_df_to_zip(wrap:str):
 
     assert os.path.isfile(filename + ".zip")
     assert df.equals(readdf)
-

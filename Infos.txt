@@ -25,7 +25,7 @@ pip install pathos
 - https://github.com/uqfoundation/pathos
 
 conda install lxml
-
+conda install pytest
 
 Allgemein:
 ----------
