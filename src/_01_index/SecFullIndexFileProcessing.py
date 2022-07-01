@@ -73,7 +73,10 @@ class SecFullIndexFileProcessor:
         self.full_index_status_df = dbmanager.read_all_fullindex_files()
 
     def _get_file_for_qrtr(self, year, qrtr):
-        return get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
+        try:
+            return get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
+        except:
+            return None
 
     def get_next_index_file_iter(self):
         """
@@ -98,6 +101,9 @@ class SecFullIndexFileProcessor:
 
     def parsed_index_file_iter(self):
         for year, qrtr, content in self.get_next_index_file_iter():
+            if content is None:
+                logging.warning("- no content for {}/{} ".format(qrtr, year))
+                continue
             last_date_received = self.last_date_received_matcher.search(content).group(0)
             last_date_received = last_date_received.split(":")[1].strip()
             ten_report_entries = self.ten_report_matcher.findall(content)

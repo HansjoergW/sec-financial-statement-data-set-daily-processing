@@ -41,7 +41,7 @@ class IndexPostProcessingDA(DB):
         sql = '''
         SELECT cikNumber, fiscalYearEnd 
         FROM (
-             SELECT ciNumber, fiscalYearEnd 
+             SELECT cikNumber, fiscalYearEnd 
              FROM {} 
              WHERE formType = "10-K" and fiscalYearEnd is not null 
              ORDER BY cikNumber, period desc
