@@ -1,36 +1,37 @@
-import logging
-import re
 import glob
+import logging
 import os
+import re
 import shutil
 import urllib.request
 from typing import List, Dict
-from _00_common.SecFileUtils import get_url_content
+
+from _00_common.DownloadUtils import UrlDownloader
 
 
 class SecZipDownloader:
-
     FIN_STAT_DATASET_URL = 'https://www.sec.gov/dera/data/financial-statement-data-sets.html'
 
     table_re = re.compile("<TABLE.*?>.*</TABLE>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     href_re = re.compile("href=\".*?\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
-    def __init__(self, zip_dir: str):
+    def __init__(self, zip_dir: str, urldownloader: UrlDownloader):
         if zip_dir[-1] != '/':
             zip_dir = zip_dir + '/'
         self.zip_dir = zip_dir
+        self.urldownloader = urldownloader
 
     def _get_downloaded_list(self) -> List[str]:
         zip_list: str = glob.glob(self.zip_dir + '*.zip')
         return [os.path.basename(x) for x in zip_list]
 
     def _get_zips_to_download(self) -> Dict[str, str]:
-        content = get_url_content(self.FIN_STAT_DATASET_URL)
+        content = self.urldownloader.get_url_content(self.FIN_STAT_DATASET_URL)
         first_table = self.table_re.findall(content)[0]
         hrefs = self.href_re.findall(first_table)
 
         hrefs = ["https://www.sec.gov" + href[6:-1] for href in hrefs]
-        return {os.path.basename(href):href for href in hrefs}
+        return {os.path.basename(href): href for href in hrefs}
 
     def _downlaod_zip(self, url: str, file_path: str) -> str:
         try:

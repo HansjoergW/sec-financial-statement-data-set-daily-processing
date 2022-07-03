@@ -2,8 +2,8 @@ import json
 import logging
 from typing import Dict, List, Protocol
 
+from _00_common.DownloadUtils import UrlDownloader
 from _00_common.ParallelExecution import ParallelExecutor
-from _00_common.SecFileUtils import get_url_content
 from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA, XbrlFile, XbrlFiles, BasicFeedData
 
 
@@ -33,8 +33,9 @@ class SecFullIndexFilePostProcessor:
 
     edgar_archive_root_url = "https://www.sec.gov/Archives/"
 
-    def __init__(self, dbmanager: DataAccessor):
+    def __init__(self, dbmanager: DataAccessor, urldownloader: UrlDownloader):
         self.dbmanager = dbmanager
+        self.urldownloader = urldownloader
 
         # read that last known fye day/month values
         self.last_knwon_fye_dict: Dict[str, str] = self.dbmanager.read_last_known_fiscalyearend()
@@ -45,7 +46,7 @@ class SecFullIndexFilePostProcessor:
         index_json_url = SecFullIndexFilePostProcessor.edgar_archive_root_url + rowdata.reportJson
 
         try:
-            content = get_url_content(index_json_url)
+            content = self.urldownloader.get_url_content(index_json_url)
             json_content = json.loads(content)
             relevant_entries: Dict[str, XbrlFile] = {}
             for fileentry in json_content['directory']['item']:
@@ -84,7 +85,7 @@ class SecFullIndexFilePostProcessor:
             period = relevant_entries['pre'].name.replace("_pre.xml", "")[-8:]
 
             # if we have a 10-K, the fye is the month and date of the period
-            if rowdata.formType is "10-K":
+            if rowdata.formType == "10-K":
                 fiscal_year_end = period[-4:]
             else:  # 10-Q
                 # otherwise we try to map it from entries we found in our database (which will be in general the

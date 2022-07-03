@@ -7,7 +7,7 @@ from typing import Protocol, Set
 
 import pandas as pd
 
-from _00_common.SecFileUtils import get_url_content
+from _00_common.DownloadUtils import UrlDownloader
 from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 
 
@@ -59,11 +59,12 @@ class SecFullIndexFileProcessor:
 
     full_index_root_url = "https://www.sec.gov/Archives/edgar/full-index/"
 
-    def __init__(self, dbmanager: DataAccessor, start_year: int, start_qrtr: int = 1, feed_dir: str = "./tmp/"):
+    def __init__(self, dbmanager: DataAccessor, urldownloader: UrlDownloader, start_year: int, start_qrtr: int = 1, feed_dir: str = "./tmp/"):
         self.dbmanager = dbmanager
         self.start_year = start_year
         self.start_qrtr = start_qrtr
         self.feed_dir = feed_dir
+        self.urldownloader = urldownloader
         self.processdate = datetime.date.today().isoformat()
 
         self.current_year = datetime.datetime.now().year
@@ -74,7 +75,7 @@ class SecFullIndexFileProcessor:
 
     def _get_file_for_qrtr(self, year, qrtr):
         try:
-            return get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
+            return self.urldownloader.get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
         except:
             return None
 

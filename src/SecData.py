@@ -1,30 +1,31 @@
-from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
+import logging
+from datetime import datetime
+
+from _00_common.DownloadUtils import UrlDownloader
 from _01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
+from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
 from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
-from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 from _02_xml.SecXmlFileParsing import SecXmlParser
-from _02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
+from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from _02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
 from _02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
+from _02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
 from _03_dailyzip.DailyZipCreating import DailyZipCreator
-from _04_seczip.SecZipDownloading import SecZipDownloader
 from _03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
-
-import logging
-from datetime import datetime, date
-import dateutil
-
+from _04_seczip.SecZipDownloading import SecZipDownloader
 
 month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
 
 class SecDataOrchestrator:
 
-    def __init__(self, workdir: str, start_year: int = None, start_qrtr: int = None):
+    def __init__(self, workdir: str, user_agent_def: str, start_year: int = None, start_qrtr: int = None):
         """
+        :param user_agent_def: according to https://www.sec.gov/os/accessing-edgar-data in the form User-Agent: Sample Company Name AdminContact@<sample company domain>.com
         """
+
         if workdir[-1] != '/':
             workdir = workdir + '/'
 
@@ -36,6 +37,8 @@ class SecDataOrchestrator:
         self.seczipdir = workdir + "quarterzip/"
 
         self.today = datetime.today()
+
+        self.urldownloader = UrlDownloader(user_agent_def)
 
         if start_year is None:
             self.start_year = self.today.year
@@ -52,12 +55,12 @@ class SecDataOrchestrator:
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
 
-    def _log_main_header(self, title:str):
+    def _log_main_header(self, title: str):
         logging.info("==============================================================")
         logging.info(title)
         logging.info("==============================================================")
 
-    def _log_sub_header(self, title:str):
+    def _log_sub_header(self, title: str):
         logging.info("")
         logging.info("--------------------------------------------------------------")
         logging.info(title)
@@ -65,12 +68,13 @@ class SecDataOrchestrator:
 
     def _download_index_data(self):
         self._log_sub_header('looking for new reports')
-        secfullindexprocessor = SecFullIndexFileProcessor(IndexProcessingDA(self.workdir), self.start_year, self.start_qrtr)
+        secfullindexprocessor = SecFullIndexFileProcessor(IndexProcessingDA(self.workdir), self.urldownloader, self.start_year,
+                                                          self.start_qrtr)
         secfullindexprocessor.process()
 
     def _postprocess_index_data(self):
         self._log_sub_header('add xbrl file urls')
-        secfullindexpostprocessor = SecFullIndexFilePostProcessor(IndexPostProcessingDA(self.workdir))
+        secfullindexpostprocessor = SecFullIndexFilePostProcessor(IndexPostProcessingDA(self.workdir), self.urldownloader)
         secfullindexpostprocessor.process()
         self._log_sub_header('check for duplicates')
         secfullindexpostprocessor.check_for_duplicated()
@@ -86,7 +90,7 @@ class SecDataOrchestrator:
         secxmlfilepreprocessor.copy_entries_to_processing_table()
 
     def _download_xml(self):
-        secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.xmldir)
+        secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.urldownloader, self.xmldir)
         self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()
         self._log_sub_header('download pre xml files')
@@ -113,7 +117,7 @@ class SecDataOrchestrator:
 
     def download_seczip(self):
         self._log_main_header("Download Seczip files")
-        downloader = SecZipDownloader(self.seczipdir)
+        downloader = SecZipDownloader(self.seczipdir, self.urldownloader)
         downloader.download()
 
     def process(self):
@@ -126,6 +130,8 @@ class SecDataOrchestrator:
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
     # orchestrator = SecDataOrchestrator(workdir_default)
-    orchestrator = SecDataOrchestrator(workdir_default, 2022, 2)
+    orchestrator = SecDataOrchestrator(workdir=workdir_default,
+                                       user_agent_def="private user hansjoerg.wingeier@gmail.com",
+                                       start_year=2022,
+                                       start_qrtr=2)
     orchestrator.process()
-

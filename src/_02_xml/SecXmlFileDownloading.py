@@ -3,8 +3,8 @@ import logging
 import os
 from typing import Protocol, List
 
+from _00_common.DownloadUtils import UrlDownloader
 from _00_common.ParallelExecution import ParallelExecutor
-from _00_common.SecFileUtils import download_url_to_file
 from _02_xml.db.XmlFileDownloadingDataAccess import MissingFile
 
 
@@ -28,9 +28,10 @@ class SecXmlFileDownloader:
     - downloads the desired sec xml files, stores them and updates the sec-processing table
     """
 
-    def __init__(self, dbmanager: DataAccessor, xml_dir: str = "./tmp/xml/"):
+    def __init__(self, dbmanager: DataAccessor, urldownloader: UrlDownloader, xml_dir: str = "./tmp/xml/"):
         self.dbmanager = dbmanager
         self.processdate = datetime.date.today().isoformat()
+        self.urldownloader = urldownloader
 
         if xml_dir[-1] != '/':
             xml_dir = xml_dir + '/'
@@ -56,7 +57,7 @@ class SecXmlFileDownloader:
 
         filepath = self.xml_dir + data.accessionNumber + "-" + filename
         try:
-            download_url_to_file(data.url, filepath, size)
+            self.urldownloader.download_url_to_file(data.url, filepath, size)
             data.file = filepath
             return data
         except:

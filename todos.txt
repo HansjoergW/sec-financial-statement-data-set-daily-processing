@@ -1,9 +1,17 @@
-- User-Agent für Datendownload muss noch konfigurierbar gemacht werden
+- Warning in
+    INFO:root:==============================================================
+    INFO:root:Create daily zip files
+    INFO:root:==============================================================
+    C:\ieu\Anaconda3\envs\sec_process_pipeline_310\lib\site-packages\pandas\core\indexes\extension.py:101: FutureWarning: In a future version, the Index constructor will not infer numeric dtypes when passed object-dtype sequences (matching Series behavior)
+      return Index(result, name=self.name)
+
+- failed reports in xbrl-url zusätzlichen Status einfügen, so dass die nicht immer wieder neu versucht werden zu laden
+
+
 - Unit Tests updaten
 - Dokumentation
-
-- alles in ein Package packen und auf pipy hochloaden
-
+- alles in ein Package packen und auf pipy hochloaden (poetry)
+- DB Skripts sauber neu erstellen, so dass keine Alter notwendig sind
 **************************************************************************************
 
 Next
