@@ -40,7 +40,7 @@ class DailyZipCreator:
         self.dbmanager = dbmanager
 
         if daily_zip_dir[-1] != '/':
-            daily_zip_dir = daily_zip_dir + '/'
+            daily_zip_dir += '/'
 
         self.daily_zip_dir = daily_zip_dir
         self.processdate = datetime.date.today().isoformat()
