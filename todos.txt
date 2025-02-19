@@ -1,3 +1,36 @@
+Bug:
+----
+download zip file schlug fehl -> forbidden -> funktionierte aber in secfsdstools
+
+INFO:root:==============================================================
+INFO:root:Download Seczip files
+INFO:root:==============================================================
+INFO:root:    downloading 1 to d:/secprocessing/quarterzip/
+INFO:root:    2023q4.zip - failed: HTTP Error 403: Forbidden
+
+
+
+MVP 0.1
+-------
+=> man könnte auch ein neues Projekt auf GitHub starten,
+   dass wäre evtl einfacher
+
+- Packaging mit Poetry
+- Primitive CLI
+- minimale Dokumentation
+- DDL Skripts aufräumen.
+- wie konfigurieren -> Verzeichnis, Email/userAgent, Default konfig
+
+
+
+
+
+
+
+Später
+------
+
+
 - Warning in
     INFO:root:==============================================================
     INFO:root:Create daily zip files
@@ -7,11 +40,10 @@
 
 - failed reports in xbrl-url zusätzlichen Status einfügen, so dass die nicht immer wieder neu versucht werden zu laden
 
-
 - Unit Tests updaten
-- Dokumentation
+
 - alles in ein Package packen und auf pipy hochloaden (poetry)
-- DB Skripts sauber neu erstellen, so dass keine Alter notwendig sind
+- DB Skripts sauber neu erstellen, so dass keine Alter entries notwendig sind notwendig sind
 **************************************************************************************
 
 Next
@@ -21,10 +53,15 @@ Next
   wahrscheinlich aufgrund des encodings... die frage ist, ob dieser test etwas bringt.
   Ist es wirklich so, oder ist es ein anderes problem
 
-- es kommt auch ab und zu zu sonstige Exceptions, die sporadisch auftauchen und dann den Prozess
-  "abstürzen lassen".
-
 - saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
+
+- absolut pro sub, num und pre:
+     wie viele Zeilen sind identisch
+     wie viele Zeilen sind unterschiedlich -> was heisst unterschiedlich -> primkey pro sub, num und pre ist hier unterschiedlich
+     wie viele Zeilen sind nur in dailyzips
+     wie viele Zeilen sind nur in quarterzips
+
+
 
 
 Later

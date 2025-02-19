@@ -1,7 +1,7 @@
 # Purpose
 The purpose of this project is to download new 10-K and 10-Q reports from edgar at sec.gov and parse and 
 preprocess these xml files in a way, so that structure of the resulting csv files is similar
-to the stracture of the "Financial Statement Datasets" from the sec.gov.
+to the structure of the "Financial Statement Datasets" from the sec.gov.
 While the "Financial Statement Dataset" is only provided once for every quarter,
 this project has the goal to provide the same data on a daily basis.
 
