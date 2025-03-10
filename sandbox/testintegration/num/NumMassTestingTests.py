@@ -1,5 +1,4 @@
 from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
-from _00_common.DBManagement import DBManager
 
 from testintegration.num.NumMassTestingTools import read_mass_num_zip_content, read_mass_num_xml_content
 
@@ -75,7 +74,7 @@ def test_compare_adshs():
     print("Entries diff        : ", abs(entries_total_xml - entries_total_zip))
 
     # we want to have all reports in the zip also present in the xml
-    # however, we do not care if there additional entries present
+    # however, we do not care if are there additional entries present
     assert len(not_in_xml) == 0
 
 

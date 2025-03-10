@@ -1,0 +1,28 @@
+[project]
+name = "dailysec"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "Hansjoerg", email = "hansjoeg.wingeier@gmail.com" }
+]
+readme = "README.md"
+requires-python = "~3.10"
+
+
+dependencies = [
+
+]
+
+[tool.poetry]
+packages = [
+    { include = "secdaily", from = "src" }
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.2" # or similar, depending of the latest version
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
