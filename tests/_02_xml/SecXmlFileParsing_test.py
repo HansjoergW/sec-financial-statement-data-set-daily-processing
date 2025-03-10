@@ -21,23 +21,24 @@ def dbmgr():
 
 
 def test_parse_num_xml(dbmgr: XmlFileParsingDA):
-    parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
+    parser = SecXmlParser(dbmanager=dbmgr, 
+                          data_dir=folder + "/data/")
     parser.parseNumFiles()
 
-    files = glob.glob(folder + "/data/*/*num.csv")
+    files = glob.glob(folder + "/data/*/*num.csv.zip")
     assert len(files) == 7
 
-    df = dbmgr.read_all_processing()
-    assert 0 == sum(df.csvNumFile.isnull() | df.numParseState.isnull() | df.numParseDate.isnull())
+    unparsed_num_files = dbmgr.find_unparsed_numFiles()
+    assert 0 == len(unparsed_num_files)
 
 
 def test_parse_pre_xml(dbmgr: XmlFileParsingDA):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parsePreFiles()
 
-    files = glob.glob(folder + "/data/*/*num.csv")
+    files = glob.glob(folder + "/data/*/*pre.csv.zip")
     assert 7 == len(files)
 
-    df = dbmgr.read_all_processing()
-    assert 0 == sum(df.csvPreFile.isnull() | df.preParseState.isnull() | df.preParseDate.isnull())
+    unparsed_pre_files = dbmgr.find_unparsed_preFiles()
+    assert 0 == len(unparsed_pre_files)
 
