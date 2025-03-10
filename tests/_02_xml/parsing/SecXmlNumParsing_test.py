@@ -18,13 +18,14 @@ def test_parse():
     parser = SecNumXmlParser()
     df, errorlist = parser.parse("", xml_exp_content)
 
-    assert 1223 == len(df)
+    assert 1236 == len(df)
     assert 12 == len(df.columns)
     assert 0 == len(errorlist)
 
-    df_clean = parser.clean_for_financial_statement_dataset(df, "")
-    assert 565 == len(df_clean)
-    assert 3 == len(df_clean.columns)
+    df_clean, fye = parser.clean_for_financial_statement_dataset(df, "")
+    assert fye == '0926'
+    assert 578 == len(df_clean)
+    assert 4 == len(df_clean.columns)
 
 
 

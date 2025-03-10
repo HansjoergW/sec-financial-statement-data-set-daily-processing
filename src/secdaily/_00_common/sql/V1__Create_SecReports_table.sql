@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS sec_feeds
+CREATE TABLE IF NOT EXISTS sec_reports
 (
     accessionNumber,
     sec_feed_file,
@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS sec_feeds
     preLastChange,
     preSize,
     status,
+    reportJson,
+    xbrlZipUrl,
+    zipLastChange,
+    zipSize,
 
     PRIMARY KEY (accessionNumber, sec_feed_file)
 )

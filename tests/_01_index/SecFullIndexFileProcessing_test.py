@@ -18,4 +18,8 @@ def dbmgr():
 
 
 def test_init(dbmgr: IndexProcessingDA):
-    processor = SecFullIndexFileProcessor(dbmgr, 2022, 2022, 1, 2, feed_dir=folder)
+    processor = SecFullIndexFileProcessor(dbmanager=dbmgr,
+                                          start_year=2022,
+                                          start_qrtr=1,
+                                          feed_dir=folder,
+                                          urldownloader=None)

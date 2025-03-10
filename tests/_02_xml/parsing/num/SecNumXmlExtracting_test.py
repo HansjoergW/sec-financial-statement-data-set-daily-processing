@@ -19,7 +19,7 @@ def test_read():
         data: SecNumExtraction = preparer.extract("", content)
 
         assert len(data.contexts) == 318
-        assert len(data.tags) == 1223
+        assert len(data.tags) == 1236
 
 
 def test_strip_file():

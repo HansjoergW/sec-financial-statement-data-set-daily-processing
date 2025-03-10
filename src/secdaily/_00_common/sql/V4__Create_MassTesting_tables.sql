@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS mass_pre_zip_content
     length,
     tagList,
     xmlFile,
+    inpth,
 
     PRIMARY KEY (adsh, report)
 );
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS mass_pre_parse_xml_data
     tagList,
     xmlFile,
     runId,
+    inpth,
 
     PRIMARY KEY (adsh, runId)
 )

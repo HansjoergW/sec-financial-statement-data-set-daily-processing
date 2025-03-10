@@ -19,5 +19,8 @@ CREATE TABLE IF NOT EXISTS sec_report_processing
     numParseDate,
     numParseState,
     csvNumFile,
+    dailyZipFile,
+    processZipDate,
+    fiscalYearEnd,
     PRIMARY KEY (accessionNumber)
 )

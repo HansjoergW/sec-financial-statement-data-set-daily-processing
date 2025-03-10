@@ -1,4 +1,4 @@
-from secdaily._00_common.DBManagement import DBManager
+from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
 import shutil
 import pytest
@@ -11,7 +11,7 @@ folder = scriptpath + "/tmp"
 @pytest.fixture(scope="module")
 def dbmgr():
     shutil.rmtree(folder, ignore_errors=True)
-    new_dbmgr = DBManager(work_dir=folder)
+    new_dbmgr = XmlFileParsingDA(work_dir=folder)
     new_dbmgr._create_db()
     new_dbmgr.create_test_data()
     new_dbmgr.create_processing_test_data()
@@ -20,7 +20,7 @@ def dbmgr():
     shutil.rmtree(folder)
 
 
-def test_parse_num_xml(dbmgr: DBManager):
+def test_parse_num_xml(dbmgr: XmlFileParsingDA):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parseNumFiles()
 
@@ -31,7 +31,7 @@ def test_parse_num_xml(dbmgr: DBManager):
     assert 0 == sum(df.csvNumFile.isnull() | df.numParseState.isnull() | df.numParseDate.isnull())
 
 
-def test_parse_pre_xml(dbmgr: DBManager):
+def test_parse_pre_xml(dbmgr: XmlFileParsingDA):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parsePreFiles()
 
