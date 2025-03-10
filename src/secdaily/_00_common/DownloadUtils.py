@@ -1,4 +1,4 @@
-from _00_common.SecFileUtils import write_content_to_zip
+from secdaily._00_common.SecFileUtils import write_content_to_zip
 
 import logging
 from time import sleep

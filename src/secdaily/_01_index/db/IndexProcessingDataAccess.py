@@ -1,4 +1,4 @@
-from _00_common.DBBase import DB
+from secdaily._00_common.DBBase import DB
 from typing import List, Tuple, Set, Optional, Dict
 
 import pandas as pd

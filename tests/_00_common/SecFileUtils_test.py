@@ -4,7 +4,7 @@ import shutil
 import pandas as pd
 import pytest
 
-import _00_common.SecFileUtils as sfu
+import secdaily._00_common.SecFileUtils as sfu
 
 folder = "./tmp/"
 

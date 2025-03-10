@@ -1,5 +1,5 @@
-from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
-from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
+from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
+from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
 import shutil
 import pytest
 import os

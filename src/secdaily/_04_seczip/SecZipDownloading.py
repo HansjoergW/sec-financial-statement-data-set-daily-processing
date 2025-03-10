@@ -6,7 +6,7 @@ import shutil
 import urllib.request
 from typing import List, Dict
 
-from _00_common.DownloadUtils import UrlDownloader
+from secdaily._00_common.DownloadUtils import UrlDownloader
 
 
 class SecZipDownloader:

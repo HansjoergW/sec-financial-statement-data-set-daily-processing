@@ -3,9 +3,9 @@ import logging
 import os
 from typing import Protocol, List
 
-from _00_common.DownloadUtils import UrlDownloader
-from _00_common.ParallelExecution import ParallelExecutor
-from _02_xml.db.XmlFileDownloadingDataAccess import MissingFile
+from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._02_xml.db.XmlFileDownloadingDataAccess import MissingFile
 
 
 class DataAccessor(Protocol):

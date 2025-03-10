@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from _00_common.DBBase import DB
+from secdaily._00_common.DBBase import DB
 
 
 @dataclass

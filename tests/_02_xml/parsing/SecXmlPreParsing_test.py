@@ -1,4 +1,4 @@
-from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
+from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 
 import os

@@ -1,5 +1,5 @@
-from _00_common.DBManagement import DBManager
-from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
+from secdaily._00_common.DBManagement import DBManager
+from secdaily._02_xml.SecXmlFileDownloading import SecXmlFileDownloader
 import shutil
 import pytest
 import os

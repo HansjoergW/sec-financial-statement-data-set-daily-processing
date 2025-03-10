@@ -1,5 +1,5 @@
-from _00_common.DBManagement import DBManager
-from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
+from secdaily._00_common.DBManagement import DBManager
+from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 
 from testintegration.sub.SubMassTestingTools import read_sub_zip_content, read_sub_xml_content, read_and_parse_direct_from_table
 

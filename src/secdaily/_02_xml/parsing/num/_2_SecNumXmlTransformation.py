@@ -1,4 +1,4 @@
-from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
+from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction, SecNumExtractContext, \
     SecNumExtractTag, SecNumExtractSegement, SecNumExtractUnit
 from typing import Dict, List, Tuple, Union
 from dataclasses import dataclass

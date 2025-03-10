@@ -9,8 +9,8 @@ from typing import List, Tuple, Dict, Protocol
 import numpy as np
 import pandas as pd
 
-from _03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
-from _00_common.SecFileUtils import read_df_from_zip
+from secdaily._03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
+from secdaily._00_common.SecFileUtils import read_df_from_zip
 
 
 class DataAccess(Protocol):

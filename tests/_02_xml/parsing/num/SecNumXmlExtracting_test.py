@@ -1,4 +1,4 @@
-from _02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
+from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
 from lxml import etree, objectify
 from typing import List
 import os

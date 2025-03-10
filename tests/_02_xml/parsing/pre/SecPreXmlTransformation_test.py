@@ -1,5 +1,5 @@
-from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
-from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
 
 import os
 

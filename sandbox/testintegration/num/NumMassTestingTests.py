@@ -1,4 +1,4 @@
-from _00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
+from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 
 from testintegration.num.NumMassTestingTools import read_mass_num_zip_content, read_mass_num_xml_content
 

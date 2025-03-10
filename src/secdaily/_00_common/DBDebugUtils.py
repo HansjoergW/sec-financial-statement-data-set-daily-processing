@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from _00_common.DBBase import DB
+from secdaily._00_common.DBBase import DB
 
 
 class DBDebugDA(DB):

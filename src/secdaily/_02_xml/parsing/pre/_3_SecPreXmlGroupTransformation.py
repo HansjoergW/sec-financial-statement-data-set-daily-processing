@@ -1,4 +1,4 @@
-from _02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
     SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
 from typing import Dict, Union, List, Tuple, Set
 import logging

@@ -1,5 +1,5 @@
-from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
-from _00_common.DebugUtils import DataAccessByAdshTool
+from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from secdaily._00_common.DebugUtils import DataAccessByAdshTool
 
 workdir = "d:/secprocessing/"
 

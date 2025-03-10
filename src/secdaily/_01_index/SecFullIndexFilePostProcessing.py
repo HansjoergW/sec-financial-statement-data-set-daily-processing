@@ -2,9 +2,9 @@ import json
 import logging
 from typing import Dict, List, Protocol
 
-from _00_common.DownloadUtils import UrlDownloader
-from _00_common.ParallelExecution import ParallelExecutor
-from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA, XbrlFile, XbrlFiles, BasicFeedData
+from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA, XbrlFile, XbrlFiles, BasicFeedData
 
 
 class DataAccessor(Protocol):

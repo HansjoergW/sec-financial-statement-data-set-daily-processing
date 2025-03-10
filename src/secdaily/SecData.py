@@ -1,20 +1,20 @@
 import logging
 from datetime import datetime
 
-from _00_common.DownloadUtils import UrlDownloader
-from _01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
-from _01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
-from _01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
-from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
-from _02_xml.SecXmlFileDownloading import SecXmlFileDownloader
-from _02_xml.SecXmlFileParsing import SecXmlParser
-from _02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
-from _02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
-from _02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
-from _02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
-from _03_dailyzip.DailyZipCreating import DailyZipCreator
-from _03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
-from _04_seczip.SecZipDownloading import SecZipDownloader
+from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
+from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
+from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
+from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
+from secdaily._02_xml.SecXmlFileDownloading import SecXmlFileDownloader
+from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
+from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
+from secdaily._02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
+from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
+from secdaily._02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
+from secdaily._03_dailyzip.DailyZipCreating import DailyZipCreator
+from secdaily._03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
+from secdaily._04_seczip.SecZipDownloading import SecZipDownloader
 
 month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 

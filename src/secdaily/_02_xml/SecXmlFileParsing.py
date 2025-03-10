@@ -4,11 +4,11 @@ import logging
 import os
 from typing import Protocol, List, Tuple
 
-from _02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, UnparsedFile, UpdatePreParsing
-from _00_common.ParallelExecution import ParallelExecutor
-from _00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
-from _02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
-from _02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
+from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, UnparsedFile, UpdatePreParsing
+from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
+from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 
 class DataAccess(Protocol):

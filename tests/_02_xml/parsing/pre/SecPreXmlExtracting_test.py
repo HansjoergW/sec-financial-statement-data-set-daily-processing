@@ -1,4 +1,4 @@
-from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
 
 from typing import List, Dict, Tuple, Union
 import os

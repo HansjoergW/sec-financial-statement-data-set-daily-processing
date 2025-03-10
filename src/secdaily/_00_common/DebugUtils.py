@@ -3,11 +3,11 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from _00_common.DBDebugUtils import DBDebugDA
-from _00_common.ParallelExecution import ParallelExecutor
-from _00_common.SecFileUtils import read_content_from_zip, read_df_from_zip
-from _02_xml.SecXmlFileParsing import SecXmlParser
-from _02_xml.db.XmlFileParsingDataAccess import UpdatePreParsing, UnparsedFile
+from secdaily._00_common.DBDebugUtils import DBDebugDA
+from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._00_common.SecFileUtils import read_content_from_zip, read_df_from_zip
+from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
+from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdatePreParsing, UnparsedFile
 
 
 class DataAccessTool():

@@ -7,8 +7,8 @@ from typing import Protocol, Set
 
 import pandas as pd
 
-from _00_common.DownloadUtils import UrlDownloader
-from _01_index.db.IndexProcessingDataAccess import IndexProcessingDA
+from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 
 
 @dataclass

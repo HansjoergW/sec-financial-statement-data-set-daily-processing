@@ -1,4 +1,4 @@
-from _02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
     SecPreExtractPresentationArcDetails
 
 from dataclasses import dataclass

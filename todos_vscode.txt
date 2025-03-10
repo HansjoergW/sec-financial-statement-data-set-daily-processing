@@ -10,9 +10,11 @@
         "python.testing.unittestEnabled": false,
         "python.testing.pytestEnabled": true
     }
-7. definieren einer neuen conda umgebung
-8. definieren der notwendigen dependencies im pyproject.toml, bis ausführung läuft
-9. Zuerst müssen die Vergleichstests korrekt laufen
+7. [ok] definieren einer neuen conda umgebung
+8. [ok] definieren der notwendigen dependencies im pyproject.toml, bis ausführung läuft
+9. sicherstellen, dass alle normlan tests wieder laufen
+   -> Abhängigkeiten zu DBManger gibt es so nicht mehr
+10. Zuerst müssen die Vergleichstests korrekt laufen
    -> detail vergleich einer einzelnen adsh nummer
    -> adshs vergleich quartal
    -> detail vergleich ganzes quartal
