@@ -1,0 +1,120 @@
+Bug:
+----
+download zip file schlug fehl -> forbidden -> funktionierte aber in secfsdstools
+
+INFO:root:==============================================================
+INFO:root:Download Seczip files
+INFO:root:==============================================================
+INFO:root:    downloading 1 to d:/secprocessing/quarterzip/
+INFO:root:    2023q4.zip - failed: HTTP Error 403: Forbidden
+
+
+
+MVP 0.1
+-------
+=> man könnte auch ein neues Projekt auf GitHub starten,
+   dass wäre evtl einfacher
+
+- Packaging mit Poetry
+- Primitive CLI
+- minimale Dokumentation
+- DDL Skripts aufräumen.
+- wie konfigurieren -> Verzeichnis, Email/userAgent, Default konfig
+
+
+
+
+
+
+
+Später
+------
+
+
+- Warning in
+    INFO:root:==============================================================
+    INFO:root:Create daily zip files
+    INFO:root:==============================================================
+    C:\ieu\Anaconda3\envs\sec_process_pipeline_310\lib\site-packages\pandas\core\indexes\extension.py:101: FutureWarning: In a future version, the Index constructor will not infer numeric dtypes when passed object-dtype sequences (matching Series behavior)
+      return Index(result, name=self.name)
+
+- failed reports in xbrl-url zusätzlichen Status einfügen, so dass die nicht immer wieder neu versucht werden zu laden
+
+- Unit Tests updaten
+
+- alles in ein Package packen und auf pipy hochloaden (poetry)
+- DB Skripts sauber neu erstellen, so dass keine Alter entries notwendig sind notwendig sind
+**************************************************************************************
+
+Next
+====
+
+- es scheint, als schlägt der längenvergleich der gedownloadeten Daten ab und zu fehl (ca. 70 in num only)
+  wahrscheinlich aufgrund des encodings... die frage ist, ob dieser test etwas bringt.
+  Ist es wirklich so, oder ist es ein anderes problem
+
+- saubere, automatische Lösung um ganzes Quartal zu vergleichen. mit vernünftigem Report
+
+- absolut pro sub, num und pre:
+     wie viele Zeilen sind identisch
+     wie viele Zeilen sind unterschiedlich -> was heisst unterschiedlich -> primkey pro sub, num und pre ist hier unterschiedlich
+     wie viele Zeilen sind nur in dailyzips
+     wie viele Zeilen sind nur in quarterzips
+
+
+
+
+Later
+=====
+
+- bessere und klarere Log Statements.. irgendwie standardisieren. Vlt auch so etwas wie eine processstatus am Ende
+
+num file
+- footnotes sind am Ende in einer eigenen Node -> siehe auch 0000004904-21-000010n
+- möglichst alle Infos bis zum Schluss mitnehmen und erst dann finale Version für SEC Zip builden
+  -> DDdate auf Ende Datum berechnen, erst wenn die genauste Präzision für ein tag und ein bestimmtes Datum
+     gefiltert wurden
+
+
+Done
+====
+27.07.2021 - dailyzips neu erzeugen, falls neue Einträge für ein filingdate auftauchen
+27.06.2021 - final fixes für kompletten lauf mit daily zip creation
+12.06.2021 - Unit Tests für NumParsing umgeschrieben
+11.06.2021 - CodeRefactoring für Num umsetzen
+           - Reihenfolge testen in Mastest für Pre
+31.05.2021 - umbauen dictionaries mit https://realpython.com/python-data-classes/
+29.05.2021 - erfolgreich BS und CP parsen, nur noch sehr wenige Ausnahmen
+21.05.2021 - erfolgreiches parsen aller reports in q1 2021 ohne überraschungen..
+14.05.2021 - diverse optimierungen in pre-parsing
+           - neu download mit prüfung auf grösse, da irgendwie die falschen Daten vorhanden sind...
+           - donwload-xml Namen mit ADSH, damit eindeutigkeit sicher gestellt ist
+13.05.2021 - diverse pre-parsing korrekturen
+11.05.2021 - organistaion directory
+               -https://docs.python-guide.org/writing/structure/
+09.05.2021  - Masstest für teiltestset mit erneutem parsing
+            - nur relevante statements parsen
+08.05.2021  - line Eintrag aufgrund Hierarchie berechnet
+04.05.2021  - alle Daten nochmals durchparsen
+03.05.2021  - Fehler prüfen -> "huge text node"
+02.05.2021  - Quartal durchparsen -> nur 2 'leere' numfiles können nicht vearbeitet werden
+            - Automatisierung des Downloads und aufbereiten der Daten
+            -- Die Daten werden laufend nachgeladen und aufbereitet
+            -- Pro Report werden die Daten in eigene Dateien in Jahr/Monats/Tag (processingday)
+30.04.2021  - pre und num files erzeugen..
+            -- erste Version läuft, nächster Schritt komplettes quartal durchparsen
+            - IFRS Standard Beispiel finden und prüfen
+26.04.2021  - aufteilen code für index und xml files
+22.04.2021  - Verwaltung Index Files
+             -- bereits abgeschlossene nicht nochmals neuladen -> Status in Progress / finished
+             -- finished wird erreicht wenn neues File vorhanden ist
+09.04.2021  - Automatisierung des Downloads und aufbereiten der Daten
+            -- in die DB soll auch der Name des SecFeedFiles aufgenommen werden, aus welchem die Daten stammen
+            -- vor dem Inserten der Daten müssen die Einträge entfernt werden, die bereits vorhanden sind
+            --- Spalte mit SecFeedFilenamen füllen
+            --- Daten mit Schlüssel SecFeedFile laden und aufgrund adsh bereinigen
+09.04.2021  - Sicherstellen, dass das Ergänzen der Informationen funktioniert.
+              kleinere Pakete sichern, nicht alles auf einmal
+09.04.2021  - Duplicate Check hinzufügen -> sicherstellen, dass jede ADSH nur einmal vorhanden ist.
+              Offenbar gibt es mit den März Daten Probleme, entweder doppelt in der Datei, oder aber bereits im Februar vorhanden
+05.04.2021  Flywayconfig  und installation

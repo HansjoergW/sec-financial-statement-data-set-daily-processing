@@ -1,43 +1,6 @@
-Setup:
-------
-Probleme beim Finden der Files aus Tests und Imports aus Src wenn die Projekte aus Python gestartet werden.
-- Verzeichnisse mit __init__.py sind immer module roots, d.h., der Foldername ist Package name
-
-- wenn also src in init file hat, dann wäre das package auch src.
-
-- IntelliJ fügt alle src roots then pfaden bei (ist eine configuration in run/dbg) config
-  wenn also Module unterhalb des src-Folders verwendet werden sollen, diese aber nicht über mit import src... importiert
-  werden sollen, müssen die Subfolder des src folders auch als source-root gekennzeichnet werden
-
-- damit aber im test folder der "normale src code" gefunden werden kann, muss der gesamte src folder auch als
-  "source root" konfiguriert werden. Keine Ahnung wieso.
-
-- wenn aus den test folder nicht andere testscripts referenziert werden, dann müssen diese folder auch nicht
-  als test-source referenziert werden
-
-Libraries
----------
-conda install pandas
-
-pip install requests
-
-pip install pathos
-- https://github.com/uqfoundation/pathos
-
-conda install lxml
-conda install pytest
-
-
-Allgemein:
-----------
-Performance Fragen:
-- Set schneller als List, vor allem mit List append -> besser Liste am Anfang mit korrekter Länge erstellen und
-  dann über Indexe Elemente zuweisen
-- Precompiler wie numba verwenden:
-  https://www.youtube.com/playlist?list=PL32jwjv5sQFjbwqVuQoLiWzeyb1mmaVIX
-   -> da gibt es ein paar Settings und Hinweise, die man sich gleich zu Beginn merken sollte
-  https://numba.pydata.org/
-
-xbrl
-- hierarchie definition für us-gaap
-  https://xbrlview.fasb.org/yeti/resources/yeti-gwt/Yeti.jsp#tax~(id~174*v~7138)!con~(id~4702285)!net~(a~3474*l~832)!lang~(code~en-us)!path~(g~99049*p~0_0_2_0_0_0_3)!rg~(rg~32*p~12)
+Allgemein neue version
+----------------------
+- Gemäss doku werden nur noch die Einträge in Num übernommen, die auch in den primary statements vorhanden sind.
+  Das müsste bedeuten, nur Einträge, die mit adsh,tag, und version auch in pre vorhanden sind.
+  Das scheint in beide Richtungen gültigkeit zu haben, man kann diese also nicht unabhängig bereinigen.
+- Ebenso sind keine CP informationen mehr in den PRE files vorhanden.
