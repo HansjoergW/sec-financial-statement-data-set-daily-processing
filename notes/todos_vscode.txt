@@ -13,9 +13,19 @@
  7. [ok] definieren einer neuen conda umgebung
  8. [ok] definieren der notwendigen dependencies im pyproject.toml, bis ausführung läuft
  9. [ok] sicherstellen, dass alle normlan tests wieder laufen
-10. Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter
+10. [] einzelner Test mit soll / ist vergleich 
+
+
+ Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter
    -> detail vergleich einer einzelnen adsh nummer
    -> adshs vergleich quartal
    -> detail vergleich ganzes quartal
+
+- git workflow aktivieren
+- sqlite db setup überlegen, wenn wird sie angelegt, wie
+  wissen wir, ab welchem script die db ddls ausgeführt werden müssen?
+  wie geschieht das im secfsdstools
+  
+
 
 

@@ -133,3 +133,5 @@ dmypy.json
 /out/
 
 /tmp
+/_localdata
+

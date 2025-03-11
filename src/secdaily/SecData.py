@@ -14,7 +14,6 @@ from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from secdaily._02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
 from secdaily._03_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
-from secdaily._04_seczip.SecZipDownloading import SecZipDownloader
 
 month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
@@ -115,21 +114,14 @@ class SecDataOrchestrator:
         zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
         zip_creator.process()
 
-    # def download_seczip(self):
-    #     self._log_main_header("Download Seczip files")
-    #     downloader = SecZipDownloader(self.seczipdir, self.urldownloader)
-    #     downloader.download()
-
     def process(self):
         self.process_index_data()
         self.process_xml_data()
         self.create_daily_zip()
-        # self.download_seczip()
 
 
 if __name__ == '__main__':
     workdir_default = "d:/secprocessing/"
-    # orchestrator = SecDataOrchestrator(workdir_default)
     orchestrator = SecDataOrchestrator(workdir=workdir_default,
                                        user_agent_def="private user somebody.lastname@gmail.com",
                                        start_year=2022,
