@@ -131,3 +131,5 @@ dmypy.json
 /sec_processing.iml
 /tst/test/_00_common/data/sec_data.db
 /out/
+
+/tmp
