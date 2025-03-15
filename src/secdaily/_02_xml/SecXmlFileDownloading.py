@@ -16,11 +16,17 @@ class DataAccessor(Protocol):
     def find_missing_xmlPreFiles(self) -> List[MissingFile]:
         """ find report entries in the process table for which the xml-pre-file has not yet been downloaded """
 
+    def find_missing_xmlLabelFiles(self) -> List[MissingFile]:
+        """ find report entries in the process table for which the xml-lab-file has not yet been downloaded """
+
     def update_processing_xml_num_file(self, update_list: List[MissingFile]):
         """ update the entry of a formerly missing xml-num-file and update it with the name of the downloaded file """
 
     def update_processing_xml_pre_file(self, update_list: List[MissingFile]):
         """ update the entry of a formerly missing xml-pre-file and update it with the name of the downloaded file """
+
+    def update_processing_xml_label_file(self, update_list: List[MissingFile]):
+        """ update the entry of a formerly missing xml-lab-file and update it with the name of the downloaded file """
 
 
 class SecXmlFileDownloader:
@@ -50,8 +56,9 @@ class SecXmlFileDownloader:
         except ValueError:
             size = None
 
-        if data.url == None:
-            logging.warning("url is null:  / " + data.accessionNumber)
+        if (data.url == None) | (data.url == ""):
+            logging.warning("url is null: " + data.accessionNumber + " / " + data.type)
+            return data
 
         filename = data.url.rsplit('/', 1)[-1]
 
@@ -85,5 +92,15 @@ class SecXmlFileDownloader:
         executor.set_get_entries_function(self.dbmanager.find_missing_xmlPreFiles)
         executor.set_process_element_function(self._download_file)
         executor.set_post_process_chunk_function(self.dbmanager.update_processing_xml_pre_file)
+
+        self._download(executor)
+
+    def downloadLabFiles(self):
+        logging.info("download Label Files")
+
+        executor = ParallelExecutor[MissingFile, MissingFile, type(None)](max_calls_per_sec=8)
+        executor.set_get_entries_function(self.dbmanager.find_missing_xmlLabelFiles)
+        executor.set_process_element_function(self._download_file)
+        executor.set_post_process_chunk_function(self.dbmanager.update_processing_xml_label_file)
 
         self._download(executor)

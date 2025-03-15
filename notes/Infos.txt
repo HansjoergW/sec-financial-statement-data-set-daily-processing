@@ -4,3 +4,12 @@ Allgemein neue version
   Das müsste bedeuten, nur Einträge, die mit adsh,tag, und version auch in pre vorhanden sind.
   Das scheint in beide Richtungen gültigkeit zu haben, man kann diese also nicht unabhängig bereinigen.
 - Ebenso sind keine CP informationen mehr in den PRE files vorhanden.
+
+
+Unterschiede aktuelle Generierung
+---------------------------------
+Single Beispiel 0000320193-24-000123 (2024 10K Apple)
+-  PRE
+  - plabels fehlen
+  - EQ wird in eine zusätzliche Gruppe gespalten
+  - Zeilen in EQ scheinen zu fehlen

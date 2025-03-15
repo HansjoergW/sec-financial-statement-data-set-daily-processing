@@ -42,8 +42,8 @@ class SecPreXmlParser(SecXmlParserBase):
             return df
         df = df[~df.stmt.isnull()]
         df = df[df.line != 0].copy()
-        df.drop(['plabel'], axis=1, inplace=True)
         df['adsh'] = adsh
+        df['negating'] = df.negating.astype(int)
 
         df.loc[df.version == 'company', 'version'] = adsh
 

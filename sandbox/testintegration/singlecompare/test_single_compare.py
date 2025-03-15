@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 from secdaily._00_common.SecFileUtils import read_content_from_zip
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
@@ -103,8 +104,25 @@ def test_merge(pre_parsed_df: pd.DataFrame, num_parsed_df: pd.DataFrame, pre_ori
     print("pre orig len: ", len(pre_orig_df))
     print("num orig len: ", len(num_orig_df))
 
+    pre_df_cols = list(set(pre_df.columns) - set(['rfile', 'plabel']))
 
+    pre_df_filtered = pre_df[pre_df_cols]
+    pre_orig_df_filtered = pre_orig_df[pre_df_cols]
+
+    pre_df_filtered = pre_df_filtered.sort_values(by=pre_df_cols).reset_index(drop=True)
+    pre_orig_df_filtered = pre_orig_df_filtered.sort_values(by=pre_df_cols).reset_index(drop=True)
+ 
     assert len(merged_df) > 0
+    try:
+        assert_frame_equal(pre_df_filtered, pre_orig_df_filtered, check_dtype=False)
+    except AssertionError as e:
+        print("Differences in pre DataFrame:")
+        diff_pre = pre_df_filtered.merge(pre_orig_df_filtered, indicator=True, how='outer')
+        
+        diff_pre = diff_pre.sort_values(['adsh', 'stmt', 'line', 'tag', 'version'])
+        print(diff_pre[diff_pre['_merge'] != 'both'])
+
+    # assert assert_frame_equal(num_df, num_orig_df, check_dtype=False)
 
 
 

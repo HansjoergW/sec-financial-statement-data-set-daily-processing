@@ -90,40 +90,47 @@ class SecDataOrchestrator:
 
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.urldownloader, self.xmldir)
+        self._log_sub_header('download lab xml files')
+        secxmlfilesdownloader.downloadLabFiles()        
         self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()
         self._log_sub_header('download pre xml files')
         secxmlfilesdownloader.downloadPreFiles()
 
-    def _parse_xml(self):
-        secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
-        self._log_sub_header('parse num xml files')
-        secxmlfileparser.parseNumFiles()
-        self._log_sub_header('parse pre xml files')
-        secxmlfileparser.parsePreFiles()
+    # def _parse_xml(self):
+    #     secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
+    #     self._log_sub_header('parse num xml files')
+    #     secxmlfileparser.parseNumFiles()
+    #     self._log_sub_header('parse pre xml files')
+    #     secxmlfileparser.parsePreFiles()
 
     def process_xml_data(self):
         self._log_main_header("Process xbrl data files")
 
         self._preprocess_xml()
         self._download_xml()
-        self._parse_xml()
+#        self._parse_xml()
 
-    def create_daily_zip(self):
-        self._log_main_header("Create daily zip files")
-        zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
-        zip_creator.process()
+    # def create_daily_zip(self):
+    #     self._log_main_header("Create daily zip files")
+    #     zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
+    #     zip_creator.process()
 
     def process(self):
         self.process_index_data()
         self.process_xml_data()
-        self.create_daily_zip()
+        # self.create_daily_zip()
 
 
 if __name__ == '__main__':
-    workdir_default = "d:/secprocessing/"
+    workdir_default = "d:/secprocessing2/"
+
+    from secdaily._00_common.DBBase import DB
+    DB(workdir_default)._create_db()
+
+
     orchestrator = SecDataOrchestrator(workdir=workdir_default,
                                        user_agent_def="private user somebody.lastname@gmail.com",
-                                       start_year=2022,
-                                       start_qrtr=2)
+                                       start_year=2025,
+                                       start_qrtr=1)
     orchestrator.process()

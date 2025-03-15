@@ -11,6 +11,10 @@ class XbrlFile:
     lastChange: str
     size: int
 
+    @staticmethod
+    def default() -> 'XbrlFile':
+        return XbrlFile(name="", url="", lastChange="", size=0)
+
 
 @dataclass
 class XbrlFiles:

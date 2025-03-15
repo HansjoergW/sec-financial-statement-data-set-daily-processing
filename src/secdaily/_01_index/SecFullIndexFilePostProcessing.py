@@ -82,7 +82,12 @@ class SecFullIndexFilePostProcessor:
                 ins_file = relevant_entries['pre'].name.replace("_pre", "")
                 relevant_entries['ins'] = relevant_entries[ins_file]
 
-            period = relevant_entries['pre'].name.replace("_pre.xml", "")[-8:]
+            period = ""
+            if 'pre' in relevant_entries:
+                period = relevant_entries['pre'].name.replace("_pre.xml", "")[-8:]
+            elif 'ins' in relevant_entries:
+                if relevant_entries['ins'].name.endswith("_htm.xml"):
+                    period = relevant_entries['ins'].name.replace("_htm.xml", "")[-8:]
 
             # if we have a 10-K, the fye is the month and date of the period
             if rowdata.formType == "10-K":
@@ -96,11 +101,12 @@ class SecFullIndexFilePostProcessor:
                              sec_feed_file=rowdata.sec_feed_file,
                              fiscal_year_end=fiscal_year_end,
                              period=period,
-                             xbrlIns=relevant_entries['ins'], xbrlPre=relevant_entries['pre'],
-                             xbrlCal=relevant_entries['cal'], xbrlDef=relevant_entries['def'],
-                             xbrlLab=relevant_entries['lab'], xbrlZip=relevant_entries['xbrlzip'])
+                             xbrlIns=relevant_entries.get('ins', XbrlFile.default()), xbrlPre=relevant_entries.get('pre', XbrlFile.default()),
+                             xbrlCal=relevant_entries.get('cal', XbrlFile.default()), xbrlDef=relevant_entries.get('def', XbrlFile.default()),
+                             xbrlLab=relevant_entries.get('lab', XbrlFile.default()), xbrlZip=relevant_entries.get('xbrlzip', XbrlFile.default()))
 
-        except:
+        except Exception as e:
+            logging.warning(f"failed to process {rowdata.accessionNumber} with {e}")
             return XbrlFiles(rowdata.accessionNumber, rowdata.sec_feed_file, None, None, None, None, None, None, None,
                              None)
 

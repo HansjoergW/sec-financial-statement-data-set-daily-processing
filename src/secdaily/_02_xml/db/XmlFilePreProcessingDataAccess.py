@@ -7,7 +7,7 @@ class XmlFilePreProcessingDA(DB):
 
     # copies entries from the feed table to the processing table if they are not already present
     def copy_uncopied_entries(self) -> int:
-        sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize  FROM {} WHERE status is null and xbrlInsUrl is not null'''.format(
+        sql = '''SELECT accessionNumber, cikNumber, filingDate, formType, xbrlInsUrl, insSize, xbrlPreUrl, preSize, xbrlLabUrl, labSize  FROM {} WHERE status is null and xbrlInsUrl is not null'''.format(
             DB.SEC_REPORTS_TBL_NAME)
         to_copy_df = self._execute_read_as_df(sql)
 

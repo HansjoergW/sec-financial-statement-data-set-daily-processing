@@ -14,6 +14,16 @@
  8. [ok] definieren der notwendigen dependencies im pyproject.toml, bis ausführung läuft
  9. [ok] sicherstellen, dass alle normlan tests wieder laufen
 10. [] einzelner PRE Test mit soll / ist vergleich 
+   - plabel sollte gleich sein
+     - [ok] download label files
+     - prozess label files
+11. [ok] Optimierung failed downloads
+       [ok] manage process index -> default values
+       [ok] copy to processing -> correct übernehmen
+       [ok] selection for missing download -> nicht übernehmen, falls url empty
+
+
+12. - wie gehen wir mit Reports um, die nur ein "ins" file haben?  
 
 
  Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter
@@ -25,7 +35,6 @@
 - sqlite db setup überlegen, wenn wird sie angelegt, wie
   wissen wir, ab welchem script die db ddls ausgeführt werden müssen?
   wie geschieht das im secfsdstools
-  
 
 
 
