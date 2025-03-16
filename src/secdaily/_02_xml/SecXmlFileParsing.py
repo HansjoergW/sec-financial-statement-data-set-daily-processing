@@ -107,7 +107,6 @@ class SecXmlParser:
         try:
             # todo: check if we should do something with the error_list
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            df = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
             write_df_to_zip(df, targetfilepath)
             return UpdatePreParsing(
                 accessionNumber=data.accessionNumber,
@@ -147,14 +146,24 @@ class SecXmlParser:
 
         try:
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            df, fye = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
+
+            # extract fiscal year end date
+            # current fiscal year end appears in the form --MM-dd, so we remove the dashes
+            df.loc[(df.tag == 'CurrentFiscalYearEndDate'), 'value'] = df[df.tag == 'CurrentFiscalYearEndDate'].value.str.replace('-','')
+
+            # check wether a currentfiscalyearenddate is present -> we return that as a separate information
+            cfyed_df = df[(df.tag == 'CurrentFiscalYearEndDate')]
+            if len(cfyed_df) > 0:
+                fiscalYearEnd = cfyed_df.value.iloc[0]
+            else:
+                fiscalYearEnd = None            
 
             write_df_to_zip(df, targetfilepath)
             return UpdateNumParsing(accessionNumber=data.accessionNumber,
                                     csvNumFile=targetfilepath,
                                     numParseDate=self.processdate,
                                     numParseState='parsed:' + str(len(df)),
-                                    fiscalYearEnd=fye)
+                                    fiscalYearEnd=fiscalYearEnd)
 
         except Exception as e:
             logging.exception("failed to parse data: " + data.file, e)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 import numpy as np
 import pandas as pd
 
@@ -38,9 +38,10 @@ class SECStyleFormatter:
         df.set_index(['adsh', 'tag', 'version', 'report', 'line', 'stmt'], inplace=True)
         return df
 
-    def _format_num(self, num_df: pd.DataFrame, adsh: Optional[str] = None) -> pd.Tuple[pd.DataFrame, Optional[str]]:
+
+    def _format_num(self, num_df: pd.DataFrame, adsh: Optional[str] = None) -> pd.DataFrame:
         if num_df.shape[0] == 0:
-            return num_df, None
+            return num_df
 
         df = (num_df[num_df.isrelevant]).copy()
 
@@ -51,16 +52,6 @@ class SECStyleFormatter:
         df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
         df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
         df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-
-        # current fiscal year end appears in the form --MM-dd, so we remove the dashes
-        df.loc[(df.tag == 'CurrentFiscalYearEndDate'), 'value'] = df[df.tag == 'CurrentFiscalYearEndDate'].value.str.replace('-','')
-
-        # check wether a currentfiscalyearenddate is present -> we return that as a separate information
-        cfyed_df = df[(df.tag == 'CurrentFiscalYearEndDate')]
-        if len(cfyed_df) > 0:
-            fiscalYearEnd = cfyed_df.value.iloc[0]
-        else:
-            fiscalYearEnd = None
 
         df['qtrs'] = df.qtrs.apply(int)
         df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')
@@ -88,8 +79,7 @@ class SECStyleFormatter:
 
         df = df[~df_double_index_mask]
 
-        return df, fiscalYearEnd
-
+        return df
 
 
     def process(self):

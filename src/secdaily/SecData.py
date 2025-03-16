@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional
 
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
@@ -20,7 +21,7 @@ month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11
 
 class SecDataOrchestrator:
 
-    def __init__(self, workdir: str, user_agent_def: str, start_year: int = None, start_qrtr: int = None):
+    def __init__(self, workdir: str, user_agent_def: str, start_year: Optional[int] = None, start_qrtr: Optional[int] = None):
         """
         :param user_agent_def: according to https://www.sec.gov/os/accessing-edgar-data in the form User-Agent: Sample Company Name AdminContact@<sample company domain>.com
         """
