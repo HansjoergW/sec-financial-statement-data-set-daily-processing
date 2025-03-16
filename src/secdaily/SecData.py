@@ -12,8 +12,8 @@ from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
 from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from secdaily._02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
-from secdaily._03_dailyzip.DailyZipCreating import DailyZipCreator
-from secdaily._03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
+from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
 month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
@@ -97,19 +97,25 @@ class SecDataOrchestrator:
         self._log_sub_header('download pre xml files')
         secxmlfilesdownloader.downloadPreFiles()
 
-    # def _parse_xml(self):
-    #     secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
-    #     self._log_sub_header('parse num xml files')
-    #     secxmlfileparser.parseNumFiles()
-    #     self._log_sub_header('parse pre xml files')
-    #     secxmlfileparser.parsePreFiles()
+    def _parse_xml(self):
+        secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
+        self._log_sub_header('parse lab xml files')
+        secxmlfileparser.parseLabFiles()
+        self._log_sub_header('parse num xml files')
+        secxmlfileparser.parseNumFiles()
+        self._log_sub_header('parse pre xml files')
+        secxmlfileparser.parsePreFiles()
 
     def process_xml_data(self):
         self._log_main_header("Process xbrl data files")
 
         self._preprocess_xml()
         self._download_xml()
-#        self._parse_xml()
+        self._parse_xml()
+    
+    def create_sec_style(self):
+        self._log_sub_header('create sec style files')
+        print("TODO")
 
     # def create_daily_zip(self):
     #     self._log_main_header("Create daily zip files")
@@ -119,6 +125,7 @@ class SecDataOrchestrator:
     def process(self):
         self.process_index_data()
         self.process_xml_data()
+        # self.create_sec_style()
         # self.create_daily_zip()
 
 

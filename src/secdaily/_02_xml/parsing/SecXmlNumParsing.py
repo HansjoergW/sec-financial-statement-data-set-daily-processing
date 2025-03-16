@@ -73,62 +73,6 @@ class SecNumXmlParser(SecXmlParserBase):
         df = self._read_tags(adsh, transformed_data)
         return df, []
 
-    def round_half_up(self, n, decimals=0):
-        # from https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe
-        multiplier = 10 ** decimals
-        return np.floor(n*multiplier + 0.5) / multiplier
-
-    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> Tuple[pd.DataFrame, Optional[str]]:
-        if df.shape[0] == 0:
-            return df, None
-
-        df = (df[df.isrelevant]).copy()
-
-        df['uom_ext'] = df['uom']
-
-        # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
-
-        df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-
-        # current fiscal year end appears in the form --MM-dd, so we remove the dashes
-        df.loc[(df.tag == 'CurrentFiscalYearEndDate'), 'value'] = df[df.tag == 'CurrentFiscalYearEndDate'].value.str.replace('-','')
-
-        # check wether a currentfiscalyearenddate is present -> we return that as a separate information
-        cfyed_df = df[(df.tag == 'CurrentFiscalYearEndDate')]
-        if len(cfyed_df) > 0:
-            fiscalYearEnd = cfyed_df.value.iloc[0]
-        else:
-            fiscalYearEnd = None
-
-        df['qtrs'] = df.qtrs.apply(int)
-        df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')
-
-        # sec rounds the values to 4 decimals
-        # sec is not using the scientific rounding method, which rounds 0.155 up to 0.16 and 0.165 down to 0.16
-        # (see https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe)
-
-        # die 'values' in den txt files haben maximal 4 nachkommastellen...
-        df.loc[~df.decimals.isnull(), 'value'] = self.round_half_up( df.loc[~df.decimals.isnull(), 'value'], decimals=4)
-
-        df.loc[df.version == 'company', 'version'] = adsh
-
-        df.drop(['segments','isrelevant'], axis=1, inplace=True)
-        df.drop_duplicates(inplace=True)
-
-        # set the indexes
-        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom_ext'], inplace=True)
-
-        # and sort by the precision
-        # it can happen that the same tag is represented in the reports multiple times with different precision
-        # and it looks as if the "txt" data of the sec is then produced with the lower precision
-        df.sort_values('decimals', inplace=True)
-        df_double_index_mask = df.index.duplicated(keep='first')
-
-        df = df[~df_double_index_mask]
-
-        return df, fiscalYearEnd
 
 
 if __name__ == '__main__':
@@ -139,6 +83,3 @@ if __name__ == '__main__':
 
     parser = SecNumXmlParser()
     data, errors = parser.parse("0001078782-21-000058", xml_exp_content)
-
-    result, fye = parser.clean_for_financial_statement_dataset(data)
-    print("")

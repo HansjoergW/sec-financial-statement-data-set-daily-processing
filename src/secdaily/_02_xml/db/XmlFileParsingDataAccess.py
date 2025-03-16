@@ -27,29 +27,44 @@ class UpdatePreParsing:
     preParseState: str
 
 
+@dataclass
+class UpdateLabParsing:
+    accessionNumber: str
+    csvLabFile: Optional[str]
+    labParseDate: str
+    labParseState: str
+
+
 class XmlFileParsingDA(DB):
 
     def find_unparsed_numFiles(self) -> List[UnparsedFile]:
-        sql = '''SELECT accessionNumber, xmlNumFile as file FROM {} WHERE csvNumFile is NULL and numParseState is NULL'''.format(
-            DB.SEC_REPORT_PROCESSING_TBL_NAME)
+        sql = f'''SELECT accessionNumber, xmlNumFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvNumFile is NULL and numParseState is NULL'''
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def find_unparsed_preFiles(self) -> List[UnparsedFile]:
-        sql = '''SELECT accessionNumber, xmlPreFile as file FROM {} WHERE csvPreFile is NULL and preParseState is NULL'''.format(
-            DB.SEC_REPORT_PROCESSING_TBL_NAME)
+        sql = f'''SELECT accessionNumber, xmlPreFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvPreFile is NULL and preParseState is NULL'''
         return self._execute_fetchall_typed(sql, UnparsedFile)
+
+    def find_unparsed_labFiles(self) -> List[UnparsedFile]:
+        sql = f'''SELECT accessionNumber, xmlLabFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvLabFile is NULL and labParseState is NULL'''
+        return self._execute_fetchall_typed(sql, UnparsedFile)
+
 
     def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
         update_data = [(x.csvNumFile, x.numParseDate, x.numParseState, x.fiscalYearEnd, x.accessionNumber) for x in
                        updatelist]
 
-        sql = '''UPDATE {} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''.format(
-            DB.SEC_REPORT_PROCESSING_TBL_NAME)
+        sql = f'''UPDATE {DB.SEC_REPORT_PROCESSING_TBL_NAME} SET csvNumFile = ?, numParseDate = ?, numParseState = ?, fiscalYearEnd =? WHERE accessionNumber = ?'''
         self._execute_many(sql, update_data)
 
     def update_parsed_pre_file(self, updatelist: List[UpdatePreParsing]):
         update_data = [(x.csvPreFile, x.preParseDate, x.preParseState, x.accessionNumber) for x in updatelist]
 
-        sql = '''UPDATE {} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''.format(
-            DB.SEC_REPORT_PROCESSING_TBL_NAME)
+        sql = f'''UPDATE {DB.SEC_REPORT_PROCESSING_TBL_NAME} SET csvPreFile = ?, preParseDate = ?, preParseState = ? WHERE accessionNumber = ?'''
+        self._execute_many(sql, update_data)
+    
+    def update_parsed_lab_file(self, updatelist: List[UpdateLabParsing]):
+        update_data = [(x.csvLabFile, x.labParseDate, x.labParseState, x.accessionNumber) for x in updatelist]
+
+        sql = f'''UPDATE {DB.SEC_REPORT_PROCESSING_TBL_NAME} SET csvLabFile = ?, labParseDate = ?, labParseState = ? WHERE accessionNumber = ?'''
         self._execute_many(sql, update_data)

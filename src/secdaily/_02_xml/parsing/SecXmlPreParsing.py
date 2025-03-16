@@ -6,7 +6,7 @@ from secdaily._02_xml.parsing.pre._4_SecPreXmlProcessing import SecPreXmlDataPro
 
 import pandas as pd
 
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Tuple
 
 
 
@@ -37,25 +37,4 @@ class SecPreXmlParser(SecXmlParserBase):
 
         return (df, sec_error_list)
 
-    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
-        if len(df) == 0:
-            return df
-        df = df[~df.stmt.isnull()]
-        df = df[df.line != 0].copy()
-        df['adsh'] = adsh
-        df['negating'] = df.negating.astype(int)
 
-        df.loc[df.version == 'company', 'version'] = adsh
-
-        # we discovered, that comprehensive income statements are labelled as IS, if no IS is present.
-        # attention: inpth has o be considered
-        contained_statements = df[df.inpth==0].stmt.unique()
-        if ("CI" in contained_statements) and ("IS" not in contained_statements):
-            df.loc[(df.stmt == 'CI') & (df.inpth==0), 'stmt'] = 'IS'
-
-            contained_statements_inpth = df[df.inpth==1].stmt.unique()
-            if ("CI" in contained_statements_inpth) and ("IS" not in contained_statements_inpth):
-                df.loc[(df.stmt == 'CI') & (df.inpth==1), 'stmt'] = 'IS'
-
-        df.set_index(['adsh', 'tag', 'version', 'report', 'line', 'stmt'], inplace=True)
-        return df

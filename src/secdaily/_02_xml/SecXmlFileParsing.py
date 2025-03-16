@@ -4,20 +4,26 @@ import logging
 import os
 from typing import Protocol, List, Tuple
 
-from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, UnparsedFile, UpdatePreParsing
+from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, UnparsedFile, UpdatePreParsing, UpdateLabParsing
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
-
+from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 
 class DataAccess(Protocol):
 
     def find_unparsed_numFiles(self) -> List[UnparsedFile]:
         """ find report entries for which the xmlnumfiles have not been parsed """
+        return []
 
     def find_unparsed_preFiles(self) -> List[UnparsedFile]:
         """ find report entries for which the xmlprefiles have not been parsed """
+        return []
+
+    def find_unparsed_labFiles(self) -> List[UnparsedFile]:
+        """ find report entries for which the xmllabfiles have not been parsed """
+        return []
 
     def update_parsed_num_file(self, updatelist: List[UpdateNumParsing]):
         """ update the report entry with the parsed result file """
@@ -25,10 +31,14 @@ class DataAccess(Protocol):
     def update_parsed_pre_file(self, updatelist: List[UpdatePreParsing]):
         """ update the report entry with the parsed result file """
 
+    def update_parsed_lab_file(self, updatelist: List[UpdateLabParsing]):
+        """ update the report entry with the parsed result file """
+
 
 class SecXmlParser:
     numparser = SecNumXmlParser()
     preparser = SecPreXmlParser()
+    labparser = SecLabXmlParser()
 
     def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/data/", use_process_date_in_path: bool = True):
         self.dbmanager = dbmanager
@@ -43,6 +53,47 @@ class SecXmlParser:
 
         if not os.path.isdir(self.data_dir):
             os.makedirs(self.data_dir)
+
+
+    # --- Lab Parsing
+    def _parse_lab_file(self, data: UnparsedFile) -> UpdateLabParsing:
+
+        parser = SecXmlParser.labparser
+
+        targetfilepath = self.data_dir + data.accessionNumber + '_' + parser.get_type() + ".csv"
+
+        xml_content = read_content_from_zip(data.file)
+
+        try:
+            # todo: check if we should do something with the error_list
+            df, error_list = parser.parse(data.accessionNumber, xml_content)
+            df = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
+            write_df_to_zip(df, targetfilepath)
+            return UpdateLabParsing(
+                accessionNumber=data.accessionNumber,
+                csvLabFile=targetfilepath,
+                labParseDate=self.processdate,
+                labParseState='parsed:' + str(len(df))
+            )
+
+        except Exception as e:
+            logging.exception("failed to parse data: " + data.file, e)
+            return UpdateLabParsing(
+                accessionNumber=data.accessionNumber,
+                csvLabFile=None,
+                labParseDate=self.processdate,
+                labParseState=str(e))
+    
+    def parseLabFiles(self):
+        logging.info("parsing Lanb Files")
+
+        executor = ParallelExecutor[UnparsedFile, UpdateLabParsing, type(None)]()  # no limitation in speed
+
+        executor.set_get_entries_function(self.dbmanager.find_unparsed_labFiles)
+        executor.set_process_element_function(self._parse_lab_file)
+        executor.set_post_process_chunk_function(self.dbmanager.update_parsed_lab_file)
+
+        executor.execute()
 
     # --- Pre Parsing
     def _parse_pre_file(self, data: UnparsedFile) -> UpdatePreParsing:

@@ -1,8 +1,7 @@
 {
-    "python.testing.pytestArgs": [
+    "python.testing.pytestArgs": ["-s", 
         "tests", "sandbox"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.testing.pytestArgs": ["-s"]
 }

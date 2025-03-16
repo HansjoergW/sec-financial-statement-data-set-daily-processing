@@ -12,12 +12,15 @@ class DataAccessor(Protocol):
 
     def find_missing_xmlNumFiles(self) -> List[MissingFile]:
         """ find report entries in the process table for which the xml-num-file has not yet been downloaded """
+        return []
 
     def find_missing_xmlPreFiles(self) -> List[MissingFile]:
         """ find report entries in the process table for which the xml-pre-file has not yet been downloaded """
+        return []
 
     def find_missing_xmlLabelFiles(self) -> List[MissingFile]:
         """ find report entries in the process table for which the xml-lab-file has not yet been downloaded """
+        return []
 
     def update_processing_xml_num_file(self, update_list: List[MissingFile]):
         """ update the entry of a formerly missing xml-num-file and update it with the name of the downloaded file """
@@ -57,7 +60,7 @@ class SecXmlFileDownloader:
             size = None
 
         if (data.url == None) | (data.url == ""):
-            logging.warning("url is null: " + data.accessionNumber + " / " + data.type)
+            logging.warning(f"url is null: {data.accessionNumber} / {data.type} ")
             return data
 
         filename = data.url.rsplit('/', 1)[-1]

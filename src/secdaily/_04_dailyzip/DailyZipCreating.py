@@ -9,7 +9,7 @@ from typing import List, Tuple, Dict, Protocol
 import numpy as np
 import pandas as pd
 
-from secdaily._03_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
 from secdaily._00_common.SecFileUtils import read_df_from_zip
 
 

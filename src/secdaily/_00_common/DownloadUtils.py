@@ -1,3 +1,4 @@
+from typing import Optional
 from secdaily._00_common.SecFileUtils import write_content_to_zip
 
 import logging
@@ -17,7 +18,7 @@ class UrlDownloader:
 
     # downloads the content of a url and stores it into a file
     # tries to download the file multiple times, if the download fails
-    def download_url_to_file(self, file_url: str, target_file: str, expected_size: int = None, max_tries: int = 6,
+    def download_url_to_file(self, file_url: str, target_file: str, expected_size: Optional[int] = None, max_tries: int = 6,
                              sleep_time: int = 1):
         content = self.get_url_content(file_url, max_tries, sleep_time)
         if expected_size != None:

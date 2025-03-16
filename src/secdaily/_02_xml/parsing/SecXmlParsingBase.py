@@ -26,7 +26,4 @@ class SecXmlParserBase(ABC):
     def parse(self, adsh: str, data: str) -> Tuple[pd.DataFrame, List[SecError]]:
         pass
 
-    @abstractmethod
-    def clean_for_financial_statement_dataset(self, df: pd.DataFrame, adsh: str = None) -> pd.DataFrame:
-        pass
 
