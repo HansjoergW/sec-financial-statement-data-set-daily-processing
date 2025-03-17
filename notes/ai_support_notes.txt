@@ -1,0 +1,15 @@
+copilot:
+ - Möglichkeit für System Prompts sollte vorhanden sein
+ - sehr langsam, bis grössere Klassen/files upgedated werden, oder auch 
+   um generierten Code zu "mergen"/akzeptieren.
+   Claude 3.5 Modell scheint etwas schneller zu sein
+
+
+augment code:
+ - keep an eye on the augmentcode.com subscription:
+   does it really switch to community after the 15.4 ?
+ - einfach zu installieren, hat schnell verstanden, worum es im code geht.
+   scheint auch key Konzepte erkannt zu haben, z.B. Parallelisierung.
+   Scheint dafür aber in erster Linie code_overview.md gelesen zu haben.
+
+

@@ -17,7 +17,7 @@
        [ok] manage process index -> default values
        [ok] copy to processing -> correct übernehmen
        [ok] selection for missing download -> nicht übernehmen, falls url empty
-11. [] implement to csv logic für label daten
+11. [] implement "to csv" logic für label daten
 12. [] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
 
 
@@ -25,6 +25,7 @@
    - plabel sollte gleich sein
      - [ok] download label files
      - prozess label files
+
 
 
  - Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter
@@ -40,3 +41,4 @@
 
 
 
+#    labels: defaultdict = field(default_factory=lambda: defaultdict(str))

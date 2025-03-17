@@ -2,7 +2,7 @@ from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreExtractPre
     SecPreExtractPresentationArcDetails
 
 from dataclasses import dataclass
-from typing import List, Dict, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple
 import re
 
 """ transforms the raw content of the information inside the xml in the a usable form. does not do any processing of the data, 
@@ -24,8 +24,8 @@ class SecPreTransformPresentationArcDetails():
     preferredLabel: str
     from_entry: str
     to_entry: str
-    key_tag: str = None
-    line: int = None
+    key_tag: Optional[str] = None
+    line: Optional[int] = None
 
 
 @dataclass
@@ -35,14 +35,11 @@ class SecPreTransformPresentationDetails():
     title: str
     role: str
     inpth: str
-    root_node: str = None
+    root_node: Optional[str] = None
 
 
 class SecPreXmlTransformer():
     digit_ending_label_regex = re.compile(r"_\d*$")
-
-    def __init__(self):
-        pass
 
     @staticmethod
     def _get_version_tag_name_from_href(href: str) -> Tuple[str, str]:
