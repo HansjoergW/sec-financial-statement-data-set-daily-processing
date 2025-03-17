@@ -28,6 +28,11 @@ CREATE TABLE IF NOT EXISTS sec_report_processing
     labParseState,
     csvLabFile,    
 
+    formatState,
+    formatDate,
+    numFormattedFile,
+    preFormattedFile,
+
     dailyZipFile,
     processZipDate,
     fiscalYearEnd,

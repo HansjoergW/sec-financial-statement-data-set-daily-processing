@@ -138,6 +138,6 @@ if __name__ == '__main__':
 
     orchestrator = SecDataOrchestrator(workdir=workdir_default,
                                        user_agent_def="private user somebody.lastname@gmail.com",
-                                       start_year=2025,
-                                       start_qrtr=1)
+                                       start_year=2024,
+                                       start_qrtr=4)
     orchestrator.process()
