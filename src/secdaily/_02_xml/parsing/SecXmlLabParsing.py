@@ -5,7 +5,8 @@ from typing import List, Tuple
 import pandas as pd
 from secdaily._02_xml.parsing.SecXmlParsingBase import SecError, SecXmlParserBase
 from secdaily._02_xml.parsing.lab._1_SecLabXmlExtracting import SecLabLabelLink, SecLabXmlExtractor
-from secdaily._02_xml.parsing.lab._2_SecLabXmlTransformation import SecLabXmlTransformer
+from secdaily._02_xml.parsing.lab._2_SecLabXmlTransformation import SecLabXmlTransformer, SecLabTransformLabelDetails
+from secdaily._02_xml.parsing.lab._3_SecLabXmlProcessing import SecLabXmlDataProcessor, LabelEntry
 
 
 class SecLabXmlParser(SecXmlParserBase):
@@ -18,11 +19,16 @@ class SecLabXmlParser(SecXmlParserBase):
         
         extractor: SecLabXmlExtractor  = SecLabXmlExtractor()
         transformer: SecLabXmlTransformer = SecLabXmlTransformer()
+        processor: SecLabXmlDataProcessor = SecLabXmlDataProcessor()
 
         extracted_data: SecLabLabelLink = extractor.extract(adsh, data)
-        transformed_data: pd.DataFrame = transformer.transform(adsh, extracted_data)
+        transformed_data: List[SecLabTransformLabelDetails] = transformer.transform(adsh, extracted_data)
+        processed_entries: List[LabelEntry]
+        collected_errors: List[Tuple[str, str, str]]
+        processed_entries, collected_errors = processor.process(adsh, transformed_data)
 
+        sec_error_list = [SecError(x[0], x[1], x[2]) for x in collected_errors]
 
-        df = None
-        sec_error_list = []
+        df = pd.DataFrame(processed_entries)
+
         return (df, sec_error_list)

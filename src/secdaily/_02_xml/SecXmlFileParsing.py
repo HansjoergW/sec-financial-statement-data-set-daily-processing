@@ -8,6 +8,7 @@ from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdateNumParsing, Unpar
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 
@@ -54,6 +55,18 @@ class SecXmlParser:
         if not os.path.isdir(self.data_dir):
             os.makedirs(self.data_dir)
 
+        self.error_log_dir = self.data_dir + "error/"
+        if not os.path.isdir(self.error_log_dir):
+            os.makedirs(self.error_log_dir)
+    
+
+    def _log_parse_errors(self, adsh: str, type: str, error_list: List[SecError]):
+        if len(error_list) > 0:
+            error_file_name = self.error_log_dir + "parse_" + type + "_" + adsh + ".txt"
+            with open(error_file_name, "w", encoding="utf-8") as f:
+                for error in error_list:
+                    f.write(error.report_role + " - " + error.error + "\n")
+
 
     # --- Lab Parsing
     def _parse_lab_file(self, data: UnparsedFile) -> UpdateLabParsing:
@@ -65,9 +78,8 @@ class SecXmlParser:
         xml_content = read_content_from_zip(data.file)
 
         try:
-            # todo: check if we should do something with the error_list
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            df = parser.clean_for_financial_statement_dataset(df, data.accessionNumber)
+            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
             write_df_to_zip(df, targetfilepath)
             return UpdateLabParsing(
                 accessionNumber=data.accessionNumber,
@@ -85,7 +97,7 @@ class SecXmlParser:
                 labParseState=str(e))
     
     def parseLabFiles(self):
-        logging.info("parsing Lanb Files")
+        logging.info("parsing Lab Files")
 
         executor = ParallelExecutor[UnparsedFile, UpdateLabParsing, type(None)]()  # no limitation in speed
 
@@ -107,6 +119,7 @@ class SecXmlParser:
         try:
             # todo: check if we should do something with the error_list
             df, error_list = parser.parse(data.accessionNumber, xml_content)
+            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
             write_df_to_zip(df, targetfilepath)
             return UpdatePreParsing(
                 accessionNumber=data.accessionNumber,
@@ -146,6 +159,7 @@ class SecXmlParser:
 
         try:
             df, error_list = parser.parse(data.accessionNumber, xml_content)
+            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
 
             # extract fiscal year end date
             # current fiscal year end appears in the form --MM-dd, so we remove the dashes

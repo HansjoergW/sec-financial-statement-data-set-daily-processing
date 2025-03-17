@@ -109,11 +109,10 @@ class SecDataOrchestrator:
 
     def process_xml_data(self):
         self._log_main_header("Process xbrl data files")
-
         self._preprocess_xml()
         self._download_xml()
         self._parse_xml()
-    
+
     def create_sec_style(self):
         self._log_sub_header('create sec style files')
         print("TODO")

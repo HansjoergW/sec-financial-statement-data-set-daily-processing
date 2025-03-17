@@ -38,15 +38,15 @@ class UpdateLabParsing:
 class XmlFileParsingDA(DB):
 
     def find_unparsed_numFiles(self) -> List[UnparsedFile]:
-        sql = f'''SELECT accessionNumber, xmlNumFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvNumFile is NULL and numParseState is NULL'''
+        sql = f'''SELECT accessionNumber, xmlNumFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE xmlNumFile is not NULL and csvNumFile is NULL and numParseState is NULL'''
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def find_unparsed_preFiles(self) -> List[UnparsedFile]:
-        sql = f'''SELECT accessionNumber, xmlPreFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvPreFile is NULL and preParseState is NULL'''
+        sql = f'''SELECT accessionNumber, xmlPreFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE xmlPreFile is not NULL and csvPreFile is NULL and preParseState is NULL'''
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def find_unparsed_labFiles(self) -> List[UnparsedFile]:
-        sql = f'''SELECT accessionNumber, xmlLabFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE csvLabFile is NULL and labParseState is NULL'''
+        sql = f'''SELECT accessionNumber, xmlLabFile as file FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE xmlLabFile is not NULL and csvLabFile is NULL and labParseState is NULL'''
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
 

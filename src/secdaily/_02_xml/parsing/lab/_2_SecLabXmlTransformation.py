@@ -6,12 +6,34 @@ from typing import List
 from secdaily._02_xml.parsing.lab._1_SecLabXmlExtracting import SecLabLabelLink
 
 
+
+
 @dataclass
 class SecLabTransformLabelDetails():
     order: str
     from_entry: str
     to_entry: str
     labels: defaultdict = field(default_factory=lambda: defaultdict(str))
+
+    @staticmethod
+    def is_labelrole_supported(labelrole: str) -> bool:
+        return labelrole in [
+            "terseLabel",
+            "positiveTerseLabel",
+            "label",
+            "positiveLabel",
+            "verboseLabel",
+            "documentation",
+            "negatedTerseLabel",
+            "negatedLabel",
+            "negatedVerboseLabel",
+            "periodStartLabel",
+            "negatedPeriodStartLabel",
+            "periodEndLabel",
+            "negatedPeriodEndLabel",
+            "totalLabel",
+            "negatedTotalLabel"
+        ]
 
 
 class SecLabXmlTransformer:
@@ -32,7 +54,7 @@ class SecLabXmlTransformer:
     
         for label in us_eng_labels:
             entry = id_map.get(label.label)
-            if entry:
+            if entry and SecLabTransformLabelDetails.is_labelrole_supported(label.role):
                 entry.labels[label.role] = label.text
 
         return list(id_map.values())
