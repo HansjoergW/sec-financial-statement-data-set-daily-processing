@@ -18,7 +18,7 @@ class SecLabXmlDataProcessor:
 
         for entry in data:
             for type, text in entry.labels.items():
-                key = f"{entry.from_entry}#{type}"
+                key = f"{entry.tag}#{entry.version}#{type}"
                 try:
                     label_entry = LabelEntry(
                         key=key,

@@ -7,6 +7,7 @@ import pandas as pd
 
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.SecFileUtils import read_df_from_zip, write_df_to_zip
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import UnformattedReport, UpdateStyleFormatting
 from secdaily._03_secstyle.formatting.SECPreNumFormatting import SECPreNumFormatter
 
@@ -42,6 +43,12 @@ class SECStyleFormatter:
         if not os.path.isdir(self.error_log_dir):
             os.makedirs(self.error_log_dir)
 
+    def _log_parse_errors(self, adsh: str, type: str, error_list: List[SecError]):
+        if len(error_list) > 0:
+            error_file_name = self.error_log_dir + "secstyleformat_" + type + "_" + adsh + ".txt"
+            with open(error_file_name, "w", encoding="utf-8") as f:
+                for error in error_list:
+                    f.write(error.report_role + " - " + error.error + "\n")
 
 
     def _format_report(self, data: UnformattedReport) -> UpdateStyleFormatting:
@@ -56,9 +63,9 @@ class SECStyleFormatter:
         targetfilepath_num = self.data_dir + adsh + '_num.csv'
 
         try:
-            pre_df, num_df = self.prenumformatter.format(adsh=adsh, pre_df=pre_df, num_df=num_df, lab_df=lab_df)
+            pre_df, num_df, error_list= self.prenumformatter.format(adsh=adsh, pre_df=pre_df, num_df=num_df, lab_df=lab_df)
 
-            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
+            self._log_parse_errors(data.accessionNumber, "prenum", error_list)
             write_df_to_zip(pre_df, targetfilepath_pre)
             write_df_to_zip(num_df, targetfilepath_num)
             return UpdateStyleFormatting(

@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List
 from secdaily._02_xml.parsing.lab._1_SecLabXmlExtracting import SecLabLabelLink
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
 
 
 
@@ -13,6 +14,8 @@ class SecLabTransformLabelDetails():
     order: str
     from_entry: str
     to_entry: str
+    tag: str
+    version: str
     labels: defaultdict = field(default_factory=lambda: defaultdict(str))
 
 class SecLabXmlTransformer:
@@ -23,13 +26,17 @@ class SecLabXmlTransformer:
 
         id_map: Dict[str, SecLabTransformLabelDetails] = {}
 
+        loc_href_map: Dict[str, str] = {loc.label: loc.href for loc in data.locs}
+
         for arc in data.arcs:
+            tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(loc_href_map.get(arc.from_entry, ""))
             entry = SecLabTransformLabelDetails(
                 order=arc.order,
+                tag=tag,
+                version=version,
                 from_entry=arc.from_entry,
                 to_entry=arc.to_entry)
-            id_map[arc.to_entry] = entry
-            
+            id_map[arc.to_entry] = entry            
     
         for label in us_eng_labels:
             entry = id_map.get(label.label)

@@ -27,7 +27,7 @@ class SecLabXmlParser(SecXmlParserBase):
         collected_errors: List[Tuple[str, str, str]]
         processed_entries, collected_errors = processor.process(adsh, transformed_data)
 
-        sec_error_list = [SecError(x[0], x[1], x[2]) for x in collected_errors]
+        sec_error_list = [SecError(adsh=x[0], report_role=x[1], error=x[2]) for x in collected_errors]
 
         df = pd.DataFrame(processed_entries)
 

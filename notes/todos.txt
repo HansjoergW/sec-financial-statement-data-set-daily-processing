@@ -22,6 +22,8 @@
           oder dann mit quotes arbeiten
 
 12. [] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
+      [ok] rewrite parsint lab, so that key contains tag/version/laybeltype
+      [] create map from lab infos to lookup plabel for pre 
 
 xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
 

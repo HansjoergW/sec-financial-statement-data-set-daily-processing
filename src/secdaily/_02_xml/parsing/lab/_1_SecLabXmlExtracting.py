@@ -20,11 +20,17 @@ class SecLabExtractLabelDetails():
     text: str
     lang: str
 
+@dataclass
+class SecLabExtractLabelLocDetails():
+    label: str
+    href: str
+
 
 @dataclass
 class SecLabLabelLink:
     labels: List[SecLabExtractLabelDetails]
     arcs: List[SecLabExtractLabelArcDetails]
+    locs: List[SecLabExtractLabelLocDetails]
 
 
 class SecLabXmlExtractor():
@@ -43,7 +49,6 @@ class SecLabXmlExtractor():
     type_clean_regex = re.compile(r"( type=\"locator\")|( type=\"arc\")", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     arcrole_parent_child_regex = re.compile(r" arcrole=\"parent-child\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
-    loc_clean_regex = re.compile(r"<loc.*/>", re.IGNORECASE)
     xml_lang_regex = re.compile(r"xml:lang", re.IGNORECASE)
 
     def __init__(self):
@@ -61,7 +66,6 @@ class SecLabXmlExtractor():
         data = self.role2009_regex.sub("", data)
         data = self.type_clean_regex.sub("", data)
         data = self.arcrole_parent_child_regex.sub("", data)
-        data = self.loc_clean_regex.sub("", data)
 
         data = self.xml_lang_regex.sub("lang", data)
         return data
@@ -90,7 +94,13 @@ class SecLabXmlExtractor():
                 role=arc.get('role')
             ) for arc in arc_els]
 
-        label_details = SecLabLabelLink(labels=labels, arcs=arcs)
+        loc_els = label_link_el.findall('loc', namespaces)
+        locs: List[SecLabExtractLabelLocDetails] = [SecLabExtractLabelLocDetails(
+                label=loc.get('label'),
+                href=loc.get('href')
+            ) for loc in loc_els]
+
+        label_details = SecLabLabelLink(labels=labels, arcs=arcs, locs=locs)
         return label_details
 
 

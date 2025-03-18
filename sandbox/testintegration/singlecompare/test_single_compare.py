@@ -1,3 +1,4 @@
+from email import errors
 import pytest
 from pathlib import Path
 
@@ -5,8 +6,10 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from secdaily._00_common.SecFileUtils import read_content_from_zip
+from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
+from secdaily._03_secstyle.formatting.SECPreNumFormatting import SECPreNumFormatter
 
 CURRENT_PATH = Path(__file__).parent
 TESTDATA_PATH = CURRENT_PATH /  'testdata'
@@ -62,6 +65,47 @@ def num_orig_df() -> pd.DataFrame:
     df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'num.txt', sep='\t')
     df = df[df.segments.isnull()] 
     return df
+
+
+def load_from_raw_xml(base_path: Path, file_prefix: str):
+    adsh = "-".join(file_prefix.split('-')[0:3])
+    
+    numparser = SecNumXmlParser()
+    preparser = SecPreXmlParser()
+    labparser = SecLabXmlParser()
+
+    base_path = Path(base_path) 
+
+    content_num = read_content_from_zip(str(base_path / f'{file_prefix}_htm.xml'))
+    content_pre = read_content_from_zip(str(base_path / f'{file_prefix}_pre.xml'))
+    content_lab = read_content_from_zip(str(base_path / f'{file_prefix}_lab.xml'))
+
+    parsed_pre_df, errors_pre = preparser.parse(adsh=adsh, data=content_pre)
+    parsed_num_df, errors_num = numparser.parse(adsh=adsh, data=content_num)
+    parsed_lab_df, errors_lab = labparser.parse(adsh=adsh, data=content_lab)
+
+    print("\n", adsh)
+
+    print(errors_pre)
+    print(errors_num)
+    print(errors_lab)
+
+    print(parsed_pre_df.shape)
+    print(parsed_num_df.shape)
+    print(parsed_lab_df.shape)
+
+    formatter = SECPreNumFormatter()
+
+    pre_formatted_df, num_formatted_df, errorlist = formatter.format(adsh=adsh, pre_df=parsed_pre_df, num_df=parsed_num_df, lab_df=parsed_lab_df)
+    print(pre_formatted_df.shape)
+    print(num_formatted_df.shape)
+    print(errorlist)
+
+
+def test_process():
+    load_from_raw_xml(base_path=Path("D:/secprocessing2/xml/2025-03-18"), file_prefix="0000045919-25-000008-hrth-20241231")
+
+
 
 
 def test_pre_single_compare(sec_pre_xml_parser: SecPreXmlParser, pre_parsed_df: pd.DataFrame):

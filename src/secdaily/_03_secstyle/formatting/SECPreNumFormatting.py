@@ -1,8 +1,10 @@
 
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 
 
 class SECPreNumFormatter:
@@ -79,10 +81,21 @@ class SECPreNumFormatter:
 
         return df
     
-    def format(self, adsh: str, pre_df: pd.DataFrame, num_df: pd.DataFrame, lab_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def format(self, adsh: str, pre_df: pd.DataFrame, num_df: pd.DataFrame, lab_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
         """ formats the pre and num dataframes for the provided adsh """
 
-        pre_formatted_df = self._format_pre(pre_df, adsh)
-        num_formatted_df = self._format_num(num_df, adsh)
+        pre_formatted_df = self._format_pre(pre_df, adsh).reset_index()
+        num_formatted_df = self._format_num(num_df, adsh).reset_index()
 
-        return (pre_formatted_df, num_formatted_df)
+        # only keep entries that have keys on both side
+        key_columns = ['adsh', 'tag', 'version']
+        merged_df = pd.merge(pre_formatted_df[key_columns], num_formatted_df[key_columns], on=key_columns, how='inner')
+
+        pre_merged_df = pre_formatted_df[pre_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]
+        num_merged_df = num_formatted_df[num_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]        
+
+        collected_errors: List[Tuple[str, str, str]] = []
+
+        sec_error_list = [SecError(adsh=x[0], report_role=x[1], error=x[2]) for x in collected_errors]
+
+        return (pre_merged_df, num_merged_df, sec_error_list)

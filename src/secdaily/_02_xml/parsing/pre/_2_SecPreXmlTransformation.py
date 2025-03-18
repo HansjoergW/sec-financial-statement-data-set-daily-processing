@@ -57,10 +57,9 @@ class SecPreXmlTransformer():
         # Note
         # tags kann have '_' in their name
 
-        details: Dict[str, str] = {}
         href_parts = href.split('#')
         complete_tag = href_parts[1]
-        version: str
+        version: Optional[str] = None
         if href_parts[0].startswith('http'):
             ns_parts = href_parts[0].split('/')
             version = ns_parts[3] + '/' + ns_parts[4]
