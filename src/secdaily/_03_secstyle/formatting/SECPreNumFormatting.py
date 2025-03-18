@@ -1,13 +1,11 @@
+
 from typing import Optional, Tuple
+
 import numpy as np
 import pandas as pd
 
 
-class SECStyleFormatter:
-
-    def __init__(self, csv_dir: str):  
-        self._csv_dir = csv_dir
-
+class SECPreNumFormatter:
 
     def _round_half_up(self, n, decimals=0):
         # from https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe
@@ -80,7 +78,11 @@ class SECStyleFormatter:
         df = df[~df_double_index_mask]
 
         return df
+    
+    def format(self, adsh: str, pre_df: pd.DataFrame, num_df: pd.DataFrame, lab_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """ formats the pre and num dataframes for the provided adsh """
 
+        pre_formatted_df = self._format_pre(pre_df, adsh)
+        num_formatted_df = self._format_num(num_df, adsh)
 
-    def process(self):
-        pass
+        return (pre_formatted_df, num_formatted_df)

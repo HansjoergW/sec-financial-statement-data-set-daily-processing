@@ -15,27 +15,6 @@ class SecLabTransformLabelDetails():
     to_entry: str
     labels: defaultdict = field(default_factory=lambda: defaultdict(str))
 
-    @staticmethod
-    def is_labelrole_supported(labelrole: str) -> bool:
-        return labelrole in [
-            "terseLabel",
-            "positiveTerseLabel",
-            "label",
-            "positiveLabel",
-            "verboseLabel",
-            "documentation",
-            "negatedTerseLabel",
-            "negatedLabel",
-            "negatedVerboseLabel",
-            "periodStartLabel",
-            "negatedPeriodStartLabel",
-            "periodEndLabel",
-            "negatedPeriodEndLabel",
-            "totalLabel",
-            "negatedTotalLabel"
-        ]
-
-
 class SecLabXmlTransformer:
 
     def transform(self, adsh: str, data: SecLabLabelLink) -> List[SecLabTransformLabelDetails]:
@@ -54,7 +33,7 @@ class SecLabXmlTransformer:
     
         for label in us_eng_labels:
             entry = id_map.get(label.label)
-            if entry and SecLabTransformLabelDetails.is_labelrole_supported(label.role):
+            if entry:
                 entry.labels[label.role] = label.text
 
         return list(id_map.values())

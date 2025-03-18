@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 from secdaily._00_common.DBBase import DB
 
 
@@ -16,8 +16,8 @@ class UpdateStyleFormatting:
     accessionNumber: str
     formatState: str
     formatDate: str
-    numFormattedFile: str
-    preFormattedFile: str
+    numFormattedFile: Optional[str]
+    preFormattedFile: Optional[str]
 
 
 class SecStyleFormatterDA(DB):

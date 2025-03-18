@@ -17,13 +17,14 @@
        [ok] manage process index -> default values
        [ok] copy to processing -> correct übernehmen
        [ok] selection for missing download -> nicht übernehmen, falls url empty
-
-
-11. [] implement "to csv" logic für label daten
+11. [ok] implement "to csv" logic für label daten
        -> achtung, ist text -> muss spezielle delimiter verwenden.
           oder dann mit quotes arbeiten
 
 12. [] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
+
+xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
+
 
 xx. [] einzelner PRE Test mit soll / ist vergleich 
    - plabel sollte gleich sein
