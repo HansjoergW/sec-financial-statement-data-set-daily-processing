@@ -81,10 +81,27 @@ class SECPreNumFormatter:
 
         return df
     
+    def _join_pre_with_lab(self, pre_df: pd.DataFrame, lab_df: pd.DataFrame) -> pd.DataFrame:
+
+        # Remove apostrophe from the 'label' column in lab_df
+        lab_df['label'] = lab_df['label'].str.replace("’", "")
+
+        pre_df['key'] = pre_df['tag'] + '#' + pre_df['version'] + '#' + pre_df['plabel']
+        pre_merged_df = pd.merge(pre_df, lab_df[['key', 'label']], on='key', how='left', suffixes=('', '_y'))
+        pre_merged_df.drop(['key', 'plabel'], axis=1, inplace=True)
+
+        pre_merged_df.rename(columns={'label': 'plabel'}, inplace=True)
+
+        return pre_merged_df
+    
     def format(self, adsh: str, pre_df: pd.DataFrame, num_df: pd.DataFrame, lab_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
         """ formats the pre and num dataframes for the provided adsh """
 
-        pre_formatted_df = self._format_pre(pre_df, adsh).reset_index()
+        collected_errors: List[Tuple[str, str, str]] = [] # not used yet
+
+        pre_joined = self._join_pre_with_lab(pre_df, lab_df)
+
+        pre_formatted_df = self._format_pre(pre_joined, adsh).reset_index()
         num_formatted_df = self._format_num(num_df, adsh).reset_index()
 
         # only keep entries that have keys on both side
@@ -94,7 +111,6 @@ class SECPreNumFormatter:
         pre_merged_df = pre_formatted_df[pre_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]
         num_merged_df = num_formatted_df[num_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]        
 
-        collected_errors: List[Tuple[str, str, str]] = []
 
         sec_error_list = [SecError(adsh=x[0], report_role=x[1], error=x[2]) for x in collected_errors]
 

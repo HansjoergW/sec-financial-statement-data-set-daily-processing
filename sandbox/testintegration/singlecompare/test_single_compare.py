@@ -1,4 +1,5 @@
 from email import errors
+from typing import List, Tuple
 import pytest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from pandas.testing import assert_frame_equal
 from secdaily._00_common.SecFileUtils import read_content_from_zip
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 from secdaily._03_secstyle.formatting.SECPreNumFormatting import SECPreNumFormatter
 
@@ -25,6 +27,21 @@ def sec_num_xml_parser() -> SecNumXmlParser:
 @pytest.fixture
 def sec_pre_xml_parser() -> SecPreXmlParser:
     return SecPreXmlParser()
+
+
+@pytest.fixture
+def print_full_table():
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', None)
+        pd.set_option('display.max_colwidth', None)
+
+        yield
+
+        pd.reset_option('display.max_rows')
+        pd.reset_option('display.max_columns')
+        pd.reset_option('display.width')
+        pd.reset_option('display.max_colwidth')
 
 
 @pytest.fixture
@@ -67,7 +84,7 @@ def num_orig_df() -> pd.DataFrame:
     return df
 
 
-def load_from_raw_xml(base_path: Path, file_prefix: str):
+def load_from_raw_xml(base_path: Path, file_prefix: str) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
     adsh = "-".join(file_prefix.split('-')[0:3])
     
     numparser = SecNumXmlParser()
@@ -84,28 +101,43 @@ def load_from_raw_xml(base_path: Path, file_prefix: str):
     parsed_num_df, errors_num = numparser.parse(adsh=adsh, data=content_num)
     parsed_lab_df, errors_lab = labparser.parse(adsh=adsh, data=content_lab)
 
-    print("\n", adsh)
-
-    print(errors_pre)
-    print(errors_num)
-    print(errors_lab)
-
-    print(parsed_pre_df.shape)
-    print(parsed_num_df.shape)
-    print(parsed_lab_df.shape)
+    print("pre_errors: ", errors_pre)
+    print("num_errors: ", errors_num)
+    print("lab_errors: ", errors_lab)
 
     formatter = SECPreNumFormatter()
 
     pre_formatted_df, num_formatted_df, errorlist = formatter.format(adsh=adsh, pre_df=parsed_pre_df, num_df=parsed_num_df, lab_df=parsed_lab_df)
-    print(pre_formatted_df.shape)
-    print(num_formatted_df.shape)
-    print(errorlist)
+
+    print("pre shape: ", pre_formatted_df.shape)
+    print("num shape: ", num_formatted_df.shape)
+    print("errorlist: ", errorlist)
+
+    return pre_formatted_df, num_formatted_df, errorlist
 
 
-def test_process():
-    load_from_raw_xml(base_path=Path("D:/secprocessing2/xml/2025-03-18"), file_prefix="0000045919-25-000008-hrth-20241231")
+def test_process(pre_orig_df, num_orig_df, print_full_table):
+    file_prefix = "0000320193-24-000123-aapl-20240928"
+    base_path = Path("D:/secprocessing2/xml/2025-03-17")
 
+    pre_df, num_df, _  =load_from_raw_xml(base_path=base_path, file_prefix=file_prefix)
 
+    #pre_df_cols = ['adsh', 'stmt', 'tag', 'version','report', 'line', 'negating', 'plabel']
+    pre_df_cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel']
+
+    pre_df = pre_df[pre_df_cols]
+    pre_orig_df = pre_orig_df[pre_df_cols]
+    
+    try:
+        assert_frame_equal(pre_df, pre_orig_df, check_dtype=False)
+    except AssertionError as e:
+        print("Differences in pre DataFrame:")
+        diff_pre = pre_df.merge(pre_orig_df, indicator=True, how='outer')
+        
+        diff_pre = diff_pre.sort_values(pre_df_cols)
+        diff_pre = diff_pre[pre_df_cols + ['_merge']]
+        
+        print(diff_pre[diff_pre['_merge'] != 'both'])
 
 
 def test_pre_single_compare(sec_pre_xml_parser: SecPreXmlParser, pre_parsed_df: pd.DataFrame):
