@@ -13,6 +13,7 @@ pandas = "^2.2"
 requests = "^2.32"
 pathos = "^0.3"
 lxml = "^4.8"
+pyarrow = "^19"
 
 [tool.poetry]
 packages = [
@@ -26,3 +27,9 @@ pytest = "^8.0.2" # or similar, depending of the latest version
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "sandbox/testintegration",  # Integration Tests
+    "sandbox/trials"            # Experimenteller Code
+]

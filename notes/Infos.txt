@@ -13,3 +13,11 @@ Single Beispiel 0000320193-24-000123 (2024 10K Apple)
   - plabels fehlen
   - EQ wird in eine zusätzliche Gruppe gespalten
   - Zeilen in EQ scheinen zu fehlen
+
+
+Limitationen Daily
+------------------
+- focus auf BS, IS, cf
+- reports nummern werden nicht geprüft
+- segments werden noch nicht erstellt
+- 
