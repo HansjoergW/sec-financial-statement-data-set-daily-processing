@@ -21,18 +21,25 @@
        -> achtung, ist text -> muss spezielle delimiter verwenden.
           oder dann mit quotes arbeiten
 
-12. [] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
+12. [ok] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
       [ok] rewrite parsint lab, so that key contains tag/version/laybeltype
       [ok] create map from lab infos to lookup plabel for pre 
-      [] labels are stripped of single quotes, maybe also other content
+      [ok] labels are stripped of single quotes, maybe also other content
+
+14. [ok] einzelner PRE und NUM Test mit soll / ist vergleich 
+   - [ok] plabel sollte gleich sein
+     - [ok] download label files
+     - [ok] prozess label files
+
+15. [] Mass Test für Q4/2024 
+      [] DB setup / dataclass und write logik schreiben
+      [] db daten für einzelnes adsh bereitstellen und in db speichern
+      [] logik um gesammtes quartel zu vergleichen und zu loggen
+      [] auswerten des quartals
 
 xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
 
 
-xx. [] einzelner PRE Test mit soll / ist vergleich 
-   - plabel sollte gleich sein
-     - [ok] download label files
-     - prozess label files
 
 
 

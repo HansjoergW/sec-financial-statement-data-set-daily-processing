@@ -1,5 +1,6 @@
 from email import errors
 from typing import List, Tuple
+from numpy import float64, int64
 import pytest
 from pathlib import Path
 
@@ -74,13 +75,39 @@ def num_parsed_df(sec_num_xml_parser) -> pd.DataFrame:
 
 @pytest.fixture
 def pre_orig_df() -> pd.DataFrame:
-    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'pre.txt', sep='\t')
+    dtypes = {
+        'adsh': str,
+        'stmt': str,
+        'tag': str,
+        'version': str,
+        'line': int,
+        'report': int,
+        'negating': bool,
+        'plabel': str
+    }
+    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'pre.txt', sep='\t', dtype=dtypes)
     return df
 
 @pytest.fixture
 def num_orig_df() -> pd.DataFrame:
-    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'num.txt', sep='\t')
-    df = df[df.segments.isnull()] 
+    dtypes = {
+        'adsh': str,
+        'tag': str,
+        'version': str,
+        'ddate': int64,
+        'qtrs': int,
+        'uom': str,
+        'coreg': str,
+        'value': float64,
+        'footnote': str, 
+        'segments': str
+    }
+    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'num.txt', sep='\t', dtype=dtypes)
+    df.loc[df.coreg.isnull(), 'coreg'] = ""
+    df.loc[df.segments.isnull(), 'segments'] = ""
+    df.loc[df.footnote.isnull(), 'footnote'] = ""
+
+    df = df[df.segments == ""] 
     return df
 
 
@@ -115,6 +142,18 @@ def load_from_raw_xml(base_path: Path, file_prefix: str) -> Tuple[pd.DataFrame, 
 
     return pre_formatted_df, num_formatted_df, errorlist
 
+def compare_tables(df_orig: pd.DataFrame, df_daily: pd.DataFrame, cols: List[str]):
+    try:
+        assert_frame_equal(df_daily, df_orig, check_dtype=False)
+    except AssertionError as e:
+        print("Differences in pre DataFrame:")
+        diff_pre = df_daily.merge(df_orig, indicator=True, how='outer')
+        
+        diff_pre = diff_pre.sort_values(cols)
+        diff_pre = diff_pre[cols + ['_merge']]
+        
+        print(diff_pre[diff_pre['_merge'] != 'both'])
+
 
 def test_process(pre_orig_df, num_orig_df, print_full_table):
     file_prefix = "0000320193-24-000123-aapl-20240928"
@@ -122,22 +161,14 @@ def test_process(pre_orig_df, num_orig_df, print_full_table):
 
     pre_df, num_df, _  =load_from_raw_xml(base_path=base_path, file_prefix=file_prefix)
 
-    #pre_df_cols = ['adsh', 'stmt', 'tag', 'version','report', 'line', 'negating', 'plabel']
-    pre_df_cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel']
+    pre_df_cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel'] # don't compare report
+    num_df_cols = ['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom', 'value', 'segments', 'footnote']
 
     pre_df = pre_df[pre_df_cols]
     pre_orig_df = pre_orig_df[pre_df_cols]
-    
-    try:
-        assert_frame_equal(pre_df, pre_orig_df, check_dtype=False)
-    except AssertionError as e:
-        print("Differences in pre DataFrame:")
-        diff_pre = pre_df.merge(pre_orig_df, indicator=True, how='outer')
-        
-        diff_pre = diff_pre.sort_values(pre_df_cols)
-        diff_pre = diff_pre[pre_df_cols + ['_merge']]
-        
-        print(diff_pre[diff_pre['_merge'] != 'both'])
+
+    compare_tables(pre_orig_df, pre_df, pre_df_cols)
+    compare_tables(num_orig_df, num_df, num_df_cols)
 
 
 def test_pre_single_compare(sec_pre_xml_parser: SecPreXmlParser, pre_parsed_df: pd.DataFrame):
@@ -170,8 +201,6 @@ def test_merge(pre_parsed_df: pd.DataFrame, num_parsed_df: pd.DataFrame, pre_ori
 
     pre_df = pre_parsed_df[pre_parsed_df[common_columns].apply(tuple, axis=1).isin(merged_df[common_columns].apply(tuple, axis=1))]
     num_df = num_parsed_df[num_parsed_df[common_columns].apply(tuple, axis=1).isin(merged_df[common_columns].apply(tuple, axis=1))]
-
-
 
     print("\nmerged len: ", len(merged_df))
     print("pre    len: ", len(pre_df))

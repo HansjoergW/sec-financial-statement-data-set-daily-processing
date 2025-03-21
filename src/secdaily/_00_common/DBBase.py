@@ -53,6 +53,7 @@ class DB(ABC):
         curr = conn.cursor()
         for index in indexes:
             sqlfile = indexes_dict[index]
+            print(f"setup db: execute {sqlfile}")
             script = open(sqlfile, 'r').read()
             curr.executescript(script)
             conn.commit()

@@ -13,6 +13,8 @@ from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
 from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from secdaily._02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
+from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
+from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import SecStyleFormatterDA
 from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
@@ -33,6 +35,7 @@ class SecDataOrchestrator:
         self.feeddir = workdir + "feed/"
         self.xmldir = workdir + "xml/"
         self.csvdir = workdir + "csv/"
+        self.formatdir = workdir + "secstyle/"
         self.dailyzipdir = workdir + "daily/"
         self.seczipdir = workdir + "quarterzip/"
 
@@ -115,7 +118,8 @@ class SecDataOrchestrator:
 
     def create_sec_style(self):
         self._log_sub_header('create sec style files')
-        print("TODO")
+        formatter = SECStyleFormatter(dbmanager=SecStyleFormatterDA(self.workdir), data_dir=self.formatdir)
+        formatter.process()
 
     # def create_daily_zip(self):
     #     self._log_main_header("Create daily zip files")
@@ -125,7 +129,7 @@ class SecDataOrchestrator:
     def process(self):
         self.process_index_data()
         self.process_xml_data()
-        # self.create_sec_style()
+        self.create_sec_style()
         # self.create_daily_zip()
 
 

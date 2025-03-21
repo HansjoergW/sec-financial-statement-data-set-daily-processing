@@ -43,15 +43,14 @@ class SECPreNumFormatter:
         if num_df.shape[0] == 0:
             return num_df
 
-        df = (num_df[num_df.isrelevant]).copy()
+        num_df = num_df[~num_df.tag.isin(['EntityCommonStockSharesOutstanding', 'TradingSymbol', 'SecurityExchangeName', 'CurrentFiscalYearEndDate'])]
+        df = (num_df[num_df.isrelevant]).copy()      
 
-        df['uom_ext'] = df['uom']
-
-        # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
-
-        df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        # # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
+        # df['uom_ext'] = df['uom']
+        # df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        # df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
+        # df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
 
         df['qtrs'] = df.qtrs.apply(int)
         df.loc[~df.decimals.isnull(), 'value'] = pd.to_numeric(df.loc[~df.decimals.isnull(), 'value'], errors='coerce')
@@ -65,19 +64,25 @@ class SECPreNumFormatter:
 
         df.loc[df.version == 'company', 'version'] = adsh
 
-        df.drop(['segments','isrelevant'], axis=1, inplace=True)
+        df.drop(['isrelevant'], axis=1, inplace=True)
         df.drop_duplicates(inplace=True)
 
+        # Cast 'ddate' column to int64
+        df['ddate'] = df['ddate'].astype('int64')
+        df['value'] = df['value'].astype('float64')
+        df.loc[df.segments.isnull(), 'segments'] = ""
+
         # set the indexes
-        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom_ext'], inplace=True)
+        df.set_index(['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
 
         # and sort by the precision
         # it can happen that the same tag is represented in the reports multiple times with different precision
         # and it looks as if the "txt" data of the sec is then produced with the lower precision
         df.sort_values('decimals', inplace=True)
         df_double_index_mask = df.index.duplicated(keep='first')
-
         df = df[~df_double_index_mask]
+
+        df.drop(['decimals'], axis=1, inplace=True)
 
         return df
     
@@ -110,7 +115,6 @@ class SECPreNumFormatter:
 
         pre_merged_df = pre_formatted_df[pre_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]
         num_merged_df = num_formatted_df[num_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]        
-
 
         sec_error_list = [SecError(adsh=x[0], report_role=x[1], error=x[2]) for x in collected_errors]
 
