@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import os
 from typing import Any, Dict, List, Optional, Set
 
-from numpy import float64, int64
+from numpy import equal, float64, int64
 import pandas as pd
 from secdaily._xx_check.quartercompare.MassTestV2DataAccess import FormattedReport, QuarterFileAccess, MassTestV2DA, UpdateMassTestV2
 
@@ -63,10 +63,14 @@ class ReportBuilder:
 
         self.adsh_daily_file_map = {}
         self.report_overview = ReportOverview()
+        
         self.num_quarter_adshs: Set[str] = set()
         self.num_daily_adshs: Set[str] = set()
         self.pre_quarter_adshs: Set[str] = set()
         self.pre_daily_adshs:Set[str] = set()
+
+        self.pre_both_adshs: Set[str] = set()
+        self.num_both_adshs: Set[str] = set()
 
 
     def _read_into_dataframes(self, files: List[str], dtypes: Dict[str, Any]) -> pd.DataFrame:
@@ -111,11 +115,15 @@ class ReportBuilder:
     def _load_data(self):
         self.qrtr_file_access.load_data()
         self._load_daily_data()
+
         self.num_quarter_adshs = set(self.qrtr_file_access.num_df.adsh.unique().tolist())
         self.num_daily_adshs = set(self.daily_num_df.adsh.unique().tolist())
+        self.num_both_adshs = self.num_quarter_adshs & self.num_daily_adshs
+        
 
         self.pre_quarter_adshs = set(self.qrtr_file_access.pre_df.adsh.unique().tolist())
         self.pre_daily_adshs = set(self.daily_pre_df.adsh.unique().tolist())
+        self.pre_both_adshs = self.pre_quarter_adshs & self.pre_daily_adshs
 
 
     def _create_adsh_only_entries_quarter(self, adshs: Set[str], type: str) -> List[UpdateMassTestV2]:
@@ -174,9 +182,79 @@ class ReportBuilder:
         return update_list
 
 
+    def _compare_dataframes(self, left_df: pd.DataFrame, right_df: pd.DataFrame) -> pd.DataFrame:
+        # Ensure both dataframes have the same columns
+        common_columns = list(set(left_df.columns) & set(right_df.columns))
+        left_df = left_df[common_columns]
+        right_df = right_df[common_columns]
+
+        # Add a 'compare' column to both dataframes
+        left_df['compare'] = 'in left'
+        right_df['compare'] = 'in right'
+
+        # Concatenate the dataframes
+        combined_df = pd.concat([left_df, right_df], axis=0)
+
+        # Find duplicates (rows that appear in both dataframes)
+        duplicates = combined_df.duplicated(subset=common_columns, keep=False)
+
+        # Mark duplicates as 'in both'
+        combined_df.loc[duplicates, 'compare'] = 'in both'
+
+        # Remove duplicate rows, keeping one instance
+        result_df = combined_df.drop_duplicates(subset=common_columns, keep='first')
+
+        return result_df
+
+
+    def _compare_pre(self):
+        cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel']
+
+        update_list = []
+        for adsh in self.pre_both_adshs:
+            quarter_df = self.qrtr_file_access.pre_df[self.qrtr_file_access.pre_df.adsh == adsh]
+            daily_df = self.daily_pre_df[self.daily_pre_df.adsh == adsh]
+
+            stmts = list(quarter_df.stmt.unique() + daily_df.stmt.unique())
+            for stmt in stmts:
+                quarter_stmt_df = quarter_df[quarter_df.stmt == stmt]
+                daily_stmt_df = daily_df[daily_df.stmt == stmt]
+                compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
+                
+                equal_count = compare_results[compare_results.compare == 'in both'].shape[0]
+
+                left_only = compare_results[compare_results.compare == 'in left']
+                right_only = compare_results[compare_results.compare == 'in right']
+
+                left_count = left_only.shape[0]
+                right_count = right_only.shape[0]                
+
+                left_only_tags = left_only.tag.unique().tolist()
+                right_only_tags = right_only.tag.unique().tolist()
+                
+                update_list.append(UpdateMassTestV2(runId=self.run_id, 
+                                                    adsh=adsh, 
+                                                    qtr=self.qrtr_str, 
+                                                    fileType="pre",
+                                                    stmt=stmt,
+                                                    countMatching=equal_count,
+                                                    countUnequal=left_count + right_count,
+                                                    countOnlyOrigin=left_count,
+                                                    countOnlyDaily=right_count,
+                                                    tagsUnequal=", ".join(left_only_tags + right_only_tags),
+                                                    tagsOnlyOrigin=", ".join(left_only_tags),
+                                                    tagsOnlyDaily=", ".join(right_only_tags),
+                                                    quarterFile=self.quarter_file,
+                                                    dailyFile=self.adsh_daily_file_map[adsh].preFile,
+                                                    ))
+        return update_list
+
+
     def _compare(self):
         compare_adhs_only_list = self._compare_adshs()
         self.mass_test_data_access.insert_test_result(compare_adhs_only_list)
+
+        compared_pre_df = self._compare_dataframes(self.qrtr_file_access.num_df, self.daily_num_df)
 
 
     def report(self):
