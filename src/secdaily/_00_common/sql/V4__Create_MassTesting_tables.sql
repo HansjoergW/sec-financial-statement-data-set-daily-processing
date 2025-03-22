@@ -42,11 +42,12 @@ CREATE TABLE IF NOT EXISTS mass_pre_parse_xml_data
 
 CREATE TABLE IF NOT EXISTS mass_testing_v2
 (
+    runId,
     adsh,
-    qtr,
     fileType, 
     stmt, 
     report,
+    qtr,
     countMatching,
     countUnequal, 
     countOnlyOrigin, 
@@ -54,9 +55,8 @@ CREATE TABLE IF NOT EXISTS mass_testing_v2
     tagsUnequal,
     tagsOnlyOrigin,
     tagsOnlyDaily,
-    runId,
     quarterFile,
     dailyFile,
 
-    PRIMARY KEY (adsh, runId)
+    PRIMARY KEY (adsh, runId, fileType, stmt, report)
 );

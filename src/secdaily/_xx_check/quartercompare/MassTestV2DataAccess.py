@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.SecFileUtils import read_file_from_zip
 
@@ -17,17 +17,17 @@ class UpdateMassTestV2:
     adsh: str
     qtr: str
     fileType: str # either num or pre
-    stmt: str # only for pre
-    report: int
-    countMatching: int
-    countUnequal: int
-    countOnlyOrigin: int
-    countOnlyDaily: int
-    tagsUnequal: str
-    tagsOnlyOrigin: str
-    tagsOnlyDaily: str
-    quarterFile: str
-    dailyFile: str
+    stmt: Optional[str] = None # only for pre
+    report: Optional[int] = None # only for pre
+    countMatching: Optional[int] = None
+    countUnequal: Optional[int] = None
+    countOnlyOrigin: Optional[int] = None
+    countOnlyDaily: Optional[int] = None
+    tagsUnequal: Optional[str] = None
+    tagsOnlyOrigin: Optional[str] = None
+    tagsOnlyDaily: Optional[str] = None
+    quarterFile: Optional[str] = None
+    dailyFile: Optional[str] = None
 
 
 class MassTestV2DA(DB):
@@ -46,14 +46,32 @@ class MassTestV2DA(DB):
 
 
     def insert_test_result(self, update_list: List[UpdateMassTestV2]):
-        sql = f"""INSERT INTO mass_test_v2 (
-                           runId, adsh, qtr, fileType, stmt, report, 
-                           countMatching, countUnequal, countOnlyOrigin, countOnlyDaily, 
-                           tagsUnequal, tagsOnlyOrigin, tagsOnlyDaily, 
-                           quarterFile, dailyFile) 
-                  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+        sql = f"""INSERT INTO {DB.MASS_TESTING_V2_TBL_NAME} 
+                    (runId, adsh, qtr, fileType, stmt, report, 
+                     countMatching, countUnequal, countOnlyOrigin, countOnlyDaily, 
+                     tagsUnequal, tagsOnlyOrigin, tagsOnlyDaily, quarterFile, dailyFile) 
+                     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+
+        # Konvertiere UpdateMassTestV2 Objekte in Tupel
+        params = [(
+            update.runId,
+            update.adsh,
+            update.qtr,
+            update.fileType,
+            update.stmt,
+            update.report,
+            update.countMatching,
+            update.countUnequal,
+            update.countOnlyOrigin,
+            update.countOnlyDaily,
+            update.tagsUnequal,
+            update.tagsOnlyOrigin,
+            update.tagsOnlyDaily,
+            update.quarterFile,
+            update.dailyFile
+        ) for update in update_list]
         
-        self._execute_many(sql, update_list)
+        self._execute_many(sql, params)
 
 
 class QuarterFileAccess:

@@ -22,6 +22,7 @@ class DB(ABC):
     SEC_REPORT_PROCESSING_TBL_NAME = "sec_report_processing"
     SEC_INDEX_FILE_TBL_NAME = "sec_index_file"
     SEC_FULL_INDEX_FILE_TBL_NAME = "sec_fullindex_file"
+    MASS_TESTING_V2_TBL_NAME = "mass_testing_v2"
 
     TESTDATA_PATH = os.path.realpath(__file__ + "/..") + '/testdata/'
 
