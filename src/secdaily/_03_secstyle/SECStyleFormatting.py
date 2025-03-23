@@ -70,8 +70,8 @@ class SECStyleFormatter:
             write_df_to_zip(num_df, targetfilepath_num)
             return UpdateStyleFormatting(
                 accessionNumber=data.accessionNumber,
-                numFormattedFile=targetfilepath_pre,
-                preFormattedFile=targetfilepath_num,
+                numFormattedFile=targetfilepath_num,
+                preFormattedFile=targetfilepath_pre,
                 formatDate=self.processdate,
                 formatState='formatted')
 

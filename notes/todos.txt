@@ -31,9 +31,11 @@
      - [ok] download label files
      - [ok] prozess label files
 
-15. [] Mass Test für Q4/2024 
-      [] DB setup / dataclass und write logik schreiben
-      [] db daten für einzelnes adsh bereitstellen und in db speichern
+15. [ok] es wird alles noch mit index geschrieben .. 
+
+16. [] Mass Test für Q4/2024 
+      [ok] DB setup / dataclass und write logik schreiben
+      [ok] db daten für einzelnes adsh bereitstellen und in db speichern
       [] logik um gesammtes quartel zu vergleichen und zu loggen
       [] auswerten des quartals
 

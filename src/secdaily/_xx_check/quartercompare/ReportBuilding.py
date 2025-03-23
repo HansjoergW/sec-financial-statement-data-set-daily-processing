@@ -206,8 +206,43 @@ class ReportBuilder:
 
         return result_df
 
+    def _create_update_entry(self, compare_results: pd.DataFrame, adsh: str, stmt: Optional[str] = None) -> UpdateMassTestV2:
+        equal_count = compare_results[compare_results.compare == 'in both'].shape[0]
 
-    def _compare_pre(self):
+        left_only = compare_results[compare_results.compare == 'in left']
+        right_only = compare_results[compare_results.compare == 'in right']
+
+        left_only_marked_tags = set(left_only.tag.unique().tolist())
+        right_only_marked_tags = set(right_only.tag.unique().tolist())
+        
+        unequal_tags = left_only_marked_tags.intersection(right_only_marked_tags)
+        left_only_tags = list(left_only_marked_tags - unequal_tags)
+        right_only_tags = list(right_only_marked_tags - unequal_tags)
+
+        unequal_count = len(unequal_tags)
+        left_count = len(left_only_tags)
+        right_count = len(right_only_tags)
+                        
+        
+        updated_entry = UpdateMassTestV2(runId=self.run_id, 
+                                            adsh=adsh, 
+                                            qtr=self.qrtr_str, 
+                                            fileType="pre",
+                                            stmt=stmt,
+                                            countMatching=equal_count,
+                                            countUnequal=unequal_count,
+                                            countOnlyOrigin=left_count,
+                                            countOnlyDaily=right_count,
+                                            tagsUnequal=", ".join(unequal_tags),
+                                            tagsOnlyOrigin=", ".join(left_only_tags),
+                                            tagsOnlyDaily=", ".join(right_only_tags),
+                                            quarterFile=self.quarter_file,
+                                            dailyFile=self.adsh_daily_file_map[adsh].preFile,
+                                            )
+        return updated_entry
+     
+
+    def _compare_pre(self) -> List[UpdateMassTestV2]:
         cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel']
 
         update_list = []
@@ -215,46 +250,35 @@ class ReportBuilder:
             quarter_df = self.qrtr_file_access.pre_df[self.qrtr_file_access.pre_df.adsh == adsh]
             daily_df = self.daily_pre_df[self.daily_pre_df.adsh == adsh]
 
-            stmts = list(quarter_df.stmt.unique() + daily_df.stmt.unique())
+            stmts = set(quarter_df.stmt.unique().tolist() + daily_df.stmt.unique().tolist())
             for stmt in stmts:
                 quarter_stmt_df = quarter_df[quarter_df.stmt == stmt]
                 daily_stmt_df = daily_df[daily_df.stmt == stmt]
                 compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
-                
-                equal_count = compare_results[compare_results.compare == 'in both'].shape[0]
+                updated_entry = self._create_update_entry(compare_results, adsh, stmt)
+                update_list.append(updated_entry)
+        return update_list
 
-                left_only = compare_results[compare_results.compare == 'in left']
-                right_only = compare_results[compare_results.compare == 'in right']
 
-                left_count = left_only.shape[0]
-                right_count = right_only.shape[0]                
-
-                left_only_tags = left_only.tag.unique().tolist()
-                right_only_tags = right_only.tag.unique().tolist()
-                
-                update_list.append(UpdateMassTestV2(runId=self.run_id, 
-                                                    adsh=adsh, 
-                                                    qtr=self.qrtr_str, 
-                                                    fileType="pre",
-                                                    stmt=stmt,
-                                                    countMatching=equal_count,
-                                                    countUnequal=left_count + right_count,
-                                                    countOnlyOrigin=left_count,
-                                                    countOnlyDaily=right_count,
-                                                    tagsUnequal=", ".join(left_only_tags + right_only_tags),
-                                                    tagsOnlyOrigin=", ".join(left_only_tags),
-                                                    tagsOnlyDaily=", ".join(right_only_tags),
-                                                    quarterFile=self.quarter_file,
-                                                    dailyFile=self.adsh_daily_file_map[adsh].preFile,
-                                                    ))
+    def _compare_num(self) -> List[UpdateMassTestV2]:
+        cols = ['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom', 'value', 'segments', 'footnote']
+        update_list = []
+        for adsh in self.num_both_adshs:
+            quarter_df = self.qrtr_file_access.num_df[self.qrtr_file_access.num_df.adsh == adsh]
+            daily_df = self.daily_num_df[self.daily_num_df.adsh == adsh]
+            compare_results = self._compare_dataframes(quarter_df[cols], daily_df[cols])
+            updated_entry = self._create_update_entry(compare_results, adsh)
+            update_list.append(updated_entry)
         return update_list
 
 
     def _compare(self):
-        compare_adhs_only_list = self._compare_adshs()
-        self.mass_test_data_access.insert_test_result(compare_adhs_only_list)
+        change_list: List[UpdateMassTestV2] = []
+        change_list.extend(self._compare_adshs())
+        change_list.extend(self._compare_pre())
+        change_list.extend(self._compare_num())
 
-        compared_pre_df = self._compare_dataframes(self.qrtr_file_access.num_df, self.daily_num_df)
+        self.mass_test_data_access.insert_test_result(change_list)
 
 
     def report(self):
@@ -271,5 +295,5 @@ if __name__ == '__main__':
 
     DB(workdir)._create_db()
 
-    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=0)
+    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=1)
     builder.report()
