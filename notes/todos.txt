@@ -41,8 +41,9 @@
 
 xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
 
-
-
+xx. [] single file processing
+      [] strip html file
+      [] analyse html file and available xml-file -> where is the data coming from to create pre?
 
 
  - Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter

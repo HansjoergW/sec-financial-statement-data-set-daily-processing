@@ -28,7 +28,7 @@ DTYPES_PRE = {
         'version': str,
         'line': int,
         'report': int,
-        'negating': bool,
+        'negating': int,
         'plabel': str
     }
 
@@ -183,14 +183,19 @@ class ReportBuilder:
 
 
     def _compare_dataframes(self, left_df: pd.DataFrame, right_df: pd.DataFrame) -> pd.DataFrame:
+               
         # Ensure both dataframes have the same columns
+        if set(left_df.columns) != set(right_df.columns):
+            raise ValueError("Dataframes must have the same columns.")
+
+        left_df = left_df.copy()
+        right_df = right_df.copy()
+
         common_columns = list(set(left_df.columns) & set(right_df.columns))
-        left_df = left_df[common_columns]
-        right_df = right_df[common_columns]
 
         # Add a 'compare' column to both dataframes
-        left_df['compare'] = 'in left'
-        right_df['compare'] = 'in right'
+        left_df['_compare'] = 'in left'
+        right_df['_compare'] = 'in right'
 
         # Concatenate the dataframes
         combined_df = pd.concat([left_df, right_df], axis=0)
@@ -199,18 +204,18 @@ class ReportBuilder:
         duplicates = combined_df.duplicated(subset=common_columns, keep=False)
 
         # Mark duplicates as 'in both'
-        combined_df.loc[duplicates, 'compare'] = 'in both'
+        combined_df.loc[duplicates, '_compare'] = 'in both'
 
         # Remove duplicate rows, keeping one instance
         result_df = combined_df.drop_duplicates(subset=common_columns, keep='first')
 
         return result_df
 
-    def _create_update_entry(self, compare_results: pd.DataFrame, adsh: str, stmt: Optional[str] = None) -> UpdateMassTestV2:
-        equal_count = compare_results[compare_results.compare == 'in both'].shape[0]
+    def _create_update_entry(self, compare_results: pd.DataFrame, adsh: str, type:str, stmt: Optional[str] = None) -> UpdateMassTestV2:
+        equal_count = compare_results[compare_results._compare == 'in both'].shape[0]
 
-        left_only = compare_results[compare_results.compare == 'in left']
-        right_only = compare_results[compare_results.compare == 'in right']
+        left_only = compare_results[compare_results._compare == 'in left']
+        right_only = compare_results[compare_results._compare == 'in right']
 
         left_only_marked_tags = set(left_only.tag.unique().tolist())
         right_only_marked_tags = set(right_only.tag.unique().tolist())
@@ -227,7 +232,7 @@ class ReportBuilder:
         updated_entry = UpdateMassTestV2(runId=self.run_id, 
                                             adsh=adsh, 
                                             qtr=self.qrtr_str, 
-                                            fileType="pre",
+                                            fileType=type,
                                             stmt=stmt,
                                             countMatching=equal_count,
                                             countUnequal=unequal_count,
@@ -242,11 +247,15 @@ class ReportBuilder:
         return updated_entry
      
 
-    def _compare_pre(self) -> List[UpdateMassTestV2]:
-        cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel']
+    def _compare_pre(self, adshs: Set[str]) -> List[UpdateMassTestV2]:
+        cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel'] # don't compare report
 
         update_list = []
-        for adsh in self.pre_both_adshs:
+        total_adshs = len(adshs)
+        for i, adsh in enumerate(adshs, 1):
+            if i % 250 == 0:
+                print(f"        processing adsh {i}/{total_adshs} ({i/total_adshs:.2%})")
+            
             quarter_df = self.qrtr_file_access.pre_df[self.qrtr_file_access.pre_df.adsh == adsh]
             daily_df = self.daily_pre_df[self.daily_pre_df.adsh == adsh]
 
@@ -255,28 +264,40 @@ class ReportBuilder:
                 quarter_stmt_df = quarter_df[quarter_df.stmt == stmt]
                 daily_stmt_df = daily_df[daily_df.stmt == stmt]
                 compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
-                updated_entry = self._create_update_entry(compare_results, adsh, stmt)
+                updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, stmt=stmt, type="pre")
+                print(updated_entry)
                 update_list.append(updated_entry)
         return update_list
 
 
-    def _compare_num(self) -> List[UpdateMassTestV2]:
+    def _compare_num(self, adshs: Set[str]) -> List[UpdateMassTestV2]:
         cols = ['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom', 'value', 'segments', 'footnote']
         update_list = []
-        for adsh in self.num_both_adshs:
+
+        total_adshs = len(adshs)
+        for i, adsh in enumerate(adshs, 1):
+            if i % 250 == 0:
+                print(f"        processing adsh {i}/{total_adshs} ({i/total_adshs:.2%})")
+        
             quarter_df = self.qrtr_file_access.num_df[self.qrtr_file_access.num_df.adsh == adsh]
             daily_df = self.daily_num_df[self.daily_num_df.adsh == adsh]
             compare_results = self._compare_dataframes(quarter_df[cols], daily_df[cols])
-            updated_entry = self._create_update_entry(compare_results, adsh)
+            updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, type="num")
             update_list.append(updated_entry)
         return update_list
 
 
     def _compare(self):
         change_list: List[UpdateMassTestV2] = []
-        change_list.extend(self._compare_adshs())
-        change_list.extend(self._compare_pre())
-        change_list.extend(self._compare_num())
+
+        print("start compairing ....")
+        #print("    ... compare adshs")
+        #change_list.extend(self._compare_adshs())
+        # print("    ... compare pre")
+        # change_list.extend(self._compare_pre(adshs=self.pre_both_adshs))
+        print("    ... compare num")
+        change_list.extend(self._compare_num(adshs=set(list(self.num_both_adshs)[:10])))
+        print("-----------------------------------")
 
         self.mass_test_data_access.insert_test_result(change_list)
 
@@ -295,5 +316,5 @@ if __name__ == '__main__':
 
     DB(workdir)._create_db()
 
-    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=1)
+    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=3)
     builder.report()
