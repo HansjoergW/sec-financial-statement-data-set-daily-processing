@@ -36,8 +36,11 @@
 16. [] Mass Test für Q4/2024 
       [ok] DB setup / dataclass und write logik schreiben
       [ok] db daten für einzelnes adsh bereitstellen und in db speichern
-      [] logik um gesammtes quartel zu vergleichen und zu loggen
-      [] auswerten des quartals
+      [ok] logik um gesammtes quartel zu vergleichen und zu loggen
+      [] auswerten des quartals / Übersicht
+      [] Auswerten einzelner reports ermöglichen
+
+xx. [] Verbessern der Ergebnisse, falls möglich und nötig
 
 xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
 
