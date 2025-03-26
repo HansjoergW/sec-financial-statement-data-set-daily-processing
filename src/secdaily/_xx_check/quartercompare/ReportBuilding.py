@@ -248,7 +248,7 @@ class ReportBuilder:
      
 
     def _compare_pre(self, adshs: Set[str]) -> List[UpdateMassTestV2]:
-        cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel'] # don't compare report
+        cols = ['adsh', 'stmt', 'tag', 'version', 'negating', 'plabel'] # don't compare report and line
 
         update_list = []
         total_adshs = len(adshs)
@@ -308,6 +308,16 @@ class ReportBuilder:
         print("-----------------------------------")
         print(self.report_overview)
 
+    def report_single(self, adsh: str):
+        self._load_data()
+
+        change_list: List[UpdateMassTestV2] = []        
+        change_list.extend(self._compare_pre(adshs={adsh}))
+        change_list.extend(self._compare_num(adshs={adsh}))
+
+        print(change_list)
+        print("-----------------------------------")
+        
 
 
 if __name__ == '__main__':
@@ -317,4 +327,5 @@ if __name__ == '__main__':
     DB(workdir)._create_db()
 
     builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=3)
-    builder.report()
+    # builder.report()
+    builder.report_single("0000004904-24-000100")

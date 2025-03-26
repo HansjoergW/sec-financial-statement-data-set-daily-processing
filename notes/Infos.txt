@@ -18,6 +18,22 @@ Single Beispiel 0000320193-24-000123 (2024 10K Apple)
 Limitationen Daily
 ------------------
 - focus auf BS, IS, cf
+- now Unknown (UN) statements
 - reports nummern werden nicht geprüft
 - segments werden noch nicht erstellt
-- 
+
+
+Unterschiede zu quarter
+-----------------------
+- manchmal sind deutliche Unterschiede für die num Tabellen vorhanden. 
+- Oftmals scheint das aber vorallem zu sein, weil Daily weniger Einträge als UN (Unkwon) statements identifiziert.
+- mit der Prüfung auf num wird sicher gestellt, dass die numerischen Werte korrekt sind. 
+  -> hier ist wohl eher entscheidend, dass der unuqualRatio sehr klein ist
+     während dem Missing weniger relvant ist, weil das oft auf die "Unknown" Einträge zurückzuführen ist.
+- Mit der Prüfung von Pre wird gezeigt, dass die selben Informationen in den Statements dargestellt werden.
+  hier sollten möglichst wenig Einträge fehlen. Die Frage ist jetzt noch, wo genau die Unterschiede sind
+- Übersicht für Pre müsste beinhalten (immer pro stmt):
+  - countTotal = sum(countMatching + countOnlyOrigin + countOnlyDaily)
+  - unequalRatio = sum(countUnequal) / countTotal
+  - missingRatioDaily = sum(countOnlyOrigin) / countTotal
+  - missingRatioQuarter = sum(countOnlyDaily) / countTotal

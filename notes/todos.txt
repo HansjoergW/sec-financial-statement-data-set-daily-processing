@@ -37,8 +37,24 @@
       [ok] DB setup / dataclass und write logik schreiben
       [ok] db daten für einzelnes adsh bereitstellen und in db speichern
       [ok] logik um gesammtes quartel zu vergleichen und zu loggen
-      [] auswerten des quartals / Übersicht
-      [] Auswerten einzelner reports ermöglichen
+      [ok] Auswerten einzelner reports ermöglichen
+      [ok] pre vergleich -> ohne line und report
+      [] auswerten des quartals -> MassTestTable neu anlegen
+      [] Übersichts report erstellen und ablegen
+      
+
+17  [] create final quarter zip file containing all daily
+      [] write final daily files as parquet for more efficient concatenation
+      [] concat existing parquets into single parquet
+      [] create final zip file
+
+18. [] activate project / create official 0.1 release
+      [] activate build pipeline with linting and tests
+      [] activate deployment to pypi
+      [] adapt readme / add limitations
+
+
+
 
 xx. [] Verbessern der Ergebnisse, falls möglich und nötig
 
