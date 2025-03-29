@@ -52,7 +52,7 @@ class SECStyleFormatter:
 
 
     def _format_report(self, data: UnformattedReport) -> UpdateStyleFormatting:
-        
+        # todo: we should provide the dtype here, to make sure we read the data in the correct format
         num_df = read_df_from_zip(data.numFile)
         pre_df = read_df_from_zip(data.preFile)
         lab_df = read_df_from_zip(data.labFile)

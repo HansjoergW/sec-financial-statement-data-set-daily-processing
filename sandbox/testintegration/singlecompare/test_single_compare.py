@@ -1,5 +1,5 @@
 from email import errors
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from numpy import float64, int64
 import pytest
 from pathlib import Path
@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from secdaily._00_common.SecFileUtils import read_content_from_zip
+from secdaily._00_common.SecFileUtils import read_content_from_zip, read_file_from_zip
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
@@ -15,6 +15,7 @@ from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 from secdaily._03_secstyle.formatting.SECPreNumFormatting import SECPreNumFormatter
 
 CURRENT_PATH = Path(__file__).parent
+SANDBOXDATA_PATH = CURRENT_PATH.parent.parent / 'data'
 TESTDATA_PATH = CURRENT_PATH /  'testdata'
 RAW_XML_PATH = TESTDATA_PATH / 'rawxml'
 
@@ -82,10 +83,10 @@ def pre_orig_df() -> pd.DataFrame:
         'version': str,
         'line': int,
         'report': int,
-        'negating': bool,
+        'negating': int,
         'plabel': str
     }
-    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'pre.txt', sep='\t', dtype=dtypes)
+    df = read_file_from_zip(str(TESTDATA_PATH / '2024q4.zip'), 'pre.txt', dtype=dtypes)
     return df
 
 @pytest.fixture
@@ -102,7 +103,7 @@ def num_orig_df() -> pd.DataFrame:
         'footnote': str, 
         'segments': str
     }
-    df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'num.txt', sep='\t', dtype=dtypes)
+    df = read_file_from_zip(str(TESTDATA_PATH / '2024q4.zip'), 'num.txt', dtype=dtypes)
     df.loc[df.coreg.isnull(), 'coreg'] = ""
     df.loc[df.segments.isnull(), 'segments'] = ""
     df.loc[df.footnote.isnull(), 'footnote'] = ""
@@ -112,17 +113,23 @@ def num_orig_df() -> pd.DataFrame:
 
 
 def load_from_raw_xml(base_path: Path, file_prefix: str) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
+    num_file = str(base_path / f'{file_prefix}_htm.xml')
+    pre_file = str(base_path / f'{file_prefix}_pre.xml')
+    lab_file = str(base_path / f'{file_prefix}_lab.xml')
+
     adsh = "-".join(file_prefix.split('-')[0:3])
-    
+
+    return load_from_raw_xml_2(num_file, pre_file, lab_file, adsh)
+
+def load_from_raw_xml_2(num_file: str, pre_file: str, lab_file: str, adsh) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
+
     numparser = SecNumXmlParser()
     preparser = SecPreXmlParser()
     labparser = SecLabXmlParser()
 
-    base_path = Path(base_path) 
-
-    content_num = read_content_from_zip(str(base_path / f'{file_prefix}_htm.xml'))
-    content_pre = read_content_from_zip(str(base_path / f'{file_prefix}_pre.xml'))
-    content_lab = read_content_from_zip(str(base_path / f'{file_prefix}_lab.xml'))
+    content_num = read_content_from_zip(num_file)
+    content_pre = read_content_from_zip(pre_file)
+    content_lab = read_content_from_zip(lab_file)
 
     parsed_pre_df, errors_pre = preparser.parse(adsh=adsh, data=content_pre)
     parsed_num_df, errors_num = numparser.parse(adsh=adsh, data=content_num)
@@ -142,33 +149,42 @@ def load_from_raw_xml(base_path: Path, file_prefix: str) -> Tuple[pd.DataFrame, 
 
     return pre_formatted_df, num_formatted_df, errorlist
 
-def compare_tables(df_orig: pd.DataFrame, df_daily: pd.DataFrame, cols: List[str]):
+def compare_tables(df_orig: pd.DataFrame, df_daily: pd.DataFrame, cols: List[str], save_path: Optional[Path] = None):
     try:
-        assert_frame_equal(df_daily, df_orig, check_dtype=False)
+        assert_frame_equal(df_daily, df_orig, check_dtype=True)
     except AssertionError as e:
-        print("Differences in pre DataFrame:")
+        print("Differences in DataFrame")
         diff_pre = df_daily.merge(df_orig, indicator=True, how='outer')
         
         diff_pre = diff_pre.sort_values(cols)
         diff_pre = diff_pre[cols + ['_merge']]
-        
-        print(diff_pre[diff_pre['_merge'] != 'both'])
+        if save_path:
+            diff_pre.to_parquet(save_path)
+        else:print(diff_pre[diff_pre['_merge'] != 'both'])
 
 
 def test_process(pre_orig_df, num_orig_df, print_full_table):
-    file_prefix = "0000320193-24-000123-aapl-20240928"
-    base_path = Path("D:/secprocessing2/xml/2025-03-17")
+    adsh = "0001477932-24-008123"
+    num_file = "d:/secprocessing2/xml/2025-03-17/0001477932-24-008123-upxi_10k_htm.xml"
+    pre_file = "d:/secprocessing2/xml/2025-03-17/0001477932-24-008123-upxi-20240630_pre.xml"
+    lab_file = "d:/secprocessing2/xml/2025-03-17/0001477932-24-008123-upxi-20240630_lab.xml"
 
-    pre_df, num_df, _  =load_from_raw_xml(base_path=base_path, file_prefix=file_prefix)
+    pre_df, num_df, _ = load_from_raw_xml_2(num_file, pre_file, lab_file, adsh)
+    pre_orig_df = pre_orig_df[pre_orig_df.adsh == adsh]
+    num_orig_df = num_orig_df[num_orig_df.adsh == adsh]
+    
+    # file_prefix = "0000320193-24-000123-aapl-20240928"   
+    # base_path = Path("D:/secprocessing2/xml/2025-03-17")
+    # pre_df, num_df, _  =load_from_raw_xml(base_path=base_path, file_prefix=file_prefix)
 
-    pre_df_cols = ['adsh', 'stmt', 'tag', 'version', 'line', 'negating', 'plabel'] # don't compare report
+    pre_df_cols = ['adsh', 'stmt', 'tag', 'version', 'negating', 'plabel'] # don't compare report and line
     num_df_cols = ['adsh', 'tag', 'version', 'ddate', 'qtrs', 'coreg', 'uom', 'value', 'segments', 'footnote']
 
     pre_df = pre_df[pre_df_cols]
     pre_orig_df = pre_orig_df[pre_df_cols]
 
-    compare_tables(pre_orig_df, pre_df, pre_df_cols)
-    compare_tables(num_orig_df, num_df, num_df_cols)
+    compare_tables(pre_orig_df, pre_df, pre_df_cols, save_path=SANDBOXDATA_PATH / f"diff_pre_{adsh}.parquet")
+    compare_tables(num_orig_df, num_df, num_df_cols, save_path=SANDBOXDATA_PATH / f"diff_num_{adsh}.parquet")
 
 
 def test_pre_single_compare(sec_pre_xml_parser: SecPreXmlParser, pre_parsed_df: pd.DataFrame):

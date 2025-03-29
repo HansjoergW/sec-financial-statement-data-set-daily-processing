@@ -44,6 +44,8 @@ class SecNumXmlParser(SecXmlParserBase):
             segments = context_entry.segments
             if len(segments) == 0:
                 segments = None
+            else:
+                segments = ','.join([f"{segment.dimension}/{segment.label}" for segment in segments])
 
             temp_dict = {}
             temp_dict['adsh'] = adsh

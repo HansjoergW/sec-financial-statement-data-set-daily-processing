@@ -94,6 +94,7 @@ class ReportBuilder:
 
         print("loading daily num files: ", len(daily_num_files))       
         if os.path.exists(num_parquet_file):
+            print("!!!!!!!!!   ATTENTION: Reading from preprocessed data !!!!!!!!!")
             print(" ... from parquet")
             self.daily_num_df = pd.read_parquet(num_parquet_file)
         else:            
@@ -102,6 +103,7 @@ class ReportBuilder:
 
         print("loading daily pre files: ", len(daily_pre_files))
         if os.path.exists(pre_parquet_file):
+            print("!!!!!!!!!   ATTENTION: Reading from preprocessed data !!!!!!!!!")
             print(" ... from parquet")
             self.daily_pre_df = pd.read_parquet(pre_parquet_file)
         else:
@@ -265,7 +267,6 @@ class ReportBuilder:
                 daily_stmt_df = daily_df[daily_df.stmt == stmt]
                 compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
                 updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, stmt=stmt, type="pre")
-                print(updated_entry)
                 update_list.append(updated_entry)
         return update_list
 
@@ -288,27 +289,31 @@ class ReportBuilder:
 
 
     def _compare(self):
-        change_list: List[UpdateMassTestV2] = []
 
         print("start compairing ....")
-        #print("    ... compare adshs")
-        #change_list.extend(self._compare_adshs())
-        # print("    ... compare pre")
-        # change_list.extend(self._compare_pre(adshs=self.pre_both_adshs))
+        
+        print("    ... compare adshs")
+        self.mass_test_data_access.insert_test_result(self._compare_adshs())
+       
+        print("    ... compare pre")
+        self.mass_test_data_access.insert_test_result(self._compare_pre(adshs=self.pre_both_adshs))
+       
         print("    ... compare num")
-        change_list.extend(self._compare_num(adshs=set(list(self.num_both_adshs)[:10])))
-        print("-----------------------------------")
+        self.mass_test_data_access.insert_test_result(self._compare_num(adshs=self.num_both_adshs))
+ 
 
-        self.mass_test_data_access.insert_test_result(change_list)
-
-
-    def report(self):
-        self._load_data()
-        self._compare()
+    def _create_report_data(self):      
         print("-----------------------------------")
         print(self.report_overview)
 
+        self._load_data()
+        self._compare()
+
+        print("-----------------------------------")
+
+
     def report_single(self, adsh: str):
+        """ used to compare a single adsh. mostly used for debugging."""
         self._load_data()
 
         change_list: List[UpdateMassTestV2] = []        
@@ -326,6 +331,6 @@ if __name__ == '__main__':
 
     DB(workdir)._create_db()
 
-    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=3)
-    # builder.report()
-    builder.report_single("0000004904-24-000100")
+    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=1)
+    builder._create_report_data()
+    #builder.report_single("0001477932-24-008123") # labels sind nicht gesetzt..

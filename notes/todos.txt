@@ -41,12 +41,10 @@
       [ok] pre vergleich -> ohne line und report
       [] auswerten des quartals -> MassTestTable neu anlegen
       [] Übersichts report erstellen und ablegen
-      
 
 17  [] create final quarter zip file containing all daily
-      [] write final daily files as parquet for more efficient concatenation
-      [] concat existing parquets into single parquet
-      [] create final zip file
+      [] concat existing zip files into single one for pre and num - overwrite an existing one
+      [] create final zip file with pre, num and sub
 
 18. [] activate project / create official 0.1 release
       [] activate build pipeline with linting and tests
@@ -77,5 +75,3 @@ xx. [] single file processing
   logik ist immer im Sinne "IF NOT EXISTS"
 
 
-
-#    labels: defaultdict = field(default_factory=lambda: defaultdict(str))

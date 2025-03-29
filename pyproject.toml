@@ -21,7 +21,21 @@ packages = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0.2" # or similar, depending of the latest version
+pytest = "^8.0.2"
+pylint = "^3.0.3"
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111",  # missing-docstring
+    "C0103",  # invalid-name
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0903",  # too-few-public-methods
+]
+
+[tool.pylint.format]
+max-line-length = 100
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

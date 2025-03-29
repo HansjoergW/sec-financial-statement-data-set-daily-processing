@@ -91,6 +91,9 @@ class SECPreNumFormatter:
         # Remove apostrophe from the 'label' column in lab_df
         lab_df['label'] = lab_df['label'].str.replace("’", "")
 
+        # Set 'plabel' to 'label' if it's not set or empty
+        pre_df.loc[pre_df['plabel'].isnull() | (pre_df['plabel'] == ''), 'plabel'] = 'label'
+
         pre_df['key'] = pre_df['tag'] + '#' + pre_df['version'] + '#' + pre_df['plabel']
         pre_merged_df = pd.merge(pre_df, lab_df[['key', 'label']], on='key', how='left', suffixes=('', '_y'))
         pre_merged_df.drop(['key', 'plabel'], axis=1, inplace=True)
