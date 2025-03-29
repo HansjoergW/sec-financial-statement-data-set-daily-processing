@@ -42,11 +42,16 @@
       [] auswerten des quartals -> MassTestTable neu anlegen
       [] Übersichts report erstellen und ablegen
 
-17  [] create final quarter zip file containing all daily
+17. [] verbesserte Ablageverzeichnisstruktur für alle Schritte
+      [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
+      [] Ablageverzeichnisstruktur anpassen
+
+
+18.  [] create final quarter zip file containing all daily
       [] concat existing zip files into single one for pre and num - overwrite an existing one
       [] create final zip file with pre, num and sub
 
-18. [] activate project / create official 0.1 release
+19.. [] activate project / create official 0.1 release
       [] activate build pipeline with linting and tests
       [] activate deployment to pypi
       [] adapt readme / add limitations
@@ -56,7 +61,6 @@
 
 xx. [] Verbessern der Ergebnisse, falls möglich und nötig
 
-xx. [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
 
 xx. [] single file processing
       [] strip html file

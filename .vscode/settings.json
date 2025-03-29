@@ -1,7 +1,14 @@
 {
-    "python.testing.pytestArgs": ["-s", 
-        "tests", "sandbox"
+    "python.testing.pytestArgs": [
+        "-s",
+        "tests",
+        "sandbox"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    }
 }

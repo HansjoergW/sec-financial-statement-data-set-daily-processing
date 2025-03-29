@@ -302,13 +302,20 @@ class ReportBuilder:
         self.mass_test_data_access.insert_test_result(self._compare_num(adshs=self.num_both_adshs))
  
 
-    def _create_report_data(self):      
+    def create_report_data(self):      
         print("-----------------------------------")
         print(self.report_overview)
 
         self._load_data()
         self._compare()
 
+        print("-----------------------------------")
+
+
+    def report(self):
+        print("-----------------------------------")
+        reportOverview = self.mass_test_data_access.get_report_overview(run_id=self.run_id, qtr=self.qrtr_str)
+        print(reportOverview)
         print("-----------------------------------")
 
 
@@ -332,5 +339,7 @@ if __name__ == '__main__':
     DB(workdir)._create_db()
 
     builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=1)
-    builder._create_report_data()
+    builder.report()
+    #builder._create_report_data()
     #builder.report_single("0001477932-24-008123") # labels sind nicht gesetzt..
+
