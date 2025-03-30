@@ -1,3 +1,5 @@
+ Version 0.1.0
+ -------------
  1. [ok] subfolder in src "secdaily" mit allem code
  2. [ok] pyproject toml entsprechend setzen (packages definition)
  3. [ok] test folder nach tests umbenennen
@@ -20,62 +22,60 @@
 11. [ok] implement "to csv" logic für label daten
        -> achtung, ist text -> muss spezielle delimiter verwenden.
           oder dann mit quotes arbeiten
-
 12. [ok] neuen step hinzufügen, der aus den raw csv files die finallen SEC-Formatted style macht
       [ok] rewrite parsint lab, so that key contains tag/version/laybeltype
       [ok] create map from lab infos to lookup plabel for pre 
       [ok] labels are stripped of single quotes, maybe also other content
-
 14. [ok] einzelner PRE und NUM Test mit soll / ist vergleich 
    - [ok] plabel sollte gleich sein
      - [ok] download label files
      - [ok] prozess label files
-
 15. [ok] es wird alles noch mit index geschrieben .. 
-
-16. [] Mass Test für Q4/2024 
+16. [ok] Mass Test für Q4/2024 
       [ok] DB setup / dataclass und write logik schreiben
       [ok] db daten für einzelnes adsh bereitstellen und in db speichern
       [ok] logik um gesammtes quartel zu vergleichen und zu loggen
       [ok] Auswerten einzelner reports ermöglichen
       [ok] pre vergleich -> ohne line und report
-      [] auswerten des quartals -> MassTestTable neu anlegen
-      [] Übersichts report erstellen und ablegen
+      [ok] auswerten des quartals -> MassTestTable neu anlegen
+      [ok] Übersichts report erstellen und ablegen
 
 17. [] verbesserte Ablageverzeichnisstruktur für alle Schritte
+       _1_xml/<qrtr>/<filedate>/..
+       _2_csv/<qrtr>/<filedate>/..
+       _3_secstyle/<qrtr>/<filedate>/..
+       _4_zip/<qrtr>
+       
       [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
       [] Ablageverzeichnisstruktur anpassen
-
 
 18.  [] create final quarter zip file containing all daily
       [] concat existing zip files into single one for pre and num - overwrite an existing one
       [] create final zip file with pre, num and sub
 
-19.. [] activate project / create official 0.1 release
+19. [] activate project / create official 0.1 release
       [] activate build pipeline with linting and tests
       [] activate deployment to pypi
       [] adapt readme / add limitations
 
+20. [] end to end tests
+      [] apple 10k
+      [] 0001477932-24-008123 (mit Einträgen on plabel)
 
-
+ Version 0.2.0
+ -------------
+xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
+       damit die Analyse danach einfacher ist
 
 xx. [] Verbessern der Ergebnisse, falls möglich und nötig
-
 
 xx. [] single file processing
       [] strip html file
       [] analyse html file and available xml-file -> where is the data coming from to create pre?
 
 
- - Zuerst müssen die Vergleichstests korrekt laufen / basierend auf einem aktuellen quarter
-   -> detail vergleich einer einzelnen adsh nummer
-   -> adshs vergleich quartal
-   -> detail vergleich ganzes quartal
-
-- wie gehen wir mit Reports um, die nur ein "ins" file haben?  
-
-- git workflow aktivieren
-- sqlite db setup überlegen -> wie bei secfsdstools
-  logik ist immer im Sinne "IF NOT EXISTS"
+ Version 0.3.0
+ -------------
+xx. [] segments hinzüfügen
 
 

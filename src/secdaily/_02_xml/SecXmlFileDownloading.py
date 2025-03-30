@@ -5,6 +5,7 @@ from typing import Protocol, List
 
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import MissingFile
 
 
@@ -32,23 +33,17 @@ class DataAccessor(Protocol):
         """ update the entry of a formerly missing xml-lab-file and update it with the name of the downloaded file """
 
 
-class SecXmlFileDownloader:
+class SecXmlFileDownloader(ProcessBase):
     """
     - downloads the desired sec xml files, stores them and updates the sec-processing table
     """
 
-    def __init__(self, dbmanager: DataAccessor, urldownloader: UrlDownloader, xml_dir: str = "./tmp/xml/"):
+    def __init__(self, dbmanager: DataAccessor, urldownloader: UrlDownloader, data_dir: str = "./tmp/xml/"):
+        super().__init__(data_dir=data_dir)
+
         self.dbmanager = dbmanager
-        self.processdate = datetime.date.today().isoformat()
         self.urldownloader = urldownloader
 
-        if xml_dir[-1] != '/':
-            xml_dir = xml_dir + '/'
-
-        self.xml_dir = xml_dir + self.processdate + '/'
-
-        if not os.path.isdir(self.xml_dir):
-            os.makedirs(self.xml_dir)
 
     def _download_file(self, data: MissingFile) -> MissingFile:
         try:
@@ -62,13 +57,16 @@ class SecXmlFileDownloader:
         if (data.url == None) | (data.url == ""):
             logging.warning(f"url is null: {data.accessionNumber} / {data.type} ")
             return data
-
+        
         filename = data.url.rsplit('/', 1)[-1]
 
-        filepath = self.xml_dir + data.accessionNumber + "-" + filename
+        filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
+
         try:
-            self.urldownloader.download_url_to_file(data.url, filepath, size)
-            data.file = filepath
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+
+            self.urldownloader.download_url_to_file(data.url, str(filepath), size)
+            data.file = str(filepath)
             return data
         except:
             logging.warning("failed to download from: " + data.url)

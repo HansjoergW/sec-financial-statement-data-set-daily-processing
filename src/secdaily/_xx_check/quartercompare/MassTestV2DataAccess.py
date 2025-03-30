@@ -49,6 +49,15 @@ class ReportOverview:
     totalMissingInQuarter: int
     compareResults: Optional[pd.DataFrame] = None
 
+    def __str__(self):
+        return f"""
+total adshs: {self.totalAdshs}
+total missing in daily: {self.totalMissingInDaily}
+total total missing in quarter: {self.totalMissingInQuarter}
+
+{self.compareResults}
+"""
+
 
 class MassTestV2DA(DB):
 
@@ -158,11 +167,9 @@ class MassTestV2DA(DB):
 
         compare_results = pd.concat([pre_results, num_results])
 
-        compare_results = compare_results.round({
-            'unequalRatio': 3,
-            'missingRatioDaily': 3,
-            'missingRatioQuarter': 3
-        })
+        compare_results = compare_results.round(
+            {"unequalRatio": 3, "missingRatioDaily": 3, "missingRatioQuarter": 3}
+        )
 
         report_overview = ReportOverview(
             totalAdshs=totalAdshs,

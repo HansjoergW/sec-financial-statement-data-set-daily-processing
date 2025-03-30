@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
+from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
 from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
@@ -18,7 +19,6 @@ from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import SecStyleFormatt
 from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
-month_to_qrtr = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
 
 class SecDataOrchestrator:
@@ -32,11 +32,10 @@ class SecDataOrchestrator:
             workdir = workdir + '/'
 
         self.workdir = workdir
-        self.feeddir = workdir + "feed/"
-        self.xmldir = workdir + "xml/"
-        self.csvdir = workdir + "csv/"
-        self.formatdir = workdir + "secstyle/"
-        self.dailyzipdir = workdir + "daily/"
+        self.xmldir = workdir + "_1_xml/"
+        self.csvdir = workdir + "_2_csv/"
+        self.formatdir = workdir + "_3_secstyle/"
+        self.dailyzipdir = workdir + "_4_daily/"
         self.seczipdir = workdir + "quarterzip/"
 
         self.today = datetime.today()
@@ -45,7 +44,7 @@ class SecDataOrchestrator:
 
         if start_year is None:
             self.start_year = self.today.year
-            self.start_qrtr = month_to_qrtr[self.today.month]
+            self.start_qrtr = MONTH_TO_QRTR[self.today.month]
             if start_qrtr is not None:
                 logging.info("set 'start_qrtr' is ignored, since 'start_year' is not set")
         else:
@@ -94,10 +93,12 @@ class SecDataOrchestrator:
 
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.urldownloader, self.xmldir)
-        self._log_sub_header('download lab xml files')
+        self._log_sub_header('download lab xml files')        
         secxmlfilesdownloader.downloadLabFiles()        
+
         self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()
+
         self._log_sub_header('download pre xml files')
         secxmlfilesdownloader.downloadPreFiles()
 
@@ -105,8 +106,10 @@ class SecDataOrchestrator:
         secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
         self._log_sub_header('parse lab xml files')
         secxmlfileparser.parseLabFiles()
+
         self._log_sub_header('parse num xml files')
         secxmlfileparser.parseNumFiles()
+
         self._log_sub_header('parse pre xml files')
         secxmlfileparser.parsePreFiles()
 
@@ -114,7 +117,7 @@ class SecDataOrchestrator:
         self._log_main_header("Process xbrl data files")
         self._preprocess_xml()
         self._download_xml()
-        self._parse_xml()
+        # self._parse_xml()
 
     def create_sec_style(self):
         self._log_sub_header('create sec style files')
@@ -129,7 +132,7 @@ class SecDataOrchestrator:
     def process(self):
         self.process_index_data()
         self.process_xml_data()
-        self.create_sec_style()
+        # self.create_sec_style()
         # self.create_daily_zip()
 
 
