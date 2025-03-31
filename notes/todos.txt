@@ -46,7 +46,7 @@
        _3_secstyle/<qrtr>/<filedate>/..
        _4_zip/<qrtr>
        
-      [] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
+      [ok] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
       [] Ablageverzeichnisstruktur anpassen
 
 18.  [] create final quarter zip file containing all daily
