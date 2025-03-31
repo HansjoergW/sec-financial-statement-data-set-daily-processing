@@ -55,13 +55,6 @@ class SecXmlParser(ProcessBase):
 
         self.dbmanager = dbmanager
 
-    def _log_parse_errors(self, adsh: str, type: str, error_list: List[SecError]):
-        if len(error_list) > 0:
-            error_file_name = self.error_log_dir + "parse_" + type + "_" + adsh + ".txt"
-            with open(error_file_name, "w", encoding="utf-8") as f:
-                for error in error_list:
-                    f.write(error.report_role + " - " + error.error + "\n")
-
     # --- Lab Parsing
     def _parse_lab_file(self, data: UnparsedFile) -> UpdateLabParsing:
 
@@ -76,7 +69,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, parser.get_type(), error_list)
             write_df_to_zip(df, str(filepath))
             return UpdateLabParsing(
                 accessionNumber=data.accessionNumber,
@@ -121,7 +114,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, parser.get_type(), error_list)
             write_df_to_zip(df, str(filepath))
             return UpdatePreParsing(
                 accessionNumber=data.accessionNumber,
@@ -167,7 +160,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_parse_errors(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, parser.get_type(), error_list)
 
             # extract fiscal year end date
             # current fiscal year end appears in the form --MM-dd, so we remove the dashes

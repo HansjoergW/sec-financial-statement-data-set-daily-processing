@@ -132,7 +132,7 @@ class SecDataOrchestrator:
     def process(self):
         self.process_index_data()
         self.process_xml_data()
-        # self.create_sec_style()
+        self.create_sec_style()
         # self.create_daily_zip()
 
 

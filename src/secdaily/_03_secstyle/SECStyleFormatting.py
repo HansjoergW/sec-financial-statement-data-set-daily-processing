@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_df_from_zip, write_df_to_zip
 from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import UnformattedReport, UpdateStyleFormatting
@@ -21,57 +22,44 @@ class DataAccess(Protocol):
         """ update the report entry with the formatted result file """
 
 
-class SECStyleFormatter:
+class SECStyleFormatter(ProcessBase):
 
     prenumformatter = SECPreNumFormatter()
 
-    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/data/", use_process_date_in_path: bool = True):  
+    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/secstyle/"):  
+        super().__init__(data_dir=data_dir)
+        
         self.dbmanager = dbmanager
-        self.processdate = datetime.date.today().isoformat()
-        self.data_dir = data_dir
-
-        if self.data_dir[-1] != '/':
-            self.data_dir = data_dir + '/'
-
-        if use_process_date_in_path:
-            self.data_dir = self.data_dir + self.processdate + '/'
-
-        if not os.path.isdir(self.data_dir):
-            os.makedirs(self.data_dir)
-
-        self.error_log_dir = self.data_dir + "error/"
-        if not os.path.isdir(self.error_log_dir):
-            os.makedirs(self.error_log_dir)
-
-    def _log_parse_errors(self, adsh: str, type: str, error_list: List[SecError]):
-        if len(error_list) > 0:
-            error_file_name = self.error_log_dir + "secstyleformat_" + type + "_" + adsh + ".txt"
-            with open(error_file_name, "w", encoding="utf-8") as f:
-                for error in error_list:
-                    f.write(error.report_role + " - " + error.error + "\n")
 
 
     def _format_report(self, data: UnformattedReport) -> UpdateStyleFormatting:
         # todo: we should provide the dtype here, to make sure we read the data in the correct format
-        num_df = read_df_from_zip(data.numFile)
-        pre_df = read_df_from_zip(data.preFile)
-        lab_df = read_df_from_zip(data.labFile)
-        
+
         adsh = data.accessionNumber
 
-        targetfilepath_pre = self.data_dir + adsh + '_pre.csv'
-        targetfilepath_num = self.data_dir + adsh + '_num.csv'
-
         try:
+            # -> hier müsste dtypes übergeben werden...
+            num_df = read_df_from_zip(data.numFile)
+            pre_df = read_df_from_zip(data.preFile)
+            lab_df = read_df_from_zip(data.labFile)
+            
+            filename_pre = adsh + '_pre.csv'
+            filename_num = adsh + '_num.csv'
+
+            filepath_pre = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_pre
+            filepath_num = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_num
+
+            filepath_pre.parent.mkdir(parents=True, exist_ok=True)
+
             pre_df, num_df, error_list= self.prenumformatter.format(adsh=adsh, pre_df=pre_df, num_df=num_df, lab_df=lab_df)
 
-            self._log_parse_errors(data.accessionNumber, "prenum", error_list)
-            write_df_to_zip(pre_df, targetfilepath_pre)
-            write_df_to_zip(num_df, targetfilepath_num)
+            self._log_error(data.accessionNumber, "prenum", error_list)
+            write_df_to_zip(pre_df, str(filepath_pre))
+            write_df_to_zip(num_df, str(filepath_num))
             return UpdateStyleFormatting(
                 accessionNumber=data.accessionNumber,
-                numFormattedFile=targetfilepath_num,
-                preFormattedFile=targetfilepath_pre,
+                numFormattedFile=str(filepath_pre),
+                preFormattedFile=str(filepath_num),
                 formatDate=self.processdate,
                 formatState='formatted')
 

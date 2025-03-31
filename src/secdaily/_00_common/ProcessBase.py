@@ -1,6 +1,9 @@
 import datetime
 import os
 from pathlib import Path
+from typing import List
+
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
 
 
 class ProcessBase:
@@ -23,8 +26,9 @@ class ProcessBase:
         self.data_path = Path(self.data_dir)
         self.error_path = Path(self.error_log_dir)
 
-    def _log_error(self, adsh: str, type: str, error: str):
-        error_file_name = self.error_log_dir + type + "_" + adsh + ".txt"
-        with open(error_file_name, "w", encoding="utf-8") as f:
-            f.write(error)
-                
+    def _log_error(self, adsh: str, type: str, error_list: List[SecError]):
+        if len(error_list) > 0:
+            error_file_name = self.error_log_dir + "parse_" + type + "_" + adsh + ".txt"
+            with open(error_file_name, "w", encoding="utf-8") as f:
+                for error in error_list:
+                    f.write(error.report_role + " - " + error.error + "\n")
