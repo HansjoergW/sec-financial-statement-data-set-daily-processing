@@ -8,7 +8,7 @@ from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import (
 )
 
 """
-Transforms the content on a "group" basis. Prepares data so that in the following processing step the 
+Transforms the content on a "group" basis. Prepares data so that in the following processing step the
 statement type (BS, IS, CF, ...) can be evaluated.
 """
 

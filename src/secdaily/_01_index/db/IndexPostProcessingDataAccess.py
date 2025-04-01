@@ -43,13 +43,13 @@ class IndexPostProcessingDA(DB):
 
     def read_last_known_fiscalyearend(self) -> Dict[str, str]:
         sql = '''
-        SELECT cikNumber, fiscalYearEnd 
+        SELECT cikNumber, fiscalYearEnd
         FROM (
-             SELECT cikNumber, fiscalYearEnd 
-             FROM {} 
-             WHERE formType = "10-K" and fiscalYearEnd is not null 
+             SELECT cikNumber, fiscalYearEnd
+             FROM {}
+             WHERE formType = "10-K" and fiscalYearEnd is not null
              ORDER BY cikNumber, period desc
-             ) as x 
+             ) as x
         GROUP BY cikNumber;
         '''.format(DB.SEC_REPORTS_TBL_NAME)
         # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
@@ -83,8 +83,8 @@ class IndexPostProcessingDA(DB):
         ]
 
         sql = '''UPDATE {} SET  period = ?,
-                                fiscalYearEnd = ?, 
-                                xbrlInsUrl = ?, insLastChange = ?, insSize = ?, 
+                                fiscalYearEnd = ?,
+                                xbrlInsUrl = ?, insLastChange = ?, insSize = ?,
                                 xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
                                 xbrlLabUrl = ?, labLastChange = ?, labSize = ?,
                                 xbrlDefUrl = ?, defLastChange = ?, defSize = ?,

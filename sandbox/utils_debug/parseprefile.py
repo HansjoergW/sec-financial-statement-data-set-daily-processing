@@ -2,7 +2,7 @@ from secdaily._00_common.DebugUtils import DataAccessByAdshTool
 from secdaily._02_xml.SecXmlPreParsing import SecPreXmlParser
 
 """
-Helper Class to process a single report based on the ADSH Nummer or directly from an xml content 
+Helper Class to process a single report based on the ADSH Nummer or directly from an xml content
 """
 
 

@@ -50,11 +50,13 @@
       [ok] Ablageverzeichnisstruktur anpassen
 
 18. [] error handling:
-      [] warning: 
+      [ok] warning: 
           C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\formatting\SECPreNumFormatting.py:73: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a 
           future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
           df.loc[df.segments.isnull(), 'segments'] = ""
       [] write normal catches to error log
+
+19. [ok] familarize with ruff -> which commands can help to check whole code and directly fix most common lint problems?
 
 19.  [] create final quarter zip file containing all daily
       [] concat existing zip files into single one for pre and num - overwrite an existing one

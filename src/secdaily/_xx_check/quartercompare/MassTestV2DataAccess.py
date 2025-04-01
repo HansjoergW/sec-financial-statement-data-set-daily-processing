@@ -67,7 +67,7 @@ class MassTestV2DA(DB):
     def find_entries_for_quarter(self, year: int, qrtr: int) -> List[FormattedReport]:
 
         sql = f"""SELECT accessionNumber, numFormattedFile as numFile, preFormattedFile as preFile
-                  FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} 
+                  FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
                   WHERE numFormattedFile is not NULL and preFormattedFile is not NULL
                       and filingYear = {year} and filingMonth in ({','.join([str(x) for x in self.months_in_qrtr[qrtr]])})
                   """
@@ -76,7 +76,7 @@ class MassTestV2DA(DB):
     def get_total_adshs(self, run_id: int, qtr: str) -> int:
         sql = f"""
         SELECT COUNT(DISTINCT adsh) as totalAdshs
-        FROM {DB.MASS_TESTING_V2_TBL_NAME} 
+        FROM {DB.MASS_TESTING_V2_TBL_NAME}
         WHERE runId = {run_id} AND qtr = '{qtr}'"""
 
         result = self._execute_fetchall(sql)
@@ -85,7 +85,7 @@ class MassTestV2DA(DB):
     def get_total_missing_daily(self, run_id: int, qtr: str) -> int:
         sql = f"""
             SELECT count(DISTINCT adsh) as totalMissingQuarter
-            FROM {DB.MASS_TESTING_V2_TBL_NAME} 
+            FROM {DB.MASS_TESTING_V2_TBL_NAME}
             WHERE runId={run_id} AND qtr='{qtr}' AND fileType="pre" AND dailyFile IS NULL;
         """
         result = self._execute_fetchall(sql)
@@ -94,7 +94,7 @@ class MassTestV2DA(DB):
     def get_total_missing_quarter(self, run_id: int, qtr: str) -> int:
         sql = f"""
             SELECT count(DISTINCT adsh) as totalMissingDaily
-            FROM {DB.MASS_TESTING_V2_TBL_NAME} 
+            FROM {DB.MASS_TESTING_V2_TBL_NAME}
             WHERE runId={run_id} AND qtr='{qtr}' AND fileType="pre" AND quarterFile IS NULL;
         """
         result = self._execute_fetchall(sql)
@@ -103,7 +103,7 @@ class MassTestV2DA(DB):
     def get_pre_overview(self, run_id: int, qtr: str) -> pd.DataFrame:
         sql = f"""
                     WITH base_counts AS (
-                        SELECT 
+                        SELECT
                             fileType,
                             stmt,
                             SUM(countMatching + countOnlyOrigin + countOnlyDaily) as countTotal,
@@ -111,13 +111,13 @@ class MassTestV2DA(DB):
                             SUM(countOnlyOrigin) as totalOnlyOrigin,
                             SUM(countOnlyDaily) as totalOnlyDaily
                         FROM {DB.MASS_TESTING_V2_TBL_NAME}
-                        WHERE fileType = 'pre' 
+                        WHERE fileType = 'pre'
                         AND stmt IS NOT NULL
                         AND runId = {run_id}
                         AND qtr = '{qtr}'
                         GROUP BY stmt
                     )
-                    SELECT 
+                    SELECT
                         fileType,
                         stmt,
                         countTotal,
@@ -132,7 +132,7 @@ class MassTestV2DA(DB):
     def get_num_overview(self, run_id: int, qtr: str) -> pd.DataFrame:
         sql = f"""
                 WITH base_counts AS (
-                    SELECT 
+                    SELECT
                         fileType,
                         stmt,
                         SUM(countMatching + countOnlyOrigin + countOnlyDaily) as countTotal,
@@ -141,18 +141,18 @@ class MassTestV2DA(DB):
                         SUM(countOnlyOrigin) as totalOnlyOrigin,
                         SUM(countOnlyDaily) as totalOnlyDaily
                     FROM {DB.MASS_TESTING_V2_TBL_NAME}
-                    WHERE fileType = 'num' 
+                    WHERE fileType = 'num'
                     AND countMatching IS NOT NULL
                     AND runId = {run_id}
                     AND qtr = '{qtr}'
                 )
-                SELECT 
+                SELECT
                     fileType,
                     stmt,
                     countTotal,
                     CAST(totalUnequal AS FLOAT) / countTotal as unequalRatio,
                     CAST(totalOnlyOrigin AS FLOAT) / countTotal as missingRatioDaily,
-                    CAST(totalOnlyDaily AS FLOAT) / countTotal as missingRatioQuarter	
+                    CAST(totalOnlyDaily AS FLOAT) / countTotal as missingRatioQuarter
                 FROM base_counts;
             """
 
@@ -182,10 +182,10 @@ class MassTestV2DA(DB):
         return report_overview
 
     def insert_test_result(self, update_list: List[UpdateMassTestV2]):
-        sql = f"""INSERT INTO {DB.MASS_TESTING_V2_TBL_NAME} 
-                    (runId, adsh, qtr, fileType, stmt, report, 
-                     countMatching, countUnequal, countOnlyOrigin, countOnlyDaily, 
-                     tagsUnequal, tagsOnlyOrigin, tagsOnlyDaily, quarterFile, dailyFile) 
+        sql = f"""INSERT INTO {DB.MASS_TESTING_V2_TBL_NAME}
+                    (runId, adsh, qtr, fileType, stmt, report,
+                     countMatching, countUnequal, countOnlyOrigin, countOnlyDaily,
+                     tagsUnequal, tagsOnlyOrigin, tagsOnlyDaily, quarterFile, dailyFile)
                      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
 
         # Konvertiere UpdateMassTestV2 Objekte in Tupel

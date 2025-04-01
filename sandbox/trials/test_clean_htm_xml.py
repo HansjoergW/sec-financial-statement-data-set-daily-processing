@@ -31,7 +31,7 @@ Extract: https://www.sec.gov/Archives/edgar/data/1475922/000095017024123110/pri-
    - Footnotes
 
 
-Notes: <ix:header><ix:hidden> -> scheint viele infos zu haben, ist auch sehr gross.. 
+Notes: <ix:header><ix:hidden> -> scheint viele infos zu haben, ist auch sehr gross..
 
 """
 

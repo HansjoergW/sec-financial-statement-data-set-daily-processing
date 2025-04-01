@@ -28,18 +28,18 @@ ruff = "^0.5.3"
 
 [tool.ruff]
 # Explicitly enable F401 (unused imports) and other rules
-select = [
+lint.select = [
     "F401",  # unused imports
     "E",     # pycodestyle errors
     "F",     # other pyflakes rules
     "I",     # isort
     "W",     # pycodestyle warnings
 ]
-line-length = 100
+line-length = 120
 fix = true
 
 [tool.black]
-line-length = 100
+line-length = 120
 
 [tool.pylint.messages_control]
 disable = [
@@ -52,7 +52,7 @@ disable = [
 ]
 
 [tool.pylint.format]
-max-line-length = 100
+max-line-length = 120
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

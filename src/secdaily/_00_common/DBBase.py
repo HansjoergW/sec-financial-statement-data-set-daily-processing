@@ -12,6 +12,8 @@ CURRENT_DIR, CURRENT_FILE = os.path.split(__file__)
 DDL_PATH = os.path.join(CURRENT_DIR, "sql")
 
 # noinspection SqlResolve
+# ruff: noqa: E501
+# pylint: disable=line-too-long
 class DB(ABC):
     """
     BaseClass für DB access to sqlite.

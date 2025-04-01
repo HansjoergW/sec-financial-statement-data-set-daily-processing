@@ -13,3 +13,16 @@ augment code:
    Scheint dafür aber in erster Linie code_overview.md gelesen zu haben.
 
 
+ruff:
+ - linting check with ruff
+  poetry run ruff check --fix .
+  poetry run ruff check --select W291 --fix --unsafe-fixes .   # spezifisches Problem fixen
+  poetry run ruff check --statistics ./src # statistics
+          256     E501    [ ] line-too-long
+            4     E712    [*] true-false-comparison
+            4     F841    [*] unused-variable
+            3     E711    [*] none-comparison
+            2     E722    [ ] bare-except
+            1     E731    [*] lambda-assignment  
+  
+  poetry run ruff check --output-format concise ./src # concise output
