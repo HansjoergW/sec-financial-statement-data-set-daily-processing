@@ -1,7 +1,8 @@
+from dataclasses import dataclass
+from typing import Dict, List
+
 from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformLocationDetails
 
-from dataclasses import dataclass
-from typing import List, Dict
 
 @dataclass
 class EvalEntry:

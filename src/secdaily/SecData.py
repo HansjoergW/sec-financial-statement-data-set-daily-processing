@@ -4,21 +4,18 @@ from typing import Optional
 
 from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
 from secdaily._00_common.DownloadUtils import UrlDownloader
-from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
-from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
 from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
-from secdaily._02_xml.SecXmlFileDownloading import SecXmlFileDownloader
-from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
-from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
+from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
+from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
 from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
 from secdaily._02_xml.db.XmlFilePreProcessingDataAccess import XmlFilePreProcessingDA
-from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
+from secdaily._02_xml.SecXmlFileDownloading import SecXmlFileDownloader
+from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
+from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import SecStyleFormatterDA
-from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
-from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
-
+from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
 
 
 class SecDataOrchestrator:
@@ -93,8 +90,8 @@ class SecDataOrchestrator:
 
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(XmlFileDownloadingDA(self.workdir), self.urldownloader, self.xmldir)
-        self._log_sub_header('download lab xml files')        
-        secxmlfilesdownloader.downloadLabFiles()        
+        self._log_sub_header('download lab xml files')
+        secxmlfilesdownloader.downloadLabFiles()
 
         self._log_sub_header('download num xml files')
         secxmlfilesdownloader.downloadNumFiles()

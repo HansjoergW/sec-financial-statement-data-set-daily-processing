@@ -1,13 +1,17 @@
-from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
-    SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
-from secdaily._02_xml.parsing.pre._4_1_SecPreXmlStatementTypeEvaluation import StmtConfidence, SecPreXmlStatementTypeEvaluator
-
-from typing import Dict, Union, List, Tuple, Set
 import logging
-import copy
-import pprint as pp
-
 from dataclasses import dataclass
+from typing import Dict, List, Tuple
+
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import (
+    SecPreTransformLocationDetails,
+    SecPreTransformPresentationArcDetails,
+    SecPreTransformPresentationDetails,
+)
+from secdaily._02_xml.parsing.pre._4_1_SecPreXmlStatementTypeEvaluation import (
+    SecPreXmlStatementTypeEvaluator,
+    StmtConfidence,
+)
+
 
 @dataclass
 class PresentationEntry:
@@ -335,19 +339,19 @@ class SecPreXmlDataProcessor:
         for stmtkey, stmt_list in stmt_data.items():
             stmt, inpth = stmtkey
 
-            if stmt is 'CP':
+            if stmt == 'CP':
                 stmt_list = self._post_process_cp(stmt_list)
 
-            if stmt is 'BS':
+            if stmt == 'BS':
                 stmt_list = self._post_process_general('BS', stmt_list)
 
-            if stmt is 'IS':
+            if stmt == 'IS':
                 stmt_list = self._post_process_is('IS', inpth, stmt_list)
 
-            if stmt is 'CI':
+            if stmt == 'CI':
                 stmt_list = self._post_process_ci('CI', inpth, stmt_list)
 
-            if stmt is 'CF':
+            if stmt == 'CF':
                 stmt_list = self._post_process_general('CF', stmt_list)
 
             selected[stmtkey] = stmt_list

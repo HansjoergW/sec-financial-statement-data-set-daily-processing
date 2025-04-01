@@ -1,11 +1,12 @@
+import os
+from multiprocessing import Pool
+from typing import List, Tuple
+
+import pandas as pd
 from secdaily._00_common.DBManagement import DBManager
 from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
-import pandas as pd
-import os
-from typing import Dict, List, Tuple
-from multiprocessing import Pool
 
 ALL_PARSED_NUM_CONTENT_FILE = "d:/secprocessing/tmp/all_num.csv"
 

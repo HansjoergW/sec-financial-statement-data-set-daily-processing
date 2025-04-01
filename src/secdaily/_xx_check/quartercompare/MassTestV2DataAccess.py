@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import pandas as pd
+
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.SecFileUtils import read_file_from_zip
 

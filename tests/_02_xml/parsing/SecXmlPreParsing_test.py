@@ -1,7 +1,6 @@
-from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
-
-
 import os
+
+from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 

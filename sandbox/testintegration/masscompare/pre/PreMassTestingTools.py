@@ -1,11 +1,12 @@
+import os
+from multiprocessing import Pool
+from typing import Dict, List, Tuple
+
+import pandas as pd
 from secdaily._00_common.DBManagement import DBManager
 from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
-from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
-import pandas as pd
-import os
-from typing import Dict, List, Tuple
-from multiprocessing import Pool
+from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 MASS_PRE_ZIP_TABLE = "mass_pre_zip_content"
 MASS_PRE_XML_TABLE = "mass_pre_parse_xml_data"

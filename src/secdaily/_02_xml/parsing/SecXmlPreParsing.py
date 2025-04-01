@@ -1,13 +1,21 @@
-from secdaily._02_xml.parsing.SecXmlParsingBase import SecXmlParserBase, SecError
-from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
-from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer, SecPreTransformPresentationDetails
-from secdaily._02_xml.parsing.pre._3_SecPreXmlGroupTransformation import SecPreXmlGroupTransformer
-from secdaily._02_xml.parsing.pre._4_SecPreXmlProcessing import SecPreXmlDataProcessor, PresentationEntry
+from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from typing import Dict, List, Tuple
-
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import (
+    SecPreExtractPresentationLink,
+    SecPreXmlExtractor,
+)
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import (
+    SecPreTransformPresentationDetails,
+    SecPreXmlTransformer,
+)
+from secdaily._02_xml.parsing.pre._3_SecPreXmlGroupTransformation import SecPreXmlGroupTransformer
+from secdaily._02_xml.parsing.pre._4_SecPreXmlProcessing import (
+    PresentationEntry,
+    SecPreXmlDataProcessor,
+)
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError, SecXmlParserBase
 
 
 class SecPreXmlParser(SecXmlParserBase):

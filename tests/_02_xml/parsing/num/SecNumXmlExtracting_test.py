@@ -1,7 +1,8 @@
-from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
-from lxml import etree, objectify
-from typing import List
 import os
+from typing import List
+
+from lxml import etree, objectify
+from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumExtraction, SecNumXmlExtractor
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"

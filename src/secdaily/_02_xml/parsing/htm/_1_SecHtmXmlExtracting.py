@@ -1,10 +1,6 @@
 import re
+
 from lxml import etree
-from typing import Dict, List, Tuple, Union
-from dataclasses import dataclass
-
-from numpy import byte
-
 
 # @dataclass
 # class SecPreExtractPresentationArcDetails():
@@ -92,11 +88,11 @@ class SecHtmXmlExtractor():
         # next empty lines removen
 
         # remove empty divs -> gibt es nicht empty divs?
-        # consider to remove  completely "<span...>" und "</span>"  
+        # consider to remove  completely "<span...>" und "</span>"
 
 
 
-        # data = self.remove_unicode_tag_regex.sub("", data)        
+        # data = self.remove_unicode_tag_regex.sub("", data)
         # data = self.default_ns_regex.sub("", data)  # some nodes define a default namespace.. that causes troubles
         # data = self.link_regex.sub("<", data)
         # data = self.link_end_regex.sub("</", data)
@@ -161,5 +157,5 @@ class SecHtmXmlExtractor():
         byte_data: bytes = bytes(bytearray(data, encoding='utf-8'))
         root = etree.fromstring(byte_data, parser=None)
 
-        # continue 
+        # continue
 

@@ -1,24 +1,19 @@
 # coordinates the parsing of downloaded xml files and stores the data in a new folder
-import datetime
 import logging
-import os
-from typing import Protocol, List, Tuple
+from typing import List, Protocol
 
-from isort import file
-
-from secdaily._00_common.ProcessBase import ProcessBase
-from secdaily._02_xml.db.XmlFileParsingDataAccess import (
-    UpdateNumParsing,
-    UnparsedFile,
-    UpdatePreParsing,
-    UpdateLabParsing,
-)
 from secdaily._00_common.ParallelExecution import ParallelExecutor
+from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
-from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
-from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
-from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
+from secdaily._02_xml.db.XmlFileParsingDataAccess import (
+    UnparsedFile,
+    UpdateLabParsing,
+    UpdateNumParsing,
+    UpdatePreParsing,
+)
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
+from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
+from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 
 class DataAccess(Protocol):

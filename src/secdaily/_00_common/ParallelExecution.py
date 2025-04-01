@@ -2,9 +2,10 @@
 # - https://stackoverflow.com/questions/3288595/multiprocessing-how-to-use-pool-map-on-a-function-defined-in-a-class
 
 import logging
+from time import sleep, time
+from typing import Callable, Generic, List, Optional, Tuple, TypeVar
+
 from pathos.multiprocessing import ProcessingPool as Pool
-from time import time, sleep
-from typing import Generic, TypeVar, List, Callable, Optional, Tuple
 
 IT = TypeVar("IT")  # input type of the list to split
 PT = TypeVar("PT")  # processed type of the list to split

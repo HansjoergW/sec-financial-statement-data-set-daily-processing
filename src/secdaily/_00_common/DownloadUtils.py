@@ -1,10 +1,10 @@
-from typing import Optional
-from secdaily._00_common.SecFileUtils import write_content_to_zip
-
 import logging
 from time import sleep
+from typing import Optional
 
 import requests
+
+from secdaily._00_common.SecFileUtils import write_content_to_zip
 
 
 class UrlDownloader:

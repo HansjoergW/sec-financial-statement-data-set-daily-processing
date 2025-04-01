@@ -2,7 +2,7 @@ import glob
 import os
 import sqlite3
 from abc import ABC
-from typing import List, TypeVar, Dict
+from typing import Dict, List, TypeVar
 
 import pandas as pd
 

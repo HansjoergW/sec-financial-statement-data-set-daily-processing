@@ -1,7 +1,7 @@
+import os
+
 from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor
 from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
-
-import os
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from secdaily._00_common.DBBase import DB
 from secdaily._00_common.BaseDefinitions import get_qrtr_string_by_month
+from secdaily._00_common.DBBase import DB
 
 
 @dataclass
@@ -18,7 +18,7 @@ class MissingFile:
 
     def get_qrtr_string(self) -> str:
         return get_qrtr_string_by_month(self.filingYear, self.filingMonth)
-    
+
     def get_filing_date(self) -> str:
         return f"{self.filingYear}-{self.filingMonth}-{self.filingDay}"
 
@@ -43,12 +43,12 @@ class XmlFileDownloadingDA(DB):
 
     def find_missing_xmlLabelFiles(self) -> List[MissingFile]:
         sql = f'''SELECT accessionNumber, filingDay, filingMonth, filingYear, xbrlLabUrl as url, labSize as fileSize FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} WHERE xmlLabFile is NULL AND xbrlLabUrl IS NOT '' '''
-        missings = self._execute_fetchall_typed(sql, MissingFile)    
+        missings = self._execute_fetchall_typed(sql, MissingFile)
 
         for missing in missings:
             missing.type = 'label'
 
-        return missings    
+        return missings
 
     def update_processing_xml_num_file(self, update_list: List[MissingFile]):
         update_data = [(x.file, x.accessionNumber) for x in update_list]

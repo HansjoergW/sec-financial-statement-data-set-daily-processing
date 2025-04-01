@@ -11,7 +11,7 @@ class ProcessBase:
     def __init__(self, data_dir: str):
         self.data_dir = data_dir
         self.processdate = datetime.date.today().isoformat()
-        
+
         if self.data_dir[-1] != '/':
             self.data_dir = data_dir + '/'
 

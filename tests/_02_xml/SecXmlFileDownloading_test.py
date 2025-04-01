@@ -1,8 +1,9 @@
+import os
+import shutil
+
+import pytest
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import XmlFileDownloadingDA
 from secdaily._02_xml.SecXmlFileDownloading import SecXmlFileDownloader
-import shutil
-import pytest
-import os
 
 scriptpath = os.path.realpath(__file__ + "/..")
 folder = scriptpath + "/tmp"

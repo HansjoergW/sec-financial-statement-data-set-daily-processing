@@ -1,8 +1,6 @@
-from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
-
-from typing import Dict, Tuple, Optional
-from lxml import etree, objectify
 import os
+
+from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/data/"

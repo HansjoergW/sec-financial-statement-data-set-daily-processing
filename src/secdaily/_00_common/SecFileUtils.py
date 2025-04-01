@@ -1,7 +1,7 @@
 import os
-from typing import Any, Optional
 import zipfile
 from pathlib import Path
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -15,13 +15,13 @@ def write_df_to_zip(df: pd.DataFrame, filename: str):
     write_content_to_zip(csv_content, filename)
 
 
-def read_df_from_zip(filename: str) -> pd.DataFrame:
+def read_df_from_zip(filename: str, dtype: Optional[Any] = None) -> pd.DataFrame:
     if _check_if_zipped(filename):
         with zipfile.ZipFile(filename + ".zip", "r") as zf:
             file = Path(filename).name
             return pd.read_csv(zf.open(file), header=0, delimiter="\t")
     else:
-        return pd.read_csv(filename, header=0, delimiter="\t")
+        return pd.read_csv(filename, header=0, delimiter="\t", dtype=dtype)
 
 
 def read_file_from_zip(zip_file: str, filename: str, dtype: Optional[Any] = None) -> pd.DataFrame:

@@ -1,7 +1,5 @@
-import datetime
 import logging
-import os
-from typing import Protocol, List
+from typing import List, Protocol
 
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.ParallelExecution import ParallelExecutor
@@ -57,7 +55,7 @@ class SecXmlFileDownloader(ProcessBase):
         if (data.url == None) | (data.url == ""):
             logging.warning(f"url is null: {data.accessionNumber} / {data.type} ")
             return data
-        
+
         filename = data.url.rsplit('/', 1)[-1]
 
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename

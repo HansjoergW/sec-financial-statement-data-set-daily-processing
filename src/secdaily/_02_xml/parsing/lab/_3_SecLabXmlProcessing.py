@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
+
 from secdaily._02_xml.parsing.lab._2_SecLabXmlTransformation import SecLabTransformLabelDetails
+
 
 @dataclass
 class LabelEntry:

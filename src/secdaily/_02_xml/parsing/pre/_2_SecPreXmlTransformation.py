@@ -1,9 +1,12 @@
-from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreExtractPresentationLink, SecPreExtractLocationDetails, \
-    SecPreExtractPresentationArcDetails
-
-from dataclasses import dataclass
-from typing import List, Dict, Optional, Union, Tuple
 import re
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import (
+    SecPreExtractLocationDetails,
+    SecPreExtractPresentationArcDetails,
+    SecPreExtractPresentationLink,
+)
 
 """ transforms the raw content of the information inside the xml in the a usable form. does not do any processing of the data, 
 but adds additional information"""

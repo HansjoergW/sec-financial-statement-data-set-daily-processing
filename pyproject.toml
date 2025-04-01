@@ -6,7 +6,7 @@ authors = [
     { name = "Hansjoerg", email = "hansjoeg.wingeier@gmail.com" }
 ]
 readme = "README.md"
-requires-python = "~3.10"
+requires-python = ">=3.10"
 
 [tool.poetry.dependencies]
 pandas = "^2.2"
@@ -24,6 +24,19 @@ packages = [
 pytest = "^8.0.2"
 pylint = "^3.0.3"
 black = "^24.2.0"
+ruff = "^0.5.3"
+
+[tool.ruff]
+# Explicitly enable F401 (unused imports) and other rules
+select = [
+    "F401",  # unused imports
+    "E",     # pycodestyle errors
+    "F",     # other pyflakes rules
+    "I",     # isort
+    "W",     # pycodestyle warnings
+]
+line-length = 100
+fix = true
 
 [tool.black]
 line-length = 100

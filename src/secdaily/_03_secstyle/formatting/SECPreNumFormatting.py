@@ -13,7 +13,7 @@ class SECPreNumFormatter:
         # from https://realpython.com/python-rounding/#rounding-pandas-series-and-dataframe
         multiplier = 10 ** decimals
         return np.floor(n*multiplier + 0.5) / multiplier
-    
+
     def _format_pre(self, pre_df: pd.DataFrame, adsh: Optional[str] = None) -> pd.DataFrame:
         if len(pre_df) == 0:
             return pre_df
@@ -44,7 +44,7 @@ class SECPreNumFormatter:
             return num_df
 
         num_df = num_df[~num_df.tag.isin(['EntityCommonStockSharesOutstanding', 'TradingSymbol', 'SecurityExchangeName', 'CurrentFiscalYearEndDate'])]
-        df = (num_df[num_df.isrelevant]).copy()      
+        df = (num_df[num_df.isrelevant]).copy()
 
         # # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
         # df['uom_ext'] = df['uom']
@@ -85,7 +85,7 @@ class SECPreNumFormatter:
         df.drop(['decimals'], axis=1, inplace=True)
 
         return df
-    
+
     def _join_pre_with_lab(self, pre_df: pd.DataFrame, lab_df: pd.DataFrame) -> pd.DataFrame:
 
         # Remove apostrophe from the 'label' column in lab_df
@@ -101,7 +101,7 @@ class SECPreNumFormatter:
         pre_merged_df.rename(columns={'label': 'plabel'}, inplace=True)
 
         return pre_merged_df
-    
+
     def format(self, adsh: str, pre_df: pd.DataFrame, num_df: pd.DataFrame, lab_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List[SecError]]:
         """ formats the pre and num dataframes for the provided adsh """
 
@@ -117,7 +117,7 @@ class SECPreNumFormatter:
         merged_df = pd.merge(pre_formatted_df[key_columns], num_formatted_df[key_columns], on=key_columns, how='inner')
 
         pre_merged_df = pre_formatted_df[pre_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]
-        num_merged_df = num_formatted_df[num_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]        
+        num_merged_df = num_formatted_df[num_formatted_df[key_columns].apply(tuple, axis=1).isin(merged_df[key_columns].apply(tuple, axis=1))]
 
         sec_error_list = [SecError(adsh=x[0], report_role=x[1], error=x[2]) for x in collected_errors]
 

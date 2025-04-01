@@ -42,12 +42,12 @@ def test_clean_htm_xml():
 
     extractor = SecHtmXmlExtractor()
     data = extractor._strip_file(file.read_text())
-    
-    
-    output_file = CURRENT_PATH / "../data/cleaned_html.txt"    
+
+
+    output_file = CURRENT_PATH / "../data/cleaned_html.txt"
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(data)
-    
+
     print(data)
     print(len(data))
 

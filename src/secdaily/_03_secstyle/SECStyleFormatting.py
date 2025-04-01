@@ -1,36 +1,34 @@
-import datetime
 import logging
-import os
-from typing import List, Optional, Protocol, Tuple
-import numpy as np
-import pandas as pd
+from typing import List, Protocol
 
+from secdaily._00_common.BaseDefinitions import DTYPES_LAB, DTYPES_NUM, DTYPES_PRE
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_df_from_zip, write_df_to_zip
-from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
-from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import UnformattedReport, UpdateStyleFormatting
+from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import (
+    UnformattedReport,
+    UpdateStyleFormatting,
+)
 from secdaily._03_secstyle.formatting.SECPreNumFormatting import SECPreNumFormatter
 
 
 class DataAccess(Protocol):
     def find_unformatted_reports(self) -> List[UnformattedReport]:
-        """ find report entries which have not been formatted """
+        """find report entries which have not been formatted"""
         return []
 
     def update_formatted_reports(self, update_list: List[UpdateStyleFormatting]):
-        """ update the report entry with the formatted result file """
+        """update the report entry with the formatted result file"""
 
 
 class SECStyleFormatter(ProcessBase):
 
     prenumformatter = SECPreNumFormatter()
 
-    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/secstyle/"):  
+    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/secstyle/"):
         super().__init__(data_dir=data_dir)
-        
-        self.dbmanager = dbmanager
 
+        self.dbmanager = dbmanager
 
     def _format_report(self, data: UnformattedReport) -> UpdateStyleFormatting:
         # todo: we should provide the dtype here, to make sure we read the data in the correct format
@@ -38,20 +36,25 @@ class SECStyleFormatter(ProcessBase):
         adsh = data.accessionNumber
 
         try:
-            # -> hier müsste dtypes übergeben werden...
-            num_df = read_df_from_zip(data.numFile)
-            pre_df = read_df_from_zip(data.preFile)
-            lab_df = read_df_from_zip(data.labFile)
-            
-            filename_pre = adsh + '_pre.csv'
-            filename_num = adsh + '_num.csv'
+            num_df = read_df_from_zip(data.numFile, dtype=DTYPES_NUM)
+            pre_df = read_df_from_zip(data.preFile, dtype=DTYPES_PRE)
+            lab_df = read_df_from_zip(data.labFile, dtype=DTYPES_LAB)
 
-            filepath_pre = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_pre
-            filepath_num = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_num
+            filename_pre = adsh + "_pre.csv"
+            filename_num = adsh + "_num.csv"
+
+            filepath_pre = (
+                self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_pre
+            )
+            filepath_num = (
+                self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename_num
+            )
 
             filepath_pre.parent.mkdir(parents=True, exist_ok=True)
 
-            pre_df, num_df, error_list= self.prenumformatter.format(adsh=adsh, pre_df=pre_df, num_df=num_df, lab_df=lab_df)
+            pre_df, num_df, error_list = self.prenumformatter.format(
+                adsh=adsh, pre_df=pre_df, num_df=num_df, lab_df=lab_df
+            )
 
             self._log_error(data.accessionNumber, "prenum", error_list)
             write_df_to_zip(pre_df, str(filepath_pre))
@@ -61,7 +64,8 @@ class SECStyleFormatter(ProcessBase):
                 numFormattedFile=str(filepath_pre),
                 preFormattedFile=str(filepath_num),
                 formatDate=self.processdate,
-                formatState='formatted')
+                formatState="formatted",
+            )
 
         except Exception as e:
             logging.exception("failed to parse data for adsh: " + adsh, e)
@@ -70,12 +74,15 @@ class SECStyleFormatter(ProcessBase):
                 numFormattedFile=None,
                 preFormattedFile=None,
                 formatDate=self.processdate,
-                formatState=str(e))
+                formatState=str(e),
+            )
 
     def process(self):
         logging.info("SEC style formatting")
 
-        executor = ParallelExecutor[UnformattedReport, UpdateStyleFormatting, type(None)]()  # no limitation in speed
+        executor = ParallelExecutor[
+            UnformattedReport, UpdateStyleFormatting, type(None)
+        ]()  # no limitation in speed
 
         executor.set_get_entries_function(self.dbmanager.find_unformatted_reports)
         executor.set_process_element_function(self._format_report)

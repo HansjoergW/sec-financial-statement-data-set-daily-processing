@@ -3,7 +3,6 @@ import shutil
 
 import pandas as pd
 import pytest
-
 import secdaily._00_common.SecFileUtils as sfu
 
 folder = "./tmp/"

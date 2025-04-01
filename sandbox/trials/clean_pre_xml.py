@@ -1,8 +1,8 @@
 import re
-from lxml import etree
-import calendar
-import pandas as pd
 from typing import Dict, List, Tuple
+
+import pandas as pd
+from lxml import etree
 
 file = "../data/aapl-20200926_pre.xml"
 target_pre_clean_xml = "c:/ieu/projects/sec_processing/data/aapl-20200926_pre-clean.xml"

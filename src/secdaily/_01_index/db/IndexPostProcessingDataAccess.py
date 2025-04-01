@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Dict
+from typing import Dict, List, Optional, Tuple
 
 from secdaily._00_common.DBBase import DB
 

@@ -1,6 +1,6 @@
-from secdaily._02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer
-
 import os
+
+from secdaily._02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 datafolder = scriptpath + "/data/"

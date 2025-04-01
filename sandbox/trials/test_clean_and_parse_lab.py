@@ -1,6 +1,4 @@
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
-from secdaily._02_xml.parsing.lab._1_SecLabXmlExtracting import SecLabXmlExtractor, SecLabLabelLink
-from secdaily._02_xml.parsing.lab._2_SecLabXmlTransformation import SecLabXmlTransformer
 
 
 def test_lab_xml_parsing():

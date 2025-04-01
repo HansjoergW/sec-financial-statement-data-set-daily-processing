@@ -1,12 +1,13 @@
-from secdaily._00_common.DBManagement import DBManager
-from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
-
-from testintegration.sub.SubMassTestingTools import read_sub_zip_content, read_sub_xml_content, read_and_parse_direct_from_table
-
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 import pandas as pd
-
+from secdaily._00_common.DBManagement import DBManager
+from secdaily._00_common.DebugUtils import DataAccessTool, TestSetCreatorTool
+from testintegration.sub.SubMassTestingTools import (
+    read_and_parse_direct_from_table,
+    read_sub_xml_content,
+    read_sub_zip_content,
+)
 
 default_workdir = "d:/secprocessing"
 
@@ -60,7 +61,7 @@ def compare_adsh(merged_df: pd.DataFrame):
 def compare_cols(merged_df: pd.DataFrame) -> pd.DataFrame:
     same_adsh_df = merged_df[(~merged_df.adsh_zip.isnull()) & (~merged_df.adsh_xml.isnull())].copy()
 
-    compare_cols = [x for x in cols if x is not "adsh"]
+    compare_cols = [x for x in cols if x != "adsh"]
     for comp_col in compare_cols:
         xml_col = comp_col + '_xml'
         zip_col = comp_col + '_zip'

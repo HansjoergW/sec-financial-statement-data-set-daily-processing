@@ -1,7 +1,8 @@
-from secdaily._00_common.DBBase import DB
-from typing import List, Tuple, Set, Optional, Dict
+from typing import List, Set, Tuple
 
 import pandas as pd
+
+from secdaily._00_common.DBBase import DB
 
 
 class IndexProcessingDA(DB):

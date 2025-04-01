@@ -1,12 +1,10 @@
-from email import errors
-from typing import List, Optional, Tuple
-from numpy import float64, int64
-import pytest
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import pandas as pd
+import pytest
+from numpy import float64, int64
 from pandas.testing import assert_frame_equal
-
 from secdaily._00_common.SecFileUtils import read_content_from_zip, read_file_from_zip
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
 from secdaily._02_xml.parsing.SecXmlNumParsing import SecNumXmlParser
@@ -52,7 +50,7 @@ def pre_parsed_df(sec_pre_xml_parser) -> pd.DataFrame:
     content_pre = read_content_from_zip(str(RAW_XML_PATH / '0000320193-24-000123-aapl-20240928_pre.xml'))
 
     parsed_df, _ = sec_pre_xml_parser.parse(adsh=APPLE_2024_10K_ADSH, data=content_pre)
-    
+
     cleaned_df = sec_pre_xml_parser.clean_for_financial_statement_dataset(df=parsed_df, adsh=APPLE_2024_10K_ADSH)
     cleaned_df.reset_index(inplace=True)
 
@@ -63,11 +61,11 @@ def pre_parsed_df(sec_pre_xml_parser) -> pd.DataFrame:
 
 @pytest.fixture
 def num_parsed_df(sec_num_xml_parser) -> pd.DataFrame:
-    
+
     content_num = read_content_from_zip(str(RAW_XML_PATH / '0000320193-24-000123-aapl-20240928_htm.xml'))
 
     parsed_df, _ = sec_num_xml_parser.parse(adsh=APPLE_2024_10K_ADSH, data=content_num)
-    
+
     cleaned_df, fye = sec_num_xml_parser.clean_for_financial_statement_dataset(df=parsed_df, adsh=APPLE_2024_10K_ADSH)
     cleaned_df.reset_index(inplace=True)
 
@@ -100,7 +98,7 @@ def num_orig_df() -> pd.DataFrame:
         'uom': str,
         'coreg': str,
         'value': float64,
-        'footnote': str, 
+        'footnote': str,
         'segments': str
     }
     df = read_file_from_zip(str(TESTDATA_PATH / '2024q4.zip'), 'num.txt', dtype=dtypes)
@@ -108,7 +106,7 @@ def num_orig_df() -> pd.DataFrame:
     df.loc[df.segments.isnull(), 'segments'] = ""
     df.loc[df.footnote.isnull(), 'footnote'] = ""
 
-    df = df[df.segments == ""] 
+    df = df[df.segments == ""]
     return df
 
 
@@ -152,10 +150,10 @@ def load_from_raw_xml_2(num_file: str, pre_file: str, lab_file: str, adsh) -> Tu
 def compare_tables(df_orig: pd.DataFrame, df_daily: pd.DataFrame, cols: List[str], save_path: Optional[Path] = None):
     try:
         assert_frame_equal(df_daily, df_orig, check_dtype=True)
-    except AssertionError as e:
+    except AssertionError:
         print("Differences in DataFrame")
         diff_pre = df_daily.merge(df_orig, indicator=True, how='outer')
-        
+
         diff_pre = diff_pre.sort_values(cols)
         diff_pre = diff_pre[cols + ['_merge']]
         if save_path:
@@ -172,8 +170,8 @@ def test_process(pre_orig_df, num_orig_df, print_full_table):
     pre_df, num_df, _ = load_from_raw_xml_2(num_file, pre_file, lab_file, adsh)
     pre_orig_df = pre_orig_df[pre_orig_df.adsh == adsh]
     num_orig_df = num_orig_df[num_orig_df.adsh == adsh]
-    
-    # file_prefix = "0000320193-24-000123-aapl-20240928"   
+
+    # file_prefix = "0000320193-24-000123-aapl-20240928"
     # base_path = Path("D:/secprocessing2/xml/2025-03-17")
     # pre_df, num_df, _  =load_from_raw_xml(base_path=base_path, file_prefix=file_prefix)
 
@@ -196,12 +194,12 @@ def test_pre_single_compare(sec_pre_xml_parser: SecPreXmlParser, pre_parsed_df: 
     assert len(cleaned_df) > 0
     assert len(orig_df) == len(cleaned_df)
 
-    
+
 
 def test_num_single_compare(sec_num_xml_parser: SecNumXmlParser, num_parsed_df: pd.DataFrame):
 
     orig_df = pd.read_csv(TESTDATA_PATH / 'quarterzips' / '_2024_10k_apple' / 'num.txt', sep='\t')
-    orig_df = orig_df[orig_df.segments.isnull()] 
+    orig_df = orig_df[orig_df.segments.isnull()]
 
     cleaned_df = num_parsed_df
 
@@ -209,7 +207,7 @@ def test_num_single_compare(sec_num_xml_parser: SecNumXmlParser, num_parsed_df: 
 
 
     assert len(cleaned_df) > 0
-    
+
 
 def test_merge(pre_parsed_df: pd.DataFrame, num_parsed_df: pd.DataFrame, pre_orig_df: pd.DataFrame, num_orig_df: pd.DataFrame):
     common_columns = ['adsh', 'tag', 'version']
@@ -232,14 +230,14 @@ def test_merge(pre_parsed_df: pd.DataFrame, num_parsed_df: pd.DataFrame, pre_ori
 
     pre_df_filtered = pre_df_filtered.sort_values(by=pre_df_cols).reset_index(drop=True)
     pre_orig_df_filtered = pre_orig_df_filtered.sort_values(by=pre_df_cols).reset_index(drop=True)
- 
+
     assert len(merged_df) > 0
     try:
         assert_frame_equal(pre_df_filtered, pre_orig_df_filtered, check_dtype=False)
-    except AssertionError as e:
+    except AssertionError:
         print("Differences in pre DataFrame:")
         diff_pre = pre_df_filtered.merge(pre_orig_df_filtered, indicator=True, how='outer')
-        
+
         diff_pre = diff_pre.sort_values(['adsh', 'stmt', 'line', 'tag', 'version'])
         print(diff_pre[diff_pre['_merge'] != 'both'])
 

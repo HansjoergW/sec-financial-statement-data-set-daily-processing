@@ -1,12 +1,10 @@
 
-from typing import Dict
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import List
+from typing import Dict, List
+
 from secdaily._02_xml.parsing.lab._1_SecLabXmlExtracting import SecLabLabelLink
 from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreXmlTransformer
-
-
 
 
 @dataclass
@@ -36,13 +34,13 @@ class SecLabXmlTransformer:
                 version=version,
                 from_entry=arc.from_entry,
                 to_entry=arc.to_entry)
-            id_map[arc.to_entry] = entry            
-    
+            id_map[arc.to_entry] = entry
+
         for label in us_eng_labels:
             entry = id_map.get(label.label)
             if entry:
                 entry.labels[label.role] = label.text
 
         return list(id_map.values())
-    
-    
+
+

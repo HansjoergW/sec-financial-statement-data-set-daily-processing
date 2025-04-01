@@ -1,11 +1,16 @@
-from secdaily._02_xml.parsing.SecXmlParsingBase import SecXmlParserBase, SecError
-from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumXmlExtractor, SecNumExtraction
-from secdaily._02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer, SecNumTransformed, SecNumTransformedContext, SecNumTransformedTag, SecNumTransformedUnit
+from typing import List, Tuple
 
 import pandas as pd
-import numpy as np
 
-from typing import Dict, List, Tuple, Optional
+from secdaily._02_xml.parsing.num._1_SecNumXmlExtracting import SecNumExtraction, SecNumXmlExtractor
+from secdaily._02_xml.parsing.num._2_SecNumXmlTransformation import (
+    SecNumTransformed,
+    SecNumTransformedContext,
+    SecNumTransformedTag,
+    SecNumTransformedUnit,
+    SecNumXmlTransformer,
+)
+from secdaily._02_xml.parsing.SecXmlParsingBase import SecError, SecXmlParserBase
 
 
 class SecNumXmlParser(SecXmlParserBase):

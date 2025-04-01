@@ -1,15 +1,14 @@
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set
 
-from numpy import equal, float64, int64
 import pandas as pd
 
 from secdaily._00_common.BaseDefinitions import DTYPES_NUM, DTYPES_PRE, get_qrtr_string
 from secdaily._xx_check.quartercompare.MassTestV2DataAccess import (  # noqa: F401
     FormattedReport,
-    QuarterFileAccess,
     MassTestV2DA,
+    QuarterFileAccess,
     UpdateMassTestV2,
 )
 

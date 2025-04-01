@@ -6,8 +6,8 @@ import pandas as pd
 from secdaily._00_common.DBDebugUtils import DBDebugDA
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.SecFileUtils import read_content_from_zip, read_df_from_zip
+from secdaily._02_xml.db.XmlFileParsingDataAccess import UnparsedFile, UpdatePreParsing
 from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
-from secdaily._02_xml.db.XmlFileParsingDataAccess import UpdatePreParsing, UnparsedFile
 
 
 class DataAccessTool():

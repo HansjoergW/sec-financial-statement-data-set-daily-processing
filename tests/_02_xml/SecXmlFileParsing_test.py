@@ -1,9 +1,10 @@
-from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
-from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
-import shutil
-import pytest
 import glob
 import os
+import shutil
+
+import pytest
+from secdaily._02_xml.db.XmlFileParsingDataAccess import XmlFileParsingDA
+from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
 
 scriptpath = os.path.realpath(__file__ + "/..")
 folder = scriptpath + "/tmp"
@@ -21,7 +22,7 @@ def dbmgr():
 
 
 def test_parse_num_xml(dbmgr: XmlFileParsingDA):
-    parser = SecXmlParser(dbmanager=dbmgr, 
+    parser = SecXmlParser(dbmanager=dbmgr,
                           data_dir=folder + "/data/")
     parser.parseNumFiles()
 

@@ -1,11 +1,11 @@
-from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import SecPreTransformPresentationDetails, \
-    SecPreTransformPresentationArcDetails, SecPreTransformLocationDetails
-from typing import Dict, Union, List, Tuple, Set
-import logging
 import copy
-import pprint as pp
+from typing import Dict, List, Tuple
 
-from dataclasses import dataclass
+from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import (
+    SecPreTransformLocationDetails,
+    SecPreTransformPresentationArcDetails,
+    SecPreTransformPresentationDetails,
+)
 
 """
 Transforms the content on a "group" basis. Prepares data so that in the following processing step the 

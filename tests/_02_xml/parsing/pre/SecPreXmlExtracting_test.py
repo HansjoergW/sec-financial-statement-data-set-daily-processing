@@ -1,7 +1,10 @@
-from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import SecPreXmlExtractor, SecPreExtractPresentationLink
-
-from typing import List, Dict, Tuple, Union
 import os
+from typing import Dict
+
+from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import (
+    SecPreExtractPresentationLink,
+    SecPreXmlExtractor,
+)
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 data_folder = scriptpath + "/../data/"

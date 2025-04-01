@@ -49,65 +49,23 @@
       [ok] Superklasse für processing steps mit basis Verzeichnissen und errorlogging
       [ok] Ablageverzeichnisstruktur anpassen
 
-18. [] warning: 
-      C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\formatting\SECPreNumFormatting.py:73: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a 
-      future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
-      df.loc[df.segments.isnull(), 'segments'] = ""
+18. [] error handling:
+      [] warning: 
+          C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\formatting\SECPreNumFormatting.py:73: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a 
+          future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+          df.loc[df.segments.isnull(), 'segments'] = ""
+      [] write normal catches to error log
 
-    [] error:
-            multiprocess.pool.RemoteTraceback: 
-            """
-            Traceback (most recent call last):
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\multiprocess\pool.py", line 125, in worker
-            result = (True, func(*args, **kwds))
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\multiprocess\pool.py", line 48, in mapstar
-            return list(map(*args))
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\pathos\helpers\mp_helper.py", line 15, in <lambda>
-            func = lambda args: f(*args)
-            File "C:\ieu\projects\sec_processing\src\secdaily\_00_common\ParallelExecution.py", line 93, in process_throttled
-            result: PT = self.process_element_function(data)
-            File "C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\SECStyleFormatting.py", line 37, in _format_report
-            num_df = read_df_from_zip(data.numFile)
-            File "C:\ieu\projects\sec_processing\src\secdaily\_00_common\SecFileUtils.py", line 19, in read_df_from_zip
-            if _check_if_zipped(filename):
-            File "C:\ieu\projects\sec_processing\src\secdaily\_00_common\SecFileUtils.py", line 10, in _check_if_zipped
-            return os.path.isfile(path + ".zip")
-            TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
-            """
-
-            The above exception was the direct cause of the following exception:
-
-            Traceback (most recent call last):
-            File "c:\ieu\projects\sec_processing\src\secdaily\SecData.py", line 150, in <module>
-            orchestrator.process()
-            File "c:\ieu\projects\sec_processing\src\secdaily\SecData.py", line 135, in process
-            self.create_sec_style()
-            File "c:\ieu\projects\sec_processing\src\secdaily\SecData.py", line 125, in create_sec_style
-            formatter.process()
-            File "C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\SECStyleFormatting.py", line 82, in process
-            executor.execute()
-            File "C:\ieu\projects\sec_processing\src\secdaily\_00_common\ParallelExecution.py", line 135, in execute
-            processed = self._execute_parallel(chunk)
-            File "C:\ieu\projects\sec_processing\src\secdaily\_00_common\ParallelExecution.py", line 102, in _execute_parallel
-            return self.pool.map(self.process_throttled, chunk)
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\pathos\multiprocessing.py", line 154, in map
-            return _pool.map(star(f), zip(*args), **kwds)
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\multiprocess\pool.py", line 367, in map
-            return self._map_async(func, iterable, mapstar, chunksize).get()
-            File "C:\ieu\Anaconda3\envs\secprocessing_3.10\lib\site-packages\multiprocess\pool.py", line 774, in get
-            raise self._value
-            TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'      
-
-18.  [] create final quarter zip file containing all daily
+19.  [] create final quarter zip file containing all daily
       [] concat existing zip files into single one for pre and num - overwrite an existing one
       [] create final zip file with pre, num and sub
 
-19. [] activate project / create official 0.1 release
+20. [] activate project / create official 0.1 release
       [] activate build pipeline with linting and tests
       [] activate deployment to pypi
       [] adapt readme / add limitations
 
-20. [] end to end tests
+21. [] end to end tests
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
 

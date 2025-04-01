@@ -1,9 +1,8 @@
 import re
-from lxml import etree
-from typing import Dict, List, Tuple, Union
 from dataclasses import dataclass
+from typing import Dict, List
 
-from numpy import byte
+from lxml import etree
 
 
 @dataclass

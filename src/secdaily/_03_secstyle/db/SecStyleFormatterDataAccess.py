@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Optional
-from secdaily._00_common.DBBase import DB
+
 from secdaily._00_common.BaseDefinitions import get_qrtr_string_by_month
+from secdaily._00_common.DBBase import DB
 
 
 @dataclass

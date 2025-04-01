@@ -1,9 +1,9 @@
-from multiprocessing import Pool
-
-import sqlite3 as sqlite3
+import logging
 import os
 import re
-import logging
+import sqlite3 as sqlite3
+from multiprocessing import Pool
+
 import requests
 
 # listet alle filenamen sauber

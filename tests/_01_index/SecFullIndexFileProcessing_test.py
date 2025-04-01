@@ -1,9 +1,9 @@
+import os
+import shutil
+
+import pytest
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from secdaily._01_index.SecFullIndexFileProcessing import SecFullIndexFileProcessor
-import shutil
-import pytest
-import os
-
 
 scriptpath = os.path.realpath(__file__ + "/..")
 folder = scriptpath + "/tmp"

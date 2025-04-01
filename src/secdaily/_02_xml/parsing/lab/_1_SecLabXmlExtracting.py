@@ -1,7 +1,8 @@
 import re
-from lxml import etree
-from typing import List
 from dataclasses import dataclass
+from typing import List
+
+from lxml import etree
 
 
 @dataclass
@@ -70,7 +71,7 @@ class SecLabXmlExtractor():
         data = self.xml_lang_regex.sub("lang", data)
         return data
 
- 
+
     def _read_structure(self, root: etree._Element) -> SecLabLabelLink:
         " reads the xml content into a structured format"
 

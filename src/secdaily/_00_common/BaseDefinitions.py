@@ -1,6 +1,5 @@
 from numpy import float64, int64
 
-
 MONTH_TO_QRTR = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
 
 DTYPES_NUM =  {
@@ -12,7 +11,7 @@ DTYPES_NUM =  {
         'uom': str,
         'coreg': str,
         'value': float64,
-        'footnote': str, 
+        'footnote': str,
         'segments': str
     }
 
@@ -26,6 +25,12 @@ DTYPES_PRE = {
         'negating': int,
         'plabel': str
     }
+
+DTYPES_LAB = {
+        'key': str,
+        'label': str,
+        'to_entry': str
+}
 
 def get_qrtr_string_by_month(year: int, month: int) -> str:
     return get_qrtr_string(year, MONTH_TO_QRTR[month])

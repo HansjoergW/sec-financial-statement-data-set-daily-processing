@@ -4,13 +4,13 @@ import math
 import os
 import zipfile
 from multiprocessing import Pool
-from typing import List, Tuple, Dict, Protocol
+from typing import Dict, List, Protocol, Tuple
 
 import numpy as np
 import pandas as pd
 
-from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
 from secdaily._00_common.SecFileUtils import read_df_from_zip
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
 
 
 class DataAccess(Protocol):
