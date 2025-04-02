@@ -3,7 +3,15 @@ import os
 from pathlib import Path
 from typing import List
 
-from secdaily._02_xml.parsing.SecXmlParsingBase import SecError
+
+class ErrorEntry:
+    def __init__(self, adsh: str, error_info: str, error: str):
+        self.adsh = adsh
+        self.error_info = error_info
+        self.error = error
+
+    def printentry(self):
+        print(self.adsh, " - ", self.error_info, " - ", self.error)
 
 
 class ProcessBase:
@@ -12,8 +20,8 @@ class ProcessBase:
         self.data_dir = data_dir
         self.processdate = datetime.date.today().isoformat()
 
-        if self.data_dir[-1] != '/':
-            self.data_dir = data_dir + '/'
+        if self.data_dir[-1] != "/":
+            self.data_dir = data_dir + "/"
 
         self.error_log_dir = self.data_dir + "error/"
 
@@ -26,9 +34,9 @@ class ProcessBase:
         self.data_path = Path(self.data_dir)
         self.error_path = Path(self.error_log_dir)
 
-    def _log_error(self, adsh: str, type: str, error_list: List[SecError]):
+    def _log_error(self, adsh: str, type: str, error_list: List[ErrorEntry]):
         if len(error_list) > 0:
-            error_file_name = self.error_log_dir + "parse_" + type + "_" + adsh + ".txt"
+            error_file_name = self.error_log_dir + type + "_" + adsh + ".txt"
             with open(error_file_name, "w", encoding="utf-8") as f:
                 for error in error_list:
-                    f.write(error.report_role + " - " + error.error + "\n")
+                    f.write(error.error_info + " - " + error.error + "\n")

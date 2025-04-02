@@ -1,34 +1,36 @@
 import logging
+import traceback
 from typing import List, Protocol
 
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._02_xml.db.XmlFileDownloadingDataAccess import MissingFile
+from secdaily._02_xml.parsing.SecXmlParsingBase import ErrorEntry
 
 
 class DataAccessor(Protocol):
 
     def find_missing_xmlNumFiles(self) -> List[MissingFile]:
-        """ find report entries in the process table for which the xml-num-file has not yet been downloaded """
+        """find report entries in the process table for which the xml-num-file has not yet been downloaded"""
         return []
 
     def find_missing_xmlPreFiles(self) -> List[MissingFile]:
-        """ find report entries in the process table for which the xml-pre-file has not yet been downloaded """
+        """find report entries in the process table for which the xml-pre-file has not yet been downloaded"""
         return []
 
     def find_missing_xmlLabelFiles(self) -> List[MissingFile]:
-        """ find report entries in the process table for which the xml-lab-file has not yet been downloaded """
+        """find report entries in the process table for which the xml-lab-file has not yet been downloaded"""
         return []
 
     def update_processing_xml_num_file(self, update_list: List[MissingFile]):
-        """ update the entry of a formerly missing xml-num-file and update it with the name of the downloaded file """
+        """update the entry of a formerly missing xml-num-file and update it with the name of the downloaded file"""
 
     def update_processing_xml_pre_file(self, update_list: List[MissingFile]):
-        """ update the entry of a formerly missing xml-pre-file and update it with the name of the downloaded file """
+        """update the entry of a formerly missing xml-pre-file and update it with the name of the downloaded file"""
 
     def update_processing_xml_label_file(self, update_list: List[MissingFile]):
-        """ update the entry of a formerly missing xml-lab-file and update it with the name of the downloaded file """
+        """update the entry of a formerly missing xml-lab-file and update it with the name of the downloaded file"""
 
 
 class SecXmlFileDownloader(ProcessBase):
@@ -42,7 +44,6 @@ class SecXmlFileDownloader(ProcessBase):
         self.dbmanager = dbmanager
         self.urldownloader = urldownloader
 
-
     def _download_file(self, data: MissingFile) -> MissingFile:
         try:
             if data.fileSize is not None:
@@ -52,11 +53,11 @@ class SecXmlFileDownloader(ProcessBase):
         except ValueError:
             size = None
 
-        if (data.url == None) | (data.url == ""):
+        if (data.url is None) | (data.url == ""):
             logging.warning(f"url is null: {data.accessionNumber} / {data.type} ")
             return data
 
-        filename = data.url.rsplit('/', 1)[-1]
+        filename = data.url.rsplit("/", 1)[-1]
 
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
 
@@ -66,8 +67,14 @@ class SecXmlFileDownloader(ProcessBase):
             self.urldownloader.download_url_to_file(data.url, str(filepath), size)
             data.file = str(filepath)
             return data
-        except:
-            logging.warning("failed to download from: " + data.url)
+        except Exception as e:
+            logging.warning("download for {} from {} failed: {}", data.accessionNumber, data.url, e)
+            self._log_error(
+                adsh=data.accessionNumber,
+                type=f"download_failed_{data.type}",
+                error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.url, error=traceback.format_exc())],
+            )
+
             return data
 
     def _download(self, executor: ParallelExecutor):

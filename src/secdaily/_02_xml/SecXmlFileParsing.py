@@ -1,9 +1,10 @@
 # coordinates the parsing of downloaded xml files and stores the data in a new folder
 import logging
+import traceback
 from typing import List, Protocol
 
 from secdaily._00_common.ParallelExecution import ParallelExecutor
-from secdaily._00_common.ProcessBase import ProcessBase
+from secdaily._00_common.ProcessBase import ErrorEntry, ProcessBase
 from secdaily._00_common.SecFileUtils import read_content_from_zip, write_df_to_zip
 from secdaily._02_xml.db.XmlFileParsingDataAccess import (
     UnparsedFile,
@@ -64,7 +65,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_error(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, f"parse_{parser.get_type()}", error_list)
             write_df_to_zip(df, str(filepath))
             return UpdateLabParsing(
                 accessionNumber=data.accessionNumber,
@@ -75,6 +76,11 @@ class SecXmlParser(ProcessBase):
 
         except Exception as e:
             logging.exception("failed to parse data: " + data.file, e)
+            self._log_error(
+                adsh=data.accessionNumber,
+                type=f"parse_failed_{parser.get_type()}",
+                error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
+            )
             return UpdateLabParsing(
                 accessionNumber=data.accessionNumber,
                 csvLabFile=None,
@@ -85,9 +91,7 @@ class SecXmlParser(ProcessBase):
     def parseLabFiles(self):
         logging.info("parsing Lab Files")
 
-        executor = ParallelExecutor[
-            UnparsedFile, UpdateLabParsing, type(None)
-        ]()  # no limitation in speed
+        executor = ParallelExecutor[UnparsedFile, UpdateLabParsing, type(None)]()  # no limitation in speed
 
         executor.set_get_entries_function(self.dbmanager.find_unparsed_labFiles)
         executor.set_process_element_function(self._parse_lab_file)
@@ -109,7 +113,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_error(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, f"parse_{parser.get_type()}", error_list)
             write_df_to_zip(df, str(filepath))
             return UpdatePreParsing(
                 accessionNumber=data.accessionNumber,
@@ -120,6 +124,11 @@ class SecXmlParser(ProcessBase):
 
         except Exception as e:
             logging.exception("failed to parse data: " + data.file, e)
+            self._log_error(
+                adsh=data.accessionNumber,
+                type=f"parse_failed_{parser.get_type()}",
+                error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
+            )
             return UpdatePreParsing(
                 accessionNumber=data.accessionNumber,
                 csvPreFile=None,
@@ -130,9 +139,7 @@ class SecXmlParser(ProcessBase):
     def parsePreFiles(self):
         logging.info("parsing Pre Files")
 
-        executor = ParallelExecutor[
-            UnparsedFile, UpdatePreParsing, type(None)
-        ]()  # no limitation in speed
+        executor = ParallelExecutor[UnparsedFile, UpdatePreParsing, type(None)]()  # no limitation in speed
 
         executor.set_get_entries_function(self.dbmanager.find_unparsed_preFiles)
         executor.set_process_element_function(self._parse_pre_file)
@@ -155,7 +162,7 @@ class SecXmlParser(ProcessBase):
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
-            self._log_error(data.accessionNumber, parser.get_type(), error_list)
+            self._log_error(data.accessionNumber, f"parse_{parser.get_type()}", error_list)
 
             # extract fiscal year end date
             # current fiscal year end appears in the form --MM-dd, so we remove the dashes
@@ -181,6 +188,11 @@ class SecXmlParser(ProcessBase):
 
         except Exception as e:
             logging.exception("failed to parse data: " + data.file, e)
+            self._log_error(
+                adsh=data.accessionNumber,
+                type=f"parse_failed_{parser.get_type()}",
+                error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
+            )
             return UpdateNumParsing(
                 accessionNumber=data.accessionNumber,
                 csvNumFile=None,
@@ -192,9 +204,7 @@ class SecXmlParser(ProcessBase):
     def parseNumFiles(self):
         logging.info("parsing Num Files")
 
-        executor = ParallelExecutor[
-            UnparsedFile, UpdateNumParsing, type(None)
-        ]()  # no limitation in speed
+        executor = ParallelExecutor[UnparsedFile, UpdateNumParsing, type(None)]()  # no limitation in speed
 
         executor.set_get_entries_function(self.dbmanager.find_unparsed_numFiles)
         executor.set_process_element_function(self._parse_num_file)

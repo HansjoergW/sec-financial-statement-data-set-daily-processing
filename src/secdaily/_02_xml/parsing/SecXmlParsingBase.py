@@ -3,15 +3,7 @@ from typing import List, Tuple
 
 import pandas as pd
 
-
-class SecError:
-    def __init__(self, adsh: str, report_role: str, error: str):
-        self.adsh = adsh
-        self.report_role = report_role
-        self.error = error
-
-    def printentry(self):
-        print(self.adsh, " - ", self.report_role, " - ", self.error)
+from secdaily._00_common.ProcessBase import ErrorEntry
 
 
 class SecXmlParserBase(ABC):
@@ -23,7 +15,5 @@ class SecXmlParserBase(ABC):
         return self.type
 
     @abstractmethod
-    def parse(self, adsh: str, data: str) -> Tuple[pd.DataFrame, List[SecError]]:
+    def parse(self, adsh: str, data: str) -> Tuple[pd.DataFrame, List[ErrorEntry]]:
         pass
-
-
