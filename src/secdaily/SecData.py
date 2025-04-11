@@ -33,7 +33,6 @@ class SecDataOrchestrator:
         self.csvdir = workdir + "_2_csv/"
         self.formatdir = workdir + "_3_secstyle/"
         self.dailyzipdir = workdir + "_4_daily/"
-        self.seczipdir = workdir + "quarterzip/"
 
         self.today = datetime.today()
 
@@ -67,8 +66,8 @@ class SecDataOrchestrator:
 
     def _download_index_data(self):
         self._log_sub_header('looking for new reports')
-        secfullindexprocessor = SecFullIndexFileProcessor(IndexProcessingDA(self.workdir), self.urldownloader, self.start_year,
-                                                          self.start_qrtr)
+        secfullindexprocessor = SecFullIndexFileProcessor(IndexProcessingDA(self.workdir), self.urldownloader,
+                                                          self.start_year, self.start_qrtr)
         secfullindexprocessor.process()
 
     def _postprocess_index_data(self):

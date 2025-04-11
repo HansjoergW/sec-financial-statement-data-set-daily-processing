@@ -1,6 +1,7 @@
 from numpy import float64, int64
 
 MONTH_TO_QRTR = {1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: 3, 10: 4, 11: 4, 12: 4}
+QRTR_TO_MONTHS = {1: [1, 2, 3], 2: [4, 5, 6], 3: [7, 8, 9], 4: [10, 11, 12]}
 
 DTYPES_NUM =  {
         'adsh': str,

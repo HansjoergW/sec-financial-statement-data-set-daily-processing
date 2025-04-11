@@ -1,31 +1,39 @@
-import datetime
 import logging
-import math
-import os
-import zipfile
-from multiprocessing import Pool
-from typing import Dict, List, Protocol, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Protocol, Set, Tuple
 
 import numpy as np
 import pandas as pd
 
+from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
+from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_df_from_zip
-from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, IncompleteMonth
+
+
+@dataclass(frozen=True)
+class IncompleteQuarter:
+    name: str
+    year: int
+    qrtr: int
 
 
 class DataAccess(Protocol):
 
-    def find_ready_to_zip_adshs(self) -> pd.DataFrame:
-        """ find entries in the process report table that are ready but not included in a daily zip """
+    def find_incomplete_months(self) -> List[IncompleteMonth]:
+        """find months in the process report table that have entries that are not in a daily zip file"""
+        return []
+
+    def find_entries_for_quarter(self, year: int, qrtr: int) -> pd.DataFrame:
+        """find all entries for a certain quarter that are ready to be packed into a daily zip file"""
+        return pd.DataFrame()
 
     def read_all_copied(self) -> pd.DataFrame:
-        """ read all entries from the report table """
-
-    def updated_ziped_entries(self, update_data: List[UpdateDailyZip]):
-        """ update the entries in the process report table """
+        """read all entries from the feed table"""
+        return pd.DataFrame()
 
 
-class DailyZipCreator:
+class DailyZipCreator(ProcessBase):
     """
     This class will find all the filing dates for which there are entries in the processing table that to have
     processed num and pre file, but haven't packed into a daily zip file.
@@ -36,30 +44,36 @@ class DailyZipCreator:
     change.
     """
 
-    def __init__(self, dbmanager: DataAccess, daily_zip_dir: str = "./tmp/daily/"):
+    def __init__(self, dbmanager: DataAccess, data_dir: str = "./tmp/daily/"):
+        super().__init__(data_dir=data_dir)
+
         self.dbmanager = dbmanager
 
-        if daily_zip_dir[-1] != '/':
-            daily_zip_dir += '/'
+    def _read_incomplete_quarters(self) -> List[IncompleteQuarter]:
+        incomplete_months = self.dbmanager.find_incomplete_months()
+        incomplete_quarters: Set[IncompleteQuarter] = set()
 
-        self.daily_zip_dir = daily_zip_dir
-        self.processdate = datetime.date.today().isoformat()
+        for incomplete_month in incomplete_months:
+            quarter_year = incomplete_month.filingYear
+            quarter_qrtr = MONTH_TO_QRTR[incomplete_month.filingMonth]
+            quarter_name = f"{quarter_year}q{quarter_qrtr}"
 
-    def _read_ready_entries(self) -> pd.DataFrame:
-        return self.dbmanager.find_ready_to_zip_adshs()
+            incomplete_quarters.add(IncompleteQuarter(name=quarter_name, year=quarter_year, qrtr=quarter_qrtr))
+
+        return list(incomplete_quarters)
 
     def _read_feed_entries_for_adshs(self, adshsAndFye: pd.DataFrame) -> pd.DataFrame:
         feed_entries = self.dbmanager.read_all_copied()
         adshs = adshsAndFye.accessionNumber.tolist()
         feed_entries = feed_entries[feed_entries.accessionNumber.isin(adshs)]
 
-        adshsAndFye['fiscalYearEnd'] = adshsAndFye.fiscalYearEnd.str.strip()
-        adshsAndFye.set_index('accessionNumber', inplace=True)
-        fye_dict: Dict[str, str] = adshsAndFye.to_dict()['fiscalYearEnd']
+        adshsAndFye["fiscalYearEnd"] = adshsAndFye.fiscalYearEnd.str.strip()
+        adshsAndFye.set_index("accessionNumber", inplace=True)
+        fye_dict: Dict[str, str] = adshsAndFye.to_dict()["fiscalYearEnd"]
 
-        return self._process_df(feed_entries, fye_dict)
+        return self._create_sub_df(feed_entries, fye_dict)
 
-    def _process_df(self, df: pd.DataFrame, fye_dict: Dict[str, str]) -> pd.DataFrame:
+    def _create_sub_df(self, df: pd.DataFrame, fye_dict: Dict[str, str]) -> pd.DataFrame:
         # fye contains the fiscalYearEnd information that were read from the num-xml file
         #
         # adsh:     edgar:accessionNumber
@@ -76,130 +90,163 @@ class DailyZipCreator:
         # accepted: edgar:acceptanceDatetime /	"like: 20210107161557 / rounded to minutes"
 
         sub_entries = df[
-            ['accessionNumber', 'cikNumber', 'companyName', 'assignedSic', 'fiscalYearEnd', 'formType', 'period',
-             'filingDate', 'acceptanceDatetime']].copy()
+            [
+                "accessionNumber",
+                "cikNumber",
+                "companyName",
+                "assignedSic",
+                "fiscalYearEnd",
+                "formType",
+                "period",
+                "filingDate",
+                "acceptanceDatetime",
+            ]
+        ].copy()
 
         # we prefer the fye information from the num file, so first we add the information from the fye_dict
         # as a new column
-        sub_entries['numFye'] = sub_entries.accessionNumber.map(fye_dict)
+        sub_entries["numFye"] = sub_entries.accessionNumber.map(fye_dict)
         # the we replace the existing fiscalYearEnd info with the numFye column, if the numFye contains data
-        sub_entries.loc[~sub_entries.numFye.isnull(), 'fiscalYearEnd'] = sub_entries['numFye']
-        sub_entries.drop(columns=['numFye'], inplace=True)
+        sub_entries.loc[~sub_entries.numFye.isnull(), "fiscalYearEnd"] = sub_entries["numFye"]
+        sub_entries.drop(columns=["numFye"], inplace=True)
 
         # rename to sub-file column names
-        sub_entries.rename(columns={'accessionNumber': 'adsh',
-                                    'cikNumber': 'cik',
-                                    'companyName': 'name',
-                                    'assignedSic': 'sic',
-                                    'fiscalYearEnd': 'fye',
-                                    'formType': 'form',
-                                    'filingDate': 'filed',
-                                    'acceptanceDatetime': 'accepted'}, inplace=True)
+        sub_entries.rename(
+            columns={
+                "accessionNumber": "adsh",
+                "cikNumber": "cik",
+                "companyName": "name",
+                "assignedSic": "sic",
+                "fiscalYearEnd": "fye",
+                "formType": "form",
+                "filingDate": "filed",
+                "acceptanceDatetime": "accepted",
+            },
+            inplace=True,
+        )
 
         if len(sub_entries) == 0:
             return sub_entries
 
         # simple conversions
-        sub_entries['cik'] = sub_entries.cik.astype(int)
-        sub_entries['name'] = sub_entries.name.str.upper()
-        sub_entries['name'] = sub_entries.name.str.replace('\\', '', regex=False)
+        sub_entries["cik"] = sub_entries.cik.astype(int)
+        sub_entries["name"] = sub_entries.name.str.upper()
+        sub_entries["name"] = sub_entries.name.str.replace("\\", "", regex=False)
 
         # check for Null Values in fye
         # there are some entries, which don't have a fye entry. if it is a 10-k, then this is the month and year of period
-        sub_entries.loc[sub_entries.fye.isnull() & (sub_entries.form == '10-K'), 'fye'] = sub_entries.period.str.slice(
-            4, 8)
+        sub_entries.loc[sub_entries.fye.isnull() & (sub_entries.form == "10-K"), "fye"] = sub_entries.period.str.slice(
+            4, 8
+        )
         # if it is a 10-q, we cannot say...
-        sub_entries.loc[sub_entries.fye.isnull(), 'fye'] = "0000"
+        sub_entries.loc[sub_entries.fye.isnull(), "fye"] = "0000"
 
         # create helper columns
-        sub_entries['period_date'] = pd.to_datetime(sub_entries.period, format='%Y%m%d')
-        sub_entries['period_year'] = sub_entries.period.str.slice(0, 4).astype(int)
-        sub_entries['period_month'] = sub_entries.period.str.slice(4, 6).astype(int)
-        sub_entries['period_day'] = sub_entries.period.str.slice(6, 8).astype(int)
+        sub_entries["period_date"] = pd.to_datetime(sub_entries.period, format="%Y%m%d")
+        sub_entries["period_year"] = sub_entries.period.str.slice(0, 4).astype(int)
+        sub_entries["period_month"] = sub_entries.period.str.slice(4, 6).astype(int)
+        sub_entries["period_day"] = sub_entries.period.str.slice(6, 8).astype(int)
 
         # round period to end of month
         mask = (sub_entries.period_day <= 15) | (
-                    (sub_entries.period_day == 16) & sub_entries.period_month.isin([1, 3, 5, 7, 8, 10, 12]))
-        sub_entries.loc[mask, 'period_date'] = sub_entries.period_date - pd.DateOffset(months=1)
-        sub_entries['period'] = sub_entries.period_date.dt.to_period('M').dt.to_timestamp('M').dt.strftime('%Y%m%d')
+            (sub_entries.period_day == 16) & sub_entries.period_month.isin([1, 3, 5, 7, 8, 10, 12])
+        )
+        sub_entries.loc[mask, "period_date"] = sub_entries.period_date - pd.DateOffset(months=1) # type: ignore
+        sub_entries["period"] = sub_entries.period_date.dt.to_period("M").dt.to_timestamp("M").dt.strftime("%Y%m%d") # type: ignore
         # Nach Korrektur neu setzen
-        sub_entries['period_date'] = pd.to_datetime(sub_entries.period, format='%Y%m%d')
+        sub_entries["period_date"] = pd.to_datetime(sub_entries.period, format="%Y%m%d")
 
         # after calculation of the period, the values might have changed
-        sub_entries['period_year'] = sub_entries.period.str.slice(0, 4).astype(int)
-        sub_entries['period_month'] = sub_entries.period.str.slice(4, 6).astype(int)
-        sub_entries['period_day'] = sub_entries.period.str.slice(6, 8).astype(int)
+        sub_entries["period_year"] = sub_entries.period.str.slice(0, 4).astype(int)
+        sub_entries["period_month"] = sub_entries.period.str.slice(4, 6).astype(int)
+        sub_entries["period_day"] = sub_entries.period.str.slice(6, 8).astype(int)
 
-        sub_entries['fye_month'] = sub_entries.fye.str.slice(0, 2).astype(int)
-        sub_entries['fye_day'] = sub_entries.fye.str.slice(2, 4).astype(int)
+        sub_entries["fye_month"] = sub_entries.fye.str.slice(0, 2).astype(int)
+        sub_entries["fye_day"] = sub_entries.fye.str.slice(2, 4).astype(int)
 
         # attention: month and day may be 0
         # so finding the closest month end for fye
         mask = ((sub_entries.fye_day <= 15) & (sub_entries.fye_day > 0)) | (
-                    (sub_entries.fye_day == 16) & sub_entries.fye_month.isin([1, 3, 5, 7, 8, 10, 12]))
-        sub_entries.loc[mask, 'fye_month'] = sub_entries.fye_month - 1
+            (sub_entries.fye_day == 16) & sub_entries.fye_month.isin([1, 3, 5, 7, 8, 10, 12])
+        )
+        sub_entries.loc[mask, "fye_month"] = sub_entries.fye_month - 1
         # if fye_month has been 1 in the line above, it becomes 0, so we have to correct that to 12
         mask = (sub_entries.fye_day > 0) & (sub_entries.fye_month == 0)
-        sub_entries.loc[mask, 'fye_month'] = 12
+        sub_entries.loc[mask, "fye_month"] = 12
 
         month_end = {0: 0, 1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31}
-        sub_entries['fye_day'] = sub_entries.fye_month.map(month_end)
-        sub_entries['fye'] = sub_entries.fye_month * 100 + sub_entries.fye_day
-        sub_entries['fye'] = sub_entries.fye.astype(str).str.zfill(4)
+        sub_entries["fye_day"] = sub_entries.fye_month.map(month_end)
+        sub_entries["fye"] = sub_entries.fye_month * 100 + sub_entries.fye_day
+        sub_entries["fye"] = sub_entries.fye.astype(str).str.zfill(4)
 
         # correction for 29 of feb in order to not run into problems later on
-        sub_entries.loc[(sub_entries.fye_month == 2) & (sub_entries.fye_day == 29), 'fye_day'] = 28
+        sub_entries.loc[(sub_entries.fye_month == 2) & (sub_entries.fye_day == 29), "fye_day"] = 28
 
-        sub_entries['is_fye_same_year'] = (sub_entries.form == '10-K') | (
-                    (sub_entries.fye_month * 100 + sub_entries.fye_day) >= (
-                        sub_entries.period_month * 100 + sub_entries.period_day))
+        sub_entries["is_fye_same_year"] = (sub_entries.form == "10-K") | (
+            (sub_entries.fye_month * 100 + sub_entries.fye_day)
+            >= (sub_entries.period_month * 100 + sub_entries.period_day)
+        )
 
         # fy_real -> year when the next fiscal year ends
-        sub_entries.loc[sub_entries.is_fye_same_year, 'fy_real'] = sub_entries.period_year
-        sub_entries.loc[sub_entries.is_fye_same_year == False, 'fy_real'] = sub_entries.period_year + 1
+        sub_entries.loc[sub_entries.is_fye_same_year, "fy_real"] = sub_entries.period_year
+        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = sub_entries.period_year + 1  # noqa: E712
         sub_entries.fy_real = sub_entries.fy_real.astype(int)
 
         # fy -> as it seems is the previous year, if the year ends in the first quarter,
         # at least that is always true for 10-K
-        sub_entries['fy'] = sub_entries.fy_real
+        sub_entries["fy"] = sub_entries.fy_real
         # if a 10-K ends in the first three months, then its fy is the one from last year
-        mask_10k_firstq = (sub_entries.form == '10-K') & (sub_entries.fye_month.isin([1, 2, 3]))
-        mask_10k_firstq = (sub_entries.fye_month.isin([1, 2, 3]))
-        sub_entries.loc[mask_10k_firstq, 'fy'] = sub_entries.fy - 1
+        mask_10k_firstq = (sub_entries.form == "10-K") & (sub_entries.fye_month.isin([1, 2, 3]))
+        mask_10k_firstq = sub_entries.fye_month.isin([1, 2, 3])
+        sub_entries.loc[mask_10k_firstq, "fy"] = sub_entries.fy - 1
 
-        sub_entries.loc[sub_entries.fye == '0000', 'fy'] = 0  # cannot be calculated, if there was no fye entry
+        sub_entries.loc[sub_entries.fye == "0000", "fy"] = 0  # cannot be calculated, if there was no fye entry
 
         # fp
         #  date when the last fiscal year ended
-        sub_entries['fye_date_prev'] = pd.to_datetime(
-            (sub_entries.fy_real - 1) * 10000 + sub_entries.fye_month * 100 + sub_entries.fye_day, format='%Y%m%d',
-            errors='coerce')
+        sub_entries["fye_date_prev"] = pd.to_datetime(
+            (sub_entries.fy_real - 1) * 10000 + sub_entries.fye_month * 100 + sub_entries.fye_day,
+            format="%Y%m%d",
+            errors="coerce",
+        )
 
-        sub_entries['fye_period_diff'] = 0
+        sub_entries["fye_period_diff"] = 0
 
-        sub_entries.loc[sub_entries.fye != '0000', 'fye_period_diff'] = (
-                                                                                    sub_entries.period_date - sub_entries.fye_date_prev) / np.timedelta64(
-            1, 'D')
+        sub_entries.loc[sub_entries.fye != "0000", "fye_period_diff"] = (
+            sub_entries.period_date - sub_entries.fye_date_prev
+        ) / np.timedelta64(1, "D") # type: ignore
 
-        sub_entries.loc[sub_entries.form == '10-K', 'fp'] = 'FY'
-        sub_entries.loc[sub_entries.form != '10-K', 'fp'] = 'Q' + (sub_entries.fye_period_diff / 91.5).round().astype(
-            str).str.slice(0, 1)
-        sub_entries.loc[sub_entries.fye == '0000', 'fp'] = 'Q0'  # cannot be calculated, if there was no fye entry
+        sub_entries.loc[sub_entries.form == "10-K", "fp"] = "FY"
+        sub_entries.loc[sub_entries.form != "10-K", "fp"] = "Q" + (sub_entries.fye_period_diff / 91.5).round().astype(
+            str
+        ).str.slice(0, 1)
+        sub_entries.loc[sub_entries.fye == "0000", "fp"] = "Q0"  # cannot be calculated, if there was no fye entry
 
         #  07/01/2021-> 20210107
-        sub_entries['filed'] = pd.to_datetime(sub_entries.filed, format='%m/%d/%Y')
-        sub_entries['filed'] = sub_entries.filed.dt.strftime('%Y%m%d')
+        sub_entries["filed"] = pd.to_datetime(sub_entries.filed, format="%m/%d/%Y")
+        sub_entries["filed"] = sub_entries.filed.dt.strftime("%Y%m%d")
 
         # accepted -> 20210107161557 rounded to minutes
         # 20210107132023-> 07.01.2021 13:20:00.0
-        sub_entries['accepted'] = pd.to_datetime(sub_entries.accepted, format='%Y%m%d%H%M%S')
-        sub_entries['accepted'] = sub_entries.accepted.dt.round('min')
-        sub_entries['accepted'] = sub_entries.accepted.dt.strftime('%Y-%m-%d %H:%M:00.0')
+        sub_entries["accepted"] = pd.to_datetime(sub_entries.accepted, format="%Y%m%d%H%M%S")
+        sub_entries["accepted"] = sub_entries.accepted.dt.round("min")
+        sub_entries["accepted"] = sub_entries.accepted.dt.strftime("%Y-%m-%d %H:%M:00.0")
 
         # drop helper columns
-        sub_entries.drop(columns=['period_year', 'period_month', 'period_day', 'fye_month',
-                                  'fye_day', 'is_fye_same_year', 'fye_date_prev', 'period_date', 'fye_period_diff'],
-                         inplace=True)
+        sub_entries.drop(
+            columns=[
+                "period_year",
+                "period_month",
+                "period_day",
+                "fye_month",
+                "fye_day",
+                "is_fye_same_year",
+                "fye_date_prev",
+                "period_date",
+                "fye_period_diff",
+            ],
+            inplace=True,
+        )
 
         return sub_entries
 
@@ -207,69 +254,87 @@ class DailyZipCreator:
         dfs = [read_df_from_zip(file) for file in filelist]
         return pd.concat(dfs).to_csv(sep="\t", header=True, index=False)
 
-    def _create_daily_content(self, date: str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame) -> Tuple[
-        str, str, str]:
+    # def _get_qrtr(self, filing_date: str) -> str:
+    #     year = filing_date[6:]
+    #     month = filing_date[0:2]
+    #     month_int = int(month)
+    #     qtr = math.floor((month_int - 1) / 3) + 1
+
+    #     return year + "q" + str(qtr)
+
+    # def _store_to_zip(self, filing_date: str, sub: str, pre: str, num: str) -> str:
+    #     qrtr = self._get_qrtr(filing_date)
+    #     qtr_dir = os.path.join(self.data_dir, qrtr)
+    #     os.makedirs(os.path.join(qtr_dir), exist_ok=True)
+
+    #     year = filing_date[6:]
+    #     month = filing_date[0:2]
+    #     day = filing_date[3:5]
+    #     zipfile_name = year + month + day + ".zip"
+    #     zipfile_path = os.path.join(qtr_dir, zipfile_name)
+    #     with zipfile.ZipFile(zipfile_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+    #         zf.writestr("sub.txt", sub)
+    #         zf.writestr("pre.txt", pre)
+    #         zf.writestr("num.txt", num)
+
+    #     return zipfile_name
+
+    def _create_quarter_content(self, entries: pd.DataFrame, entries_sub_df: pd.DataFrame) -> Tuple[str, str, str]:
         sub_content = entries_sub_df.to_csv(sep="\t", header=True, index=False)
-        pre_content = self._read_csvfiles(entries.csvPreFile.tolist())
-        num_content = self._read_csvfiles(entries.csvNumFile.tolist())
+        pre_content = self._read_csvfiles(entries.preFormattedFile.tolist())
+        num_content = self._read_csvfiles(entries.numFormattedFile.tolist())
         return sub_content, pre_content, num_content
 
-    def _get_qrtr(self, filing_date: str) -> str:
-        year = filing_date[6:]
-        month = filing_date[0:2]
-        month_int = int(month)
-        qtr = math.floor((month_int - 1) / 3) + 1
-
-        return year + "q" + str(qtr)
-
-    def _store_to_zip(self, filing_date: str, sub: str, pre: str, num: str) -> str:
-        qrtr = self._get_qrtr(filing_date)
-        qtr_dir = os.path.join(self.daily_zip_dir, qrtr)
-        os.makedirs(os.path.join(qtr_dir), exist_ok=True)
-
-        year = filing_date[6:]
-        month = filing_date[0:2]
-        day = filing_date[3:5]
-        zipfile_name = year + month + day + ".zip"
-        zipfile_path = os.path.join(qtr_dir, zipfile_name)
-        with zipfile.ZipFile(zipfile_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr('sub.txt', sub)
-            zf.writestr('pre.txt', pre)
-            zf.writestr('num.txt', num)
-
-        return zipfile_name
-
-    def _process_date(self, data: Tuple[str, pd.DataFrame, pd.DataFrame]):
-        filing_date: str = data[0]
-        group_df: pd.DataFrame = data[1]
-        entries_sub: pd.DataFrame = data[2]
+    def _process_quarter(self, quarter: IncompleteQuarter, entries: pd.DataFrame):
 
         try:
-            adshs = group_df.accessionNumber.tolist()
-            sub, pre, num = self._create_daily_content(filing_date, group_df, entries_sub[entries_sub.adsh.isin(adshs)])
-            zf_name = self._store_to_zip(filing_date, sub, pre, num)
-            update_data = [UpdateDailyZip(accessionNumber=x,
-                                          dailyZipFile=zf_name,
-                                          processZipDate=self.processdate) for x in adshs]
-            self.dbmanager.updated_ziped_entries(update_data)
+            adsh_and_fye_to_process = entries[["accessionNumber", "fiscalYearEnd"]].copy()
+            entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
+            print(entries_sub.shape)
+
+            sub, pre, num = self._create_quarter_content(entries=entries, entries_sub_df=entries_sub)
+            print("")
+
+            # zf_name = self._store_to_zip(filing_date, sub, pre, num)
+            # update_data = [
+            #     UpdateDailyZip(accessionNumber=x, dailyZipFile=zf_name, processZipDate=self.processdate) for x in adshs
+            # ]
+            # self.dbmanager.updated_ziped_entries(update_data)
         except Exception as e:
-            logging.warning(f"failed to process {filing_date}", e)
+            logging.warning(f"failed to process {quarter.name}", e)
 
     def process(self):
-        pool = Pool(8)
+        logging.info("Daily zip creating")
 
-        entries_ready = self._read_ready_entries()
-        adsh_and_fye_to_process = entries_ready[['accessionNumber', 'fiscalYearEnd']].copy()
-        entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
-        grouped = entries_ready.groupby('filingDate')
+        incomplete_quaraters = self._read_incomplete_quarters()
 
-        logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
+        for incomplete_quarter in incomplete_quaraters:
+            logging.info(f"processing {incomplete_quarter.name}")
+            entries = self.dbmanager.find_entries_for_quarter(incomplete_quarter.year, incomplete_quarter.qrtr)
+            logging.info(f" ... found {len(entries)} entries for {incomplete_quarter.name}")
 
-        param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [(*entry, entries_sub) for entry in grouped]
-        pool.map(self._process_date, param_list)
+            self._process_quarter(incomplete_quarter, entries)
+
+        # pool = Pool(8)
+
+        # entries_ready = self._read_ready_entries()
+        # adsh_and_fye_to_process = entries_ready[["accessionNumber", "fiscalYearEnd"]].copy()
+        # entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
+        # grouped = entries_ready.groupby("filingDate")
+
+        # logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
+
+        # param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [(*entry, entries_sub) for entry in grouped]
+        # pool.map(self._process_date, param_list)
 
 
-if __name__ == '__main__':
-    dbm = DailyZipCreatingDA("d:/secprocessing")
+if __name__ == "__main__":
+    logging.basicConfig(
+        format="%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
+        datefmt="%Y-%m-%d:%H:%M:%S",
+        level=logging.DEBUG,
+    )
+
+    dbm = DailyZipCreatingDA("d:/secprocessing2")
     creator = DailyZipCreator(dbm, "d:/tmp/daily/")
     creator.process()
