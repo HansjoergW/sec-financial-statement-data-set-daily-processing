@@ -2,12 +2,12 @@ import logging
 import os
 import zipfile
 from multiprocessing import Pool
-from typing import Dict, List, Protocol, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 import numpy as np
 import pandas as pd
 
-from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
+from secdaily._00_common.BaseDefinitions import DTYPES_NUM, DTYPES_PRE, MONTH_TO_QRTR
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_df_from_zip
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
@@ -236,9 +236,17 @@ class DailyZipCreator(ProcessBase):
 
         return sub_entries
 
-    def _read_csvfiles(self, filelist: List[str]) -> str:
-        dfs = [read_df_from_zip(file) for file in filelist]
-        return pd.concat(dfs).to_csv(sep="\t", header=True, index=False)
+    def _read_csvfiles(self, filelist: List[str], dtype) -> str:
+        dfs = [read_df_from_zip(filename=file, dtype=dtype) for file in filelist]
+        # Filter out empty DataFrames to avoid FutureWarning
+        non_empty_dfs = [df for df in dfs if not df.empty]
+        if not non_empty_dfs:
+            # If all DataFrames are empty, create an empty DataFrame with the expected columns
+            # based on the dtype parameter
+            logging.warning("All DataFrames are empty: %s ... ", str(filelist)[0:50])
+            empty_df = pd.DataFrame(columns=list(dtype.keys()))
+            return empty_df.to_csv(sep="\t", header=True, index=False)
+        return pd.concat(non_empty_dfs).to_csv(sep="\t", header=True, index=False)
 
     def _get_qrtr(self, filing_date: str) -> str:
         year = filing_date[6:]
@@ -263,15 +271,14 @@ class DailyZipCreator(ProcessBase):
             zf.writestr("pre.txt", pre)
             zf.writestr("num.txt", num)
 
-        return zipfile_name
+        return zipfile_path
 
     def _create_daily_content(
         self, date: str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame
     ) -> Tuple[str, str, str]:
         sub_content = entries_sub_df.to_csv(sep="\t", header=True, index=False)
-        falsher name der dateien.. 
-        pre_content = self._read_csvfiles(entries.csvPreFile.tolist())
-        num_content = self._read_csvfiles(entries.csvNumFile.tolist())
+        pre_content = self._read_csvfiles(entries.preFormattedFile.tolist(), DTYPES_PRE)
+        num_content = self._read_csvfiles(entries.numFormattedFile.tolist(), DTYPES_NUM)
         return sub_content, pre_content, num_content
 
     def _process_date(self, data: Tuple[str, pd.DataFrame, pd.DataFrame]):
@@ -282,9 +289,10 @@ class DailyZipCreator(ProcessBase):
         try:
             adshs = group_df.accessionNumber.tolist()
             sub, pre, num = self._create_daily_content(filing_date, group_df, entries_sub[entries_sub.adsh.isin(adshs)])
-            zf_name = self._store_to_zip(filing_date, sub, pre, num)
+            zipfile_path = self._store_to_zip(filing_date, sub, pre, num)
             update_data = [
-                UpdateDailyZip(accessionNumber=x, dailyZipFile=zf_name, processZipDate=self.processdate) for x in adshs
+                UpdateDailyZip(accessionNumber=x, dailyZipFile=zipfile_path, processZipDate=self.processdate)
+                for x in adshs
             ]
             self.dbmanager.updated_ziped_entries(update_data)
         except Exception as e:

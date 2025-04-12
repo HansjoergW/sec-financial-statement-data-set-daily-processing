@@ -58,18 +58,12 @@
 
 19. [ok] familarize with ruff -> which commands can help to check whole code and directly fix most common lint problems?
 
-19.  [] create final quarter zip file containing all daily
-      [x] find quarters which have entries that are not part of the zip -> in sqldb tool?
-      [x] find all entries for the found quarters
-      [x] create content for sub_txt file
-      [] concat existing files into single one for pre and num
-         ->  Problem --> alle via pandas lesen scheint zu inneffizient zu sein. (5000files pro Quartal)
-                         Variante: als Text lesen und zusammenhängen (header nur vom ersten.. )
-                         Variante 2: oder nur Delta Verarbeitung,
-                         Variante 3: pro Tag erstellen Zip erstellen und daraus quarter Zip machen? Vorteil: wir hätten auch daily zips
-                          und dann gar nicht weiter prozessieren (also keine quarter zips daraus erstellen)
-                          dann könnte man auch wieder die parallele Verarbeitung nutzen
-      [] create final zip file with pre, num and sub
+19.  [ok] create final quarter zip file containing all daily
+      [ok] find quarters which have entries that are not part of the zip -> in sqldb tool?
+      [ok] find all entries for the found quarters
+      [ok] create content for sub_txt file
+      [ok] create daily zip files
+      [ok] ensure path of zipfiles is full path
 
 20. [] activate project / create official 0.1 release
       [] activate build pipeline with linting and tests
