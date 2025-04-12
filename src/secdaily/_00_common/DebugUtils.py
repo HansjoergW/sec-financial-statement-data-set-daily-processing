@@ -1,5 +1,5 @@
 import zipfile
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import pandas as pd
 
@@ -10,14 +10,14 @@ from secdaily._02_xml.db.XmlFileParsingDataAccess import UnparsedFile, UpdatePre
 from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
 
 
-class DataAccessTool():
-    def __init__(self, workdir='./'):
-        if workdir[-1] != '/':
-            workdir = workdir + '/'
+class DataAccessTool:
+    def __init__(self, workdir="./"):
+        if workdir[-1] != "/":
+            workdir = workdir + "/"
 
         self.workdir = workdir
-        self.qtrdir = workdir + 'quarterzip/'
-        self.dailyzipdir = workdir + 'daily/'
+        self.qtrdir = workdir + "quarterzip/"
+        self.dailyzipdir = workdir + "daily/"
         self.dbmgr = DBDebugDA(workdir)
 
     def _read_file_from_zip(self, zipfile_to_read: str, file_to_read: str, read_as_str=False) -> pd.DataFrame:
@@ -27,7 +27,7 @@ class DataAccessTool():
             return pd.read_csv(myzip.open(file_to_read), header=0, delimiter="\t", dtype=str)
 
     def _get_zipfilename(self, year: int, qrtr: int) -> str:
-        return self.qtrdir + str(year) + 'q' + str(qrtr) + '.zip'
+        return self.qtrdir + str(year) + "q" + str(qrtr) + ".zip"
 
     def _get_by_adsh_from_quarter(self, year: int, qrtr: int, adsh: str, file: str) -> pd.DataFrame:
         "file is num.txt, pre.txt or sub.txt"
@@ -45,23 +45,23 @@ class DataAccessTool():
         return self._get_by_adsh_from_quarter(year, qrtr, adsh, "sub.txt")
 
     def get_pre_xml_content_by_adsh(self, adsh: str):
-        adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
+        adsh, xmlpre, _, _, _ = self.dbmgr.get_files_for_adsh(adsh)
         return read_content_from_zip(xmlpre)
 
     def get_num_xml_content_by_adsh(self, adsh: str):
-        adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
+        adsh, _, xmlnum, _, _ = self.dbmgr.get_files_for_adsh(adsh)
         return read_content_from_zip(xmlnum)
 
     def get_pre_csv_as_df_by_adsh(self, adsh: str) -> pd.DataFrame:
-        adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
+        adsh, _, _, csvpre, _ = self.dbmgr.get_files_for_adsh(adsh)
         return read_df_from_zip(csvpre)
 
     def get_num_csv_as_df_by_adsh(self, adsh: str) -> pd.DataFrame:
-        adsh, xmlpre, xmlnum, csvpre, csvnum = self.dbmgr.get_files_for_adsh(adsh)
+        adsh, _, _, _, csvnum = self.dbmgr.get_files_for_adsh(adsh)
         return read_df_from_zip(csvnum)
 
 
-class DataAccessByAdshTool():
+class DataAccessByAdshTool:
 
     def __init__(self, workdir: str, adsh: str, year: int, qrtr: int):
         self.tool = DataAccessTool(workdir)
@@ -88,52 +88,58 @@ class DataAccessByAdshTool():
         return self.tool.get_num_csv_as_df_by_adsh(self.adsh)
 
 
-class TestSetCreatorTool():
+class TestSetCreatorTool:
     def __init__(self, workdir: str):
         self.tool = DataAccessTool(workdir)
 
-    def get_testset_by_year_and_months(self, year: int, months: List[int], count: int = None) -> List[str]:
+    def get_testset_by_year_and_months(self, year: int, months: List[int], count: Optional[int] = None) -> List[str]:
         conn = self.tool.dbmgr.get_connection()
-        months = ','.join([str(month) for month in months])
+        months_str = ",".join([str(month) for month in months])
 
         try:
-            sql = '''SELECT accessionNumber from sec_report_processing WHERE filingYear = {} and filingMonth in ({}) and xmlPreFile not null and xmlNumFile not null order by accessionNumber '''.format(
-                year, months)
+            sql = f"""SELECT accessionNumber
+                      FROM sec_report_processing
+                      WHERE filingYear = {year} AND filingMonth in ({months_str})
+                            AND xmlPreFile not null AND xmlNumFile not null order by accessionNumber """
             selection: List[Tuple[str]] = conn.execute(sql).fetchall()
             result: List[str] = [x[0] for x in selection]
             if count is not None:
                 return result[:count]
-            else:
-                return result
+            return result
         finally:
             conn.close()
 
-    def get_daily_zips_by_year_and_montsh(self, year: int, months: List[int], count: int = None) -> List[str]:
+    def get_daily_zips_by_year_and_montsh(self, year: int, months: List[int], count: Optional[int] = None) -> List[str]:
 
         conn = self.tool.dbmgr.get_connection()
-        months = ','.join([str(month) for month in months])
+        months_str = ",".join([str(month) for month in months])
 
         try:
-            sql = '''SELECT DISTINCT dailyZipFile from sec_report_processing WHERE filingYear = {} and filingMonth in ({})'''.format(
-                year, months)
+            sql = f"""SELECT DISTINCT dailyZipFile
+                      FROM sec_report_processing
+                      WHERE filingYear = {year} and filingMonth in ({months_str})"""
             selection: List[Tuple[str]] = conn.execute(sql).fetchall()
             result: List[str] = [x[0] for x in selection]
             if count is not None:
                 return result[:count]
-            else:
-                return result
+            return result
         finally:
             conn.close()
 
 
-class ReparseTool():
+class ReparseTool:
 
     def __init__(self, workdir: str):
         self.tool = DataAccessTool(workdir)
 
-    def reparse_pre_by_adshs(self, adshs: List[str], targetFolder: str, ):
+    def reparse_pre_by_adshs(
+        self,
+        adshs: List[str],
+        targetFolder: str,
+    ):
         xml_files_info: List[Tuple[str, str, str]] = self.tool.dbmgr.get_xml_files_info_from_sec_processing_by_adshs(
-            adshs)
+            adshs
+        )
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info]  # adsh and preXmlFile
 
         select_funct = lambda: pre_xml_files_info
@@ -143,7 +149,7 @@ class ReparseTool():
                 print(entry)
 
         # tbd: check if correctly changed
-        xmlParser = SecXmlParser(None, targetFolder, False)
+        xmlParser = SecXmlParser(None, targetFolder)
 
         executor = ParallelExecutor[UnparsedFile, UpdatePreParsing, type(None)]()  # no limitation in speed
 
@@ -154,9 +160,9 @@ class ReparseTool():
         executor.execute()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # short test to check if all methods can be executed
-    adsh_tool = DataAccessByAdshTool("d:/secprocessing/", '0001437749-21-005151', 2021, 1)
+    adsh_tool = DataAccessByAdshTool("d:/secprocessing/", "0001437749-21-005151", 2021, 1)
     adsh_tool.get_pre_from_qrtr_zip()
     adsh_tool.get_num_from_qrtr_zip()
     adsh_tool.get_pre_xml_content()

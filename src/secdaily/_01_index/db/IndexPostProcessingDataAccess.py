@@ -42,23 +42,24 @@ class BasicFeedData:
 class IndexPostProcessingDA(DB):
 
     def read_last_known_fiscalyearend(self) -> Dict[str, str]:
-        sql = '''
+        sql = f'''
         SELECT cikNumber, fiscalYearEnd
         FROM (
              SELECT cikNumber, fiscalYearEnd
-             FROM {}
+             FROM {DB.SEC_REPORTS_TBL_NAME}
              WHERE formType = "10-K" and fiscalYearEnd is not null
              ORDER BY cikNumber, period desc
              ) as x
         GROUP BY cikNumber;
-        '''.format(DB.SEC_REPORTS_TBL_NAME)
+        '''
         # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
         df = self._execute_read_as_df(sql)
         return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
 
     def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
-        sql = '''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson FROM {} WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''.format(
-            DB.SEC_REPORTS_TBL_NAME)
+        sql = f'''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson
+                 FROM {DB.SEC_REPORTS_TBL_NAME}
+                 WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''
         return self._execute_fetchall_typed(sql, BasicFeedData)
 
     def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
@@ -94,16 +95,18 @@ class IndexPostProcessingDA(DB):
         self._execute_many(sql, update_data)
 
     def find_duplicated_adsh(self) -> List[str]:
-        sql = '''SELECT COUNT(*) as mycount, accessionNumber FROM {} WHERE status is null GROUP BY accessionNumber'''.format(
-            DB.SEC_REPORTS_TBL_NAME)
+        sql = f'''SELECT COUNT(*) as mycount, accessionNumber
+                 FROM {DB.SEC_REPORTS_TBL_NAME}
+                 WHERE status is null GROUP BY accessionNumber'''
         duplicated_df = self._execute_read_as_df(sql)
 
         duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
         return duplicated_df.accessionNumber.tolist()
 
     def mark_duplicated_adsh(self, adsh: str):
-        sql = '''SELECT accessionNumber, sec_feed_file FROM {} WHERE accessionNumber= '{}' and status is null order by sec_feed_file'''.format(
-            DB.SEC_REPORTS_TBL_NAME, adsh)
+        sql = f'''SELECT accessionNumber, sec_feed_file
+                  FROM {DB.SEC_REPORTS_TBL_NAME}
+                  WHERE accessionNumber= '{adsh}' and status is null order by sec_feed_file'''
         result: List[Tuple[str]] = self._execute_fetchall(sql)
 
         update_sql = '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(

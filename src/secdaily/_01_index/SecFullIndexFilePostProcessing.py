@@ -79,9 +79,8 @@ class SecFullIndexFilePostProcessor:
                     if name.endswith('_htm.xml'):
                         key = 'ins'
 
-                    relevant_entries[key] = XbrlFile(name,
-                                                     SecFullIndexFilePostProcessor.edgar_archive_root_url + report_path + name,
-                                                     last_modified, size)
+                    url = SecFullIndexFilePostProcessor.edgar_archive_root_url + report_path + name
+                    relevant_entries[key] = XbrlFile(name=name, url=url, lastChange=last_modified, size=size)
 
             if 'ins' not in relevant_entries:
                 ins_file = relevant_entries['pre'].name.replace("_pre", "")
@@ -106,9 +105,12 @@ class SecFullIndexFilePostProcessor:
                              sec_feed_file=rowdata.sec_feed_file,
                              fiscal_year_end=fiscal_year_end,
                              period=period,
-                             xbrlIns=relevant_entries.get('ins', XbrlFile.default()), xbrlPre=relevant_entries.get('pre', XbrlFile.default()),
-                             xbrlCal=relevant_entries.get('cal', XbrlFile.default()), xbrlDef=relevant_entries.get('def', XbrlFile.default()),
-                             xbrlLab=relevant_entries.get('lab', XbrlFile.default()), xbrlZip=relevant_entries.get('xbrlzip', XbrlFile.default()))
+                             xbrlIns=relevant_entries.get('ins', XbrlFile.default()),
+                             xbrlPre=relevant_entries.get('pre', XbrlFile.default()),
+                             xbrlCal=relevant_entries.get('cal', XbrlFile.default()),
+                             xbrlDef=relevant_entries.get('def', XbrlFile.default()),
+                             xbrlLab=relevant_entries.get('lab', XbrlFile.default()),
+                             xbrlZip=relevant_entries.get('xbrlzip', XbrlFile.default()))
 
         except Exception as e:
             logging.warning(f"failed to process {rowdata.accessionNumber} with {e}")
@@ -132,42 +134,3 @@ class SecFullIndexFilePostProcessor:
         for duplicated in duplicated_adshs:
             logging.info("Found duplicated: " + duplicated)
             self.dbmanager.mark_duplicated_adsh(duplicated)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-                        datefmt='%Y-%m-%d:%H:%M:%S',
-                        level=logging.DEBUG)
-
-    folder = "./tmp"
-    # new_dbmgr = DBManager(work_dir=folder)
-    # new_dbmgr._create_db()
-    new_dbmgr = IndexPostProcessingDA(work_dir="d:/secprocessing/")
-    processor = SecFullIndexFilePostProcessor(new_dbmgr)
-    processor.process()
-
-    # dbm = DBManager(work_dir="d:/secprocessing/")
-    # lastye: Dict[str, str] = dbm.read_last_known_fiscalyearend()
-    #
-    # conn = dbm.get_connection()
-    # sql = '''SELECT accessionNumber, cikNumber FROM sec_feeds WHERE fiscalYearEnd is null'''
-    # results = conn.execute(sql).fetchall()
-    #
-    # mapped = [(lastye.get(x[1], None), x[0]) for x in results]
-    #
-    # found = [x for x in mapped if x[0] is not None]
-    # not_found = [x for x in mapped if x[0] is None]
-    # conn.close()
-    #
-    # conn = dbm.get_connection()
-    # sql = '''UPDATE sec_feeds SET fiscalYearEnd = ? WHERE accessionNumber = ?'''
-    # conn.executemany(sql, found)
-    # conn.commit()
-    # conn.close()
-    #
-    # print("found: ", len(found))
-    # print("not found: ", len(not_found))
-
-# adsh = None
-# report_index_json_url = test_reports[1]
-# SecFullIndexFilePostProcessor._find_xbrl_files((adsh, None, None, None, None, report_index_json_url))

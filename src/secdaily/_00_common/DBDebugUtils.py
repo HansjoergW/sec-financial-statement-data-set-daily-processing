@@ -8,7 +8,7 @@ from secdaily._00_common.DBBase import DB
 class DBDebugDA(DB):
 
     def read_all_processing(self) -> pd.DataFrame:
-        sql = """SELECT * FROM {}""".format(DB.SEC_REPORT_PROCESSING_TBL_NAME)
+        sql = f"""SELECT * FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}"""
         return self._execute_read_as_df(sql)
 
     def get_xml_files_info_from_sec_processing_by_adshs(self, adshs: List[str]) -> List[Tuple[str, str, str]]:
@@ -26,7 +26,7 @@ class DBDebugDA(DB):
     def get_files_for_adsh(self, adsh: str) -> Tuple[str, str, str, str, str]:
         conn = self.get_connection()
         try:
-            sql = f"""SELECT accessionNumber, xmlPreFile, xmlNumFile, csvPreFile, csvNumFile 
+            sql = f"""SELECT accessionNumber, xmlPreFile, xmlNumFile, csvPreFile, csvNumFile
                       FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
                       WHEREaccessionNumber = '{adsh}' """
 
@@ -35,7 +35,7 @@ class DBDebugDA(DB):
             conn.close()
 
     def read_all(self) -> pd.DataFrame:
-        sql = """SELECT * FROM {}""".format(DB.SEC_REPORTS_TBL_NAME)
+        sql = f"""SELECT * FROM {DB.SEC_REPORTS_TBL_NAME}"""
         return self._execute_read_as_df(sql)
 
     def read_by_year_and_quarter(self, year: int, qrtr: int) -> pd.DataFrame:
