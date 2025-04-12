@@ -16,6 +16,8 @@ from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
 from secdaily._02_xml.SecXmlFilePreProcessing import SecXmlFilePreprocessor
 from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import SecStyleFormatterDA
 from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
+from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
 
 class SecDataOrchestrator:
@@ -120,16 +122,16 @@ class SecDataOrchestrator:
         formatter = SECStyleFormatter(dbmanager=SecStyleFormatterDA(self.workdir), data_dir=self.formatdir)
         formatter.process()
 
-    # def create_daily_zip(self):
-    #     self._log_main_header("Create daily zip files")
-    #     zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
-    #     zip_creator.process()
+    def create_daily_zip(self):
+        self._log_main_header("Create daily zip files")
+        zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
+        zip_creator.process()
 
     def process(self):
         self.process_index_data()
         self.process_xml_data()
         self.create_sec_style()
-        # self.create_daily_zip()
+        self.create_daily_zip()
 
 
 if __name__ == '__main__':

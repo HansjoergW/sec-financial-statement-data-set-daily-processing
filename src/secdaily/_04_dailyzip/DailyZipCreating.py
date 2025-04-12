@@ -1,6 +1,8 @@
 import logging
-from dataclasses import dataclass
-from typing import Dict, List, Protocol, Set, Tuple
+import os
+import zipfile
+from multiprocessing import Pool
+from typing import Dict, List, Protocol, Tuple
 
 import numpy as np
 import pandas as pd
@@ -8,29 +10,21 @@ import pandas as pd
 from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_df_from_zip
-from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, IncompleteMonth
-
-
-@dataclass(frozen=True)
-class IncompleteQuarter:
-    name: str
-    year: int
-    qrtr: int
+from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA, UpdateDailyZip
 
 
 class DataAccess(Protocol):
 
-    def find_incomplete_months(self) -> List[IncompleteMonth]:
-        """find months in the process report table that have entries that are not in a daily zip file"""
-        return []
-
-    def find_entries_for_quarter(self, year: int, qrtr: int) -> pd.DataFrame:
-        """find all entries for a certain quarter that are ready to be packed into a daily zip file"""
-        return pd.DataFrame()
-
     def read_all_copied(self) -> pd.DataFrame:
         """read all entries from the feed table"""
         return pd.DataFrame()
+
+    def find_ready_to_zip_adshs(self) -> pd.DataFrame:
+        """find all entries that are ready to be packed into a daily zip file"""
+        return pd.DataFrame()
+
+    def updated_ziped_entries(self, update_list: List[UpdateDailyZip]):
+        """update the daily zip file information for the given entries"""
 
 
 class DailyZipCreator(ProcessBase):
@@ -49,19 +43,6 @@ class DailyZipCreator(ProcessBase):
 
         self.dbmanager = dbmanager
 
-    def _read_incomplete_quarters(self) -> List[IncompleteQuarter]:
-        incomplete_months = self.dbmanager.find_incomplete_months()
-        incomplete_quarters: Set[IncompleteQuarter] = set()
-
-        for incomplete_month in incomplete_months:
-            quarter_year = incomplete_month.filingYear
-            quarter_qrtr = MONTH_TO_QRTR[incomplete_month.filingMonth]
-            quarter_name = f"{quarter_year}q{quarter_qrtr}"
-
-            incomplete_quarters.add(IncompleteQuarter(name=quarter_name, year=quarter_year, qrtr=quarter_qrtr))
-
-        return list(incomplete_quarters)
-
     def _read_feed_entries_for_adshs(self, adshsAndFye: pd.DataFrame) -> pd.DataFrame:
         feed_entries = self.dbmanager.read_all_copied()
         adshs = adshsAndFye.accessionNumber.tolist()
@@ -72,6 +53,9 @@ class DailyZipCreator(ProcessBase):
         fye_dict: Dict[str, str] = adshsAndFye.to_dict()["fiscalYearEnd"]
 
         return self._create_sub_df(feed_entries, fye_dict)
+
+    def _read_ready_entries(self) -> pd.DataFrame:
+        return self.dbmanager.find_ready_to_zip_adshs()
 
     def _create_sub_df(self, df: pd.DataFrame, fye_dict: Dict[str, str]) -> pd.DataFrame:
         # fye contains the fiscalYearEnd information that were read from the num-xml file
@@ -151,8 +135,8 @@ class DailyZipCreator(ProcessBase):
         mask = (sub_entries.period_day <= 15) | (
             (sub_entries.period_day == 16) & sub_entries.period_month.isin([1, 3, 5, 7, 8, 10, 12])
         )
-        sub_entries.loc[mask, "period_date"] = sub_entries.period_date - pd.DateOffset(months=1) # type: ignore
-        sub_entries["period"] = sub_entries.period_date.dt.to_period("M").dt.to_timestamp("M").dt.strftime("%Y%m%d") # type: ignore
+        sub_entries.loc[mask, "period_date"] = sub_entries.period_date - pd.DateOffset(months=1)  # type: ignore
+        sub_entries["period"] = sub_entries.period_date.dt.to_period("M").dt.to_timestamp("M").dt.strftime("%Y%m%d")  # type: ignore
         # Nach Korrektur neu setzen
         sub_entries["period_date"] = pd.to_datetime(sub_entries.period, format="%Y%m%d")
 
@@ -214,7 +198,9 @@ class DailyZipCreator(ProcessBase):
 
         sub_entries.loc[sub_entries.fye != "0000", "fye_period_diff"] = (
             sub_entries.period_date - sub_entries.fye_date_prev
-        ) / np.timedelta64(1, "D") # type: ignore
+        ) / np.timedelta64(
+            1, "D"
+        )  # type: ignore
 
         sub_entries.loc[sub_entries.form == "10-K", "fp"] = "FY"
         sub_entries.loc[sub_entries.form != "10-K", "fp"] = "Q" + (sub_entries.fye_period_diff / 91.5).round().astype(
@@ -254,78 +240,74 @@ class DailyZipCreator(ProcessBase):
         dfs = [read_df_from_zip(file) for file in filelist]
         return pd.concat(dfs).to_csv(sep="\t", header=True, index=False)
 
-    # def _get_qrtr(self, filing_date: str) -> str:
-    #     year = filing_date[6:]
-    #     month = filing_date[0:2]
-    #     month_int = int(month)
-    #     qtr = math.floor((month_int - 1) / 3) + 1
+    def _get_qrtr(self, filing_date: str) -> str:
+        year = filing_date[6:]
+        month = filing_date[0:2]
+        month_int = int(month)
+        qtr = MONTH_TO_QRTR[month_int]
 
-    #     return year + "q" + str(qtr)
+        return year + "q" + str(qtr)
 
-    # def _store_to_zip(self, filing_date: str, sub: str, pre: str, num: str) -> str:
-    #     qrtr = self._get_qrtr(filing_date)
-    #     qtr_dir = os.path.join(self.data_dir, qrtr)
-    #     os.makedirs(os.path.join(qtr_dir), exist_ok=True)
+    def _store_to_zip(self, filing_date: str, sub: str, pre: str, num: str) -> str:
+        qrtr = self._get_qrtr(filing_date)
+        qtr_dir = os.path.join(self.data_dir, qrtr)
+        os.makedirs(os.path.join(qtr_dir), exist_ok=True)
 
-    #     year = filing_date[6:]
-    #     month = filing_date[0:2]
-    #     day = filing_date[3:5]
-    #     zipfile_name = year + month + day + ".zip"
-    #     zipfile_path = os.path.join(qtr_dir, zipfile_name)
-    #     with zipfile.ZipFile(zipfile_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-    #         zf.writestr("sub.txt", sub)
-    #         zf.writestr("pre.txt", pre)
-    #         zf.writestr("num.txt", num)
+        year = filing_date[6:]
+        month = filing_date[0:2]
+        day = filing_date[3:5]
+        zipfile_name = year + month + day + ".zip"
+        zipfile_path = os.path.join(qtr_dir, zipfile_name)
+        with zipfile.ZipFile(zipfile_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("sub.txt", sub)
+            zf.writestr("pre.txt", pre)
+            zf.writestr("num.txt", num)
 
-    #     return zipfile_name
+        return zipfile_name
 
-    def _create_quarter_content(self, entries: pd.DataFrame, entries_sub_df: pd.DataFrame) -> Tuple[str, str, str]:
+    def _create_daily_content(
+        self, date: str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame
+    ) -> Tuple[str, str, str]:
         sub_content = entries_sub_df.to_csv(sep="\t", header=True, index=False)
-        pre_content = self._read_csvfiles(entries.preFormattedFile.tolist())
-        num_content = self._read_csvfiles(entries.numFormattedFile.tolist())
+        falsher name der dateien.. 
+        pre_content = self._read_csvfiles(entries.csvPreFile.tolist())
+        num_content = self._read_csvfiles(entries.csvNumFile.tolist())
         return sub_content, pre_content, num_content
 
-    def _process_quarter(self, quarter: IncompleteQuarter, entries: pd.DataFrame):
+    def _process_date(self, data: Tuple[str, pd.DataFrame, pd.DataFrame]):
+        filing_date: str = data[0]
+        group_df: pd.DataFrame = data[1]
+        entries_sub: pd.DataFrame = data[2]
 
         try:
-            adsh_and_fye_to_process = entries[["accessionNumber", "fiscalYearEnd"]].copy()
-            entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
-            print(entries_sub.shape)
-
-            sub, pre, num = self._create_quarter_content(entries=entries, entries_sub_df=entries_sub)
-            print("")
-
-            # zf_name = self._store_to_zip(filing_date, sub, pre, num)
-            # update_data = [
-            #     UpdateDailyZip(accessionNumber=x, dailyZipFile=zf_name, processZipDate=self.processdate) for x in adshs
-            # ]
-            # self.dbmanager.updated_ziped_entries(update_data)
+            adshs = group_df.accessionNumber.tolist()
+            sub, pre, num = self._create_daily_content(filing_date, group_df, entries_sub[entries_sub.adsh.isin(adshs)])
+            zf_name = self._store_to_zip(filing_date, sub, pre, num)
+            update_data = [
+                UpdateDailyZip(accessionNumber=x, dailyZipFile=zf_name, processZipDate=self.processdate) for x in adshs
+            ]
+            self.dbmanager.updated_ziped_entries(update_data)
         except Exception as e:
-            logging.warning(f"failed to process {quarter.name}", e)
+            logging.warning(f"failed to process {filing_date}", e)
 
     def process(self):
         logging.info("Daily zip creating")
 
-        incomplete_quaraters = self._read_incomplete_quarters()
+        pool = Pool(8)
 
-        for incomplete_quarter in incomplete_quaraters:
-            logging.info(f"processing {incomplete_quarter.name}")
-            entries = self.dbmanager.find_entries_for_quarter(incomplete_quarter.year, incomplete_quarter.qrtr)
-            logging.info(f" ... found {len(entries)} entries for {incomplete_quarter.name}")
+        entries_ready = self._read_ready_entries()
+        adsh_and_fye_to_process = entries_ready[["accessionNumber", "fiscalYearEnd"]].copy()
+        entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
+        grouped = entries_ready.groupby("filingDate")
 
-            self._process_quarter(incomplete_quarter, entries)
+        logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
 
-        # pool = Pool(8)
-
-        # entries_ready = self._read_ready_entries()
-        # adsh_and_fye_to_process = entries_ready[["accessionNumber", "fiscalYearEnd"]].copy()
-        # entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
-        # grouped = entries_ready.groupby("filingDate")
-
-        # logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
-
-        # param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [(*entry, entries_sub) for entry in grouped]
-        # pool.map(self._process_date, param_list)
+        # entry[0] is the date
+        # entry[1] is the group as dataframe
+        param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [
+            (str(entry[0]), entry[1], entries_sub) for entry in grouped
+        ]
+        pool.map(self._process_date, param_list)
 
 
 if __name__ == "__main__":
