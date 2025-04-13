@@ -53,12 +53,6 @@ class SECPreNumFormatter:
         ]
         df = (num_df[num_df.isrelevant]).copy()
 
-        # # in order to be able to distinguish stock classes, uom has to be extended with the appropriate dimension
-        # df['uom_ext'] = df['uom']
-        # df.loc[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].uom + "_" + df[(df.tag == 'EntityCommonStockSharesOutstanding') & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        # df.loc[(df.tag == 'TradingSymbol') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'TradingSymbol')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-        # df.loc[(df.tag == 'SecurityExchangeName') & (~df.segments.isnull()), 'uom_ext'] = df[(df.tag == 'SecurityExchangeName')  & (~df.segments.isnull())].segments.apply(lambda x: x[0].label)
-
         df["qtrs"] = df.qtrs.apply(int)
         df.loc[~df.decimals.isnull(), "value"] = pd.to_numeric(df.loc[~df.decimals.isnull(), "value"], errors="coerce")
 

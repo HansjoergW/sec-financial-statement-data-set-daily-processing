@@ -24,8 +24,8 @@ from lxml import etree
 #     preArc_list: List[SecPreExtractPresentationArcDetails]
 
 
-class SecHtmXmlExtractor():
-    """ Preparses the xml content and returns a Dict, Tuple, List Structure with the relevant raw information"""
+class SecHtmXmlExtractor:
+    """Preparses the xml content and returns a Dict, Tuple, List Structure with the relevant raw information"""
 
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_ix_header_regex = re.compile(r"<ix:header>.*?</ix:header>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -33,8 +33,8 @@ class SecHtmXmlExtractor():
     remove_empty_style_regex = re.compile(r"( style=\"\")", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_colspan_content_regex = re.compile(r'(?<=colspan=")[^"]*(?=")')
     remove_empty_colspan_regex = re.compile(r"( colspan=\"\")", re.IGNORECASE + re.MULTILINE + re.DOTALL)
-    remove_span_attributes_regex = re.compile(r'<span\s+[^>]*>', re.IGNORECASE + re.MULTILINE + re.DOTALL)
-    remove_div_attributes_regex = re.compile(r'<div\s+[^>]*>', re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    remove_span_attributes_regex = re.compile(r"<span\s+[^>]*>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
+    remove_div_attributes_regex = re.compile(r"<div\s+[^>]*>", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     remove_span_160_regex = re.compile(r"(<span>&#160;</span>)")
     remove_empty_span_regex = re.compile(r"(<span> </span>)|(<span></span>)")
     remove_empty_ps_regex = re.compile(r"<p></p>")
@@ -45,8 +45,7 @@ class SecHtmXmlExtractor():
     remove_empty_tds_regex = re.compile(r"(<td></td>)|(<td/>)")
     remove_span_tags_regex = re.compile(r"(<span>)|(</span>)")
     remove_div_tags_regex = re.compile(r"(<div>)|(</div>)")
-    remove_empty_lines_regex = re.compile(r'^\s*$\n', re.MULTILINE)
-
+    remove_empty_lines_regex = re.compile(r"^\s*$\n", re.MULTILINE)
 
     link_regex = re.compile(r"(<link:)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     link_end_regex = re.compile(r"(</link:)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -83,14 +82,11 @@ class SecHtmXmlExtractor():
         data = self.remove_empty_tds_regex.sub("", data)
         data = self.remove_empty_lines_regex.sub("", data)
 
-
         # next colspan -> before td remove
         # next empty lines removen
 
         # remove empty divs -> gibt es nicht empty divs?
         # consider to remove  completely "<span...>" und "</span>"
-
-
 
         # data = self.remove_unicode_tag_regex.sub("", data)
         # data = self.default_ns_regex.sub("", data)  # some nodes define a default namespace.. that causes troubles
@@ -152,10 +148,9 @@ class SecHtmXmlExtractor():
 
     #     return result
 
-    def extract(self, adsh: str, data: str): # -> Dict[int, SecPreExtractPresentationLink]:
+    def extract(self, adsh: str, data: str):  # -> Dict[int, SecPreExtractPresentationLink]:
         data = self._strip_file(data)
-        byte_data: bytes = bytes(bytearray(data, encoding='utf-8'))
+        byte_data: bytes = bytes(bytearray(data, encoding="utf-8"))
         root = etree.fromstring(byte_data, parser=None)
 
         # continue
-

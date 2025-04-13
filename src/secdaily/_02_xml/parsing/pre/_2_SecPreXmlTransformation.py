@@ -8,12 +8,9 @@ from secdaily._02_xml.parsing.pre._1_SecPreXmlExtracting import (
     SecPreExtractPresentationLink,
 )
 
-""" transforms the raw content of the information inside the xml in the a usable form. does not do any processing of the data,
-but adds additional information"""
-
 
 @dataclass
-class SecPreTransformLocationDetails():
+class SecPreTransformLocationDetails:
     label: str
     tag: str
     version: str
@@ -21,7 +18,7 @@ class SecPreTransformLocationDetails():
 
 
 @dataclass
-class SecPreTransformPresentationArcDetails():
+class SecPreTransformPresentationArcDetails:
     negating: bool
     order_nr: float
     preferredLabel: str
@@ -32,7 +29,7 @@ class SecPreTransformPresentationArcDetails():
 
 
 @dataclass
-class SecPreTransformPresentationDetails():
+class SecPreTransformPresentationDetails:
     loc_list: List[SecPreTransformLocationDetails]
     preArc_list: List[SecPreTransformPresentationArcDetails]
     title: str
@@ -41,7 +38,7 @@ class SecPreTransformPresentationDetails():
     root_node: Optional[str] = None
 
 
-class SecPreXmlTransformer():
+class SecPreXmlTransformer:
     digit_ending_label_regex = re.compile(r"_\d*$")
 
     @staticmethod
@@ -60,30 +57,28 @@ class SecPreXmlTransformer():
         # Note
         # tags kann have '_' in their name
 
-        href_parts = href.split('#')
+        href_parts = href.split("#")
         complete_tag = href_parts[1]
         version: Optional[str] = None
-        if href_parts[0].startswith('http'):
-            ns_parts = href_parts[0].split('/')
-            version = ns_parts[3] + '/' + ns_parts[4]
+        if href_parts[0].startswith("http"):
+            ns_parts = href_parts[0].split("/")
+            version = ns_parts[3] + "/" + ns_parts[4]
         else:
-            version = 'company'  # special hint to indicate that this is a company specifig tag
+            version = "company"  # special hint to indicate that this is a company specifig tag
 
-        pos = complete_tag.find('_')
-        tag = complete_tag[pos + 1:]
+        pos = complete_tag.find("_")
+        tag = complete_tag[pos + 1 :]
 
         return tag, version
 
-    def _transform_loc(self, extract_loc_list: List[SecPreExtractLocationDetails]) -> List[
-        SecPreTransformLocationDetails]:
+    def _transform_loc(
+        self, extract_loc_list: List[SecPreExtractLocationDetails]
+    ) -> List[SecPreTransformLocationDetails]:
         result: List[SecPreTransformLocationDetails] = []
         for extract_loc in extract_loc_list:
             tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(extract_loc.href)
             transform_loc = SecPreTransformLocationDetails(
-                label=extract_loc.label,
-                tag=tag,
-                version=version,
-                digit_ending=False
+                label=extract_loc.label, tag=tag, version=version, digit_ending=False
             )
 
             # there are some special cases of reports which adds a running number to every appereance of a label,
@@ -96,8 +91,9 @@ class SecPreXmlTransformer():
             result.append(transform_loc)
         return result
 
-    def _transform_preArc(self, extract_preArc_list: List[SecPreExtractPresentationArcDetails]) -> List[
-        SecPreTransformPresentationArcDetails]:
+    def _transform_preArc(
+        self, extract_preArc_list: List[SecPreExtractPresentationArcDetails]
+    ) -> List[SecPreTransformPresentationArcDetails]:
         result: List[SecPreTransformPresentationArcDetails] = []
 
         for extract_preArc in extract_preArc_list:
@@ -109,16 +105,19 @@ class SecPreXmlTransformer():
                 from_entry=extract_preArc.from_entry,
                 preferredLabel=extract_preArc.preferredLabel,
                 negating=negated,
-                # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an order_nr that is always a float
-                # there are also strange entries which have an order number of xy.02 or so
-                order_nr=float(extract_preArc.order))
+                # some xmls use 0.0, 1.0 ... as order number instead of a pure int, so we ensure that we have an
+                # order_nr that is always a float
+                # there are also strange entries which have an order number of xy.02 or similar
+                order_nr=float(extract_preArc.order),
+            )
 
             result.append(transform_presentationArc)
 
         return result
 
-    def transform(self, adsh: str, data: Dict[int, SecPreExtractPresentationLink]) -> Dict[
-        int, SecPreTransformPresentationDetails]:
+    def transform(
+        self, adsh: str, data: Dict[int, SecPreExtractPresentationLink]
+    ) -> Dict[int, SecPreTransformPresentationDetails]:
 
         result: Dict[int, SecPreTransformPresentationDetails] = {}
         for k, v in data.items():
@@ -127,7 +126,8 @@ class SecPreXmlTransformer():
                 preArc_list=self._transform_preArc(v.preArc_list),
                 title=v.title,
                 role=v.role,
-                inpth="0")
+                inpth="0",
+            )
 
             # if there is a title info, then this has precedence over the role
             if entry.title is not None:

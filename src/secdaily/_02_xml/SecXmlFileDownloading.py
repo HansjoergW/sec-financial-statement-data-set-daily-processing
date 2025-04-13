@@ -54,7 +54,7 @@ class SecXmlFileDownloader(ProcessBase):
             size = None
 
         if (data.url is None) | (data.url == ""):
-            logging.warning(f"url is null: {data.accessionNumber} / {data.type} ")
+            logging.warning("url is null: %s / %s ", data.accessionNumber, data.type)
             return data
 
         filename = data.url.rsplit("/", 1)[-1]
@@ -80,7 +80,7 @@ class SecXmlFileDownloader(ProcessBase):
     def _download(self, executor: ParallelExecutor):
         _, missing = executor.execute()
         if len(missing) > 0:
-            logging.info("   Failed to add missing for " + str(len(missing)))
+            logging.info("   Failed to add missing for %s", str(len(missing)))
 
     def downloadNumFiles(self):
         logging.info("download Num Files")

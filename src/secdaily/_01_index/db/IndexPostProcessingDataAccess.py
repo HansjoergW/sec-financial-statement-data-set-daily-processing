@@ -12,7 +12,7 @@ class XbrlFile:
     size: int
 
     @staticmethod
-    def default() -> 'XbrlFile':
+    def default() -> "XbrlFile":
         return XbrlFile(name="", url="", lastChange="", size=0)
 
 
@@ -42,7 +42,7 @@ class BasicFeedData:
 class IndexPostProcessingDA(DB):
 
     def read_last_known_fiscalyearend(self) -> Dict[str, str]:
-        sql = f'''
+        sql = f"""
         SELECT cikNumber, fiscalYearEnd
         FROM (
              SELECT cikNumber, fiscalYearEnd
@@ -51,15 +51,15 @@ class IndexPostProcessingDA(DB):
              ORDER BY cikNumber, period desc
              ) as x
         GROUP BY cikNumber;
-        '''
+        """
         # return as dict, where cikNumber is the key and the fiscalYearEnd is the value
         df = self._execute_read_as_df(sql)
-        return df.set_index('cikNumber')['fiscalYearEnd'].to_dict()
+        return df.set_index("cikNumber")["fiscalYearEnd"].to_dict()
 
     def find_entries_with_missing_xbrl_ins_or_pre(self) -> List[BasicFeedData]:
-        sql = f'''SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson
+        sql = f"""SELECT accessionNumber, sec_feed_file, formType, cikNumber, reportJson
                  FROM {DB.SEC_REPORTS_TBL_NAME}
-                 WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL'''
+                 WHERE xbrlInsUrl is NULL OR xbrlPreUrl is NULL"""
         return self._execute_fetchall_typed(sql, BasicFeedData)
 
     def update_xbrl_infos(self, xbrlfiles: List[XbrlFiles]):
@@ -69,21 +69,22 @@ class IndexPostProcessingDA(DB):
             return (info.url, info.lastChange, info.size)
 
         update_data = [
-            (file.period,
-             file.fiscal_year_end,
-             *expand(file.xbrlIns),
-             *expand(file.xbrlCal),
-             *expand(file.xbrlLab),
-             *expand(file.xbrlDef),
-             *expand(file.xbrlPre),
-             *expand(file.xbrlZip),
-             file.accessionNumber,
-             file.sec_feed_file
-             )
+            (
+                file.period,
+                file.fiscal_year_end,
+                *expand(file.xbrlIns),
+                *expand(file.xbrlCal),
+                *expand(file.xbrlLab),
+                *expand(file.xbrlDef),
+                *expand(file.xbrlPre),
+                *expand(file.xbrlZip),
+                file.accessionNumber,
+                file.sec_feed_file,
+            )
             for file in xbrlfiles
         ]
 
-        sql = '''UPDATE {} SET  period = ?,
+        sql = """UPDATE {} SET  period = ?,
                                 fiscalYearEnd = ?,
                                 xbrlInsUrl = ?, insLastChange = ?, insSize = ?,
                                 xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
@@ -91,24 +92,27 @@ class IndexPostProcessingDA(DB):
                                 xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
                                 xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
                                 xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
-                 WHERE accessionNumber = ? and sec_feed_file = ?'''.format(DB.SEC_REPORTS_TBL_NAME)
+                 WHERE accessionNumber = ? and sec_feed_file = ?""".format(
+            DB.SEC_REPORTS_TBL_NAME
+        )
         self._execute_many(sql, update_data)
 
     def find_duplicated_adsh(self) -> List[str]:
-        sql = f'''SELECT COUNT(*) as mycount, accessionNumber
+        sql = f"""SELECT COUNT(*) as mycount, accessionNumber
                  FROM {DB.SEC_REPORTS_TBL_NAME}
-                 WHERE status is null GROUP BY accessionNumber'''
+                 WHERE status is null GROUP BY accessionNumber"""
         duplicated_df = self._execute_read_as_df(sql)
 
         duplicated_df = duplicated_df[duplicated_df.mycount > 1].copy()
         return duplicated_df.accessionNumber.tolist()
 
     def mark_duplicated_adsh(self, adsh: str):
-        sql = f'''SELECT accessionNumber, sec_feed_file
+        sql = f"""SELECT accessionNumber, sec_feed_file
                   FROM {DB.SEC_REPORTS_TBL_NAME}
-                  WHERE accessionNumber= '{adsh}' and status is null order by sec_feed_file'''
+                  WHERE accessionNumber= '{adsh}' and status is null order by sec_feed_file"""
         result: List[Tuple[str]] = self._execute_fetchall(sql)
 
-        update_sql = '''UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? '''.format(
-            DB.SEC_REPORTS_TBL_NAME)
+        update_sql = """UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? """.format(
+            DB.SEC_REPORTS_TBL_NAME
+        )
         self._execute_many(update_sql, result[1:])

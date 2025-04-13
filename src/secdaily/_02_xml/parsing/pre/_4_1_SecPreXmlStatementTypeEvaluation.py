@@ -40,415 +40,211 @@ class SecPreXmlStatementTypeEvaluator:
     #     label_list -> evtll noch mit versionliste und tagliste unterscheiden
 
     stmt_eval_dict = {
-        'CP': StmtEvalDefinition(
+        "CP": StmtEvalDefinition(
             role_keys=[
-                EvalEntry(
-                    includes=['role/cover'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['coverpage'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['coverabstract'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['deidocument'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['document', 'entity', 'information'],
-                    excludes=[],
-                    confidence=3),
+                EvalEntry(includes=["role/cover"], excludes=[], confidence=3),
+                EvalEntry(includes=["coverpage"], excludes=[], confidence=3),
+                EvalEntry(includes=["coverabstract"], excludes=[], confidence=3),
+                EvalEntry(includes=["deidocument"], excludes=[], confidence=3),
+                EvalEntry(includes=["document", "entity", "information"], excludes=[], confidence=3),
             ],
             root_keys=[
-                EvalEntry(
-                    includes=['document', 'entity', 'information'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['coverpage'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['coverabstract'],
-                    excludes=[],
-                    confidence=3),
+                EvalEntry(includes=["document", "entity", "information"], excludes=[], confidence=3),
+                EvalEntry(includes=["coverpage"], excludes=[], confidence=3),
+                EvalEntry(includes=["coverabstract"], excludes=[], confidence=3),
             ],
-            label_list=[]
+            label_list=[],
         ),
-
-        'BS': StmtEvalDefinition(
+        "BS": StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'financialposition'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "financialposition"], excludes=["detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'financialcondition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'condition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'balance', 'sheet'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'financialposition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['condensed', 'balance', 'sheet'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'balance', 'sheet'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'financialposition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'financialcondition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'condition'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'assets', 'liabilities'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['role/balancesheet'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "financialcondition"], excludes=["detail"], confidence=3
+                ),
+                EvalEntry(includes=["consolidated", "statement", "condition"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["consolidated", "balance", "sheet"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["consolidated", "financialposition"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["condensed", "balance", "sheet"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["statement", "balance", "sheet"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["statement", "financialposition"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["statement", "financialcondition"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["statement", "condition"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["statement", "assets", "liabilities"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["role/balancesheet"], excludes=["detail"], confidence=3),
                 EvalEntry(
                     # special case for "arma.com": ex. 0001625285-21-000004, 0001625285-21-000002,  0001625285-21-000006
-                    includes=['role/idr_balancesheet'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["role/idr_balancesheet"],
+                    excludes=["detail"],
+                    confidence=3,
+                ),
                 EvalEntry(  # special case for "kingsway" only report with details in main BS 0001072627-21-000022
-                    includes=['kingsway-financial', 'consolidated', 'balancesheet'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["kingsway-financial", "consolidated", "balancesheet"], excludes=[], confidence=3
+                ),
                 EvalEntry(  # special case for xfleet BS with role cashflow 0001213900-21-019311
-                    includes=['www.xlfleet.com', 'consolidatedcashflow'],
-                    excludes=['cashflow0'],
-                    confidence=3),
+                    includes=["www.xlfleet.com", "consolidatedcashflow"], excludes=["cashflow0"], confidence=3
+                ),
             ],
             root_keys=[
-                EvalEntry(
-                    includes=['statementoffinancialposition'],
-                    excludes=[],
-                    confidence=2),
-                EvalEntry(
-                    includes=['balancesheet', 'parenthetical'],
-                    excludes=[],
-                    confidence=2),
+                EvalEntry(includes=["statementoffinancialposition"], excludes=[], confidence=2),
+                EvalEntry(includes=["balancesheet", "parenthetical"], excludes=[], confidence=2),
             ],
-            label_list=[]),
-
-        'EQ': StmtEvalDefinition(
-            role_keys=[
-                EvalEntry(
-                    includes=['statement', 'shareholder', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'stockholder', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'shareowner', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'stockowner', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'members','equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'partner','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'changes', 'partner','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['shareholder', 'equity','type'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement','changes','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'changes','members','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'changes','trust','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement','stockholder','deficit'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'changes','stockholder','deficit'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement','shareholder','deficit'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement','shareowner','deficit'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'changes','shareholder','deficit'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement','capital','stock'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement','capitalization'],
-                    excludes=[],
-                    confidence=3),
-            ],
-            root_keys=[
-                EvalEntry(
-                    includes=['statement', 'shareholder', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'stockholder', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'shareowner', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'stockowner', 'equity'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'partner','capital'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'members','equity'],
-                    excludes=[],
-                    confidence=3),
-            ],
-            label_list=[]
+            label_list=[],
         ),
-
-        'IS': StmtEvalDefinition(
+        "EQ": StmtEvalDefinition(
             role_keys=[
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'income'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'loss'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'revenue'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'earnings'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['condensed', 'statement', 'earnings'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'statement', 'operation'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['consolidated', 'results', 'operation'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['condensed', 'statement', 'operation'],
-                    excludes=['comprehensive','detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'operation'],
-                    excludes=['comprehensive', 'detail', 'presentation'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'income'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'loss'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['statement', 'earnings'],
-                    excludes=['comprehensive', 'detail'],
-                    confidence=3),
-                EvalEntry( # case 00000007789-21-000018 -> IS parenth contains detail in name
-                    includes=['consolidated', 'statement','income','parenthetical'],
-                    excludes=['comprehensive'],
-                    confidence=3),
-                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
-                    includes=['consolidated', 'statement','income','parenthetical'],
-                    excludes=['comprehensive'],
-                    confidence=3),
-                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
-                    includes=['consolidatedbalancesheet_parentheticals0'],
-                    excludes=['comprehensive'],
-                    confidence=6),
-                EvalEntry( # case 0001213900-21-xxxxxx -> IS is balancesheet0
-                    includes=['consolidatedbalancesheet0'],
-                    excludes=['comprehensive'],
-                    confidence=6),
+                EvalEntry(includes=["statement", "shareholder", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "stockholder", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "shareowner", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "stockowner", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "members", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "partner", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "changes", "partner", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["shareholder", "equity", "type"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "changes", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "changes", "members", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "changes", "trust", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "stockholder", "deficit"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "changes", "stockholder", "deficit"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "shareholder", "deficit"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "shareowner", "deficit"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "changes", "shareholder", "deficit"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "capital", "stock"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "statement", "capitalization"], excludes=[], confidence=3),
             ],
             root_keys=[
-                EvalEntry(
-                    includes=['income', 'statement', 'abstract'],
-                    excludes=['comprehensive'],
-                    confidence=2),
+                EvalEntry(includes=["statement", "shareholder", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "stockholder", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "shareowner", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "stockowner", "equity"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "partner", "capital"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "members", "equity"], excludes=[], confidence=3),
             ],
-            label_list=[
-                EvalEntry(
-                    includes=['operating', 'income', 'loss'],
-                    excludes=['asset'],
-                    confidence=1
-                )
-            ]
+            label_list=[],
         ),
-
-        'CI': StmtEvalDefinition(
+        "IS": StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'operation', 'loss'],
-                    excludes=['detail'],
-                    confidence=6),
+                    includes=["consolidated", "statement", "income"], excludes=["comprehensive", "detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'income'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "loss"], excludes=["comprehensive", "detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'earnings'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "revenue"],
+                    excludes=["comprehensive", "detail"],
+                    confidence=3,
+                ),
                 EvalEntry(
-                    includes=['comprehensive','condensed', 'statement', 'earnings'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "earnings"],
+                    excludes=["comprehensive", "detail"],
+                    confidence=3,
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'loss'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["condensed", "statement", "earnings"], excludes=["comprehensive", "detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'operation'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "statement", "operation"],
+                    excludes=["comprehensive", "detail"],
+                    confidence=3,
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'results', 'operation'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["consolidated", "results", "operation"],
+                    excludes=["comprehensive", "detail"],
+                    confidence=3,
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'statement', 'loss'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["condensed", "statement", "operation"], excludes=["comprehensive", "detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['comprehensive', 'statement', 'income'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['comprehensive','statement', 'loss'],
-                    excludes=['detail'],
-                    confidence=3),
-                EvalEntry(
-                    includes=['comprehensive', 'statement', 'operation'],
-                    excludes=['detail'],
-                    confidence=3),
-
-                EvalEntry(
-                    includes=['comprehensive', 'consolidated', 'income'],
-                    excludes=['detail'],
-                    confidence=3),
+                    includes=["statement", "operation"],
+                    excludes=["comprehensive", "detail", "presentation"],
+                    confidence=3,
+                ),
+                EvalEntry(includes=["statement", "income"], excludes=["comprehensive", "detail"], confidence=3),
+                EvalEntry(includes=["statement", "loss"], excludes=["comprehensive", "detail"], confidence=3),
+                EvalEntry(includes=["statement", "earnings"], excludes=["comprehensive", "detail"], confidence=3),
+                EvalEntry(  # case 00000007789-21-000018 -> IS parenth contains detail in name
+                    includes=["consolidated", "statement", "income", "parenthetical"],
+                    excludes=["comprehensive"],
+                    confidence=3,
+                ),
+                EvalEntry(  # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=["consolidated", "statement", "income", "parenthetical"],
+                    excludes=["comprehensive"],
+                    confidence=3,
+                ),
+                EvalEntry(  # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=["consolidatedbalancesheet_parentheticals0"], excludes=["comprehensive"], confidence=6
+                ),
+                EvalEntry(  # case 0001213900-21-xxxxxx -> IS is balancesheet0
+                    includes=["consolidatedbalancesheet0"], excludes=["comprehensive"], confidence=6
+                ),
             ],
             root_keys=[
-                EvalEntry(
-                    includes=['comprehensive', 'income', 'statement', 'abstract'],
-                    excludes=[],
-                    confidence=2),
-                EvalEntry(
-                    includes=['income', 'statement', 'abstract'],
-                    excludes=[],
-                    confidence=1),
+                EvalEntry(includes=["income", "statement", "abstract"], excludes=["comprehensive"], confidence=2),
             ],
-            label_list=[
-                EvalEntry(
-                    includes=['comprehensive'],
-                    excludes=['asset'],
-                    confidence=1
-                )
-            ]
+            label_list=[EvalEntry(includes=["operating", "income", "loss"], excludes=["asset"], confidence=1)],
         ),
-
-        'CF': StmtEvalDefinition(
+        "CI": StmtEvalDefinition(
             role_keys=[
                 EvalEntry(
-                    includes=['consolidated', 'statement', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
-                EvalEntry( # spelling error 0001052918-21-000009
-                    includes=['consoldiated','statement', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "consolidated", "statement", "operation", "loss"],
+                    excludes=["detail"],
+                    confidence=6,
+                ),
                 EvalEntry(
-                    includes=['condensed', 'statement', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "consolidated", "statement", "income"], excludes=["detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['consolidated', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "consolidated", "statement", "earnings"],
+                    excludes=["detail"],
+                    confidence=3,
+                ),
                 EvalEntry(
-                    includes=['condensed', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "condensed", "statement", "earnings"], excludes=["detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['statement', 'cash', 'flow'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "consolidated", "statement", "loss"], excludes=["detail"], confidence=3
+                ),
                 EvalEntry(
-                    includes=['statement', 'cash', 'receipt', 'disbursement'],
-                    excludes=[],
-                    confidence=3),
+                    includes=["comprehensive", "consolidated", "statement", "operation"],
+                    excludes=["detail"],
+                    confidence=3,
+                ),
+                EvalEntry(
+                    includes=["comprehensive", "consolidated", "results", "operation"],
+                    excludes=["detail"],
+                    confidence=3,
+                ),
+                EvalEntry(
+                    includes=["comprehensive", "consolidated", "statement", "loss"], excludes=["detail"], confidence=3
+                ),
+                EvalEntry(includes=["comprehensive", "statement", "income"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["comprehensive", "statement", "loss"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["comprehensive", "statement", "operation"], excludes=["detail"], confidence=3),
+                EvalEntry(includes=["comprehensive", "consolidated", "income"], excludes=["detail"], confidence=3),
             ],
-
+            root_keys=[
+                EvalEntry(includes=["comprehensive", "income", "statement", "abstract"], excludes=[], confidence=2),
+                EvalEntry(includes=["income", "statement", "abstract"], excludes=[], confidence=1),
+            ],
+            label_list=[EvalEntry(includes=["comprehensive"], excludes=["asset"], confidence=1)],
+        ),
+        "CF": StmtEvalDefinition(
+            role_keys=[
+                EvalEntry(includes=["consolidated", "statement", "cash", "flow"], excludes=[], confidence=3),
+                EvalEntry(  # spelling error 0001052918-21-000009
+                    includes=["consoldiated", "statement", "cash", "flow"], excludes=[], confidence=3
+                ),
+                EvalEntry(includes=["condensed", "statement", "cash", "flow"], excludes=[], confidence=3),
+                EvalEntry(includes=["consolidated", "cash", "flow"], excludes=[], confidence=3),
+                EvalEntry(includes=["condensed", "cash", "flow"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "cash", "flow"], excludes=[], confidence=3),
+                EvalEntry(includes=["statement", "cash", "receipt", "disbursement"], excludes=[], confidence=3),
+            ],
             # SonderFall für diesen hier kann man nicht so einfach excluden...
             # ginge nur über labels oder mit regex prüfung
             # { # special case for xfleet BS with role cashflow 0001213900-21-019311
@@ -456,21 +252,14 @@ class SecPreXmlStatementTypeEvaluator:
             #     excludes= ['cashflow0'],
             #     confidence= 2
             # },
-
             root_keys=[
-                EvalEntry(
-                    includes=['statement', 'cashflow'],
-                    excludes=[],
-                    confidence=3), ],
+                EvalEntry(includes=["statement", "cashflow"], excludes=[], confidence=3),
+            ],
             label_list=[
-                EvalEntry(
-                    includes=['netcashprovided','operatingactivities'],
-                    excludes=[],
-                    confidence=6),
-            ]
-        )
+                EvalEntry(includes=["netcashprovided", "operatingactivities"], excludes=[], confidence=6),
+            ],
+        ),
     }
-
 
     def __init__(self):
         pass
@@ -491,8 +280,9 @@ class SecPreXmlStatementTypeEvaluator:
 
         return max_confidence
 
-    def _eval_statement_canditate_label_helper(self, loc_list: List[SecPreTransformLocationDetails],
-                                               definition: List[EvalEntry]):
+    def _eval_statement_canditate_label_helper(
+        self, loc_list: List[SecPreTransformLocationDetails], definition: List[EvalEntry]
+    ):
         tag_list_lower = [loc_entry.tag.lower() for loc_entry in loc_list]
 
         max_confidence = 0
@@ -514,8 +304,9 @@ class SecPreXmlStatementTypeEvaluator:
 
         return max_confidence
 
-    def evaluate_statement_canditates(self, role: str, root_node: str,
-                                       loc_list: List[SecPreTransformLocationDetails]) -> Dict[str, StmtConfidence]:
+    def evaluate_statement_canditates(
+        self, role: str, root_node: str, loc_list: List[SecPreTransformLocationDetails]
+    ) -> Dict[str, StmtConfidence]:
         # returns for matches stmt: {byrole: confidence, byroot:confidence, bylabel: confidence}
 
         result: Dict[str, StmtConfidence] = {}
@@ -528,7 +319,7 @@ class SecPreXmlStatementTypeEvaluator:
             details = StmtConfidence(
                 byRole=self._eval_statement_canditate_helper(role, role_keys_definition),
                 byRoot=self._eval_statement_canditate_helper(root_node, root_keys_definition),
-                byLabel=self._eval_statement_canditate_label_helper(loc_list, label_definition)
+                byLabel=self._eval_statement_canditate_label_helper(loc_list, label_definition),
             )
 
             if details.get_max_confidenc() > 0:

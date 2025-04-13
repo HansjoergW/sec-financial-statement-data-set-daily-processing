@@ -62,8 +62,8 @@ class ReportBuilder:
         return pd.concat(df_list, ignore_index=True)
 
     def _load_daily_data(self):
-        daily_reports_of_quarter: List[FormattedReport] = (
-            self.mass_test_data_access.find_entries_for_quarter(self.year, self.qrtr)
+        daily_reports_of_quarter: List[FormattedReport] = self.mass_test_data_access.find_entries_for_quarter(
+            self.year, self.qrtr
         )
 
         self.adsh_daily_file_map = {x.accessionNumber: x for x in daily_reports_of_quarter}
@@ -107,9 +107,7 @@ class ReportBuilder:
         self.pre_daily_adshs = set(self.daily_pre_df.adsh.unique().tolist())
         self.pre_both_adshs = self.pre_quarter_adshs & self.pre_daily_adshs
 
-    def _create_adsh_only_entries_quarter(
-        self, adshs: Set[str], type: str
-    ) -> List[UpdateMassTestV2]:
+    def _create_adsh_only_entries_quarter(self, adshs: Set[str], type: str) -> List[UpdateMassTestV2]:
         update_list = []
         for adsh in adshs:
             update_list.append(
@@ -259,9 +257,7 @@ class ReportBuilder:
             for stmt in stmts:
                 quarter_stmt_df = quarter_df[quarter_df.stmt == stmt]
                 daily_stmt_df = daily_df[daily_df.stmt == stmt]
-                compare_results = self._compare_dataframes(
-                    quarter_stmt_df[cols], daily_stmt_df[cols]
-                )
+                compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
                 updated_entry = self._create_update_entry(
                     compare_results=compare_results, adsh=adsh, stmt=stmt, type="pre"
                 )
@@ -291,9 +287,7 @@ class ReportBuilder:
             quarter_df = self.qrtr_file_access.num_df[self.qrtr_file_access.num_df.adsh == adsh]
             daily_df = self.daily_num_df[self.daily_num_df.adsh == adsh]
             compare_results = self._compare_dataframes(quarter_df[cols], daily_df[cols])
-            updated_entry = self._create_update_entry(
-                compare_results=compare_results, adsh=adsh, type="num"
-            )
+            updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, type="num")
             update_list.append(updated_entry)
         return update_list
 
@@ -321,9 +315,7 @@ class ReportBuilder:
 
     def report(self):
         print("-----------------------------------")
-        reportOverview = self.mass_test_data_access.get_report_overview(
-            run_id=self.run_id, qtr=self.qrtr_str
-        )
+        reportOverview = self.mass_test_data_access.get_report_overview(run_id=self.run_id, qtr=self.qrtr_str)
         print(reportOverview)
         print("-----------------------------------")
 

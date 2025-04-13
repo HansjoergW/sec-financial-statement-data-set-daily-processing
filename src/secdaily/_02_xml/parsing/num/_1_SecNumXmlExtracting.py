@@ -13,9 +13,9 @@ class SecNumExtractSegement:
 
 @dataclass
 class SecNumExtractContext:
-    instanttxt: Union[str,None]
-    startdatetxt: Union[str,None]
-    enddatetxt: Union[str,None]
+    instanttxt: Union[str, None]
+    startdatetxt: Union[str, None]
+    enddatetxt: Union[str, None]
     id: str
     segments: List[SecNumExtractSegement]
 
@@ -47,11 +47,11 @@ class SecNumExtraction:
     units: List[SecNumExtractUnit]
 
 
-class SecNumXmlExtractor():
+class SecNumXmlExtractor:
 
     # reports who's num file is part of the report use a "xbrli" prefix for all tags
     # reports for which the "num"xml has been created from the html don't use such a tag
-    xbrli_prefix_regex = re.compile(r"xbrli:", re.IGNORECASE  + re.DOTALL)
+    xbrli_prefix_regex = re.compile(r"xbrli:", re.IGNORECASE + re.DOTALL)
 
     period_regex = re.compile(r"<period>|(</period>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
     entity_regex = re.compile(r"<entity>|(</entity>)", re.IGNORECASE + re.MULTILINE + re.DOTALL)
@@ -63,7 +63,7 @@ class SecNumXmlExtractor():
 
     remove_unicode_tag_regex = re.compile(r" encoding=\"utf-8\"", re.IGNORECASE + re.MULTILINE + re.DOTALL)
 
-    relevant_ns = ['us-gaap','ifrs_full','dei','srt','stpr']
+    relevant_ns = ["us-gaap", "ifrs_full", "dei", "srt", "stpr"]
 
     def __init__(self):
         pass
@@ -74,7 +74,7 @@ class SecNumXmlExtractor():
         data = self.identifier_regex.sub("", data)
         data = self.period_regex.sub("", data)
         data = self.entity_regex.sub("", data)
-        data = self.xbrlns_regex.sub("", data) # clear xbrlns, so it is easier to parse
+        data = self.xbrlns_regex.sub("", data)  # clear xbrlns, so it is easier to parse
         data = self.link_regex.sub("", data)
         data = self.link_end_regex.sub("", data)
         data = self.remove_unicode_tag_regex.sub("", data)
@@ -82,7 +82,7 @@ class SecNumXmlExtractor():
         return data
 
     def _find_company_namespaces(self, root: etree._Element) -> List[str]:
-        official = ['xbrl.org', 'sec.gov','fasb.org','w3.org', 'xbrl.ifrs.org']
+        official = ["xbrl.org", "sec.gov", "fasb.org", "w3.org", "xbrl.ifrs.org"]
         company_namespaces = []
         for key, value in root.nsmap.items():
             if not any(x in value for x in official):
@@ -90,7 +90,7 @@ class SecNumXmlExtractor():
         return company_namespaces
 
     def _read_contexts(self, root: etree._Element) -> List[SecNumExtractContext]:
-        contexts = root.findall('context', root.nsmap)
+        contexts = root.findall("context", root.nsmap)
         result: List[SecNumExtractContext] = []
 
         for context in contexts:
@@ -100,7 +100,7 @@ class SecNumXmlExtractor():
 
             # generally, we are mainly interested in the contexts without a segment
             # however, the segment might be deliver interesting inside in future analysis
-            segments = list(context.findall('.//*[@dimension]', root.nsmap))
+            segments = list(context.findall(".//*[@dimension]", root.nsmap))
             segments_list = []
             for segment in segments:
                 segment_label = segment.text
@@ -108,30 +108,32 @@ class SecNumXmlExtractor():
                 segments_list.append(SecNumExtractSegement(label=segment_label, dimension=segment_dim))
 
             id = context.get("id")
-            instant = context.find('instant', root.nsmap)
+            instant = context.find("instant", root.nsmap)
             if instant is not None:
                 instanttxt = instant.text
 
-            startdate = context.find('startDate', root.nsmap)
+            startdate = context.find("startDate", root.nsmap)
             if startdate is not None:
                 startdatetxt = startdate.text
 
-            enddate = context.find('endDate', root.nsmap)
+            enddate = context.find("endDate", root.nsmap)
             if enddate is not None:
                 enddatetxt = enddate.text
 
-            result.append(SecNumExtractContext(
-                instanttxt=instanttxt,
-                startdatetxt=startdatetxt,
-                enddatetxt=enddatetxt,
-                id=id,
-                segments=segments_list
-            ))
+            result.append(
+                SecNumExtractContext(
+                    instanttxt=instanttxt,
+                    startdatetxt=startdatetxt,
+                    enddatetxt=enddatetxt,
+                    id=id,
+                    segments=segments_list,
+                )
+            )
 
         return result
 
     def _read_units(self, root: etree._Element) -> List[SecNumExtractUnit]:
-        units = root.findall('unit', root.nsmap)
+        units = root.findall("unit", root.nsmap)
         result: List[SecNumExtractUnit] = []
 
         for unit in units:
@@ -139,33 +141,26 @@ class SecNumXmlExtractor():
             measure = None
             denumerator = None
             numerator = None
-            measure_node = unit.find('measure', root.nsmap)
-            divide_node = unit.find('divide', root.nsmap)
+            measure_node = unit.find("measure", root.nsmap)
+            divide_node = unit.find("divide", root.nsmap)
 
             if measure_node is not None:
                 measure = measure_node.text
             elif divide_node is not None:
-                numerator_child = divide_node.find('unitNumerator/measure', root.nsmap)
+                numerator_child = divide_node.find("unitNumerator/measure", root.nsmap)
                 numerator = numerator_child.text
-                denumerator_child = divide_node.find('unitDenominator/measure', root.nsmap)
+                denumerator_child = divide_node.find("unitDenominator/measure", root.nsmap)
                 denumerator = denumerator_child.text
 
-            result.append(SecNumExtractUnit(
-                id=id,
-                measure=measure,
-                denumerator=denumerator,
-                numerator=numerator
-        ))
+            result.append(SecNumExtractUnit(id=id, measure=measure, denumerator=denumerator, numerator=numerator))
         return result
-
 
     def _read_tags(self, root: etree._Element) -> List[SecNumExtractTag]:
 
-        tags = list(root.findall('.//*[@unitRef]'))
-        tags_secexchange = list(root.findall('.//dei:SecurityExchangeName', root.nsmap))
-        tags_tradingsymbol = list(root.findall('.//dei:TradingSymbol', root.nsmap))
-        tags_fiscalyearend = list(root.findall('.//dei:CurrentFiscalYearEndDate', root.nsmap))
-
+        tags = list(root.findall(".//*[@unitRef]"))
+        tags_secexchange = list(root.findall(".//dei:SecurityExchangeName", root.nsmap))
+        tags_tradingsymbol = list(root.findall(".//dei:TradingSymbol", root.nsmap))
+        tags_fiscalyearend = list(root.findall(".//dei:CurrentFiscalYearEndDate", root.nsmap))
 
         tags.extend(tags_secexchange)
         tags.extend(tags_tradingsymbol)
@@ -180,41 +175,39 @@ class SecNumXmlExtractor():
             ctxtRef = tag.get("contextRef")
             unitRef = tag.get("unitRef")
 
-            result.append(SecNumExtractTag(
-                tagname=tag.tag,
-                valuetxt=value_text,
-                prefix=prefix,
-                decimals=decimals,
-                ctxtRef=ctxtRef,
-                unitRef=unitRef
-            ))
+            result.append(
+                SecNumExtractTag(
+                    tagname=tag.tag,
+                    valuetxt=value_text,
+                    prefix=prefix,
+                    decimals=decimals,
+                    ctxtRef=ctxtRef,
+                    unitRef=unitRef,
+                )
+            )
 
         return result
 
     def _extract_data(self, root: etree._Element) -> SecNumExtraction:
         company_namespaces = self._find_company_namespaces(root)
 
-        rel_ns_map:Dict[str, str] = {}
+        rel_ns_map: Dict[str, str] = {}
         for rel_ns in self.relevant_ns:
             ns = root.nsmap.get(rel_ns, None)
             if ns:
                 rel_ns_map[rel_ns] = ns
 
-        contexts:List[SecNumExtractContext] = self._read_contexts(root)
+        contexts: List[SecNumExtractContext] = self._read_contexts(root)
         tags: List[SecNumExtractTag] = self._read_tags(root)
         units: List[SecNumExtractUnit] = self._read_units(root)
 
         return SecNumExtraction(
-            company_namespaces = company_namespaces,
-            relevant_ns_map=rel_ns_map,
-            contexts=contexts,
-            tags=tags,
-            units=units
+            company_namespaces=company_namespaces, relevant_ns_map=rel_ns_map, contexts=contexts, tags=tags, units=units
         )
 
     def extract(self, adsh: str, data: str) -> SecNumExtraction:
         data = self._strip_file(data)
-        data = bytes(bytearray(data, encoding='utf-8'))
+        data = bytes(bytearray(data, encoding="utf-8"))
         parser = etree.XMLParser(huge_tree=True)
         root: etree._Element = etree.fromstring(data, parser)
 

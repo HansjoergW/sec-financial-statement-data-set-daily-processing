@@ -46,8 +46,8 @@ class SecPreXmlDataProcessor:
         pass
 
     def _calculate_line_nr(self, root_node: str, preArc_list: List[SecPreTransformPresentationArcDetails]):
-        """ the 'only' thing this method does is to add the 'line' attribute to the preArc entries.
-            this is done 'inplace'"""
+        """the 'only' thing this method does is to add the 'line' attribute to the preArc entries.
+        this is done 'inplace'"""
 
         # building parent child relation from the from and to attributes of the preArc entries
         parent_child_dict: Dict[str, Dict[float, str]] = {}
@@ -111,8 +111,12 @@ class SecPreXmlDataProcessor:
 
             line += 1
 
-    def _calculate_entries(self, root_node: str, loc_list: List[SecPreTransformLocationDetails],
-                           preArc_list: List[SecPreTransformPresentationArcDetails]) -> List[PresentationEntry]:
+    def _calculate_entries(
+        self,
+        root_node: str,
+        loc_list: List[SecPreTransformLocationDetails],
+        preArc_list: List[SecPreTransformPresentationArcDetails],
+    ) -> List[PresentationEntry]:
 
         # create dict by label for the loc-entries, so that we can link them to with the preArc entries
         loc_by_label_dict: Dict[str, SecPreTransformLocationDetails] = {}
@@ -128,18 +132,20 @@ class SecPreXmlDataProcessor:
 
             loc_entry = loc_by_label_dict[to_tag]
             entry = PresentationEntry(
-                version = loc_entry.version,
-                tag = loc_entry.tag,
-                plabel = preArc.preferredLabel,
-                negating = preArc.negating,
-                line = preArc.line)
+                version=loc_entry.version,
+                tag=loc_entry.tag,
+                plabel=preArc.preferredLabel,
+                negating=preArc.negating,
+                line=preArc.line,
+            )
 
             result.append(entry)
 
         return result
 
-    def process_reports(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
-            Tuple[Dict[int, PresentationReport], List[Tuple[str, str, str]]]:
+    def process_reports(
+        self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]
+    ) -> Tuple[Dict[int, PresentationReport], List[Tuple[str, str, str]]]:
         # processed the reports in the data.
         # organizes the reports by the report-type (BS, CP, CI, IS, CF, EQ) in the result
 
@@ -155,17 +161,23 @@ class SecPreXmlDataProcessor:
             preArc_list: List[SecPreTransformPresentationArcDetails] = reportinfo.preArc_list
             root_node: str = reportinfo.root_node
 
-            stmt_canditates: Dict[str, StmtConfidence] = stmt_evaluator.evaluate_statement_canditates(role, root_node,
-                                                                                          loc_list)
+            stmt_canditates: Dict[str, StmtConfidence] = stmt_evaluator.evaluate_statement_canditates(
+                role, root_node, loc_list
+            )
             if root_node is None:
                 error_collector.append((adsh, role, str("Not a single root node found")))
                 # just log if the name gives a hint that this could be a primary statement
                 if len(stmt_canditates) > 0:
                     logging.info(
-                        "{} / {} skipped report with role {} : {}".format(adsh, list(stmt_canditates.keys()), role,
-                                                                          "Not a single root node found"))
-                    print("{} / {} skipped report with role {} : {}".format(adsh, list(stmt_canditates.keys()), role,
-                                                                            "Not a single root node found"))
+                        "{} / {} skipped report with role {} : {}".format(
+                            adsh, list(stmt_canditates.keys()), role, "Not a single root node found"
+                        )
+                    )
+                    print(
+                        "{} / {} skipped report with role {} : {}".format(
+                            adsh, list(stmt_canditates.keys()), role, "Not a single root node found"
+                        )
+                    )
                 continue
 
             if len(stmt_canditates) == 0:
@@ -176,14 +188,14 @@ class SecPreXmlDataProcessor:
                 entries: List[PresentationEntry] = self._calculate_entries(root_node, loc_list, preArc_list)
 
                 report = PresentationReport(
-                    adsh = adsh, # str
-                    role = role, # str
-                    loc_list = loc_list, # List[SecPreTransformLocationDetails]
-                    preArc_list = preArc_list, # List[SecPreTransformPresentationArcDetails]
-                    rootNode = root_node, # str
-                    entries = entries, # List[PresentationEntry]
-                    inpth = inpth, # int
-                    stmt_canditates = stmt_canditates # Dict[str, StmtConfidence]
+                    adsh=adsh,  # str
+                    role=role,  # str
+                    loc_list=loc_list,  # List[SecPreTransformLocationDetails]
+                    preArc_list=preArc_list,  # List[SecPreTransformPresentationArcDetails]
+                    rootNode=root_node,  # str
+                    entries=entries,  # List[PresentationEntry]
+                    inpth=inpth,  # int
+                    stmt_canditates=stmt_canditates,  # Dict[str, StmtConfidence]
                 )
                 result[idx] = report
 
@@ -192,8 +204,9 @@ class SecPreXmlDataProcessor:
 
         return (result, error_collector)
 
-    def _post_process_assign_report_to_stmt(self, report_data: Dict[int, PresentationReport]) -> \
-            Dict[Tuple[str, int], List[PresentationReport]]:
+    def _post_process_assign_report_to_stmt(
+        self, report_data: Dict[int, PresentationReport]
+    ) -> Dict[Tuple[str, int], List[PresentationReport]]:
         # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
 
         # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth" which indicates wether it is  a "in parenthical" report
@@ -241,7 +254,7 @@ class SecPreXmlDataProcessor:
         # so we either return the first who was identified as CP by the rolename
         # or we return the first entry of the list (since CP is generally the first that appears in a report)
         for report_data in stmt_list:
-            confidence_dict = report_data.stmt_canditates['CP']
+            confidence_dict = report_data.stmt_canditates["CP"]
             if confidence_dict.byRole == 2:
                 return [report_data]
         first_entry = stmt_list[0]
@@ -249,12 +262,12 @@ class SecPreXmlDataProcessor:
 
     def _post_process_general(self, stmt_type: str, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
         """
-         often detail-reports contain the keywords in their role definition but also much more text.
-         there are also cases with proper supparts of a company like 0001711269-21-000023
+        often detail-reports contain the keywords in their role definition but also much more text.
+        there are also cases with proper supparts of a company like 0001711269-21-000023
 
         """
         current_max_confidence = 0
-        current_max_confidence_list:  List[PresentationReport] = []
+        current_max_confidence_list: List[PresentationReport] = []
 
         for report_data in stmt_list:
             confidence = report_data.stmt_canditates[stmt_type]
@@ -281,18 +294,21 @@ class SecPreXmlDataProcessor:
 
         return result
 
+    def _post_process_is(
+        self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]
+    ) -> List[PresentationReport]:
 
-    def _post_process_is(self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
-
-        result: List[PresentationReport] =  self._post_process_general(stmt_type, stmt_list)
+        result: List[PresentationReport] = self._post_process_general(stmt_type, stmt_list)
 
         # just the label hint is not enough for IS
-        if (inpth==0) and (result[0].stmt_canditates['IS'].get_confidence_sum() == 1):
+        if (inpth == 0) and (result[0].stmt_canditates["IS"].get_confidence_sum() == 1):
             return []
 
         return result
 
-    def _post_process_ci(self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]) -> List[PresentationReport]:
+    def _post_process_ci(
+        self, stmt_type: str, inpth: int, stmt_list: List[PresentationReport]
+    ) -> List[PresentationReport]:
 
         if inpth == 1:
             return self._post_process_general(stmt_type, stmt_list)
@@ -303,15 +319,15 @@ class SecPreXmlDataProcessor:
         max_role: int = 0
 
         for report in stmt_list:
-            if report.stmt_canditates['CI'].get_confidence_sum() > 1:
+            if report.stmt_canditates["CI"].get_confidence_sum() > 1:
                 not_only_by_label.append(report)
-            if (report.stmt_canditates['CI'].byRole == 3) and (report.stmt_canditates['CI'].get_confidence_sum() > 3):
+            if (report.stmt_canditates["CI"].byRole == 3) and (report.stmt_canditates["CI"].get_confidence_sum() > 3):
                 role_conf_3.append(report)
-            max_role = max(max_role, report.stmt_canditates['CI'].byRole)
+            max_role = max(max_role, report.stmt_canditates["CI"].byRole)
 
         # in case max_role > 3 or  not more than 1 role with conf 3
         #  -> the standard in general approach can be used
-        if (max_role > 3) or (len(role_conf_3) < 2) :
+        if (max_role > 3) or (len(role_conf_3) < 2):
             return self._post_process_general(stmt_type, stmt_list)
 
         # if there is more than one entry with byrole confidence of 3, we take the one with the most labels!
@@ -320,8 +336,9 @@ class SecPreXmlDataProcessor:
 
         return role_conf_3[:2]
 
-    def process(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> \
-            Tuple[List[PresentationEntry], List[Tuple[str, str, str]]]:
+    def process(
+        self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]
+    ) -> Tuple[List[PresentationEntry], List[Tuple[str, str, str]]]:
 
         results: List[PresentationEntry] = []
 
@@ -330,8 +347,9 @@ class SecPreXmlDataProcessor:
 
         report_data, error_collector = self.process_reports(adsh, data)
 
-        stmt_data: Dict[Tuple[str, int], List[PresentationReport]] \
-            = self._post_process_assign_report_to_stmt(report_data)
+        stmt_data: Dict[Tuple[str, int], List[PresentationReport]] = self._post_process_assign_report_to_stmt(
+            report_data
+        )
 
         reportnr = 0
 
@@ -339,20 +357,20 @@ class SecPreXmlDataProcessor:
         for stmtkey, stmt_list in stmt_data.items():
             stmt, inpth = stmtkey
 
-            if stmt == 'CP':
+            if stmt == "CP":
                 stmt_list = self._post_process_cp(stmt_list)
 
-            if stmt == 'BS':
-                stmt_list = self._post_process_general('BS', stmt_list)
+            if stmt == "BS":
+                stmt_list = self._post_process_general("BS", stmt_list)
 
-            if stmt == 'IS':
-                stmt_list = self._post_process_is('IS', inpth, stmt_list)
+            if stmt == "IS":
+                stmt_list = self._post_process_is("IS", inpth, stmt_list)
 
-            if stmt == 'CI':
-                stmt_list = self._post_process_ci('CI', inpth, stmt_list)
+            if stmt == "CI":
+                stmt_list = self._post_process_ci("CI", inpth, stmt_list)
 
-            if stmt == 'CF':
-                stmt_list = self._post_process_general('CF', stmt_list)
+            if stmt == "CF":
+                stmt_list = self._post_process_general("CF", stmt_list)
 
             selected[stmtkey] = stmt_list
 
@@ -363,13 +381,12 @@ class SecPreXmlDataProcessor:
                     entry.report = reportnr
                     entry.inpth = inpth
 
-
-        if (len(selected.get(('CI', 0), [])) > 1) and (len(selected.get(('IS',0), [])) == 0):
+        if (len(selected.get(("CI", 0), [])) > 1) and (len(selected.get(("IS", 0), [])) == 0):
             # case 3.12 / 0000766704-21-000018
             # falls zwei CIs und kein IS, CI mit mehr labels wird zum IS
             # wird übersteuert, ohne Berücksichtigung von inpth
 
-            ci_reports = selected[('CI', 0)]
+            ci_reports = selected[("CI", 0)]
             max_label_count: int = 0
 
             for report in ci_reports:
@@ -377,10 +394,9 @@ class SecPreXmlDataProcessor:
 
             for report in ci_reports:
                 if len(report.loc_list) == max_label_count:
-                    selected[('IS', 0)] = [report]
+                    selected[("IS", 0)] = [report]
                 else:
-                    selected[('CI', 0)] = [report]
-
+                    selected[("CI", 0)] = [report]
 
         for stmtkey, stmt_list in selected.items():
             stmt, inpth = stmtkey

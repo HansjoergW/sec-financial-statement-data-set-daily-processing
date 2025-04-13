@@ -11,7 +11,7 @@ def _check_if_zipped(path: str) -> bool:
 
 
 def write_df_to_zip(df: pd.DataFrame, filename: str):
-    csv_content = df.to_csv(sep='\t', header=True, index=False)
+    csv_content = df.to_csv(sep="\t", header=True, index=False)
     write_content_to_zip(csv_content, filename)
 
 

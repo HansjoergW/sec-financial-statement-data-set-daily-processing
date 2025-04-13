@@ -15,4 +15,4 @@ class SecXmlFilePreprocessor:
 
     def copy_entries_to_processing_table(self):
         entries = self.dbmanager.copy_uncopied_entries()
-        logging.info("{} entries copied into processing table".format(entries))
+        logging.info("%d entries copied into processing table, entries)

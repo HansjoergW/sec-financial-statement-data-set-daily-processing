@@ -2,7 +2,7 @@ import logging
 import os
 import zipfile
 from multiprocessing import Pool
-from typing import Any, Dict, List, Optional, Protocol, Tuple
+from typing import Dict, List, Protocol, Tuple
 
 import numpy as np
 import pandas as pd
@@ -173,7 +173,9 @@ class DailyZipCreator(ProcessBase):
 
         # fy_real -> year when the next fiscal year ends
         sub_entries.loc[sub_entries.is_fye_same_year, "fy_real"] = sub_entries.period_year
-        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = sub_entries.period_year + 1  # noqa: E712
+        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = (
+            sub_entries.period_year + 1
+        )  # noqa: E712 pylint:disable=C0121
         sub_entries.fy_real = sub_entries.fy_real.astype(int)
 
         # fy -> as it seems is the previous year, if the year ends in the first quarter,

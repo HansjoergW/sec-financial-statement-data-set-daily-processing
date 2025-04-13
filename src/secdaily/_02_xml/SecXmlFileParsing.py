@@ -75,7 +75,7 @@ class SecXmlParser(ProcessBase):
             )
 
         except Exception as e:
-            logging.exception("failed to parse data: " + data.file, e)
+            logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
                 type=f"parse_failed_{parser.get_type()}",
@@ -123,7 +123,7 @@ class SecXmlParser(ProcessBase):
             )
 
         except Exception as e:
-            logging.exception("failed to parse data: " + data.file, e)
+            logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
                 type=f"parse_failed_{parser.get_type()}",
@@ -187,7 +187,7 @@ class SecXmlParser(ProcessBase):
             )
 
         except Exception as e:
-            logging.exception("failed to parse data: " + data.file, e)
+            logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
                 type=f"parse_failed_{parser.get_type()}",

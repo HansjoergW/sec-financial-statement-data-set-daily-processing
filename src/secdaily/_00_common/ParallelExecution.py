@@ -11,8 +11,8 @@ IT = TypeVar("IT")  # input type of the list to split
 PT = TypeVar("PT")  # processed type of the list to split
 OT = TypeVar("OT")  # PostProcessed Type
 
-class ParallelExecutor(Generic[IT, PT, OT]):
 
+class ParallelExecutor(Generic[IT, PT, OT]):
     """
     this helper class supports in parallel processing of entries that are provided as a list, for instance to
     download and process data.. like downloading and processing sec filing reports.
@@ -32,17 +32,20 @@ class ParallelExecutor(Generic[IT, PT, OT]):
     How to use it
     You need to define 3 functions.
     The get_entries_function returnes a list with the entries that need to be processed.
-    The process_element_function is the logic that processes a single element from the entries and returns the processed content.
-    The post_process_chunk_function receives a list of processed entries. you use this function to update the processed entries,
-    so that in the next call to get_entries_function, these entries will not be part of
+    The process_element_function is the logic that processes a single element from the entries and returns
+    the processed content. The post_process_chunk_function receives a list of processed entries. you use
+    this function to update the processed entries, so that in the next call to get_entries_function, these
+    entries will not be part of.
     """
 
-    def __init__(self,
-                 processes: int = 8,
-                 chunksize: int = 100,
-                 max_calls_per_sec: int = 0,
-                 intend: str = "    ",
-                 execute_serial: bool = False):
+    def __init__(
+        self,
+        processes: int = 8,
+        chunksize: int = 100,
+        max_calls_per_sec: int = 0,
+        intend: str = "    ",
+        execute_serial: bool = False,
+    ):
         """
         :param processes: number of parallel processes
         :param chunksize: size of chunk - think of it as a commit
@@ -81,7 +84,7 @@ class ParallelExecutor(Generic[IT, PT, OT]):
         """
         self.process_element_function = process_element
 
-    def set_post_process_chunk_function(self,  post_process: Callable[[List[PT]], OT]):
+    def set_post_process_chunk_function(self, post_process: Callable[[List[PT]], OT]):
         """
         set the function that receives a list of processed elements unad updates the state of these elements.
         accordingly
@@ -126,7 +129,7 @@ class ParallelExecutor(Generic[IT, PT, OT]):
                 chunk_entries = len(missing)
 
             for i in range(0, len(missing), chunk_entries):
-                chunk = missing[i:i + chunk_entries]
+                chunk = missing[i : i + chunk_entries]
 
                 processed: List[PT]
 
@@ -145,11 +148,13 @@ class ParallelExecutor(Generic[IT, PT, OT]):
         return result_list, missing
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-                        datefmt='%Y-%m-%d:%H:%M:%S',
-                        level=logging.DEBUG)
+    logging.basicConfig(
+        format="%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
+        datefmt="%Y-%m-%d:%H:%M:%S",
+        level=logging.DEBUG,
+    )
 
     # simple example to use it
     class MyTestClass:

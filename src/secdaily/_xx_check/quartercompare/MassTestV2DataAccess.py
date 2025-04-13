@@ -168,9 +168,7 @@ class MassTestV2DA(DB):
 
         compare_results = pd.concat([pre_results, num_results])
 
-        compare_results = compare_results.round(
-            {"unequalRatio": 3, "missingRatioDaily": 3, "missingRatioQuarter": 3}
-        )
+        compare_results = compare_results.round({"unequalRatio": 3, "missingRatioDaily": 3, "missingRatioQuarter": 3})
 
         report_overview = ReportOverview(
             totalAdshs=totalAdshs,

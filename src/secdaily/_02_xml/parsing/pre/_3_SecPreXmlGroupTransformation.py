@@ -15,10 +15,10 @@ statement type (BS, IS, CF, ...) can be evaluated.
 
 class SecPreXmlGroupTransformer:
 
-    key_tag_separator = '$$$'
+    key_tag_separator = "$$$"
 
     # keywords of role definition that should be ignored
-    role_report_ingore_keywords: List[str] = ['-note-', 'supplemental', '-significant', '-schedule-', 'role/disclosure']
+    role_report_ingore_keywords: List[str] = ["-note-", "supplemental", "-significant", "-schedule-", "role/disclosure"]
 
     def __init__(self):
         pass
@@ -30,9 +30,9 @@ class SecPreXmlGroupTransformer:
                 return True
         return False
 
-    def _handle_digit_ending_case(self, preArc_list: List[SecPreTransformPresentationArcDetails],
-                                  loc_list: List[SecPreTransformLocationDetails]) -> Tuple[
-        List[SecPreTransformPresentationArcDetails], List[SecPreTransformLocationDetails]]:
+    def _handle_digit_ending_case(
+        self, preArc_list: List[SecPreTransformPresentationArcDetails], loc_list: List[SecPreTransformLocationDetails]
+    ) -> Tuple[List[SecPreTransformPresentationArcDetails], List[SecPreTransformLocationDetails]]:
         """
         # a digit ending case has all labels ending with _<digits>, this case has to be handled especially, since
         # no hiearchy can be build. An example for this case is: 0000016160-21-000018
@@ -71,7 +71,7 @@ class SecPreXmlGroupTransformer:
         for loc in loc_list:
             new_loc = copy.copy(loc)
             label = loc.label
-            label = label[:label.rfind('_')]
+            label = label[: label.rfind("_")]
             new_loc.label = label
 
             if label in new_loc_label_list:
@@ -84,19 +84,20 @@ class SecPreXmlGroupTransformer:
         for preArc in preArc_list:
             new_preArc = copy.copy(preArc)
             to_label = preArc.to_entry
-            to_label = to_label[:to_label.rfind('_')]
+            to_label = to_label[: to_label.rfind("_")]
             new_preArc.to_entry = to_label
 
             from_label = preArc.from_entry
-            from_label = from_label[:from_label.rfind('_')]
+            from_label = from_label[: from_label.rfind("_")]
             new_preArc.from_entry = from_label
 
             new_preArc_list.append(new_preArc)
 
         return new_preArc_list, new_loc_list
 
-    def _handle_ambiguous_child_parent_relation(self, preArc_list: List[SecPreTransformPresentationArcDetails]) -> List[
-        SecPreTransformPresentationArcDetails]:
+    def _handle_ambiguous_child_parent_relation(
+        self, preArc_list: List[SecPreTransformPresentationArcDetails]
+    ) -> List[SecPreTransformPresentationArcDetails]:
         # there are some rare cases (2 in 5500 reports from 2021-q1) when for a single node no line can be evaluated.
         # this is the reason when the child-parent relation is ambiguous.
         # e.g. "0001562762-21-000101" # StatementConsolidatedStatementsOfStockholdersEquity because there
@@ -168,8 +169,8 @@ class SecPreXmlGroupTransformer:
             preArc.key_tag = key_tag
 
     def _find_root_node(self, preArc_list: List[SecPreTransformPresentationArcDetails]) -> str:
-        """ finds the root node, expect only ONE entry. If there is more than one root node, then an exception is raised
-            and this report will be skipped later in the process."""
+        """finds the root node, expect only ONE entry. If there is more than one root node, then an exception is raised
+        and this report will be skipped later in the process."""
         to_list: List[str] = []
         from_list: List[str] = []
 
@@ -185,7 +186,9 @@ class SecPreXmlGroupTransformer:
 
         return root_nodes[0]
 
-    def grouptransform(self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]) -> Dict[int, SecPreTransformPresentationDetails]:
+    def grouptransform(
+        self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]
+    ) -> Dict[int, SecPreTransformPresentationDetails]:
 
         result: Dict[int, SecPreTransformPresentationDetails] = {}
 

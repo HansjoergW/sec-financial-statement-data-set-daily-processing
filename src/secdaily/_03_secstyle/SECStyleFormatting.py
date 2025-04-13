@@ -67,9 +67,13 @@ class SECStyleFormatter(ProcessBase):
             self._log_error(
                 adsh=data.accessionNumber,
                 type="parse_failed_format_prenum",
-                error_list=[ErrorEntry(adsh=data.accessionNumber, 
-                                       error_info=f"{data.preFile} / {data.numFile} / {data.labFile}", 
-                                       error=traceback.format_exc())],
+                error_list=[
+                    ErrorEntry(
+                        adsh=data.accessionNumber,
+                        error_info=f"{data.preFile} / {data.numFile} / {data.labFile}",
+                        error=traceback.format_exc(),
+                    )
+                ],
             )
             return UpdateStyleFormatting(
                 accessionNumber=data.accessionNumber,
