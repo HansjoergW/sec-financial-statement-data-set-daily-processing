@@ -50,9 +50,8 @@ class UrlDownloader:
                 break
             except requests.exceptions.RequestException as err:
                 if current_try >= max_tries:
-                    logging.info(f"RequestException: failed to download {file_url}")
+                    logging.info("RequestException: failed to download %s", file_url)
                     raise err
-                else:
-                    sleep(sleep_time)
+                sleep(sleep_time)
 
         return response.text

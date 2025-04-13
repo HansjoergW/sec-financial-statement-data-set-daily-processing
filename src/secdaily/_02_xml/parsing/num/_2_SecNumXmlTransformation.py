@@ -115,9 +115,7 @@ class SecNumXmlTransformer:
 
         return coreg
 
-    def _transform_contexts(
-        self, contexts: List[SecNumExtractContext], company_namespaces: List[str], relevant_ns_map: Dict[str, str]
-    ) -> Dict[str, SecNumTransformedContext]:
+    def _transform_contexts(self, contexts: List[SecNumExtractContext]) -> Dict[str, SecNumTransformedContext]:
         context_map: Dict[str, SecNumTransformedContext] = {}
 
         for context in contexts:
@@ -228,12 +226,10 @@ class SecNumXmlTransformer:
             result[unitid] = SecNumTransformedUnit(id=unitid, uom=uom)
         return result
 
-    def transform(self, adsh: str, data: SecNumExtraction) -> SecNumTransformed:
+    def transform(self, data: SecNumExtraction) -> SecNumTransformed:
         ns_years: Dict[str, str] = self._eval_versionyear(data.relevant_ns_map)
 
-        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(
-            data.contexts, data.company_namespaces, data.relevant_ns_map
-        )
+        contexts_map: Dict[str, SecNumTransformedContext] = self._transform_contexts(data.contexts)
         tag_list: List[SecNumTransformedTag] = self._transform_tags(data.tags, ns_years, data.company_namespaces)
         units_map: Dict[str, SecNumTransformedUnit] = self._transform_units(data.units)
 

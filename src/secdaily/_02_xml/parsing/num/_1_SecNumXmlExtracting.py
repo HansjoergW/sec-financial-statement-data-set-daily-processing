@@ -107,7 +107,7 @@ class SecNumXmlExtractor:
                 segment_dim = segment.get("dimension")
                 segments_list.append(SecNumExtractSegement(label=segment_label, dimension=segment_dim))
 
-            id = context.get("id")
+            ctx_id = context.get("id")
             instant = context.find("instant", root.nsmap)
             if instant is not None:
                 instanttxt = instant.text
@@ -125,7 +125,7 @@ class SecNumXmlExtractor:
                     instanttxt=instanttxt,
                     startdatetxt=startdatetxt,
                     enddatetxt=enddatetxt,
-                    id=id,
+                    id=ctx_id,
                     segments=segments_list,
                 )
             )
@@ -137,7 +137,7 @@ class SecNumXmlExtractor:
         result: List[SecNumExtractUnit] = []
 
         for unit in units:
-            id = unit.get("id")
+            unit_id = unit.get("id")
             measure = None
             denumerator = None
             numerator = None
@@ -152,7 +152,7 @@ class SecNumXmlExtractor:
                 denumerator_child = divide_node.find("unitDenominator/measure", root.nsmap)
                 denumerator = denumerator_child.text
 
-            result.append(SecNumExtractUnit(id=id, measure=measure, denumerator=denumerator, numerator=numerator))
+            result.append(SecNumExtractUnit(id=unit_id, measure=measure, denumerator=denumerator, numerator=numerator))
         return result
 
     def _read_tags(self, root: etree._Element) -> List[SecNumExtractTag]:
@@ -205,10 +205,10 @@ class SecNumXmlExtractor:
             company_namespaces=company_namespaces, relevant_ns_map=rel_ns_map, contexts=contexts, tags=tags, units=units
         )
 
-    def extract(self, adsh: str, data: str) -> SecNumExtraction:
+    def extract(self, data: str) -> SecNumExtraction:
         data = self._strip_file(data)
-        data = bytes(bytearray(data, encoding="utf-8"))
+        data_bytes = bytes(bytearray(data, encoding="utf-8"))
         parser = etree.XMLParser(huge_tree=True)
-        root: etree._Element = etree.fromstring(data, parser)
+        root: etree._Element = etree.fromstring(data_bytes, parser)
 
         return self._extract_data(root)

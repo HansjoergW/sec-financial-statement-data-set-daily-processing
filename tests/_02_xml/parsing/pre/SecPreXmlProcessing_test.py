@@ -21,9 +21,9 @@ def test_process():
     with open(testprexml_numbered_label, "r", encoding="utf-8") as f:
         content: str = f.read()
 
-        data = extractor.extract("", content)
-        data_transformed= transformer.transform("", data)
-        data_grouptransformed= grouptransformer.grouptransform("", data_transformed)
+        data = extractor.extract(data=content)
+        data_transformed= transformer.transform(data=data)
+        data_grouptransformed= grouptransformer.grouptransform(data=data_transformed)
         data_processed = processor.process("", data_grouptransformed)
 
         print(len(data_processed))

@@ -17,5 +17,9 @@
     },
     "ruff.enable": true,
     "ruff.organizeImports": true,
-    "ruff.fixAll": true
+    "ruff.fixAll": true,
+    "pylint.enabled": true,
+    "pylint.args": [
+        "--extension-pkg-allow-list=lxml,numpy"
+    ]
 }

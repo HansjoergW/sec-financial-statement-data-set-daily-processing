@@ -17,7 +17,7 @@ def test_read():
     preparer = SecNumXmlExtractor()
     with open(testnumxml, "r", encoding="utf-8") as f:
         content: str = f.read()
-        data: SecNumExtraction = preparer.extract("", content)
+        data: SecNumExtraction = preparer.extract(data=content)
 
         assert len(data.contexts) == 318
         assert len(data.tags) == 1236

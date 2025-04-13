@@ -59,6 +59,11 @@ disable = [
     "W0511",  # fixme
 ]
 
+extension-pkg-allow-list = [
+    "lxml",
+    "numpy"
+]
+
 [tool.pylint.format]
 max-line-length = 120
 

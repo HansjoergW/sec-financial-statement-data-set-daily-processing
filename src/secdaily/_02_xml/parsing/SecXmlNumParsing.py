@@ -18,8 +18,7 @@ class SecNumXmlParser(SecXmlParserBase):
     contained in the financial statements dataset of the sec."""
 
     def __init__(self):
-        super(SecNumXmlParser, self).__init__("num")
-        pass
+        super().__init__("num")
 
     def _read_tags(self, adsh: str, transformed_data: SecNumTransformed) -> pd.DataFrame:
 
@@ -74,8 +73,8 @@ class SecNumXmlParser(SecXmlParserBase):
         extractor: SecNumXmlExtractor = SecNumXmlExtractor()
         transformer: SecNumXmlTransformer = SecNumXmlTransformer()
 
-        extracted_data: SecNumExtraction = extractor.extract(adsh, data)
-        transformed_data: SecNumTransformed = transformer.transform(adsh, extracted_data)
+        extracted_data: SecNumExtraction = extractor.extract(data=data)
+        transformed_data: SecNumTransformed = transformer.transform(data=extracted_data)
 
         df = self._read_tags(adsh, transformed_data)
         return df, []
@@ -88,4 +87,4 @@ if __name__ == "__main__":
     f.close()
 
     parser = SecNumXmlParser()
-    data, errors = parser.parse("0001078782-21-000058", xml_exp_content)
+    parsed_data, errors = parser.parse(adsh="0001078782-21-000058", data=xml_exp_content)

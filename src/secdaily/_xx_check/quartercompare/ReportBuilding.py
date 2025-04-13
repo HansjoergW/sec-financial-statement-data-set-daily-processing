@@ -203,10 +203,10 @@ class ReportBuilder:
     def _create_update_entry(
         self, compare_results: pd.DataFrame, adsh: str, fileType: str, stmt: Optional[str] = None
     ) -> UpdateMassTestV2:
-        equal_count = compare_results[compare_results._compare == "in both"].shape[0] # pylint: disable="W0212"
+        equal_count = compare_results[compare_results._compare == "in both"].shape[0]  # pylint: disable="W0212"
 
-        left_only = compare_results[compare_results._compare == "in left"] # pylint: disable="W0212"
-        right_only = compare_results[compare_results._compare == "in right"] # pylint: disable="W0212"
+        left_only = compare_results[compare_results._compare == "in left"]  # pylint: disable="W0212"
+        right_only = compare_results[compare_results._compare == "in right"]  # pylint: disable="W0212"
 
         left_only_marked_tags = set(left_only.tag.unique().tolist())
         right_only_marked_tags = set(right_only.tag.unique().tolist())
@@ -339,7 +339,7 @@ if __name__ == "__main__":
 
     workingdir = "d:/secprocessing2/"
 
-    DB(work_dir=workingdir)._create_db() # pylint: disable="W0212"
+    DB(work_dir=workingdir).create_db()  # pylint: disable="W0212"
 
     builder = ReportBuilder(year=2024, qrtr=4, workdir=workingdir, run_id=1)
     builder.report()

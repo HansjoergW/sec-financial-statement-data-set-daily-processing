@@ -18,7 +18,7 @@ class SecLabTransformLabelDetails:
 
 class SecLabXmlTransformer:
 
-    def transform(self, adsh: str, data: SecLabLabelLink) -> List[SecLabTransformLabelDetails]:
+    def transform(self, data: SecLabLabelLink) -> List[SecLabTransformLabelDetails]:
 
         us_eng_labels = [label for label in data.labels if label.lang == "en-US"]
 
@@ -27,7 +27,7 @@ class SecLabXmlTransformer:
         loc_href_map: Dict[str, str] = {loc.label: loc.href for loc in data.locs}
 
         for arc in data.arcs:
-            tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(loc_href_map.get(arc.from_entry, ""))
+            tag, version = SecPreXmlTransformer.get_version_tag_name_from_href(loc_href_map.get(arc.from_entry, ""))
             entry = SecLabTransformLabelDetails(
                 order=arc.order, tag=tag, version=version, from_entry=arc.from_entry, to_entry=arc.to_entry
             )

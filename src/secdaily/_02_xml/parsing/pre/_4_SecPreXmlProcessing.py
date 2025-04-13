@@ -113,7 +113,6 @@ class SecPreXmlDataProcessor:
 
     def _calculate_entries(
         self,
-        root_node: str,
         loc_list: List[SecPreTransformLocationDetails],
         preArc_list: List[SecPreTransformPresentationArcDetails],
     ) -> List[PresentationEntry]:
@@ -166,15 +165,11 @@ class SecPreXmlDataProcessor:
                 error_collector.append((adsh, role, str("Not a single root node found")))
                 # just log if the name gives a hint that this could be a primary statement
                 if len(stmt_canditates) > 0:
-                    logging.info(
-                        "{} / {} skipped report with role {} : {}".format(
-                            adsh, list(stmt_canditates.keys()), role, "Not a single root node found"
-                        )
-                    )
-                    print(
-                        "{} / {} skipped report with role {} : {}".format(
-                            adsh, list(stmt_canditates.keys()), role, "Not a single root node found"
-                        )
+                    logging.warning(
+                        "%s / %s skipped report with role %s : Not a single root node found",
+                        adsh,
+                        list(stmt_canditates.keys()),
+                        role,
                     )
                 continue
 
@@ -183,7 +178,7 @@ class SecPreXmlDataProcessor:
 
             try:
                 self._calculate_line_nr(root_node, preArc_list)
-                entries: List[PresentationEntry] = self._calculate_entries(root_node, loc_list, preArc_list)
+                entries: List[PresentationEntry] = self._calculate_entries(loc_list=loc_list, preArc_list=preArc_list)
 
                 report = PresentationReport(
                     adsh=adsh,  # str
@@ -197,7 +192,7 @@ class SecPreXmlDataProcessor:
                 )
                 result[idx] = report
 
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 error_collector.append((adsh, role, str(err)))
 
         return (result, error_collector)
@@ -213,7 +208,7 @@ class SecPreXmlDataProcessor:
         result: Dict[Tuple[str, int], List[PresentationReport]] = {}
 
         # ensure that a report only belongs to one stmt type
-        for idx, reportinfo in report_data.items():
+        for _, reportinfo in report_data.items():
             stmt_canditates_dict: Dict[str, StmtConfidence] = reportinfo.stmt_canditates
             stmt_canditates_keys = list(stmt_canditates_dict.keys())
             inpth = reportinfo.inpth

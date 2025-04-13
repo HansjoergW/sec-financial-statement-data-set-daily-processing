@@ -35,8 +35,7 @@ class DB(ABC):
     def get_connection(self):
         return sqlite3.connect(self.database)
 
-    def _create_db(self):
-        """ """
+    def create_db(self):
         sqlfiles = list(glob.glob(f"{DDL_PATH}/*.sql"))
 
         indexes_dict: Dict[int, str] = {}
@@ -55,8 +54,9 @@ class DB(ABC):
         for index in indexes:
             sqlfile = indexes_dict[index]
             print(f"setup db: execute {sqlfile}")
-            script = open(sqlfile, "r").read()
-            curr.executescript(script)
+            with open(sqlfile, "r", encoding="utf-8") as f:
+                script = f.read()
+                curr.executescript(script)
             conn.commit()
         conn.close()
 
@@ -90,14 +90,14 @@ class DB(ABC):
         finally:
             conn.close()
 
-    def _execute_fetchall_typed(self, sql, T) -> List[T]:
+    def _execute_fetchall_typed(self, sql, type_class: type[T]) -> List[T]:
         conn = self.get_connection()
         try:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
             c.execute(sql)
             results = c.fetchall()
-            return [T(**dict(x)) for x in results]
+            return [type_class(**dict(x)) for x in results]
         finally:
             conn.close()
 

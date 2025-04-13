@@ -29,7 +29,7 @@ class IndexProcessingDA(DB):
     def get_adsh_by_feed_file(self, feed_file_name: str) -> Set[str]:
         sql = f"""SELECT accessionNumber FROM {DB.SEC_REPORTS_TBL_NAME} where sec_feed_file == '{feed_file_name}' """
         result: List[Tuple[str]] = self._execute_fetchall(sql)
-        return set([x[0] for x in result])
+        return {x[0] for x in result}
 
     def insert_feed_info(self, df: pd.DataFrame):
         conn = self.get_connection()

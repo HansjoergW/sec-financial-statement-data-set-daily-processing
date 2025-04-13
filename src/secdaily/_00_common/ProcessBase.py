@@ -34,9 +34,9 @@ class ProcessBase:
         self.data_path = Path(self.data_dir)
         self.error_path = Path(self.error_log_dir)
 
-    def _log_error(self, adsh: str, type: str, error_list: List[ErrorEntry]):
+    def _log_error(self, adsh: str, file_type: str, error_list: List[ErrorEntry]):
         if len(error_list) > 0:
-            error_file_name = self.error_log_dir + type + "_" + adsh + ".txt"
+            error_file_name = self.error_log_dir + file_type + "_" + adsh + ".txt"
             with open(error_file_name, "w", encoding="utf-8") as f:
                 for error in error_list:
                     f.write(error.error_info + " - " + error.error + "\n")

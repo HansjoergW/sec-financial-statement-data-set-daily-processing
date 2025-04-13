@@ -109,7 +109,7 @@ class SecPreXmlExtractor:
 
         return result
 
-    def extract(self, adsh: str, data: str) -> Dict[int, SecPreExtractPresentationLink]:
+    def extract(self, data: str) -> Dict[int, SecPreExtractPresentationLink]:
         data = self._strip_file(data)
         byte_data: bytes = bytes(bytearray(data, encoding="utf-8"))
         root = etree.fromstring(byte_data, parser=None)

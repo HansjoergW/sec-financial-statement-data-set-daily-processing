@@ -15,8 +15,7 @@ from secdaily._02_xml.parsing.SecXmlParsingBase import ErrorEntry, SecXmlParserB
 class SecPreXmlParser(SecXmlParserBase):
 
     def __init__(self):
-        super(SecPreXmlParser, self).__init__("pre")
-        pass
+        super().__init__("pre")
 
     def parse(self, adsh: str, data: str) -> Tuple[pd.DataFrame, List[ErrorEntry]]:
         extractor: SecPreXmlExtractor = SecPreXmlExtractor()
@@ -24,10 +23,10 @@ class SecPreXmlParser(SecXmlParserBase):
         grouptransformer: SecPreXmlGroupTransformer = SecPreXmlGroupTransformer()
         processor: SecPreXmlDataProcessor = SecPreXmlDataProcessor()
 
-        extracted_data: Dict[int, SecPreExtractPresentationLink] = extractor.extract(adsh, data)
-        transformed_data: Dict[int, SecPreTransformPresentationDetails] = transformer.transform(adsh, extracted_data)
+        extracted_data: Dict[int, SecPreExtractPresentationLink] = extractor.extract(data=data)
+        transformed_data: Dict[int, SecPreTransformPresentationDetails] = transformer.transform(data=extracted_data)
         group_transformed_data: Dict[int, SecPreTransformPresentationDetails] = grouptransformer.grouptransform(
-            adsh, transformed_data
+            data=transformed_data
         )
 
         processed_entries: List[PresentationEntry]

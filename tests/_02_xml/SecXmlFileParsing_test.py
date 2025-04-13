@@ -9,11 +9,12 @@ from secdaily._02_xml.SecXmlFileParsing import SecXmlParser
 scriptpath = os.path.realpath(__file__ + "/..")
 folder = scriptpath + "/tmp"
 
+
 @pytest.fixture(scope="module")
 def dbmgr():
     shutil.rmtree(folder, ignore_errors=True)
     new_dbmgr = XmlFileParsingDA(work_dir=folder)
-    new_dbmgr._create_db()
+    new_dbmgr.create_db()
     new_dbmgr.create_test_data()
     new_dbmgr.create_processing_test_data()
 
@@ -22,8 +23,7 @@ def dbmgr():
 
 
 def test_parse_num_xml(dbmgr: XmlFileParsingDA):
-    parser = SecXmlParser(dbmanager=dbmgr,
-                          data_dir=folder + "/data/")
+    parser = SecXmlParser(dbmanager=dbmgr, data_dir=folder + "/data/")
     parser.parseNumFiles()
 
     files = glob.glob(folder + "/data/*/*num.csv.zip")
@@ -42,4 +42,3 @@ def test_parse_pre_xml(dbmgr: XmlFileParsingDA):
 
     unparsed_pre_files = dbmgr.find_unparsed_preFiles()
     assert 0 == len(unparsed_pre_files)
-

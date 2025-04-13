@@ -84,7 +84,7 @@ class IndexPostProcessingDA(DB):
             for file in xbrlfiles
         ]
 
-        sql = """UPDATE {} SET  period = ?,
+        sql = f"""UPDATE {DB.SEC_REPORTS_TBL_NAME} SET  period = ?,
                                 fiscalYearEnd = ?,
                                 xbrlInsUrl = ?, insLastChange = ?, insSize = ?,
                                 xbrlCalUrl = ?, calLastChange = ?, calSize = ?,
@@ -92,9 +92,7 @@ class IndexPostProcessingDA(DB):
                                 xbrlDefUrl = ?, defLastChange = ?, defSize = ?,
                                 xbrlPreUrl = ?, preLastChange = ?, preSize = ?,
                                 xbrlZipUrl = ?, zipLastChange = ?, zipSize = ?
-                 WHERE accessionNumber = ? and sec_feed_file = ?""".format(
-            DB.SEC_REPORTS_TBL_NAME
-        )
+                 WHERE accessionNumber = ? and sec_feed_file = ?"""
         self._execute_many(sql, update_data)
 
     def find_duplicated_adsh(self) -> List[str]:
@@ -112,7 +110,7 @@ class IndexPostProcessingDA(DB):
                   WHERE accessionNumber= '{adsh}' and status is null order by sec_feed_file"""
         result: List[Tuple[str]] = self._execute_fetchall(sql)
 
-        update_sql = """UPDATE {} SET status = 'duplicated' WHERE accessionNumber = ? and sec_feed_file = ? """.format(
-            DB.SEC_REPORTS_TBL_NAME
-        )
+        update_sql = f"""UPDATE {DB.SEC_REPORTS_TBL_NAME}
+                         SET status = 'duplicated'
+                         WHERE accessionNumber = ? and sec_feed_file = ? """
         self._execute_many(update_sql, result[1:])

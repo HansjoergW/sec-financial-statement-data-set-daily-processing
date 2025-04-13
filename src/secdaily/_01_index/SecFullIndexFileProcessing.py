@@ -84,7 +84,7 @@ class SecFullIndexFileProcessor:
     def _get_file_for_qrtr(self, year, qrtr):
         try:
             return self.urldownloader.get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logging.warning("failed to get content for %d/%d: %s", year, qrtr, e)
             return None
 
@@ -127,9 +127,8 @@ class SecFullIndexFileProcessor:
                 if entry_df.iloc[0].state == last_date_received:
                     logging.info("- already processed %d/%d -> skip ", qrtr, year)
                     continue
-                else:
-                    logging.info("- updates for %d/%d ", qrtr, year)
-                    self.dbmanager.update_fullindex_file(year, qrtr, self.processdate)
+                logging.info("- updates for %d/%d ", qrtr, year)
+                self.dbmanager.update_fullindex_file(year, qrtr, self.processdate)
             else:
                 logging.info("- new file for %d/%d ", qrtr, year)
                 self.dbmanager.insert_fullindex_file(year, qrtr, self.processdate)
@@ -172,7 +171,7 @@ class SecFullIndexFileProcessor:
             new_entries_save_df.drop_duplicates("accessionNumber", inplace=True)
             new_entries_save_df.set_index("accessionNumber", inplace=True)
 
-            logging.info(f"   read entries: {len(new_entries_save_df)}")
+            logging.info("   read entries: %d", len(new_entries_save_df))
 
             # updaten -> status table
             self.dbmanager.insert_feed_info(new_entries_save_df)
@@ -191,7 +190,7 @@ if __name__ == "__main__":
     folder = "./tmp"
     try:
         new_dbmgr = IndexProcessingDA(work_dir=folder)
-        new_dbmgr._create_db()
+        new_dbmgr.create_db()
         processor = SecFullIndexFileProcessor(new_dbmgr, 2022, 1)
         processor.process()
     finally:

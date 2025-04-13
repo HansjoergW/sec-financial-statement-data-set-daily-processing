@@ -11,7 +11,7 @@ from secdaily._02_xml.parsing.SecXmlParsingBase import ErrorEntry, SecXmlParserB
 class SecLabXmlParser(SecXmlParserBase):
 
     def __init__(self):
-        super(SecLabXmlParser, self).__init__("lab")
+        super().__init__("lab")
 
     def parse(self, adsh: str, data: str) -> Tuple[pd.DataFrame, List[ErrorEntry]]:
 
@@ -19,8 +19,8 @@ class SecLabXmlParser(SecXmlParserBase):
         transformer: SecLabXmlTransformer = SecLabXmlTransformer()
         processor: SecLabXmlDataProcessor = SecLabXmlDataProcessor()
 
-        extracted_data: SecLabLabelLink = extractor.extract(adsh, data)
-        transformed_data: List[SecLabTransformLabelDetails] = transformer.transform(adsh, extracted_data)
+        extracted_data: SecLabLabelLink = extractor.extract(data=data)
+        transformed_data: List[SecLabTransformLabelDetails] = transformer.transform(data=extracted_data)
         processed_entries: List[LabelEntry]
         collected_errors: List[Tuple[str, str, str]]
         processed_entries, collected_errors = processor.process(adsh, transformed_data)

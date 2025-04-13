@@ -18,7 +18,7 @@ def test_read():
     preparer = SecPreXmlExtractor()
     with open(testprexml, "r", encoding="utf-8") as f:
         content: str = f.read()
-        data: Dict[int, SecPreExtractPresentationLink] = preparer.extract("", content)
+        data: Dict[int, SecPreExtractPresentationLink] = preparer.extract(data=content)
         print(len(data))
         print(data)
 

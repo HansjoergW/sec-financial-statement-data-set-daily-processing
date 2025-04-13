@@ -106,7 +106,7 @@ class SecLabXmlExtractor:
         label_details = SecLabLabelLink(labels=labels, arcs=arcs, locs=locs)
         return label_details
 
-    def extract(self, adsh: str, data: str) -> SecLabLabelLink:
+    def extract(self, data: str) -> SecLabLabelLink:
         data = self._strip_file(data)
         byte_data: bytes = bytes(bytearray(data, encoding="utf-8"))
         root = etree.fromstring(byte_data, parser=None)

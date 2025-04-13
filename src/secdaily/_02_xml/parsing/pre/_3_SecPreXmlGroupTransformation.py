@@ -1,3 +1,8 @@
+"""
+Transforms the content on a "group" basis. Prepares data so that in the following processing step the
+statement type (BS, IS, CF, ...) can be evaluated.
+"""
+
 import copy
 from typing import Dict, List, Tuple
 
@@ -6,11 +11,6 @@ from secdaily._02_xml.parsing.pre._2_SecPreXmlTransformation import (
     SecPreTransformPresentationArcDetails,
     SecPreTransformPresentationDetails,
 )
-
-"""
-Transforms the content on a "group" basis. Prepares data so that in the following processing step the
-statement type (BS, IS, CF, ...) can be evaluated.
-"""
 
 
 class SecPreXmlGroupTransformer:
@@ -114,10 +114,12 @@ class SecPreXmlGroupTransformer:
 
         kick_out_list: List[str] = []
 
-        for from_entry in from_list:
-            count = sum(map(lambda x: x == from_entry, to_list))
+        # Find nodes that appear multiple times as child nodes (in to_list).
+        # These indicate ambiguous parent-child relationships that need to be removed.
+        for from_list_entry in from_list:
+            count = sum(1 for x in to_list if x == from_list_entry)
             if count > 1:
-                kick_out_list.append(from_entry)
+                kick_out_list.append(from_list_entry)
 
         new_entries_found: bool = False
 
@@ -188,7 +190,7 @@ class SecPreXmlGroupTransformer:
         return root_nodes[0]
 
     def grouptransform(
-        self, adsh: str, data: Dict[int, SecPreTransformPresentationDetails]
+        self, data: Dict[int, SecPreTransformPresentationDetails]
     ) -> Dict[int, SecPreTransformPresentationDetails]:
 
         result: Dict[int, SecPreTransformPresentationDetails] = {}

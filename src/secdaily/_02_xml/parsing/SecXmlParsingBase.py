@@ -8,8 +8,8 @@ from secdaily._00_common.ProcessBase import ErrorEntry
 
 class SecXmlParserBase(ABC):
 
-    def __init__(self, type: str):
-        self.type = type
+    def __init__(self, parser_type: str):
+        self.type = parser_type
 
     def get_type(self):
         return self.type

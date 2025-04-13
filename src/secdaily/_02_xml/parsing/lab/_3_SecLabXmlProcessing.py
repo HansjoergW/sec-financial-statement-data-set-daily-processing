@@ -21,12 +21,12 @@ class SecLabXmlDataProcessor:
         error_collector: List[Tuple[str, str, str]] = []
 
         for entry in data:
-            for type, text in entry.labels.items():
-                key = f"{entry.tag}#{entry.version}#{type}"
+            for label_type, text in entry.labels.items():
+                key = f"{entry.tag}#{entry.version}#{label_type}"
                 try:
                     label_entry = LabelEntry(key=key, to_entry=entry.to_entry, label=text)
                     result.append(label_entry)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     error_collector.append((adsh, key, str(e)))
 
         return result, error_collector

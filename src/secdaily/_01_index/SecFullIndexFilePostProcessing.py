@@ -113,7 +113,7 @@ class SecFullIndexFilePostProcessor:
                 xbrlZip=relevant_entries.get("xbrlzip", XbrlFile.default()),
             )
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.warning("failed to process %s with %s", rowdata.accessionNumber, e)
             return XbrlFiles(
                 rowdata.accessionNumber, rowdata.sec_feed_file, None, None, None, None, None, None, None, None

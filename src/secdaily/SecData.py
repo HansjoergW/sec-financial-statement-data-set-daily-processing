@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     from secdaily._00_common.DBBase import DB
 
-    DB(workdir_default)._create_db()
+    DB(workdir_default).create_db()
 
     orchestrator = SecDataOrchestrator(
         workdir=workdir_default,

@@ -42,11 +42,11 @@ class SecPreXmlTransformer:
     digit_ending_label_regex = re.compile(r"_\d*$")
 
     @staticmethod
-    def _get_version_tag_name_from_href(href: str) -> Tuple[str, str]:
+    def get_version_tag_name_from_href(href: str) -> Tuple[str, str]:
         # Attention: extend testcases if adaptions should be necessary.
 
         # in the href-definition, the first part indicates wich namespace and version it, if they start with http:
-        # eg: xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member"
+        # eg: xlink:href="http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member" pylint: disable=line-too-long
         # if it is a company namespace, then there is no http:
         # eg: xlink:href="pki-20210103.xsd#pki_AccountingStandardsUpdate_201616Member"
         # if it is a "company", then the version of the tag is the adsh number of the report
@@ -76,7 +76,7 @@ class SecPreXmlTransformer:
     ) -> List[SecPreTransformLocationDetails]:
         result: List[SecPreTransformLocationDetails] = []
         for extract_loc in extract_loc_list:
-            tag, version = SecPreXmlTransformer._get_version_tag_name_from_href(extract_loc.href)
+            tag, version = SecPreXmlTransformer.get_version_tag_name_from_href(extract_loc.href)
             transform_loc = SecPreTransformLocationDetails(
                 label=extract_loc.label, tag=tag, version=version, digit_ending=False
             )
@@ -116,7 +116,7 @@ class SecPreXmlTransformer:
         return result
 
     def transform(
-        self, adsh: str, data: Dict[int, SecPreExtractPresentationLink]
+        self, data: Dict[int, SecPreExtractPresentationLink]
     ) -> Dict[int, SecPreTransformPresentationDetails]:
 
         result: Dict[int, SecPreTransformPresentationDetails] = {}

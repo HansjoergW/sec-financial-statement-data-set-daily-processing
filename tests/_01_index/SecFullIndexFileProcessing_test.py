@@ -12,14 +12,12 @@ folder = scriptpath + "/tmp"
 @pytest.fixture(scope="module")
 def dbmgr():
     new_dbmgr = IndexProcessingDA(work_dir=folder)
-    new_dbmgr._create_db()
+    new_dbmgr.create_db()
     yield new_dbmgr
     shutil.rmtree(folder)
 
 
 def test_init(dbmgr: IndexProcessingDA):
-    processor = SecFullIndexFileProcessor(dbmanager=dbmgr,
-                                          start_year=2022,
-                                          start_qrtr=1,
-                                          feed_dir=folder,
-                                          urldownloader=None)
+    processor = SecFullIndexFileProcessor(
+        dbmanager=dbmgr, start_year=2022, start_qrtr=1, feed_dir=folder, urldownloader=None
+    )

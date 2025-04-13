@@ -120,7 +120,7 @@ class ParallelExecutor(Generic[IT, PT, OT]):
         # we retry as long as we were able to process additional entries with in the while loop.
         while (last_missing is None) or (last_missing > len(missing)):
             last_missing = len(missing)
-            logging.info(f"{self.intend}missing entries {len(missing)}")
+            logging.info("%smissing entries %d", self.intend, len(missing))
 
             # break up the list of missing entries in chunks and process every chunk in parallel
             chunk_entries = self.chunksize
@@ -140,7 +140,7 @@ class ParallelExecutor(Generic[IT, PT, OT]):
 
                 # post process the chunk and add the result to the result_list. it is olso ok to return nothing
                 result_list.append(self.post_process_chunk_function(processed))
-                logging.info(f"{self.intend}commited chunk: {i}")
+                logging.info("%scommited chunk: %d", self.intend, i)
 
             # call get_entries_function again to check whether there have been entries that couldn't be processed
             missing = self.get_entries_function()
@@ -168,11 +168,11 @@ if __name__ == "__main__":
                 return self.data_list
             return []
 
-        def process_element(self, input: str) -> str:
-            return "0" + str(input)
+        def process_element(self, input_str: str) -> str:
+            return "0" + str(input_str)
 
-        def post_process(self, input: List[str]) -> List[str]:
-            return input
+        def post_process(self, input_str: List[str]) -> List[str]:
+            return input_str
 
         def process(self):
             executor = ParallelExecutor[str, str, str](max_calls_per_sec=250)

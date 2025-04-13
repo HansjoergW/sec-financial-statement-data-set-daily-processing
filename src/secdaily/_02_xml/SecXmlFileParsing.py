@@ -74,11 +74,11 @@ class SecXmlParser(ProcessBase):
                 labParseState="parsed:" + str(len(df)),
             )
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
-                type=f"parse_failed_{parser.get_type()}",
+                file_type=f"parse_failed_{parser.get_type()}",
                 error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
             )
             return UpdateLabParsing(
@@ -122,11 +122,11 @@ class SecXmlParser(ProcessBase):
                 preParseState="parsed:" + str(len(df)),
             )
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
-                type=f"parse_failed_{parser.get_type()}",
+                file_type=f"parse_failed_{parser.get_type()}",
                 error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
             )
             return UpdatePreParsing(
@@ -186,11 +186,11 @@ class SecXmlParser(ProcessBase):
                 fiscalYearEnd=fiscalYearEnd,
             )
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
-                type=f"parse_failed_{parser.get_type()}",
+                file_type=f"parse_failed_{parser.get_type()}",
                 error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.file, error=traceback.format_exc())],
             )
             return UpdateNumParsing(

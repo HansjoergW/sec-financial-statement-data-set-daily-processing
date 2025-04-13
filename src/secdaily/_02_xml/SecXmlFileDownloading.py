@@ -67,11 +67,11 @@ class SecXmlFileDownloader(ProcessBase):
             self.urldownloader.download_url_to_file(data.url, str(filepath), size)
             data.file = str(filepath)
             return data
-        except Exception as e:
-            logging.warning("download for {} from {} failed: {}", data.accessionNumber, data.url, e)
+        except Exception as e: # pylint: disable=broad-except
+            logging.warning("download for %s from %s failed: %s", data.accessionNumber, data.url, e)
             self._log_error(
                 adsh=data.accessionNumber,
-                type=f"download_failed_{data.type}",
+                file_type=f"download_failed_{data.type}",
                 error_list=[ErrorEntry(adsh=data.accessionNumber, error_info=data.url, error=traceback.format_exc())],
             )
 

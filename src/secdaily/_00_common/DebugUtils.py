@@ -155,7 +155,7 @@ class ReparseTool:
         executor = ParallelExecutor[UnparsedFile, UpdatePreParsing, type(None)]()  # no limitation in speed
 
         executor.set_get_entries_function(select_funct)
-        executor.set_process_element_function(xmlParser._parse_pre_file)
+        executor.set_process_element_function(xmlParser._parse_pre_file) # pylint: disable=protected-access
         executor.set_post_process_chunk_function(update_function)
 
         executor.execute()
