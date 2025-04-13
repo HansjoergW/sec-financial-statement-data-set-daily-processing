@@ -66,6 +66,8 @@
       [ok] ensure path of zipfiles is full path
 
 20. [] activate project / create official 0.1 release
+      [x] fix linting problems
+      [] ensure existing tests run
       [] activate build pipeline with linting and tests
       [] activate deployment to pypi
       [] adapt readme / add limitations

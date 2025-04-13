@@ -24,7 +24,7 @@ def test_transform():
 def test_get_version_tag_name_from_href():
     testcases = [
         {
-            "href": "http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member",
+            "href": "http://xbrl.fasb.org/us-gaap/2020/elts/us-gaap-2020-01-31.xsd#us-gaap_AccountingStandardsUpdate201802Member", # pylint: disable=line-too-long
             "version": "us-gaap/2020",
             "tag": "AccountingStandardsUpdate201802Member",
         },

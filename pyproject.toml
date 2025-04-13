@@ -41,7 +41,8 @@ fix = true
 [tool.black]
 line-length = 120
 
-[tool.pylint.messages_control]
+[tool.pylint.'MAIN']
+# Base settings that apply to everything
 disable = [
     "C0111",  # missing-docstring
     "C0103",  # invalid-name
@@ -57,6 +58,16 @@ disable = [
     "R0915",  # too-many-statements
     "R0917",  # too-many-positional-arguments
     "W0511",  # fixme
+]
+
+[tool.pylint.'tests/*']
+# More relaxed settings for test files
+disable = [
+    "R0801",  # duplicate-code
+    "W0212",  # protected-access
+    "W0612",  # unused-variable (common in pytest with fixtures)
+    "W0613",  # unused-argument (common in pytest with fixtures)
+    "W0621",  # redefined-outer-name (common in pytest with fixtures)
 ]
 
 extension-pkg-allow-list = [

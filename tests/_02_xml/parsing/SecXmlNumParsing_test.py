@@ -24,12 +24,3 @@ def test_parse():
     assert fye == '0926'
     assert 578 == len(df_clean)
     assert 4 == len(df_clean.columns)
-
-
-
-
-
-
-
-
-

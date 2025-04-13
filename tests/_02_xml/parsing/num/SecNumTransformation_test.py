@@ -1,3 +1,4 @@
+# pylint: disable="W0212"
 import os
 
 from secdaily._02_xml.parsing.num._2_SecNumXmlTransformation import SecNumXmlTransformer
@@ -41,5 +42,3 @@ def test_clean_member():
     assert parser._clean_member_domain_from_coreg("xyMemberDomainab") == "xyMemberDomainab"
     assert parser._clean_member_domain_from_coreg("xyMemberMember") == "xyMember"
     assert parser._clean_member_domain_from_coreg("xyDomainDomain") == "xyDomain"
-
-
