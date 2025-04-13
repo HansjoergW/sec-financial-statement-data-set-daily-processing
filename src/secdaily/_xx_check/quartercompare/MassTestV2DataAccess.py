@@ -216,6 +216,9 @@ class QuarterFileAccess:
 
     def __init__(self, quarter_file: str):
         self.quarter_file = quarter_file
+        self.num_df: Optional[pd.DataFrame] = None
+        self.pre_df: Optional[pd.DataFrame] = None
+        self.sub_df: Optional[pd.DataFrame] = None
 
     def load_data(self):
         self.num_df = read_file_from_zip(self.quarter_file, "num.txt")

@@ -53,6 +53,8 @@ disable = [
     "R0903",  # too-few-public-methods
     "R0912",  # too-many-branches
     "R0913",  # too-many-arguments
+    "R0914",  # too-many-locals
+    "R0915",  # too-many-statements
     "R0917",  # too-many-positional-arguments
     "W0511",  # fixme
 ]

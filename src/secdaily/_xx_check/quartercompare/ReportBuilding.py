@@ -54,6 +54,9 @@ class ReportBuilder:
         self.pre_both_adshs: Set[str] = set()
         self.num_both_adshs: Set[str] = set()
 
+        self.daily_num_df: Optional[pd.DataFrame] = None
+        self.daily_pre_df: Optional[pd.DataFrame] = None
+
     def _read_into_dataframes(self, files: List[str], dtypes: Dict[str, Any]) -> pd.DataFrame:
         # Use a list comprehension to read each CSV file into a DataFrame
         df_list = [pd.read_csv(file, delimiter="\t", dtype=dtypes) for file in files]
@@ -107,7 +110,7 @@ class ReportBuilder:
         self.pre_daily_adshs = set(self.daily_pre_df.adsh.unique().tolist())
         self.pre_both_adshs = self.pre_quarter_adshs & self.pre_daily_adshs
 
-    def _create_adsh_only_entries_quarter(self, adshs: Set[str], type: str) -> List[UpdateMassTestV2]:
+    def _create_adsh_only_entries_quarter(self, adshs: Set[str], fileType: str) -> List[UpdateMassTestV2]:
         update_list = []
         for adsh in adshs:
             update_list.append(
@@ -115,17 +118,17 @@ class ReportBuilder:
                     runId=self.run_id,
                     adsh=adsh,
                     qtr=self.qrtr_str,
-                    fileType=type,
+                    fileType=fileType,
                     quarterFile=self.quarter_file,
                 )
             )
 
         return update_list
 
-    def _create_adsh_only_entries_daily(self, adshs: Set[str], type: str) -> List[UpdateMassTestV2]:
+    def _create_adsh_only_entries_daily(self, adshs: Set[str], fileType: str) -> List[UpdateMassTestV2]:
         update_list = []
         for adsh in adshs:
-            if type == "num":
+            if fileType == "num":
                 daily_file = self.adsh_daily_file_map[adsh].numFile
             else:
                 daily_file = self.adsh_daily_file_map[adsh].preFile
@@ -135,7 +138,7 @@ class ReportBuilder:
                     runId=self.run_id,
                     adsh=adsh,
                     qtr=self.qrtr_str,
-                    fileType=type,
+                    fileType=fileType,
                     dailyFile=daily_file,
                 )
             )
@@ -198,12 +201,12 @@ class ReportBuilder:
         return result_df
 
     def _create_update_entry(
-        self, compare_results: pd.DataFrame, adsh: str, type: str, stmt: Optional[str] = None
+        self, compare_results: pd.DataFrame, adsh: str, fileType: str, stmt: Optional[str] = None
     ) -> UpdateMassTestV2:
-        equal_count = compare_results[compare_results._compare == "in both"].shape[0]
+        equal_count = compare_results[compare_results._compare == "in both"].shape[0] # pylint: disable="W0212"
 
-        left_only = compare_results[compare_results._compare == "in left"]
-        right_only = compare_results[compare_results._compare == "in right"]
+        left_only = compare_results[compare_results._compare == "in left"] # pylint: disable="W0212"
+        right_only = compare_results[compare_results._compare == "in right"] # pylint: disable="W0212"
 
         left_only_marked_tags = set(left_only.tag.unique().tolist())
         right_only_marked_tags = set(right_only.tag.unique().tolist())
@@ -220,7 +223,7 @@ class ReportBuilder:
             runId=self.run_id,
             adsh=adsh,
             qtr=self.qrtr_str,
-            fileType=type,
+            fileType=fileType,
             stmt=stmt,
             countMatching=equal_count,
             countUnequal=unequal_count,
@@ -259,7 +262,7 @@ class ReportBuilder:
                 daily_stmt_df = daily_df[daily_df.stmt == stmt]
                 compare_results = self._compare_dataframes(quarter_stmt_df[cols], daily_stmt_df[cols])
                 updated_entry = self._create_update_entry(
-                    compare_results=compare_results, adsh=adsh, stmt=stmt, type="pre"
+                    compare_results=compare_results, adsh=adsh, stmt=stmt, fileType="pre"
                 )
                 update_list.append(updated_entry)
         return update_list
@@ -287,7 +290,7 @@ class ReportBuilder:
             quarter_df = self.qrtr_file_access.num_df[self.qrtr_file_access.num_df.adsh == adsh]
             daily_df = self.daily_num_df[self.daily_num_df.adsh == adsh]
             compare_results = self._compare_dataframes(quarter_df[cols], daily_df[cols])
-            updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, type="num")
+            updated_entry = self._create_update_entry(compare_results=compare_results, adsh=adsh, fileType="num")
             update_list.append(updated_entry)
         return update_list
 
@@ -334,11 +337,11 @@ class ReportBuilder:
 if __name__ == "__main__":
     from secdaily._00_common.DBBase import DB
 
-    workdir = "d:/secprocessing2/"
+    workingdir = "d:/secprocessing2/"
 
-    DB(workdir)._create_db()
+    DB(work_dir=workingdir)._create_db() # pylint: disable="W0212"
 
-    builder = ReportBuilder(year=2024, qrtr=4, workdir=workdir, run_id=1)
+    builder = ReportBuilder(year=2024, qrtr=4, workdir=workingdir, run_id=1)
     builder.report()
     # builder._create_report_data()
     # builder.report_single("0001477932-24-008123") # labels sind nicht gesetzt..

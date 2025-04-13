@@ -137,7 +137,9 @@ class DailyZipCreator(ProcessBase):
             (sub_entries.period_day == 16) & sub_entries.period_month.isin([1, 3, 5, 7, 8, 10, 12])
         )
         sub_entries.loc[mask, "period_date"] = sub_entries.period_date - pd.DateOffset(months=1)  # type: ignore
-        sub_entries["period"] = sub_entries.period_date.dt.to_period("M").dt.to_timestamp("M").dt.strftime("%Y%m%d")  # type: ignore
+        sub_entries["period"] = (
+            sub_entries.period_date.dt.to_period("M").dt.to_timestamp("M").dt.strftime("%Y%m%d")
+        )  # type: ignore
         # Nach Korrektur neu setzen
         sub_entries["period_date"] = pd.to_datetime(sub_entries.period, format="%Y%m%d")
 
@@ -174,8 +176,9 @@ class DailyZipCreator(ProcessBase):
 
         # fy_real -> year when the next fiscal year ends
         sub_entries.loc[sub_entries.is_fye_same_year, "fy_real"] = sub_entries.period_year
-        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = \
-            sub_entries.period_year + 1  # noqa: E712
+        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = (  # noqa: E712 pylint: disable=C0121
+            sub_entries.period_year + 1
+        )
 
         sub_entries.fy_real = sub_entries.fy_real.astype(int)
 
@@ -276,12 +279,10 @@ class DailyZipCreator(ProcessBase):
 
         return zipfile_path
 
-    def _create_daily_content(
-        self, date: str, entries: pd.DataFrame, entries_sub_df: pd.DataFrame
-    ) -> Tuple[str, str, str]:
+    def _create_daily_content(self, entries_df: pd.DataFrame, entries_sub_df: pd.DataFrame) -> Tuple[str, str, str]:
         sub_content = entries_sub_df.to_csv(sep="\t", header=True, index=False)
-        pre_content = self._read_csvfiles(entries.preFormattedFile.tolist(), DTYPES_PRE)
-        num_content = self._read_csvfiles(entries.numFormattedFile.tolist(), DTYPES_NUM)
+        pre_content = self._read_csvfiles(entries_df.preFormattedFile.tolist(), DTYPES_PRE)
+        num_content = self._read_csvfiles(entries_df.numFormattedFile.tolist(), DTYPES_NUM)
         return sub_content, pre_content, num_content
 
     def _process_date(self, data: Tuple[str, pd.DataFrame, pd.DataFrame]):
@@ -291,34 +292,35 @@ class DailyZipCreator(ProcessBase):
 
         try:
             adshs = group_df.accessionNumber.tolist()
-            sub, pre, num = self._create_daily_content(filing_date, group_df, entries_sub[entries_sub.adsh.isin(adshs)])
+            sub, pre, num = self._create_daily_content(
+                entries_df=group_df, entries_sub_df=entries_sub[entries_sub.adsh.isin(adshs)]
+            )
             zipfile_path = self._store_to_zip(filing_date, sub, pre, num)
             update_data = [
                 UpdateDailyZip(accessionNumber=x, dailyZipFile=zipfile_path, processZipDate=self.processdate)
                 for x in adshs
             ]
             self.dbmanager.updated_ziped_entries(update_data)
-        except Exception as e:
-            logging.warning(f"failed to process {filing_date}", e)
+        except Exception as e:  # pylint: disable=broad-except
+            logging.warning("failed to process %s / %s", filing_date, e)
 
     def process(self):
         logging.info("Daily zip creating")
 
-        pool = Pool(8)
+        with Pool(8) as pool:
+            entries_ready = self._read_ready_entries()
+            adsh_and_fye_to_process = entries_ready[["accessionNumber", "fiscalYearEnd"]].copy()
+            entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
+            grouped = entries_ready.groupby("filingDate")
 
-        entries_ready = self._read_ready_entries()
-        adsh_and_fye_to_process = entries_ready[["accessionNumber", "fiscalYearEnd"]].copy()
-        entries_sub = self._read_feed_entries_for_adshs(adsh_and_fye_to_process).copy()
-        grouped = entries_ready.groupby("filingDate")
+            logging.info("found %d reports in %d dates to process", len(adsh_and_fye_to_process), len(grouped))
 
-        logging.info("found {} reports in {} dates to process".format(len(adsh_and_fye_to_process), len(grouped)))
-
-        # entry[0] is the date
-        # entry[1] is the group as dataframe
-        param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [
-            (str(entry[0]), entry[1], entries_sub) for entry in grouped
-        ]
-        pool.map(self._process_date, param_list)
+            # entry[0] is the date
+            # entry[1] is the group as dataframe
+            param_list: List[Tuple[str, pd.DataFrame, pd.DataFrame]] = [
+                (str(entry[0]), entry[1], entries_sub) for entry in grouped
+            ]
+            pool.map(self._process_date, param_list)
 
 
 if __name__ == "__main__":

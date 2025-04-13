@@ -22,7 +22,7 @@ class IncompleteMonth:
 class DailyZipCreatingDA(DB):
 
     def read_all_copied(self) -> pd.DataFrame:
-        sql = """SELECT * FROM {} WHERE status is 'copied' """.format(DB.SEC_REPORTS_TBL_NAME)
+        sql = f"""SELECT * FROM {DB.SEC_REPORTS_TBL_NAME} WHERE status is 'copied' """
         return self._execute_read_as_df(sql)
 
     def find_ready_to_zip_adshs(self) -> pd.DataFrame:
@@ -52,7 +52,6 @@ class DailyZipCreatingDA(DB):
     def updated_ziped_entries(self, update_list: List[UpdateDailyZip]):
         update_data = [(x.dailyZipFile, x.processZipDate, x.accessionNumber) for x in update_list]
 
-        sql = """UPDATE {} SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?""".format(
-            DB.SEC_REPORT_PROCESSING_TBL_NAME
-        )
+        sql = f"""UPDATE {DB.SEC_REPORT_PROCESSING_TBL_NAME}
+                  SET dailyZipFile = ?, processZipDate = ? WHERE accessionNumber = ?"""
         self._execute_many(sql, update_data)

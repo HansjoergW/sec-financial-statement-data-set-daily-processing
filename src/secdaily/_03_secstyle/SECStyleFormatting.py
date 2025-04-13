@@ -62,8 +62,8 @@ class SECStyleFormatter(ProcessBase):
                 formatState="formatted",
             )
 
-        except Exception as e:
-            logging.exception("failed to parse data for adsh: " + adsh, e)
+        except Exception as e:  # pylint: disable=broad-except
+            logging.exception("failed to parse data for adsh: %s / %s", adsh, e)
             self._log_error(
                 adsh=data.accessionNumber,
                 type="parse_failed_format_prenum",
