@@ -19,8 +19,3 @@ def test_parse():
     assert 1236 == len(df)
     assert 12 == len(df.columns)
     assert 0 == len(errorlist)
-
-    df_clean, fye = parser.clean_for_financial_statement_dataset(df, "")
-    assert fye == '0926'
-    assert 578 == len(df_clean)
-    assert 4 == len(df_clean.columns)

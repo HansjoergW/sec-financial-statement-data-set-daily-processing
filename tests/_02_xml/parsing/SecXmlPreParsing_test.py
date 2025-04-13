@@ -4,9 +4,9 @@ from secdaily._02_xml.parsing.SecXmlPreParsing import SecPreXmlParser
 
 scriptpath = os.path.realpath(__file__ + "/../..")
 
-xml_test_data_file = scriptpath + '/data/test_pre.xml'
-xml_expected_stripped_file = scriptpath + '/data/test_pre_exp.xml'
-xml_unsorted_loc_file = scriptpath + '/data/test_pre_unsorted_loc.xml'
+xml_test_data_file = scriptpath + "/data/test_pre.xml"
+xml_expected_stripped_file = scriptpath + "/data/test_pre_exp.xml"
+xml_unsorted_loc_file = scriptpath + "/data/test_pre_unsorted_loc.xml"
 xml_complete_pre_file = scriptpath + "/data/aapl-20200926_pre.xml"
 
 
@@ -28,10 +28,8 @@ def test_clean_for_pure_pre():
     f.close()
 
     parser = SecPreXmlParser()
-    df, errorlist = parser.parse("", xml_exp_content)
-    df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
-
-    assert 45 == len(df_clean)
+    df, _ = parser.parse("", xml_exp_content)
+    assert 45 == len(df)
 
 
 def test_complete_file_parse():
@@ -39,7 +37,7 @@ def test_complete_file_parse():
 
     with open(xml_complete_pre_file, "r", encoding="utf-8") as f:
         xml_content = f.read()
-        df, errorlist = parser.parse("", xml_content)
+        df, _ = parser.parse("", xml_content)
         print(len(df))
 
 
@@ -49,10 +47,7 @@ def test_unsorted_loc_file_parse():
     f.close()
 
     parser = SecPreXmlParser()
-    df, errorlist = parser.parse("", xml_exp_content)
-    df_clean = parser.clean_for_financial_statement_dataset(df, "an_adsh")
+    df, _ = parser.parse("", xml_exp_content)
 
-    assert len(df_clean[df_clean.index.isin(["IS"], level="stmt")]) > 0
-
-
-
+    assert len(df) == 27
+    assert len(df[df.stmt == "IS"]) == 27
