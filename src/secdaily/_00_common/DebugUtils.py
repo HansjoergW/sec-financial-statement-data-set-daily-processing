@@ -142,7 +142,8 @@ class ReparseTool:
         )
         pre_xml_files_info: List[Tuple[str, str]] = [(x[0], x[2]) for x in xml_files_info]  # adsh and preXmlFile
 
-        select_funct = lambda: pre_xml_files_info
+        def select_funct():
+            return pre_xml_files_info
 
         def update_function(data: List[UpdatePreParsing]):
             for entry in data:

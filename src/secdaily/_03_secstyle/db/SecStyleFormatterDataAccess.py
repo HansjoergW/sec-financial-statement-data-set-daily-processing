@@ -34,7 +34,8 @@ class UpdateStyleFormatting:
 class SecStyleFormatterDA(DB):
 
     def find_unformatted_reports(self) -> List[UnformattedReport]:
-        sql = f"""SELECT accessionNumber, csvPreFile as preFile, csvNumFile as numFile, csvLabFile as labFile, filingDay, filingMonth, filingYear
+        sql = f"""SELECT accessionNumber, csvPreFile as preFile, csvNumFile as numFile, csvLabFile as labFile,
+                         filingDay, filingMonth, filingYear
                   FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
                      WHERE     numParseState is not NULL and preParseState is not NULL and labParseState is not NULL
                            and csvNumFile is not NULL and csvPreFile is not NULL and csvLabFile is not NULL

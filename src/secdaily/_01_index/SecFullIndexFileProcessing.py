@@ -84,7 +84,8 @@ class SecFullIndexFileProcessor:
     def _get_file_for_qrtr(self, year, qrtr):
         try:
             return self.urldownloader.get_url_content(f"{self.full_index_root_url}{year}/QTR{qrtr}/xbrl.idx")
-        except:
+        except Exception as e:
+            logging.warning("failed to get content for %d/%d: %s", year, qrtr, e)
             return None
 
     def get_next_index_file_iter(self):

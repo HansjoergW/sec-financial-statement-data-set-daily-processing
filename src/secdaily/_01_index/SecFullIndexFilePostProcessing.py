@@ -6,7 +6,6 @@ from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.ParallelExecution import ParallelExecutor
 from secdaily._01_index.db.IndexPostProcessingDataAccess import (
     BasicFeedData,
-    IndexPostProcessingDA,
     XbrlFile,
     XbrlFiles,
 )

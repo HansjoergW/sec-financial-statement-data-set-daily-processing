@@ -149,8 +149,9 @@ class SecHtmXmlExtractor:
     #     return result
 
     def extract(self, adsh: str, data: str):  # -> Dict[int, SecPreExtractPresentationLink]:
+        pass
         data = self._strip_file(data)
         byte_data: bytes = bytes(bytearray(data, encoding="utf-8"))
-        root = etree.fromstring(byte_data, parser=None)
+        root = etree.fromstring(byte_data, parser=None) #  # noqa: F841
 
         # continue

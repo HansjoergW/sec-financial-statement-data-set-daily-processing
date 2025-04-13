@@ -118,7 +118,8 @@ class DailyZipCreator(ProcessBase):
         sub_entries["name"] = sub_entries.name.str.replace("\\", "", regex=False)
 
         # check for Null Values in fye
-        # there are some entries, which don't have a fye entry. if it is a 10-k, then this is the month and year of period
+        # there are some entries, which don't have a fye entry.
+        # if it is a 10-k, then this is the month and year of period
         sub_entries.loc[sub_entries.fye.isnull() & (sub_entries.form == "10-K"), "fye"] = sub_entries.period.str.slice(
             4, 8
         )
@@ -173,9 +174,9 @@ class DailyZipCreator(ProcessBase):
 
         # fy_real -> year when the next fiscal year ends
         sub_entries.loc[sub_entries.is_fye_same_year, "fy_real"] = sub_entries.period_year
-        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = (
-            sub_entries.period_year + 1
-        )  # noqa: E712 pylint:disable=C0121
+        sub_entries.loc[sub_entries.is_fye_same_year == False, "fy_real"] = \
+            sub_entries.period_year + 1  # noqa: E712
+
         sub_entries.fy_real = sub_entries.fy_real.astype(int)
 
         # fy -> as it seems is the previous year, if the year ends in the first quarter,

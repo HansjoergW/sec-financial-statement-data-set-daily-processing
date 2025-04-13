@@ -39,7 +39,8 @@ class SecPreXmlGroupTransformer:
         # check for digit_ending
         example:
         <loc  label="Locator_us-gaap_StatementClassOfStockAxis_398"/>
-        <presentationArc from="Locator_us-gaap_StatementClassOfStockAxis_403" to="Locator_us-gaap_ClassOfStockDomain_404" order="1.0" preferredLabel="terseLabel"/>
+        <presentationArc from="Locator_us-gaap_StatementClassOfStockAxis_403"
+                         to="Locator_us-gaap_ClassOfStockDomain_404" order="1.0" preferredLabel="terseLabel"/>
         """
         digit_ending = True
         for loc in loc_list:
@@ -194,7 +195,6 @@ class SecPreXmlGroupTransformer:
 
         for idx, reportinfo in data.items():
             role: str = reportinfo.role
-            inpth: int = int(reportinfo.inpth)
             loc_list: List[SecPreTransformLocationDetails] = reportinfo.loc_list
             preArc_list: List[SecPreTransformPresentationArcDetails] = reportinfo.preArc_list
 

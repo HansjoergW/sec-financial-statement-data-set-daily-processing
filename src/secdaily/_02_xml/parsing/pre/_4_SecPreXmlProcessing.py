@@ -126,8 +126,6 @@ class SecPreXmlDataProcessor:
 
         result: List[PresentationEntry] = []
         for preArc in preArc_list:
-            # note: using [] instead of the get-method since we expect all keys to be present
-            details = {}
             to_tag = preArc.to_entry
 
             loc_entry = loc_by_label_dict[to_tag]
@@ -207,9 +205,11 @@ class SecPreXmlDataProcessor:
     def _post_process_assign_report_to_stmt(
         self, report_data: Dict[int, PresentationReport]
     ) -> Dict[Tuple[str, int], List[PresentationReport]]:
-        # based on the stmt_canditates info, this function figures out to which statement type the report belongs to. generally, there should be just one possiblity
+        # based on the stmt_canditates info, this function figures out to which statement type the report belongs to.
+        # generally, there should be just one possiblity
 
-        # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth" which indicates wether it is  a "in parenthical" report
+        # the key is defined from the stmt type ('BS', 'IS', ..) the flog "inpth"
+        # which indicates wether it is  a "in parenthical" report
         result: Dict[Tuple[str, int], List[PresentationReport]] = {}
 
         # ensure that a report only belongs to one stmt type
@@ -225,15 +225,11 @@ class SecPreXmlDataProcessor:
                 # try to either find a single confidence of 2
                 # or to find the entry with the biggest sum of confidence values
 
-                conf_of_3_list = []
                 max_sum_of_confidence = 0
                 max_sum_of_confidence_stmt = None
 
                 for stmt_key in stmt_canditates_keys:
                     confidence: StmtConfidence = stmt_canditates_dict[stmt_key]
-
-                    # if confidence.get_max_confidenc() == 3:
-                    #     conf_of_3_list.append(stmt_key)
 
                     sum_of_confidence = confidence.get_confidence_sum()
                     if sum_of_confidence > max_sum_of_confidence:
@@ -242,7 +238,7 @@ class SecPreXmlDataProcessor:
 
                 stmt = max_sum_of_confidence_stmt
 
-            if result.get((stmt, inpth)) == None:
+            if result.get((stmt, inpth)) is None:
                 result[(stmt, inpth)] = []
 
             result[(stmt, inpth)].append(reportinfo)

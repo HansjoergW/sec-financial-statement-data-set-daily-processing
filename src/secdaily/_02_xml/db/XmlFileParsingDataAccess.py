@@ -54,8 +54,8 @@ class XmlFileParsingDA(DB):
         return self._execute_fetchall_typed(sql, UnparsedFile)
 
     def find_unparsed_preFiles(self) -> List[UnparsedFile]:
-        sql = f"""SELECT accessionNumber, xmlPreFile as file, filingDay, filingMonth, filingYear 
-                  FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME} 
+        sql = f"""SELECT accessionNumber, xmlPreFile as file, filingDay, filingMonth, filingYear
+                  FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
                   WHERE xmlPreFile is not NULL and csvPreFile is NULL and preParseState is NULL"""
         return self._execute_fetchall_typed(sql, UnparsedFile)
 

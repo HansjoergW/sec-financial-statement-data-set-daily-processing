@@ -68,8 +68,9 @@ class MassTestV2DA(DB):
 
         sql = f"""SELECT accessionNumber, numFormattedFile as numFile, preFormattedFile as preFile
                   FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
-                  WHERE numFormattedFile is not NULL and preFormattedFile is not NULL
-                      and filingYear = {year} and filingMonth in ({','.join([str(x) for x in self.months_in_qrtr[qrtr]])})
+                  WHERE numFormattedFile is not NULL AND preFormattedFile is not NULL
+                        ANDd filingYear = {year}
+                        AND filingMonth in ({','.join([str(x) for x in self.months_in_qrtr[qrtr]])})
                   """
         return self._execute_fetchall_typed(sql, FormattedReport)
 

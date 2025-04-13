@@ -163,7 +163,7 @@ if __name__ == "__main__":
             self.was_read = [False]
 
         def get_unprocessed_entries(self) -> List[str]:
-            if self.was_read[0] == False:
+            if not self.was_read[0]:
                 self.was_read[0] = True
                 return self.data_list
             return []

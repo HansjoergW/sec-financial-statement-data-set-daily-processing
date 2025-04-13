@@ -275,7 +275,7 @@ class SecPreXmlStatementTypeEvaluator:
             excludes = key_def.excludes
             confidence = key_def.confidence
 
-            if all(map_key in key for map_key in includes) and any(map_key in key for map_key in excludes) == False:
+            if all(map_key in key for map_key in includes) and not any(map_key in key for map_key in excludes):
                 max_confidence = max(max_confidence, confidence)
 
         return max_confidence
@@ -299,7 +299,7 @@ class SecPreXmlStatementTypeEvaluator:
                 if any(map_key in tag for map_key in excludes):
                     contains_exlcude = True
             # the included condition has to be present and the excluded conditions may not be present
-            if contains_include and contains_exlcude == False:
+            if contains_include and not contains_exlcude:
                 max_confidence = max(max_confidence, confidence)
 
         return max_confidence
