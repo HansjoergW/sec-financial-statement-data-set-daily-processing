@@ -76,8 +76,18 @@
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
 
- Version 0.2.0
- -------------
+Version 0.1.1
+-------------
+xx. [] clean up for quarter
+      [] cleanup files for a specific quarter
+      [] cleanup db tables for a specific quarter
+
+xx. [] verbessern der Configurations possibilities -> über config class?
+
+
+Version 0.2.0
+-------------
+
 xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
        damit die Analyse danach einfacher ist
 
@@ -89,8 +99,8 @@ xx. [] single file processing
 
 xx. [] mehr end-to-end testfälle
 
- Version 0.3.0
- -------------
+Version 0.3.0
+-------------
 xx. [] segments hinzüfügen
 
 
