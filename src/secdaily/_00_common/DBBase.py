@@ -43,7 +43,7 @@ class DB(ABC):
             sqlfile = os.path.basename(sqlfilepath)
 
             index = int(sqlfile[sqlfile.rfind("\\V") + 2 : sqlfile.find("__")])
-            indexes_dict[index] = sqlfile
+            indexes_dict[index] = sqlfilepath
 
         indexes = list(indexes_dict.keys())
         indexes.sort()
