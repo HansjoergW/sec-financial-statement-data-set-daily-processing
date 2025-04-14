@@ -65,7 +65,7 @@
       [ok] create daily zip files
       [ok] ensure path of zipfiles is full path
 
-20. [] activate project / create official 0.1 release
+20. [] activate project
       [ok] fix linting problems
       [ok] ensure existing tests run.
       [ok] activate build pipeline with linting and tests for py3.10/3.11/3.12/3.13
@@ -73,9 +73,11 @@
       [] adapt readme / add limitations
       
 
+21. [] activate deployment to pypi
+      [] create official 0.0.1 release
+
 21. [] sponsoring message and end end beginning
 
-21. [] activate deployment to pypi
 
 
 

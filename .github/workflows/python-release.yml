@@ -1,14 +1,14 @@
 name: Release to PyPI
 
 on:
-  push:
-    tags:
-      - 'v*'  # Trigger on version tags like v0.1.0
+  release:
+    types: [published]  # Triggers when a release is published
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: release    # This should match the environment name you created
     permissions:
       id-token: write  # Required for trusted publishing to PyPI
 
@@ -23,7 +23,7 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.7.1
+        version: 2.1in th .1
         virtualenvs-create: true
         virtualenvs-in-project: true
 
