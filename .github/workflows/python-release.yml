@@ -7,8 +7,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment:
-      name: release    # This should match the environment name you created
     permissions:
       id-token: write  # Required for trusted publishing to PyPI
 
@@ -32,3 +30,6 @@ jobs:
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
