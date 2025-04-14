@@ -49,6 +49,14 @@ keywords = [
     "XBRL"
 ]
 
+dependencies = [
+    "pandas>=2.2.0",
+    "requests>=2.32.0",
+    "pathos>=0.3.0",
+    "lxml>=4.8.0",
+    "pyarrow>=19.0.0"
+]
+
 [project.urls]
 "Homepage" = "https://hansjoergw.github.io/sec-fincancial-statement-data-set-daily-processing/"
 "Bug Tracker" = "https://github.com/HansjoergW/sec-fincancial-statement-data-set-daily-processing/issues"
@@ -59,14 +67,7 @@ keywords = [
 "Change Log" = "https://github.com/HansjoergW/sec-fincancial-statement-data-set-daily-processing/blob/main/CHANGELOG.md"
 
 
-[tool.poetry.dependencies]
-pandas = "^2.2"     # For data manipulation and analysis
-requests = "^2.32"  # For HTTP requests to SEC.gov
-pathos = "^0.3"     # For parallel processing
-lxml = "^4.8"       # For XML/HTML parsing
-pyarrow = "^19"     # For efficient data storage
-
-[tool.poetry.extras]
+[project.optional-dependencies]
 dev = ["pytest", "pylint", "black", "ruff"]
 
 [tool.poetry]
