@@ -39,7 +39,9 @@ class DB(ABC):
         sqlfiles = list(glob.glob(f"{DDL_PATH}/*.sql"))
 
         indexes_dict: Dict[int, str] = {}
-        for sqlfile in sqlfiles:
+        for sqlfilepath in sqlfiles:
+            sqlfile = os.path.basename(sqlfilepath)
+
             index = int(sqlfile[sqlfile.rfind("\\V") + 2 : sqlfile.find("__")])
             indexes_dict[index] = sqlfile
 
