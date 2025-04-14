@@ -6,7 +6,7 @@ authors = [
     { name = "Hansjoerg", email = "hansjoeg.wingeier@gmail.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10"  # Updated to reflect minimum supported version
 
 [tool.poetry.dependencies]
 pandas = "^2.2"
