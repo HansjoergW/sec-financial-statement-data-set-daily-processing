@@ -65,23 +65,26 @@
       [ok] create daily zip files
       [ok] ensure path of zipfiles is full path
 
-20. [] activate project
+20. [ok] activate project
       [ok] fix linting problems
       [ok] ensure existing tests run.
       [ok] activate build pipeline with linting and tests for py3.10/3.11/3.12/3.13
       [ok] project.toml, including title of library
-      [] adapt readme / add limitations
       
 
 21. [] activate deployment to pypi
       [] create official 0.0.1 release
 
-21. [] sponsoring message and end end beginning
+Version 0.1.0
+-------------
 
+01. [] sponsoring message and end end beginning
 
+02. [] documentation
+      [] adapt readme / add limitations
+      [] code documentation
 
-
-22. [] end to end tests
+03. [] end to end tests
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
 
