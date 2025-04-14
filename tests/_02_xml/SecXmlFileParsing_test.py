@@ -26,7 +26,7 @@ def test_parse_num_xml(dbmgr: XmlFileParsingDA):
     parser = SecXmlParser(dbmanager=dbmgr, data_dir=folder + "/data/")
     parser.parseNumFiles()
 
-    files = glob.glob(folder + "/data/*/*num.csv.zip")
+    files = glob.glob(folder + "/data/*/*/*num.csv.zip")
     assert len(files) == 7
 
     unparsed_num_files = dbmgr.find_unparsed_numFiles()
@@ -37,7 +37,7 @@ def test_parse_pre_xml(dbmgr: XmlFileParsingDA):
     parser = SecXmlParser(dbmgr, data_dir=folder + "/data/")
     parser.parsePreFiles()
 
-    files = glob.glob(folder + "/data/*/*pre.csv.zip")
+    files = glob.glob(folder + "/data/*/*/*pre.csv.zip")
     assert 7 == len(files)
 
     unparsed_pre_files = dbmgr.find_unparsed_preFiles()

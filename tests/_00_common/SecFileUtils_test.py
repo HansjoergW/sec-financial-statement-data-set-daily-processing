@@ -33,7 +33,6 @@ def test_write_read_df_to_zip(wrap: str):
 
     sfu.write_df_to_zip(df, filename)
     readdf = sfu.read_df_from_zip(filename)
-    readdf.set_index("Unnamed: 0", inplace=True)
 
     assert os.path.isfile(filename + ".zip")
     assert df.equals(readdf)
