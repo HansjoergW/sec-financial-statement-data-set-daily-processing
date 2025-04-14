@@ -990,7 +990,10 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[extras]
+dev = []
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "f03309d6471ec69757de3c72f4ac6121c0797f853f78f65979fd4098d032bc74"
+content-hash = "392c4679be59d277c877b6b5e85b201572fe9662c66db7c403f5c179a98454b7"
