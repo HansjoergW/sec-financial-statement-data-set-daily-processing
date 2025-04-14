@@ -68,11 +68,17 @@
 20. [] activate project / create official 0.1 release
       [x] fix linting problems
       [x] ensure existing tests run.
-      [] activate build pipeline with linting and tests for py3.10/3.11/3.12/3.13
-      [] activate deployment to pypi
+      [x] activate build pipeline with linting and tests for py3.10/3.11/3.12/3.13
       [] adapt readme / add limitations
+      [] project.toml, including title of library
 
-21. [] end to end tests
+21. [] sponsoring message and end end beginning
+
+21. [] activate deployment to pypi
+
+
+
+22. [] end to end tests
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
 

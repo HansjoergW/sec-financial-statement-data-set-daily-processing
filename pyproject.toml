@@ -1,12 +1,49 @@
 [project]
-name = "dailysec"
+name = "secdaily"
 version = "0.1.0"
-description = ""
 authors = [
     { name = "Hansjoerg", email = "hansjoeg.wingeier@gmail.com" }
 ]
+
+description = "A tool that replicates the quarterly Financial Statement Datasets from the SEC (https://www.sec.gov/dera/data/financial-statement-data-sets), but on a daily basis."
 readme = "README.md"
+
 requires-python = ">=3.10"  # Updated to reflect minimum supported version
+license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities"
+]
+
+keywords=[
+    "SEC.GOV",
+    "SEC EDGAR",
+    "SEC Filing",
+    "EDGAR",
+    "Finance",
+    "CIK",
+    "10-Q",
+    "10-K",
+    "Financial Statements",
+    "Financial Statements Dataset",
+    "Financial Analysis",
+    "Data Processing",
+]
+
+[project.urls]
+"Homepage" = "https://hansjoergw.github.io/sec-fincancial-statement-data-set-daily-processing/"
+"Bug Tracker" = "https://github.com/HansjoergW/sec-fincancial-statement-data-set-daily-processing/issues"
+"Github" = "https://github.com/HansjoergW/sec-fincancial-statement-data-set-daily-processing"
+"Funding" = "https://github.com/sponsors/HansjoergW"
+"Forum" =  "https://github.com/HansjoergW/sec-fincancial-statement-data-set-daily-processing/discussions"
+
 
 [tool.poetry.dependencies]
 pandas = "^2.2"
