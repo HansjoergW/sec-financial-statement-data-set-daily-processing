@@ -3,7 +3,9 @@ from datetime import datetime
 from typing import Optional
 
 from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
+from secdaily._00_common.DBBase import DB
 from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._00_common.Sponsoring import print_sponsoring_message
 from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
@@ -20,7 +22,7 @@ from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 
 
-class SecDataOrchestrator:
+class SecDailyOrchestrator:
 
     def __init__(
         self, workdir: str, user_agent_def: str, start_year: Optional[int] = None, start_qrtr: Optional[int] = None
@@ -32,6 +34,8 @@ class SecDataOrchestrator:
 
         if workdir[-1] != "/":
             workdir = workdir + "/"
+
+        DB(workdir).create_db() # create database if ncessary
 
         self.workdir = workdir
         self.xmldir = workdir + "_1_xml/"
@@ -140,16 +144,13 @@ class SecDataOrchestrator:
         self.process_xml_data()
         self.create_sec_style()
         self.create_daily_zip()
+        print_sponsoring_message()
 
 
 if __name__ == "__main__":
     workdir_default = "d:/secprocessing2/"
 
-    from secdaily._00_common.DBBase import DB
-
-    DB(workdir_default).create_db()
-
-    orchestrator = SecDataOrchestrator(
+    orchestrator = SecDailyOrchestrator(
         workdir=workdir_default,
         user_agent_def="private user somebody.lastname@gmail.com",
         start_year=2024,

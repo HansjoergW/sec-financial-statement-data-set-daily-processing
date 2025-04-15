@@ -72,13 +72,14 @@
       [ok] project.toml, including title of library
       
 
-21. [] activate deployment to pypi
-      [] create official 0.0.1 release
+21. [ok] activate deployment to pypi
+      [ok] create official 0.0.1 release
+
 
 Version 0.1.0
 -------------
 
-01. [] sponsoring message and end end beginning
+01. [x] sponsoring message and end end beginning
 
 02. [] documentation
       [] adapt readme / add limitations
@@ -87,6 +88,7 @@ Version 0.1.0
 03. [] end to end tests
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
+
 
 Version 0.1.1
 -------------
