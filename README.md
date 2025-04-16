@@ -1,70 +1,127 @@
-# Purpose
-The purpose of this project is to download new 10-K and 10-Q reports from edgar at sec.gov and parse and 
-preprocess these xml files in a way, so that structure of the resulting csv files is similar
-to the structure of the "Financial Statement Datasets" from the sec.gov.
-While the "Financial Statement Dataset" is only provided once for every quarter,
-this project has the goal to provide the same data on a daily basis.
+# SEC Financial Statement Data Set Daily Processing
 
-# Highlevel Process Description
-The implementation is "robust". It uses several fail-over and retry measures to ensure that code can
-run automatically without the need of manual restarts. However, should it be necessary, it also isn't
-a problem to restart process manually. It also ensures the the access to the sec.gov site is throttled
-(there is a limit of 10 request per second) and the logic uses parallel processing if meaningful.
+[![PyPI version](https://badge.fury.io/py/secdaily.svg)](https://badge.fury.io/py/secdaily)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-In order to keep track of the different steps of the process, a simple SQLite database is used.
+## Purpose
 
-The main steps of the process are as follows:
-1. check https://www.sec.gov/Archives/edgar/monthly/index.json for a new monthly file or an update on an existing
-   monthly file
-2. if there are new and or updated monthly files, download and parse them.
-3. add the meta information for new 10k and 10q reports to the appropriate table
-4. select unprocessed reports and create appropriate entries in the processing table
-5. select reports for which the xml-files have not been downloaded and download this files
-6. select reports for which the downloaded xml-files have not been parsed already and parse them
-7. for every filing day, create a new zipfile containing all the information for all reports which were
-   filed on that day. use the same structure as used in the "Financial Statement Data Sets"
+The `secdaily` package replicates the quarterly [Financial Statement Datasets](https://www.sec.gov/dera/data/financial-statement-data-sets) from the SEC, but on a daily basis. While the SEC only provides these datasets once per quarter, this tool allows you to:
 
-# Folder content of the Project
-1. ddl <br>
-This folder contains the flyway scripts to setup the used SQLite DB.
-1. doc <br>
-This folder contains the documentation of the project.
-1. src <br>
-The source code of the project.
-1. test <br>
-Unit Tests
-1. test_ext <br>
-"Extented" testing, contains three subfolders:
-    1. testintegration <br>
-    Mainly contains "mass-testing" code. This is code that is used to compare the parse content with the 
-    original content of the "Financial Statement Data Sets" Zip-Files. 
-    1. trials <br> 
-    A Sandbox to try out different things and with code that might be worth to keep 
-    1. utils_debug <br>
-    Some code the helps to simplify debugging of parsing issues 
+- Add daily updates by processing new 10-K and 10-Q filings as they become available
+- Generate daily zip files in the same format as the official quarterly datasets
 
+This enables financial analysts, researchers, and developers to access structured financial statement data without waiting for the quarterly releases.
 
-# Setup and first run
-## Setup the Python environment
-The simplest way to setup the environment is do use the conda envinronment.yml file, provided that you have miniconda or anaconda installed.
-just execute
+## Installation
 
-    conda env create --file environment.yml
+The package requires Python 3.10 or higher. Install using pip:
 
-This will create a new conda python environment based on Python 3.7 with the name "sec_processing".
+```bash
+pip install secdaily
+```
 
-If you wanna setup your environment manually, create a new python 3.7 environment and install the packages
-- pandas
-- lxml
-- requests
-- pytest
+## Usage
 
+The main entry point is the `SecDailyOrchestrator` class. Here's a basic example:
 
+```python
+from secdaily.SecDaily import SecDailyOrchestrator
 
-## First run
-In order to excute the download and the parsing of the reports, just instantiate the SecDataOrchestrator 
-form the SecData module and call the process method.
-Note: when creating an instance of the SecDataOrchestrator, you have to provide the folder, in which the sqlite-db file was created.
-If you don't any additional information, then the SecDataOrchestrator will start to download and parse the 
-reports from the following and the 3 previous months.
+# Initialize the orchestrator
+orchestrator = SecDailyOrchestrator(
+    workdir="/path/to/your/data/directory/",
+    user_agent_def="Your Company Name yourname@example.com",
+    start_year=2024,  # Optional: specify starting year
+    start_qrtr=1      # Optional: specify starting quarter
+)
 
+# Run the full process
+orchestrator.process()
+```
+
+### Parameters
+
+- `workdir`: Directory where all data will be stored (including the SQLite database)
+- `user_agent_def`: **Required** - Your user agent string for SEC.gov requests. Must follow the format specified in [SEC's EDGAR access requirements](https://www.sec.gov/os/accessing-edgar-data): "Company Name contact@company.com"
+- `start_year`: Optional - Year to start processing from (defaults to current year)
+- `start_qrtr`: Optional - Quarter to start processing from (defaults to current quarter)
+
+### Individual Process Steps
+
+You can also run individual parts of the process:
+
+```python
+# Only process index data
+orchestrator.process_index_data()
+
+# Only process XML data
+orchestrator.process_xml_data()
+
+# Only create SEC-style formatted files
+orchestrator.create_sec_style()
+
+# Only create daily zip files
+orchestrator.create_daily_zip()
+```
+
+## Directory Structure of the Created Data
+
+The tool creates the following directory structure in your specified `workdir`:
+
+```
+workdir/
+├── sec_data.db                # SQLite database for tracking processing
+├── _1_xml/                    # Downloaded XML files
+├── _2_csv/                    # Parsed CSV files
+├── _3_secstyle/               # SEC-style formatted files
+└── _4_daily/                  # Daily zip files organized by quarter
+    ├── 2024q1/                # Quarter directory
+    │   ├── 20240101.zip       # Daily zip file
+    │   ├── 20240102.zip
+    │   └── ...
+    └── ...
+```
+
+Each daily zip file contains:
+- `sub.txt` - Submission information
+- `pre.txt` - Presentation information
+- `num.txt` - Numeric data
+
+## Limitations
+
+- `num.txt` doesn't contain content for the segments column
+- XBRL data embedded in HTML files (approximately 20% of reports) is not processed yet
+- Numbering of columns "report" and "line" in `pre.txt` may not be the same as in the quarterly files, but the order should be the same
+- The tool throttles requests to SEC.gov to comply with their limit of 10 requests per second
+
+## High-level Process Description
+
+1. **Index Processing**: Parse SEC's index.json to identify new filings
+2. **XML Processing**: Download and extract necessary XML files
+3. **Data Parsing**: Process the XML files into CSV format (creating initial versions of `num.txt`, `pre.txt`, `lab.txt`)
+4. **SEC-style Formatting**: Format the data to match the official SEC dataset structure
+5. **Daily Zip Creation**: Package the formatted data into daily zip files
+
+## Robustness Features
+
+- Implements retry mechanisms for failed downloads
+- Uses a SQLite database to track processing state, allowing for safe restarts
+- Throttles requests to comply with SEC.gov's rate limits
+- Stores downloaded and created files in a compressed format to conserve disk space
+- Uses parallel processing where appropriate for improved performance
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+
+## Links
+
+- [Documentation](https://hansjoergw.github.io/sec-financial-statement-data-set-daily-processing/)
+- [GitHub Repository](https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing)
+- [Issue Tracker](https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/issues)
+- [Discussions](https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions)
+- [Changelog](https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/blob/main/CHANGELOG.md)
