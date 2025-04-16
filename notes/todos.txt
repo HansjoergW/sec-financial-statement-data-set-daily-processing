@@ -82,7 +82,7 @@ Version 0.1.0
 01. [x] sponsoring message and end end beginning
 
 02. [] documentation
-      [] adapt readme / add limitations
+      [x] adapt readme / add limitations
       [] code documentation
 
 03. [] end to end tests
