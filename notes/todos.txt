@@ -1,4 +1,4 @@
- Version 0.1.0
+ Version 0.0.1
  -------------
  1. [ok] subfolder in src "secdaily" mit allem code
  2. [ok] pyproject toml entsprechend setzen (packages definition)
@@ -81,17 +81,19 @@ Version 0.1.0
 
 01. [x] sponsoring message and end end beginning
 
-02. [] documentation
-      [x] adapt readme / add limitations
-      [] code documentation
+02. [x] adapt readme / add limitations
 
-03. [] end to end tests
+
+03. [] end to end tests -> kann da der agent helfen? und zwar so, dass er reproduzierbar neue beispiele  hinzufügen kann?
       [] apple 10k
       [] 0001477932-24-008123 (mit Einträgen on plabel)
 
 
 Version 0.1.1
 -------------
+xx. [] code documentation
+        [] code/module documentation
+
 xx. [] clean up for quarter
       [] cleanup files for a specific quarter
       [] cleanup db tables for a specific quarter
