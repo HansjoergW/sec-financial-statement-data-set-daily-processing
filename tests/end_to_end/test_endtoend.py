@@ -62,4 +62,3 @@ def test_apple_10k_2024():
     # Read the num.parquet file and compare it to the num_df
     num_parquet_df = pd.read_parquet(path / "num.parquet")
     pd.testing.assert_frame_equal(num_df, num_parquet_df, check_dtype=False)
-
