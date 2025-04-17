@@ -72,12 +72,35 @@ The tool creates the following directory structure in your specified `workdir`:
 workdir/
 ├── sec_data.db                # SQLite database for tracking processing
 ├── _1_xml/                    # Downloaded XML files
+│   ├── 2024q4/  
+│   │   ├── 2024-10-01/
+│   │   │   ├── xyz_htm.xml.zip
+│   │   │   ├── xyz_pre.xml.zip
+│   │   │   ├── xyz_lab.xml.zip
+│   │   │   └── ...
+│   │   └── ...
+│   └── ...                    
 ├── _2_csv/                    # Parsed CSV files
+│   ├── 2024q4/  
+│   │   ├── 2024-10-01/
+│   │   │   ├── xyz_num.csv.zip
+│   │   │   ├── xyz_pre.csv.zip
+│   │   │   ├── xyz_lab.csv.zip
+│   │   │   └── ...
+│   │   └── ...
+│   └── ...                    
 ├── _3_secstyle/               # SEC-style formatted files
+│   ├── 2024q4/  
+│   │   ├── 2024-10-01/
+│   │   │   ├── xyz_num.csv.zip
+│   │   │   ├── xyz_pre.csv.zip
+│   │   │   └── ...
+│   │   └── ...
+│   └── ...                    
 └── _4_daily/                  # Daily zip files organized by quarter
-    ├── 2024q1/                # Quarter directory
-    │   ├── 20240101.zip       # Daily zip file
-    │   ├── 20240102.zip
+    ├── 2024q4/                
+    │   ├── 20241001.zip       # Daily zip file
+    │   ├── 20241002.zip
     │   └── ...
     └── ...
 ```
