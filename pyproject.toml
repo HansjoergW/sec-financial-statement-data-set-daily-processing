@@ -1,6 +1,6 @@
 [project]
 name = "secdaily"
-version = "0.0.1"
+version = "0.1.0"
 authors = [{ name = "Hansjoerg", email = "hansjoeg.wingeier@gmail.com" }]
 description = "A tool that replicates the quarterly Financial Statement Datasets from the SEC (https://www.sec.gov/dera/data/financial-statement-data-sets), but on a daily basis."
 readme = "README.md"

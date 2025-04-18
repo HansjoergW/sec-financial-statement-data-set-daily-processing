@@ -1,3 +1,55 @@
+Release
+- update readme
+- update version in pyproject.toml
+- push to github -> check pipeline
+- create tag in format vx.x.x
+- push everything
+- create release
+
+
+Version 0.1.1
+-------------
+xx. [] code documentation
+        [] code/module documentation
+xx. [] improved configuration 
+
+xx. [] clean up for quarter
+      [] cleanup files for a specific quarter
+      [] cleanup db tables for a specific quarter
+
+xx. [] verbessern der Configurations possibilities -> über config class?
+
+xx. [] what else is needed for the integration into secfsdstools?
+
+
+Version 0.2.0
+-------------
+
+xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
+       damit die Analyse danach einfacher ist
+
+xx. [] Verbessern der Ergebnisse, falls möglich und nötig
+
+xx. [] single file processing
+      [] strip html file
+      [] analyse html file and available xml-file -> where is the data coming from to create pre?
+
+xx. [] mehr end-to-end testfälle
+
+Version 0.3.0
+-------------
+xx. [] segments hinzüfügen
+
+
+Version 0.1.0
+-------------
+01. [x] sponsoring message and end end beginning
+02. [x] adapt readme / add limitations
+03. [x] end to end tests -> kann da der agent helfen? und zwar so, dass er reproduzierbar neue beispiele  hinzufügen kann?
+      [x] apple 10k
+      [x] 0001477932-24-008123 (mit Einträgen on plabel)
+04. [x] reference to secfsdstools
+ 
  Version 0.0.1
  -------------
  1. [ok] subfolder in src "secdaily" mit allem code
@@ -76,50 +128,7 @@
       [ok] create official 0.0.1 release
 
 
-Version 0.1.0
--------------
-
-01. [x] sponsoring message and end end beginning
-
-02. [x] adapt readme / add limitations
-
-03. [x] end to end tests -> kann da der agent helfen? und zwar so, dass er reproduzierbar neue beispiele  hinzufügen kann?
-      [x] apple 10k
-      [x] 0001477932-24-008123 (mit Einträgen on plabel)
-
-04. [x] reference to secfsdstools
 
 
-Version 0.1.1
--------------
-xx. [] code documentation
-        [] code/module documentation
-
-xx. [] clean up for quarter
-      [] cleanup files for a specific quarter
-      [] cleanup db tables for a specific quarter
-
-xx. [] verbessern der Configurations possibilities -> über config class?
-
-xx. [] what else is needed for the integration into secfsdstools?
-
-
-Version 0.2.0
--------------
-
-xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
-       damit die Analyse danach einfacher ist
-
-xx. [] Verbessern der Ergebnisse, falls möglich und nötig
-
-xx. [] single file processing
-      [] strip html file
-      [] analyse html file and available xml-file -> where is the data coming from to create pre?
-
-xx. [] mehr end-to-end testfälle
-
-Version 0.3.0
--------------
-xx. [] segments hinzüfügen
 
 
