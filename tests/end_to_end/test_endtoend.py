@@ -47,8 +47,7 @@ def process_from_raw_xml(path: Path) -> Tuple[pd.DataFrame, pd.DataFrame, List[E
     return pre_formatted_df, num_formatted_df, errorlist
 
 
-def test_apple_10k_2024():
-    path = CURRENT_PATH / "data" / "0000320193-24-000123"
+def run_endtoend(path: Path):
     pre_df, num_df, errorlist = process_from_raw_xml(path)
 
     assert len(pre_df) > 0
@@ -62,3 +61,15 @@ def test_apple_10k_2024():
     # Read the num.parquet file and compare it to the num_df
     num_parquet_df = pd.read_parquet(path / "num.parquet")
     pd.testing.assert_frame_equal(num_df, num_parquet_df, check_dtype=False)
+
+
+def test_apple_10k_2024():
+    # default case
+    path = CURRENT_PATH / "data" / "0000320193-24-000123"
+    run_endtoend(path)
+
+
+def test_upxi_2024():
+    # case with direct plabel values
+    path = CURRENT_PATH / "data" / "0001477932-24-008123"
+    run_endtoend(path)

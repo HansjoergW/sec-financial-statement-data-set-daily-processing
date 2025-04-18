@@ -70,7 +70,7 @@ The tool creates the following directory structure in your specified `workdir`:
 
 ```
 workdir/
-├── sec_data.db                # SQLite database for tracking processing
+├── sec_processing.db                # SQLite database for tracking processing
 ├── _1_xml/                    # Downloaded XML files
 │   ├── 2024q4/  
 │   │   ├── 2024-10-01/
@@ -97,9 +97,9 @@ workdir/
 │   │   │   └── ...
 │   │   └── ...
 │   └── ...                    
-└── _4_daily/                  # Daily zip files organized by quarter
+└── _4_daily/                  # Daily zip files
     ├── 2024q4/                
-    │   ├── 20241001.zip       # Daily zip file
+    │   ├── 20241001.zip       
     │   ├── 20241002.zip
     │   └── ...
     └── ...
@@ -140,6 +140,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+
+## SEC Financial Statement Data Sets Tools (secfsdstools)
+Also check out the [SEC Financial Statement Data Sets Tools](https://github.com/HansjoergW/secfsdstools) project.
 
 ## Links
 

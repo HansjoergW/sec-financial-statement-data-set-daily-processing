@@ -83,10 +83,11 @@ Version 0.1.0
 
 02. [x] adapt readme / add limitations
 
+03. [x] end to end tests -> kann da der agent helfen? und zwar so, dass er reproduzierbar neue beispiele  hinzufügen kann?
+      [x] apple 10k
+      [x] 0001477932-24-008123 (mit Einträgen on plabel)
 
-03. [] end to end tests -> kann da der agent helfen? und zwar so, dass er reproduzierbar neue beispiele  hinzufügen kann?
-      [] apple 10k
-      [] 0001477932-24-008123 (mit Einträgen on plabel)
+04. [x] reference to secfsdstools
 
 
 Version 0.1.1
@@ -99,6 +100,8 @@ xx. [] clean up for quarter
       [] cleanup db tables for a specific quarter
 
 xx. [] verbessern der Configurations possibilities -> über config class?
+
+xx. [] what else is needed for the integration into secfsdstools?
 
 
 Version 0.2.0
