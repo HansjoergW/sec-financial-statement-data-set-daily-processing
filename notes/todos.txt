@@ -9,17 +9,25 @@ Release
 
 Version 0.1.1
 -------------
-xx. [] code documentation
-        [] code/module documentation
+01. [x] version in code
+    [x] update check
+
 xx. [] improved configuration 
+xx. [] verbessern der Configurations possibilities -> über config class?
+
+xx. [] build quarter zip files from daily zip files -> what is the most efficient way?
 
 xx. [] clean up for quarter
       [] cleanup files for a specific quarter
       [] cleanup db tables for a specific quarter
+      [] option to cleanup daily / zip files as well
 
-xx. [] verbessern der Configurations possibilities -> über config class?
+xx. [] code documentation
+        [] code/module documentation
 
 xx. [] what else is needed for the integration into secfsdstools?
+
+xx. [] adapt workflow to try to publish with "trusted publisher" (Trusted Publisher was already set for project on pypi.org)
 
 
 Version 0.2.0
@@ -40,6 +48,9 @@ Version 0.3.0
 -------------
 xx. [] segments hinzüfügen
 
+
+History
+=======
 
 Version 0.1.0
 -------------
@@ -123,12 +134,6 @@ Version 0.1.0
       [ok] activate build pipeline with linting and tests for py3.10/3.11/3.12/3.13
       [ok] project.toml, including title of library
       
-
 21. [ok] activate deployment to pypi
       [ok] create official 0.0.1 release
-
-
-
-
-
 

@@ -6,6 +6,7 @@ from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.Sponsoring import print_sponsoring_message
+from secdaily._00_common.version import print_newer_version_message
 from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
@@ -35,7 +36,7 @@ class SecDailyOrchestrator:
         if workdir[-1] != "/":
             workdir = workdir + "/"
 
-        DB(workdir).create_db() # create database if ncessary
+        DB(workdir).create_db()  # create database if ncessary
 
         self.workdir = workdir
         self.xmldir = workdir + "_1_xml/"
@@ -145,6 +146,7 @@ class SecDailyOrchestrator:
         self.create_sec_style()
         self.create_daily_zip()
         print_sponsoring_message()
+        print_newer_version_message()
 
 
 if __name__ == "__main__":
