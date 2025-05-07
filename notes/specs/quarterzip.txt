@@ -1,0 +1,51 @@
+Goal
+----
+Build quarter zip files from daily zip files.
+
+InputData
+--------
+- a folder containing dailyzip files of a quarter
+- every zip file contains three csv files: num.txt, sub.txt, and pre.txt
+- every csv file has a header
+- all sub.txt files have the same header
+- all pre.txt files have the same header
+- all num.txt files have the same header
+
+Output
+------
+- a zip file containing three csv files: num.txt, sub.txt, and pre.txt
+- every csv file has a header
+
+
+Cases
+-----
+1. quarter file does not exist
+   - create a new quarterfile from all daily zip files of the quarter
+
+2. quarter file does exist, but new daily zip files are available
+   - add the new daily zip files to the quarter file
+
+3. quarter file does exist and no new daily zip files are available
+   - do nothing
+
+Code
+----
+- Code has to be provided in a separte package "_05_quarterzip". The modules name is "QuarterZipCreating.py".
+  If meaningful, sub packages or additional moduls can be added
+- Do not use any database tables to track which daily zipfiles are already part of the quarter file
+- Instead, check the file names of the daily zip files and compare it with the file names in the quarter file
+  or, if more efficient, maintain metadata file containing the information
+- If the quarter file does not exist, create a new one from all daily zip files of the quarter
+- If the quarter file does exist, compare the file names in the quarter file with the file names of the daily zip files
+- If there are new daily zip files, add them to the quarter file
+
+
+Tests
+-----
+reasonable tests shall be created under "tests/_05_quarterzip". testdata shall be put under "tests/_05_quarterzip/data". 
+
+- test if quarter file is created correctly if it does not exist
+- test if quarter file is extended correctly if it does exist
+- test if quarter file is not changed if it does exist and no new daily zip files are available
+- test if quarter file is created correctly if it does not exist and there are no daily zip files
+- test if quarter file is extended correctly if it does exist and there are new daily zip files

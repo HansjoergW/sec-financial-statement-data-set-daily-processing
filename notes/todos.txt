@@ -12,10 +12,13 @@ Version 0.1.1
 01. [x] version in code
     [x] update check
 
+02. [] build quarter zip files from daily zip files -> what is the most efficient way?
+
+
+
 xx. [] improved configuration 
 xx. [] verbessern der Configurations possibilities -> über config class?
 
-xx. [] build quarter zip files from daily zip files -> what is the most efficient way?
 
 xx. [] clean up for quarter
       [] cleanup files for a specific quarter

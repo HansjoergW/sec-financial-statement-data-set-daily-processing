@@ -6,7 +6,7 @@ from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.Sponsoring import print_sponsoring_message
-from secdaily._00_common.version import print_newer_version_message
+from secdaily._00_common.Version import print_newer_version_message
 from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
@@ -21,6 +21,7 @@ from secdaily._03_secstyle.db.SecStyleFormatterDataAccess import SecStyleFormatt
 from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
 from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
+from secdaily._05_quarterzip.QuarterZipCreating import QuarterZipCreator
 
 
 class SecDailyOrchestrator:
@@ -43,6 +44,7 @@ class SecDailyOrchestrator:
         self.csvdir = workdir + "_2_csv/"
         self.formatdir = workdir + "_3_secstyle/"
         self.dailyzipdir = workdir + "_4_daily/"
+        self.quarterzipdir = workdir + "_5_quarter/"
 
         self.today = datetime.today()
 
@@ -140,11 +142,17 @@ class SecDailyOrchestrator:
         zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
         zip_creator.process()
 
+    def create_quarter_zip(self):
+        self._log_main_header("Create quarter zip files")
+        quarter_zip_creator = QuarterZipCreator(daily_zip_dir=self.dailyzipdir, quarter_zip_dir=self.quarterzipdir)
+        quarter_zip_creator.process()
+
     def process(self):
         self.process_index_data()
         self.process_xml_data()
         self.create_sec_style()
         self.create_daily_zip()
+        self.create_quarter_zip()
         print_sponsoring_message()
         print_newer_version_message()
 
