@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from secdaily._00_common.BaseDefinitions import MONTH_TO_QRTR
+from secdaily._00_common.BaseDefinitions import QuarterInfo
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.Sponsoring import print_sponsoring_message
@@ -50,17 +50,7 @@ class SecDailyOrchestrator:
 
         self.urldownloader = UrlDownloader(user_agent_def)
 
-        if start_year is None:
-            self.start_year = self.today.year
-            self.start_qrtr = MONTH_TO_QRTR[self.today.month]
-            if start_qrtr is not None:
-                logging.info("set 'start_qrtr' is ignored, since 'start_year' is not set")
-        else:
-            self.start_year = start_year
-            if start_qrtr is None:
-                self.start_qrtr = 1
-            else:
-                self.start_qrtr = start_qrtr
+        self.start_qrtr_info = QuarterInfo(year=start_year, qrtr=start_qrtr)
 
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
@@ -79,7 +69,10 @@ class SecDailyOrchestrator:
     def _download_index_data(self):
         self._log_sub_header("looking for new reports")
         secfullindexprocessor = SecFullIndexFileProcessor(
-            IndexProcessingDA(self.workdir), self.urldownloader, self.start_year, self.start_qrtr
+            dbmanager=IndexProcessingDA(self.workdir),
+            urldownloader=self.urldownloader,
+            start_year=self.start_qrtr_info.year,
+            start_qrtr=self.start_qrtr_info.qrtr,
         )
         secfullindexprocessor.process()
 
@@ -144,7 +137,8 @@ class SecDailyOrchestrator:
 
     def create_quarter_zip(self):
         self._log_main_header("Create quarter zip files")
-        quarter_zip_creator = QuarterZipCreator(daily_zip_dir=self.dailyzipdir, quarter_zip_dir=self.quarterzipdir)
+        quarter_zip_creator = QuarterZipCreator(start_qrtr_info=self.start_qrtr_info,
+                daily_zip_dir=self.dailyzipdir, quarter_zip_dir=self.quarterzipdir)
         quarter_zip_creator.process()
 
     def process(self):
@@ -153,6 +147,7 @@ class SecDailyOrchestrator:
         self.create_sec_style()
         self.create_daily_zip()
         self.create_quarter_zip()
+
         print_sponsoring_message()
         print_newer_version_message()
 

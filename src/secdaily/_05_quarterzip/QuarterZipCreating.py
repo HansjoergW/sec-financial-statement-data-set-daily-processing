@@ -6,7 +6,7 @@ from typing import List, Optional, Set
 
 import pandas as pd
 
-from secdaily._00_common.BaseDefinitions import DTYPES_NUM, DTYPES_PRE, get_qrtr_string
+from secdaily._00_common.BaseDefinitions import DTYPES_NUM, DTYPES_PRE, QuarterInfo, get_qrtr_string
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._00_common.SecFileUtils import read_file_from_zip
 
@@ -24,13 +24,14 @@ class QuarterZipCreator(ProcessBase):
     it compares the file names of the daily zip files with the metadata stored in the quarter file.
     """
 
-    def __init__(self, daily_zip_dir: str, quarter_zip_dir: Optional[str] = None):
+    def __init__(self, start_qrtr_info: QuarterInfo, daily_zip_dir: str, quarter_zip_dir: Optional[str] = None):
         """
         Initialize the QuarterZipCreator.
 
         Args:
             daily_zip_dir: Directory containing the daily zip files organized by quarter
             quarter_zip_dir: Directory where quarter zip files will be stored (defaults to daily_zip_dir if None)
+            start_qrtr_info: The quarter to start processing from
         """
         super().__init__(data_dir=quarter_zip_dir or daily_zip_dir)
 
@@ -40,6 +41,7 @@ class QuarterZipCreator(ProcessBase):
 
         self.daily_zip_path = Path(self.daily_zip_dir)
         self.metadata_filename = "metadata.txt"
+        self.start_qrtr_info = start_qrtr_info
 
     def _get_quarter_zip_path(self, year: int, qrtr: int) -> str:
         """
@@ -155,7 +157,7 @@ class QuarterZipCreator(ProcessBase):
                     sub_dfs.append(sub_df)
                     pre_dfs.append(pre_df)
                     num_dfs.append(num_df)
-                except Exception as e: # pylint: disable=broad-except
+                except Exception as e:  # pylint: disable=broad-except
                     logging.warning("Error reading %s: %s", daily_zip, e)
                     continue
 
@@ -179,7 +181,7 @@ class QuarterZipCreator(ProcessBase):
             logging.info("Created quarter zip file: %s", quarter_zip_path)
             return True
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.error("Error creating quarter zip file %s: %s", quarter_zip_path, e)
             return False
 
@@ -228,7 +230,7 @@ class QuarterZipCreator(ProcessBase):
                     new_sub_dfs.append(sub_df)
                     new_pre_dfs.append(pre_df)
                     new_num_dfs.append(num_df)
-                except Exception as e: # pylint: disable=broad-except
+                except Exception as e:  # pylint: disable=broad-except
                     logging.warning("Error reading %s: %s", daily_zip, e)
                     continue
 
@@ -254,11 +256,11 @@ class QuarterZipCreator(ProcessBase):
             )
             return True
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.error("Error updating quarter zip file %s: %s", quarter_zip_path, e)
             return False
 
-    def process_quarter(self, year: int, qrtr: int) -> bool:
+    def process_quarter(self, qrtr_info: QuarterInfo) -> bool:
         """
         Process a specific quarter, creating or updating the quarter zip file as needed.
 
@@ -269,6 +271,9 @@ class QuarterZipCreator(ProcessBase):
         Returns:
             True if successful, False otherwise
         """
+        year = qrtr_info.year
+        qrtr = qrtr_info.qrtr
+
         quarter_zip_path = self._get_quarter_zip_path(year, qrtr)
         daily_zip_files = self._get_daily_zip_files(year, qrtr)
 
@@ -302,7 +307,7 @@ class QuarterZipCreator(ProcessBase):
         logging.info("Quarter zip creating")
 
         # Find all quarter directories in the daily zip directory
-        quarters = []
+        quarters: List[QuarterInfo] = []
         for item in os.listdir(self.daily_zip_dir):
             if (
                 os.path.isdir(os.path.join(self.daily_zip_dir, item))
@@ -314,17 +319,20 @@ class QuarterZipCreator(ProcessBase):
                 try:
                     year = int(item[:-2])
                     qrtr = int(item[-1])
-                    quarters.append((year, qrtr))
+                    quarters.append(QuarterInfo(year=year, qrtr=qrtr))
                 except ValueError:
                     continue
 
+        # filter only quarters that are equal or later than the start quarter
+        quarters = [qrtr for qrtr in quarters if qrtr.qrtr_value >= self.start_qrtr_info.qrtr_value]
+
         if not quarters:
-            logging.info("No quarter directories found")
+            logging.info("No quarter directories to process")
             return
 
         # Process each quarter
-        for year, qrtr in quarters:
-            self.process_quarter(year, qrtr)
+        for quarter in quarters:
+            self.process_quarter(quarter)
 
 
 if __name__ == "__main__":
@@ -335,6 +343,9 @@ if __name__ == "__main__":
     )
 
     # Example usage
-    creator = QuarterZipCreator(daily_zip_dir="d:/secprocessing2/_4_daily/",
-                                quarter_zip_dir="d:/secprocessing2/_5_quarter/")
+    creator = QuarterZipCreator(
+        start_qrtr_info=QuarterInfo(),
+        daily_zip_dir="d:/secprocessing2/_4_daily/",
+        quarter_zip_dir="d:/secprocessing2/_5_quarter/",
+    )
     creator.process()

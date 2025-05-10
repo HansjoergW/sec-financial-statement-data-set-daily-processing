@@ -5,6 +5,8 @@ import zipfile
 
 import pandas as pd
 import pytest
+
+from secdaily._00_common.BaseDefinitions import QuarterInfo
 from secdaily._05_quarterzip.QuarterZipCreating import QuarterZipCreator
 
 
@@ -108,6 +110,7 @@ def test_create_quarter_zip_new(test_dirs):
     # Create test daily zip files
     year = 2024
     qrtr = 1
+    qrtr_info = QuarterInfo(year=year, qrtr=qrtr)
 
     # Create 3 daily zip files with different ADSHs
     create_test_daily_zip(daily_dir, year, qrtr, 1, ["0001234567-24-000001", "0001234567-24-000002"])
@@ -115,8 +118,8 @@ def test_create_quarter_zip_new(test_dirs):
     create_test_daily_zip(daily_dir, year, qrtr, 3, ["0001234567-24-000005", "0001234567-24-000006"])
 
     # Create QuarterZipCreator and process the quarter
-    creator = QuarterZipCreator(daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
-    result = creator.process_quarter(year, qrtr)
+    creator = QuarterZipCreator(start_qrtr_info=qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    result = creator.process_quarter(qrtr_info)
 
     # Check that the quarter zip was created
     assert result is True
@@ -160,20 +163,21 @@ def test_update_quarter_zip(test_dirs):
     # Create test daily zip files
     year = 2024
     qrtr = 1
+    qrtr_info = QuarterInfo(year=year, qrtr=qrtr)
 
     # Create initial daily zip files
     create_test_daily_zip(daily_dir, year, qrtr, 1, ["0001234567-24-000001", "0001234567-24-000002"])
     create_test_daily_zip(daily_dir, year, qrtr, 2, ["0001234567-24-000003", "0001234567-24-000004"])
 
     # Create QuarterZipCreator and process the quarter
-    creator = QuarterZipCreator(daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
-    creator.process_quarter(year, qrtr)
+    creator = QuarterZipCreator(start_qrtr_info=qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    creator.process_quarter(qrtr_info)
 
     # Create a new daily zip file
     create_test_daily_zip(daily_dir, year, qrtr, 3, ["0001234567-24-000005", "0001234567-24-000006"])
 
     # Process the quarter again
-    result = creator.process_quarter(year, qrtr)
+    result = creator.process_quarter(qrtr_info)
 
     # Check that the quarter zip was updated
     assert result is True
@@ -205,20 +209,21 @@ def test_no_new_daily_files(test_dirs):
     # Create test daily zip files
     year = 2024
     qrtr = 1
+    qrtr_info = QuarterInfo(year=year, qrtr=qrtr)
 
     # Create daily zip files
     create_test_daily_zip(daily_dir, year, qrtr, 1, ["0001234567-24-000001", "0001234567-24-000002"])
 
     # Create QuarterZipCreator and process the quarter
-    creator = QuarterZipCreator(daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
-    creator.process_quarter(year, qrtr)
+    creator = QuarterZipCreator(start_qrtr_info=qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    creator.process_quarter(qrtr_info)
 
     # Get the modification time of the quarter zip
     quarter_zip_path = os.path.join(quarter_dir, f"{year}q{qrtr}.zip")
     mtime_before = os.path.getmtime(quarter_zip_path)
 
     # Process the quarter again without adding new daily zip files
-    result = creator.process_quarter(year, qrtr)
+    result = creator.process_quarter(qrtr_info)
 
     # Check that the quarter zip was not modified
     assert result is True
@@ -231,8 +236,9 @@ def test_no_daily_files(test_dirs):
     daily_dir, quarter_dir = test_dirs
 
     # Create QuarterZipCreator and process a quarter with no daily zip files
-    creator = QuarterZipCreator(daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
-    result = creator.process_quarter(2024, 1)
+    qrtr_info = QuarterInfo(year=2024, qrtr=1)
+    creator = QuarterZipCreator(start_qrtr_info=qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    result = creator.process_quarter(qrtr_info)
 
     # Check that no quarter zip was created
     assert result is True  # Not an error, just nothing to do
@@ -249,9 +255,30 @@ def test_process_all_quarters(test_dirs):
     create_test_daily_zip(daily_dir, 2024, 2, 1, ["0001234567-24-000002"])
 
     # Create QuarterZipCreator and process all quarters
-    creator = QuarterZipCreator(daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    start_qrtr_info = QuarterInfo(year=2024, qrtr=1)
+    creator = QuarterZipCreator(start_qrtr_info=start_qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
     creator.process()
 
     # Check that quarter zips were created for both quarters
     assert os.path.exists(os.path.join(quarter_dir, "2024q1.zip"))
     assert os.path.exists(os.path.join(quarter_dir, "2024q2.zip"))
+
+
+def test_process_with_start_quarter_filter(test_dirs):
+    """Test that only quarters equal or later than start_qrtr_info are processed."""
+    daily_dir, quarter_dir = test_dirs
+
+    # Create test daily zip files for multiple quarters
+    create_test_daily_zip(daily_dir, 2023, 4, 1, ["0001234567-23-000001"])  # 2023Q4 - should be skipped
+    create_test_daily_zip(daily_dir, 2024, 1, 1, ["0001234567-24-000001"])  # 2024Q1 - should be processed
+    create_test_daily_zip(daily_dir, 2024, 2, 1, ["0001234567-24-000002"])  # 2024Q2 - should be processed
+
+    # Create QuarterZipCreator with start quarter of 2024Q1
+    start_qrtr_info = QuarterInfo(year=2024, qrtr=1)
+    creator = QuarterZipCreator(start_qrtr_info=start_qrtr_info, daily_zip_dir=daily_dir, quarter_zip_dir=quarter_dir)
+    creator.process()
+
+    # Check that only quarter zips for 2024Q1 and later were created
+    assert not os.path.exists(os.path.join(quarter_dir, "2023q4.zip"))  # Should not exist
+    assert os.path.exists(os.path.join(quarter_dir, "2024q1.zip"))  # Should exist
+    assert os.path.exists(os.path.join(quarter_dir, "2024q2.zip"))  # Should exist
