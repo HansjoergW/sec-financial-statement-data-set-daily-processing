@@ -155,7 +155,7 @@ class QuarterZipCreator(ProcessBase):
                     sub_dfs.append(sub_df)
                     pre_dfs.append(pre_df)
                     num_dfs.append(num_df)
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
                     logging.warning("Error reading %s: %s", daily_zip, e)
                     continue
 
@@ -179,7 +179,7 @@ class QuarterZipCreator(ProcessBase):
             logging.info("Created quarter zip file: %s", quarter_zip_path)
             return True
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.error("Error creating quarter zip file %s: %s", quarter_zip_path, e)
             return False
 
@@ -201,9 +201,12 @@ class QuarterZipCreator(ProcessBase):
         try:
             # Read existing quarter zip content
             with zipfile.ZipFile(quarter_zip_path, "r") as zf:
-                existing_sub = pd.read_csv(zf.open("sub.txt"), sep="\t", header=0)
-                existing_pre = pd.read_csv(zf.open("pre.txt"), sep="\t", header=0, dtype=DTYPES_PRE)
-                existing_num = pd.read_csv(zf.open("num.txt"), sep="\t", header=0, dtype=DTYPES_NUM)
+                with zf.open("sub.txt") as f:
+                    existing_sub = pd.read_csv(f, sep="\t", header=0)
+                with zf.open("pre.txt") as f:
+                    existing_pre = pd.read_csv(f, sep="\t", header=0, dtype=DTYPES_PRE)
+                with zf.open("num.txt") as f:
+                    existing_num = pd.read_csv(f, sep="\t", header=0, dtype=DTYPES_NUM)
 
                 if self.metadata_filename in zf.namelist():
                     metadata_content = zf.read(self.metadata_filename).decode("utf-8")
@@ -225,7 +228,7 @@ class QuarterZipCreator(ProcessBase):
                     new_sub_dfs.append(sub_df)
                     new_pre_dfs.append(pre_df)
                     new_num_dfs.append(num_df)
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
                     logging.warning("Error reading %s: %s", daily_zip, e)
                     continue
 
@@ -251,7 +254,7 @@ class QuarterZipCreator(ProcessBase):
             )
             return True
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             logging.error("Error updating quarter zip file %s: %s", quarter_zip_path, e)
             return False
 
@@ -332,5 +335,6 @@ if __name__ == "__main__":
     )
 
     # Example usage
-    creator = QuarterZipCreator(daily_zip_dir="d:/secprocessing2/_4_daily/", quarter_zip_dir="d:/secprocessing2/_5_quarter/")
+    creator = QuarterZipCreator(daily_zip_dir="d:/secprocessing2/_4_daily/",
+                                quarter_zip_dir="d:/secprocessing2/_5_quarter/")
     creator.process()

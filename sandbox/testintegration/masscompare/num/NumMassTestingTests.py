@@ -2,17 +2,16 @@ from typing import List
 
 import pandas as pd
 from secdaily._00_common.DebugUtils import DataAccessTool
-from testintegration.num.NumMassTestingTools import (
-    read_mass_num_xml_content,
-    read_mass_num_zip_content,
-)
+from testintegration.num.NumMassTestingTools import read_mass_num_xml_content, read_mass_num_zip_content
 
 default_workdir = "d:/secprocessing"
 merged_tmp_file = default_workdir + "/tmp/nummerge.csv"
 diff_tmp_file = default_workdir + "/tmp/diff.csv"
 
+
 def filter_for_adsh(df: pd.DataFrame, adshs: List[str]) -> pd.DataFrame:
     return df[df.adsh.isin(adshs)].copy()
+
 
 dataUtils = DataAccessTool(default_workdir)
 
@@ -42,14 +41,18 @@ def test_save_merged_df():
     so that is possible to compare the results. Stores this merged df in a new file for later analysis"""
     adshs_in_xml, adshs_in_zip, xml_data_matching_adshs_df, zip_data_matching_adshs_df = load_data()
 
-    zip_data_matching_adshs_df.loc[zip_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
-    xml_data_matching_adshs_df.loc[xml_data_matching_adshs_df.coreg.isnull(), 'coreg'] = ""
+    zip_data_matching_adshs_df.loc[zip_data_matching_adshs_df.coreg.isnull(), "coreg"] = ""
+    xml_data_matching_adshs_df.loc[xml_data_matching_adshs_df.coreg.isnull(), "coreg"] = ""
 
-    zip_idx = zip_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'])[['value']]
-    xml_idx = xml_data_matching_adshs_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'])[['value']]
+    zip_idx = zip_data_matching_adshs_df.set_index(["adsh", "tag", "version", "ddate", "qtrs", "coreg", "uom"])[
+        ["value"]
+    ]
+    xml_idx = xml_data_matching_adshs_df.set_index(["adsh", "tag", "version", "ddate", "qtrs", "coreg", "uom"])[
+        ["value"]
+    ]
 
-    zip_idx.rename(columns = lambda x: x + '_zip', inplace=True)
-    xml_idx.rename(columns = lambda x: x + '_xml', inplace=True)
+    zip_idx.rename(columns=lambda x: x + "_zip", inplace=True)
+    xml_idx.rename(columns=lambda x: x + "_xml", inplace=True)
 
     merged_pure_df = pd.merge(xml_idx, zip_idx, how="outer", left_index=True, right_index=True)
 
@@ -89,7 +92,7 @@ def test_compare_content():
 
     merged_pure_df = pd.read_csv(merged_tmp_file)
     # merged_pure_df = merged_pure_df[merged_pure_df.adsh.isin(['0000002178-21-000034'])]
-    merged_pure_df.set_index(['adsh','tag','version','ddate', 'qtrs', 'coreg', 'uom'], inplace=True)
+    merged_pure_df.set_index(["adsh", "tag", "version", "ddate", "qtrs", "coreg", "uom"], inplace=True)
 
     # filtern von value spalten mit null
     merged_df = merged_pure_df[~(merged_pure_df.value_xml.isnull() & merged_pure_df.value_zip.isnull())]
@@ -98,15 +101,13 @@ def test_compare_content():
     print("Check Duplicated Index Count: ", len(duplicated))
     print("Entries total pure merge: ", len(merged_pure_df))
 
-    merged_df['is_equal'] = (merged_df.value_zip == merged_df.value_xml)
+    merged_df["is_equal"] = merged_df.value_zip == merged_df.value_xml
 
-    equal_df = merged_df[merged_df.is_equal == True]
-    not_equal_df = merged_df[merged_df.is_equal == False]
+    equal_df = merged_df[merged_df.is_equal == True] # pylint: disable=C0121
+    not_equal_df = merged_df[merged_df.is_equal == False] # pylint: disable=C0121
 
     not_equal_df.to_csv(diff_tmp_file, sep="\t", index=True, header=True)
 
     print("Entries total in merged : ", len(merged_df))
     print("Entries equal           : ", len(equal_df))
     print("Entries not equal       : ", len(not_equal_df))
-
-

@@ -138,15 +138,18 @@ def test_create_quarter_zip_new(test_dirs):
         assert "20240103.zip" in metadata
 
         # Check that the sub.txt contains all ADSHs
-        sub_df = pd.read_csv(zf.open("sub.txt"), sep="\t", header=0)
+        with zf.open("sub.txt") as f:
+            sub_df = pd.read_csv(f, sep="\t", header=0)
         assert len(sub_df) == 6  # 2 ADSHs per day, 3 days
 
         # Check that the pre.txt contains all entries
-        pre_df = pd.read_csv(zf.open("pre.txt"), sep="\t", header=0)
+        with zf.open("pre.txt") as f:
+            pre_df = pd.read_csv(f, sep="\t", header=0)
         assert len(pre_df) == 18  # 3 entries per ADSH, 6 ADSHs
 
         # Check that the num.txt contains all entries
-        num_df = pd.read_csv(zf.open("num.txt"), sep="\t", header=0)
+        with zf.open("num.txt") as f:
+            num_df = pd.read_csv(f, sep="\t", header=0)
         assert len(num_df) == 18  # 3 entries per ADSH, 6 ADSHs
 
 
@@ -185,7 +188,8 @@ def test_update_quarter_zip(test_dirs):
         assert "20240103.zip" in metadata
 
         # Check that the sub.txt contains all ADSHs
-        sub_df = pd.read_csv(zf.open("sub.txt"), sep="\t", header=0)
+        with zf.open("sub.txt") as f:
+            sub_df = pd.read_csv(f, sep="\t", header=0)
         assert len(sub_df) == 6  # 2 ADSHs per day, 3 days
 
         # Check that all ADSHs are present

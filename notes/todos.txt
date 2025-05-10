@@ -12,18 +12,21 @@ Version 0.1.1
 01. [x] version in code
     [x] update check
 
-02. [] build quarter zip files from daily zip files -> what is the most efficient way?
+02. [] build quarter zip files from daily zip filenames
+      [x] for all quarters
+      [] starting from a specific quarter
 
+xx. [] clean up for quarter
+      [] cleanup files for a specific quarter
+      [] cleanup db tables for a specific quarter
+      [] option to cleanup daily / zip files as well
 
 
 xx. [] improved configuration 
 xx. [] verbessern der Configurations possibilities -> über config class?
 
 
-xx. [] clean up for quarter
-      [] cleanup files for a specific quarter
-      [] cleanup db tables for a specific quarter
-      [] option to cleanup daily / zip files as well
+
 
 xx. [] code documentation
         [] code/module documentation
