@@ -1,0 +1,56 @@
+Goal
+----
+Data for quarters that are are before the provided "start-quarter" can be removed.
+
+Options
+-------
+- remove temporary files that were downloaded and created during the process
+  - xml files
+  - csv files
+  - secstyle files
+- remove entries in the database tables "sec_reports" and "sec_report_processing" (based on filing date, resp filing month and filing year)
+- remove quarter zip files
+- remove daily zip files
+
+
+Parameters
+--------
+- paths to the xml-files, csv-fils, and secstyle-files
+- path to the database file
+- path to the quarter zip files
+- path to the daily zip files
+- start quarter
+- boolean options: remove_processing_files, remove_db_entries, remove_quarter_zip_files, remove_daily_zip_files
+
+
+Cases
+-----
+- remove temporary files that were downloaded and created during the process
+- remove entries in the database tables "sec_reports" and "sec_report_processing" (based on filing date, resp filing month and filing year)
+- remove quarter zip files
+- remove daily zip files
+
+
+Code
+----
+- follow general code rules defined in "common.txt"
+- Code has to be provided in a separte package "_06_cleanup". The modules name is "Housekeeping.py".
+- If meaningful, sub packages or additional moduls can be added
+- Data-access logic is extracted in its own module within '_06_cleanup.db'
+  Use the same patterns for data access as in the other modules (e.g. _01_index.db). Use the same superclass.
+  also, provide a Dataccess Interface in the "Housekeeping.py", using the protocol feature of python.
+- add proper logging that shows what is happeneing and what is being deleted/removed. do that only on the quarter level, no need to log on the file level.
+
+
+Tests
+-----
+- reasonable tests shall be created under "tests/_06_cleanup". testdata shall be put under "tests/_06_cleanup/data". 
+- The file containing the test is called "Housekeeping_test.py"
+
+- test if temporary files are removed correctly
+- test if database entries are removed correctly
+- test if quarter zip files are removed correctly
+- test if daily zip files are removed correctly
+- test if combination of options works correctly
+
+- add other tests if meaningful

@@ -12,14 +12,23 @@ Version 0.1.1
 01. [x] version in code
     [x] update check
 
-02. [] build quarter zip files from daily zip filenames
+02. [x] build quarter zip files from daily zip filenames
       [x] for all quarters
-      [] starting from a specific quarter
+      [x] starting from a specific quarter
+
+03. [] introduce a configuration class for secdaily
+      [] define workdir and subdirs
+      [] define intermediate files cleaning
+      [] define final files cleaning
+      [] define user agent
+
+      [] ensure compatibility with "old" interface, maybe using a classmethod?
+
 
 xx. [] clean up for quarter
       [] cleanup files for a specific quarter
       [] cleanup db tables for a specific quarter
-      [] option to cleanup daily / zip files as well
+      [] option to cleanup daily / quarter zip files as well
 
 
 xx. [] improved configuration 

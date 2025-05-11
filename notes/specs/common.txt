@@ -1,0 +1,11 @@
+Code Generation Rules
+----------------------
+- line with is 120
+- follow pylint configuration
+- follow ruff configuration
+- follow black configuration
+- use lazy evaluation when writing log entries
+- Don't change code that is not part of the current task
+- keep a reasonable file size. in general, about 500 lines is a good maximum. there can be exceptions, but they should be rare.
+
+
