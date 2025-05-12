@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import datetime
 from typing import Optional
 
@@ -24,33 +25,46 @@ from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreating
 from secdaily._05_quarterzip.QuarterZipCreating import QuarterZipCreator
 
 
-class SecDailyOrchestrator:
+class Configuration:
 
     def __init__(
-        self, workdir: str, user_agent_def: str, start_year: Optional[int] = None, start_qrtr: Optional[int] = None
+        self,
+        user_agent_def: Optional[str] = None,
+        workdir: Optional[str] = None,
+        xmldir: Optional[str] = None,
+        csvdir: Optional[str] = None,
+        formatdir: Optional[str] = None,
+        dailyzipdir: Optional[str] = None,
+        quarterzipdir: Optional[str] = None,
     ):
+
+        self.user_agent_def = user_agent_def or f"private user somebody{random.randint(1, 1000)}.lastname@gmail.com"
+
+        self.workdir = workdir or "./"
+        if self.workdir[-1] != "/":
+            self.workdir = self.workdir + "/"
+
+        self.xmldir = xmldir or self.workdir + "_1_xml/"
+        self.csvdir = csvdir or self.workdir + "_2_csv/"
+        self.formatdir = formatdir or self.workdir + "_3_secstyle/"
+        self.dailyzipdir = dailyzipdir or self.workdir + "_4_daily/"
+        self.quarterzipdir = quarterzipdir or self.workdir + "_5_quarter/"
+
+
+class SecDailyOrchestrator:
+
+    def __init__(self, configuration: Configuration):
         """
         :param user_agent_def: according to https://www.sec.gov/os/accessing-edgar-data in the
           form User-Agent: Sample Company Name AdminContact@<sample company domain>.com
         """
+        self.configuration = configuration
 
-        if workdir[-1] != "/":
-            workdir = workdir + "/"
-
-        DB(workdir).create_db()  # create database if ncessary
-
-        self.workdir = workdir
-        self.xmldir = workdir + "_1_xml/"
-        self.csvdir = workdir + "_2_csv/"
-        self.formatdir = workdir + "_3_secstyle/"
-        self.dailyzipdir = workdir + "_4_daily/"
-        self.quarterzipdir = workdir + "_5_quarter/"
+        DB(self.configuration.workdir).create_db()  # create database if ncessary
 
         self.today = datetime.today()
 
-        self.urldownloader = UrlDownloader(user_agent_def)
-
-        self.start_qrtr_info = QuarterInfo(year=start_year, qrtr=start_qrtr)
+        self.urldownloader = UrlDownloader(self.configuration.user_agent_def)
 
         # logging.basicConfig(filename='logging.log',level=logging.DEBUG)
         logging.basicConfig(level=logging.INFO)
@@ -66,38 +80,38 @@ class SecDailyOrchestrator:
         logging.info(title)
         logging.info("--------------------------------------------------------------")
 
-    def _download_index_data(self):
+    def _download_index_data(self, start_qrtr_info: QuarterInfo):
         self._log_sub_header("looking for new reports")
         secfullindexprocessor = SecFullIndexFileProcessor(
-            dbmanager=IndexProcessingDA(self.workdir),
+            dbmanager=IndexProcessingDA(self.configuration.workdir),
             urldownloader=self.urldownloader,
-            start_year=self.start_qrtr_info.year,
-            start_qrtr=self.start_qrtr_info.qrtr,
+            start_year=start_qrtr_info.year,
+            start_qrtr=start_qrtr_info.qrtr,
         )
         secfullindexprocessor.process()
 
     def _postprocess_index_data(self):
         self._log_sub_header("add xbrl file urls")
         secfullindexpostprocessor = SecFullIndexFilePostProcessor(
-            IndexPostProcessingDA(self.workdir), self.urldownloader
+            IndexPostProcessingDA(self.configuration.workdir), self.urldownloader
         )
         secfullindexpostprocessor.process()
         self._log_sub_header("check for duplicates")
         secfullindexpostprocessor.check_for_duplicated()
 
-    def process_index_data(self):
+    def process_index_data(self, start_qrtr_info: QuarterInfo):
         self._log_main_header("Process xbrl full index files")
-        self._download_index_data()
+        self._download_index_data(start_qrtr_info=start_qrtr_info)
         self._postprocess_index_data()
 
     def _preprocess_xml(self):
         self._log_sub_header("preprocess xml files")
-        secxmlfilepreprocessor = SecXmlFilePreprocessor(XmlFilePreProcessingDA(self.workdir))
+        secxmlfilepreprocessor = SecXmlFilePreprocessor(XmlFilePreProcessingDA(self.configuration.workdir))
         secxmlfilepreprocessor.copy_entries_to_processing_table()
 
     def _download_xml(self):
         secxmlfilesdownloader = SecXmlFileDownloader(
-            XmlFileDownloadingDA(self.workdir), self.urldownloader, self.xmldir
+            XmlFileDownloadingDA(self.configuration.workdir), self.urldownloader, self.configuration.xmldir
         )
         self._log_sub_header("download lab xml files")
         secxmlfilesdownloader.downloadLabFiles()
@@ -109,7 +123,7 @@ class SecDailyOrchestrator:
         secxmlfilesdownloader.downloadPreFiles()
 
     def _parse_xml(self):
-        secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.workdir), self.csvdir)
+        secxmlfileparser = SecXmlParser(XmlFileParsingDA(self.configuration.workdir), self.configuration.csvdir)
         self._log_sub_header("parse lab xml files")
         secxmlfileparser.parseLabFiles()
 
@@ -127,26 +141,33 @@ class SecDailyOrchestrator:
 
     def create_sec_style(self):
         self._log_sub_header("create sec style files")
-        formatter = SECStyleFormatter(dbmanager=SecStyleFormatterDA(self.workdir), data_dir=self.formatdir)
+        formatter = SECStyleFormatter(
+            dbmanager=SecStyleFormatterDA(self.configuration.workdir), data_dir=self.configuration.formatdir
+        )
         formatter.process()
 
     def create_daily_zip(self):
         self._log_main_header("Create daily zip files")
-        zip_creator = DailyZipCreator(DailyZipCreatingDA(self.workdir), self.dailyzipdir)
+        zip_creator = DailyZipCreator(DailyZipCreatingDA(self.configuration.workdir), self.configuration.dailyzipdir)
         zip_creator.process()
 
-    def create_quarter_zip(self):
+    def create_quarter_zip(self, start_qrtr_info: QuarterInfo):
         self._log_main_header("Create quarter zip files")
-        quarter_zip_creator = QuarterZipCreator(start_qrtr_info=self.start_qrtr_info,
-                daily_zip_dir=self.dailyzipdir, quarter_zip_dir=self.quarterzipdir)
+        quarter_zip_creator = QuarterZipCreator(
+            start_qrtr_info=start_qrtr_info,
+            daily_zip_dir=self.configuration.dailyzipdir,
+            quarter_zip_dir=self.configuration.quarterzipdir,
+        )
         quarter_zip_creator.process()
 
-    def process(self):
-        self.process_index_data()
+    def process(self, start_year: Optional[int] = None, start_qrtr: Optional[int] = None):
+        start_qrtr_info = QuarterInfo(year=start_year, qrtr=start_qrtr)
+
+        self.process_index_data(start_qrtr_info=start_qrtr_info)
         self.process_xml_data()
         self.create_sec_style()
         self.create_daily_zip()
-        self.create_quarter_zip()
+        self.create_quarter_zip(start_qrtr_info=start_qrtr_info)
 
         print_sponsoring_message()
         print_newer_version_message()
@@ -155,10 +176,8 @@ class SecDailyOrchestrator:
 if __name__ == "__main__":
     workdir_default = "d:/secprocessing2/"
 
-    orchestrator = SecDailyOrchestrator(
-        workdir=workdir_default,
-        user_agent_def="private user somebody.lastname@gmail.com",
-        start_year=2024,
-        start_qrtr=4,
-    )
-    orchestrator.process()
+    configuration = Configuration(workdir=workdir_default)
+
+    orchestrator = SecDailyOrchestrator(configuration=configuration)
+
+    orchestrator.process(start_year=2024, start_qrtr=4)

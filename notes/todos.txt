@@ -16,20 +16,20 @@ Version 0.1.1
       [x] for all quarters
       [x] starting from a specific quarter
 
-x5. [] clean up for quarter
-      [] cleanup files for a specific quarter
-      [] cleanup db tables for a specific quarter
-      [] option to cleanup daily / quarter zip files as well
+03. [] clean up for quarter
+      [x] cleanup files for a specific quarter
+      [x] cleanup db tables for a specific quarter
+      [x] option to cleanup daily / quarter zip files as well
 
 04. [] introduce a configuration class for secdaily
-      [] define workdir and subdirs
+      [x] define user agent
+      [x] define workdir and subdirs
       [] define intermediate files cleaning
       [] define final files cleaning
-      [] define user agent
 
       [] ensure compatibility with "old" interface, maybe using a classmethod?
 
-
+05. Radme anpassen
 xx. [] improved configuration 
 xx. [] verbessern der Configurations possibilities -> über config class?
 
