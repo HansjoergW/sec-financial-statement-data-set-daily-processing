@@ -1,10 +1,15 @@
+"""
+Main module for the housekeeping functionality. Provides the Housekeeper class that manages cleanup of old data
+from the SEC processing pipeline based on a specified start quarter.
+"""
+
 import logging
 import os
 import shutil
 from pathlib import Path
 from typing import List, Optional, Protocol
 
-from secdaily._00_common.BaseDefinitions import QuarterInfo
+from secdaily._00_common.BaseDefinitions import QuarterInfo, qrtr_value_from_string
 from secdaily._00_common.ProcessBase import ProcessBase
 from secdaily._06_cleanup.db.HousekeepingDataAccess import HousekeepingDataAccess, ReportToCleanup
 
@@ -41,7 +46,7 @@ class Housekeeper(ProcessBase):
         daily_zip_dir: str,
         quarter_zip_dir: str,
         db_manager: Optional[HousekeepingDataAccessProtocol] = None,
-        work_dir: str = None,
+        work_dir: Optional[str] = None,
     ):
         """
         Initialize the Housekeeper.
@@ -67,13 +72,6 @@ class Housekeeper(ProcessBase):
 
         self.db_manager = db_manager or HousekeepingDataAccess(work_dir=work_dir or ".")
 
-    @staticmethod
-    def _ensure_trailing_slash(directory: str) -> str:
-        """Ensure the directory path ends with a slash."""
-        if directory and directory[-1] != "/" and directory[-1] != "\\":
-            return directory + "/"
-        return directory
-
     def _is_quarter_before_start(self, qrtr_string: str) -> bool:
         """
         Check if the given quarter is before the start quarter.
@@ -85,64 +83,57 @@ class Housekeeper(ProcessBase):
             True if the quarter is before the start quarter, False otherwise
         """
         try:
-            year = int(qrtr_string[:-2])
-            qrtr = int(qrtr_string[-1])
-            qrtr_value = year * 10 + qrtr
-            return qrtr_value < self.start_qrtr_info.qrtr_value
+            return qrtr_value_from_string(qrtr_string) < self.start_qrtr_info.qrtr_value
         except (ValueError, IndexError):
             # If the format is invalid, assume it's not a quarter directory
             return False
 
-    def cleanup_processing_files(self) -> int:
+    def clean_directory(self, directory: str) -> int:
+        """
+        Remove all files and directories before the start quarter in the given directory.
+
+        Args:
+            directory: Directory to clean
+
+        Returns:
+            Number of files and directories removed
+        """
+
+        files_removed = 0
+
+        if os.path.exists(directory):
+            for item in os.listdir(directory):
+                item_path = os.path.join(directory, item)
+
+                # Check if it's a directory and matches the quarter format
+                if os.path.isdir(item_path) and self._is_quarter_before_start(item):
+                    # Count files before removing
+                    files_count = sum(1 for _ in Path(item_path).glob("**/*.*"))
+                    files_removed += files_count
+
+                    # Remove the entire directory
+                    shutil.rmtree(item_path)
+                    logging.info("Removed directory: %s containing %d files", item_path, files_count)
+
+        return files_removed
+
+    def cleanup_processing_files(self):
         """
         Remove temporary files (XML, CSV, secstyle files) for reports before the start quarter.
 
         Returns:
             Number of files removed
         """
-        reports = self.db_manager.find_reports_before_quarter(self.start_qrtr_info)
-        files_removed = 0
+        processing_dirs = [self.xml_dir, self.csv_dir, self.secstyle_dir]
 
-        for report in reports:
-            # Remove XML files
-            if report.xmlNumFile and os.path.exists(report.xmlNumFile):
-                os.remove(report.xmlNumFile)
-                files_removed += 1
-
-            if report.xmlPreFile and os.path.exists(report.xmlPreFile):
-                os.remove(report.xmlPreFile)
-                files_removed += 1
-
-            if report.xmlLabFile and os.path.exists(report.xmlLabFile):
-                os.remove(report.xmlLabFile)
-                files_removed += 1
-
-            # Remove CSV files
-            if report.csvNumFile and os.path.exists(report.csvNumFile):
-                os.remove(report.csvNumFile)
-                files_removed += 1
-
-            if report.csvPreFile and os.path.exists(report.csvPreFile):
-                os.remove(report.csvPreFile)
-                files_removed += 1
-
-            if report.csvLabFile and os.path.exists(report.csvLabFile):
-                os.remove(report.csvLabFile)
-                files_removed += 1
-
-            # Remove secstyle files
-            if report.numFormattedFile and os.path.exists(report.numFormattedFile):
-                os.remove(report.numFormattedFile)
-                files_removed += 1
-
-            if report.preFormattedFile and os.path.exists(report.preFormattedFile):
-                os.remove(report.preFormattedFile)
-                files_removed += 1
-
-        logging.info(
-            "Removed %d processing files for quarters before %s", files_removed, self.start_qrtr_info.qrtr_string
-        )
-        return files_removed
+        for directory in processing_dirs:
+            files_removed = self.clean_directory(directory)
+            logging.info(
+                "Removed %d files from %s for quarters before %s",
+                files_removed,
+                directory,
+                self.start_qrtr_info.qrtr_string,
+            )
 
     def cleanup_db_entries(self) -> int:
         """
@@ -171,42 +162,29 @@ class Housekeeper(ProcessBase):
                     logging.info("Removed quarter zip file: %s", file_path)
 
         logging.info(
-            "Removed %d quarter zip files for quarters before %s", files_removed, self.start_qrtr_info.qrtr_string
+            "Removed %d quarter zip files from %sfor quarters before %s",
+            self.quarter_zip_dir,
+            files_removed,
+            self.start_qrtr_info.qrtr_string,
         )
         return files_removed
 
-    def cleanup_daily_zip_files(self) -> int:
+    def cleanup_daily_zip_files(self):
         """
         Remove daily zip files for quarters before the start quarter.
 
         Returns:
             Number of daily zip files removed
         """
-        dirs_removed = 0
-        files_removed = 0
 
-        if os.path.exists(self.daily_zip_dir):
-            for item in os.listdir(self.daily_zip_dir):
-                item_path = os.path.join(self.daily_zip_dir, item)
-
-                # Check if it's a directory and matches the quarter format
-                if os.path.isdir(item_path) and self._is_quarter_before_start(item):
-                    # Count files before removing
-                    files_count = sum(1 for _ in Path(item_path).glob("*.zip"))
-                    files_removed += files_count
-
-                    # Remove the entire directory
-                    shutil.rmtree(item_path)
-                    dirs_removed += 1
-                    logging.info("Removed daily zip directory: %s containing %d files", item_path, files_count)
+        files_removed = self.clean_directory(self.daily_zip_dir)
 
         logging.info(
-            "Removed %d daily zip directories with %d files for quarters before %s",
-            dirs_removed,
+            "Removed daily zips from %s with %d files for quarters before %s",
+            self.daily_zip_dir,
             files_removed,
             self.start_qrtr_info.qrtr_string,
         )
-        return files_removed
 
     def process(
         self,
@@ -214,7 +192,7 @@ class Housekeeper(ProcessBase):
         remove_db_entries: bool = False,
         remove_quarter_zip_files: bool = False,
         remove_daily_zip_files: bool = False,
-    ) -> dict:
+    ):
         """
         Perform the cleanup process based on the specified options.
 
@@ -229,27 +207,19 @@ class Housekeeper(ProcessBase):
         """
         logging.info("Starting cleanup for quarters before %s", self.start_qrtr_info.qrtr_string)
 
-        result = {
-            "processing_files_removed": 0,
-            "db_entries_removed": 0,
-            "quarter_zip_files_removed": 0,
-            "daily_zip_files_removed": 0,
-        }
-
         if remove_processing_files:
-            result["processing_files_removed"] = self.cleanup_processing_files()
+            self.cleanup_processing_files()
 
         if remove_db_entries:
-            result["db_entries_removed"] = self.cleanup_db_entries()
+            self.cleanup_db_entries()
 
         if remove_quarter_zip_files:
-            result["quarter_zip_files_removed"] = self.cleanup_quarter_zip_files()
+            self.cleanup_quarter_zip_files()
 
         if remove_daily_zip_files:
-            result["daily_zip_files_removed"] = self.cleanup_daily_zip_files()
+            self.cleanup_daily_zip_files()
 
         logging.info("Cleanup completed for quarters before %s", self.start_qrtr_info.qrtr_string)
-        return result
 
 
 if __name__ == "__main__":
@@ -270,8 +240,6 @@ if __name__ == "__main__":
         work_dir="d:/secprocessing/",
     )
 
-    result = housekeeper.process(
+    housekeeper.process(
         remove_processing_files=True, remove_db_entries=True, remove_quarter_zip_files=True, remove_daily_zip_files=True
     )
-
-    print(f"Cleanup results: {result}")

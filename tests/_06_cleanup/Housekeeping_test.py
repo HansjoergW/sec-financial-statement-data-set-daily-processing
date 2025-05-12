@@ -1,3 +1,8 @@
+"""
+Test module for the Housekeeping functionality. Tests the cleanup of old data including processing files,
+database entries, quarter zip files, and daily zip files based on a specified start quarter.
+"""
+
 import os
 import shutil
 import sqlite3
@@ -97,9 +102,9 @@ def test_db():
     # Insert test data
     conn.execute(
         """
-        INSERT INTO sec_reports 
+        INSERT INTO sec_reports
         (accessionNumber, sec_feed_file, formType, filingDate, filingMonth, filingYear, cikNumber)
-        VALUES 
+        VALUES
         ('0001234567-22-000001', 'feed1.txt', '10-K', '2022-12-15', 12, 2022, '0001234567'),
         ('0001234567-23-000002', 'feed2.txt', '10-K', '2023-01-15', 1, 2023, '0001234567'),
         ('0001234567-23-000003', 'feed3.txt', '10-K', '2023-04-15', 4, 2023, '0001234567')
@@ -108,21 +113,21 @@ def test_db():
 
     conn.execute(
         """
-        INSERT INTO sec_report_processing 
+        INSERT INTO sec_report_processing
         (accessionNumber, formType, filingDate, filingDay, filingMonth, filingYear, cikNumber,
          xmlNumFile, xmlPreFile, xmlLabFile, csvNumFile, csvPreFile, csvLabFile,
          numFormattedFile, preFormattedFile, dailyZipFile)
-        VALUES 
+        VALUES
         ('0001234567-22-000001', '10-K', '2022-12-15', 15, 12, 2022, '0001234567',
-         'xml_num_1.xml', 'xml_pre_1.xml', 'xml_lab_1.xml', 
+         'xml_num_1.xml', 'xml_pre_1.xml', 'xml_lab_1.xml',
          'csv_num_1.csv', 'csv_pre_1.csv', 'csv_lab_1.csv',
          'num_fmt_1.txt', 'pre_fmt_1.txt', 'daily_1.zip'),
         ('0001234567-23-000002', '10-K', '2023-01-15', 15, 1, 2023, '0001234567',
-         'xml_num_2.xml', 'xml_pre_2.xml', 'xml_lab_2.xml', 
+         'xml_num_2.xml', 'xml_pre_2.xml', 'xml_lab_2.xml',
          'csv_num_2.csv', 'csv_pre_2.csv', 'csv_lab_2.csv',
          'num_fmt_2.txt', 'pre_fmt_2.txt', 'daily_2.zip'),
         ('0001234567-23-000003', '10-K', '2023-04-15', 15, 4, 2023, '0001234567',
-         'xml_num_3.xml', 'xml_pre_3.xml', 'xml_lab_3.xml', 
+         'xml_num_3.xml', 'xml_pre_3.xml', 'xml_lab_3.xml',
          'csv_num_3.csv', 'csv_pre_3.csv', 'csv_lab_3.csv',
          'num_fmt_3.txt', 'pre_fmt_3.txt', 'daily_3.zip')
     """
@@ -217,10 +222,9 @@ def test_cleanup_processing_files(test_dirs):
     )
 
     # Run cleanup
-    files_removed = housekeeper.cleanup_processing_files()
+    housekeeper.cleanup_processing_files()
 
     # Check that files before 2023q1 were removed
-    assert files_removed == 6
     assert not os.path.exists(xml_files[0])
     assert not os.path.exists(xml_files[1])
     assert not os.path.exists(csv_files[0])

@@ -55,7 +55,22 @@ class QuarterInfo:
                 self.qrtr = qrtr
 
         self.qrtr_string = get_qrtr_string(self.year, self.qrtr)
-        self.qrtr_value:int = self.year * 10 + self.qrtr
+        self.qrtr_value: int = qrtr_value(self.year, self.qrtr)
+
+
+def qrtr_value(year: int, qrtr: int) -> int:
+    return year * 10 + qrtr
+
+
+def qrtr_value_from_string(qrtr_string: str) -> int:
+    "qrtr_string is in format 'YYYYqQ'"
+
+    if not (len(qrtr_string) == 6 and qrtr_string[4] == 'q' and qrtr_string[:4].isdigit() and qrtr_string[5].isdigit()):
+        raise ValueError(f"Invalid quarter string format: {qrtr_string}")
+
+    year = int(qrtr_string[:-2])
+    qrtr = int(qrtr_string[-1])
+    return qrtr_value(year, qrtr)
 
 
 def get_qrtr_string_by_month(year: int, month: int) -> str:

@@ -20,8 +20,7 @@ class ProcessBase:
         self.data_dir = data_dir
         self.processdate = datetime.date.today().isoformat()
 
-        if self.data_dir[-1] != "/":
-            self.data_dir = data_dir + "/"
+        self.data_dir = self._ensure_trailing_slash(data_dir)
 
         self.error_log_dir = self.data_dir + "error/"
 
@@ -40,3 +39,10 @@ class ProcessBase:
             with open(error_file_name, "w", encoding="utf-8") as f:
                 for error in error_list:
                     f.write(error.error_info + " - " + error.error + "\n")
+
+    @staticmethod
+    def _ensure_trailing_slash(directory: str) -> str:
+        """Ensure the directory path ends with a slash."""
+        if directory and directory[-1] != "/" and directory[-1] != "\\":
+            return directory + "/"
+        return directory

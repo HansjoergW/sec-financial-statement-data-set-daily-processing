@@ -1,3 +1,8 @@
+"""
+Data access module for the housekeeping functionality. Provides database operations for finding and deleting
+reports before a specified quarter.
+"""
+
 import logging
 from dataclasses import dataclass
 from typing import List
@@ -14,15 +19,15 @@ class ReportToCleanup:
     filingYear: int
     filingMonth: int
     filingDay: int
-    xmlNumFile: str = None
-    xmlPreFile: str = None
-    xmlLabFile: str = None
-    csvNumFile: str = None
-    csvPreFile: str = None
-    csvLabFile: str = None
-    numFormattedFile: str = None
-    preFormattedFile: str = None
-    dailyZipFile: str = None
+    xmlNumFile: str | None = None
+    xmlPreFile: str | None = None
+    xmlLabFile: str | None = None
+    csvNumFile: str | None = None
+    csvPreFile: str | None = None
+    csvLabFile: str | None = None
+    numFormattedFile: str | None = None
+    preFormattedFile: str | None = None
+    dailyZipFile: str | None = None
 
 
 class HousekeepingDataAccess(DB):
@@ -48,7 +53,7 @@ class HousekeepingDataAccess(DB):
                    csvNumFile, csvPreFile, csvLabFile,
                    numFormattedFile, preFormattedFile, dailyZipFile
             FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
-            WHERE (filingYear * 10 + (CASE 
+            WHERE (filingYear * 10 + (CASE
                                       WHEN filingMonth BETWEEN 1 AND 3 THEN 1
                                       WHEN filingMonth BETWEEN 4 AND 6 THEN 2
                                       WHEN filingMonth BETWEEN 7 AND 9 THEN 3
@@ -76,7 +81,7 @@ class HousekeepingDataAccess(DB):
         # First, count how many records will be deleted
         count_sql = f"""
             SELECT COUNT(*) FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
-            WHERE (filingYear * 10 + (CASE 
+            WHERE (filingYear * 10 + (CASE
                                       WHEN filingMonth BETWEEN 1 AND 3 THEN 1
                                       WHEN filingMonth BETWEEN 4 AND 6 THEN 2
                                       WHEN filingMonth BETWEEN 7 AND 9 THEN 3
@@ -90,7 +95,7 @@ class HousekeepingDataAccess(DB):
         # Delete records from sec_report_processing
         delete_processing_sql = f"""
             DELETE FROM {DB.SEC_REPORT_PROCESSING_TBL_NAME}
-            WHERE (filingYear * 10 + (CASE 
+            WHERE (filingYear * 10 + (CASE
                                       WHEN filingMonth BETWEEN 1 AND 3 THEN 1
                                       WHEN filingMonth BETWEEN 4 AND 6 THEN 2
                                       WHEN filingMonth BETWEEN 7 AND 9 THEN 3
@@ -103,7 +108,7 @@ class HousekeepingDataAccess(DB):
         # Delete records from sec_reports
         delete_reports_sql = f"""
             DELETE FROM {DB.SEC_REPORTS_TBL_NAME}
-            WHERE (filingYear * 10 + (CASE 
+            WHERE (filingYear * 10 + (CASE
                                       WHEN filingMonth BETWEEN 1 AND 3 THEN 1
                                       WHEN filingMonth BETWEEN 4 AND 6 THEN 2
                                       WHEN filingMonth BETWEEN 7 AND 9 THEN 3
