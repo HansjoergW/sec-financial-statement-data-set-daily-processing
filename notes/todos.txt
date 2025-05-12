@@ -30,9 +30,6 @@ x5. [] clean up for quarter
       [] ensure compatibility with "old" interface, maybe using a classmethod?
 
 
-
-
-
 xx. [] improved configuration 
 xx. [] verbessern der Configurations possibilities -> über config class?
 

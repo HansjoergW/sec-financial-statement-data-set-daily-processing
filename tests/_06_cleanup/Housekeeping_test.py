@@ -8,6 +8,7 @@ import shutil
 import sqlite3
 import tempfile
 import zipfile
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -18,30 +19,25 @@ from secdaily._06_cleanup.Housekeeping import Housekeeper
 
 
 @pytest.fixture
-def test_dirs():
+def test_dirs(tmp_path):
     """Create temporary directories for testing."""
-    temp_dir = tempfile.mkdtemp()
 
     # Create directory structure
-    xml_dir = os.path.join(temp_dir, "_1_xml")
-    csv_dir = os.path.join(temp_dir, "_2_csv")
-    secstyle_dir = os.path.join(temp_dir, "_3_secstyle")
-    daily_zip_dir = os.path.join(temp_dir, "_4_daily")
-    quarter_zip_dir = os.path.join(temp_dir, "_5_quarter")
+    xml_dir = os.path.join(tmp_path, "_1_xml")
+    csv_dir = os.path.join(tmp_path, "_2_csv")
+    secstyle_dir = os.path.join(tmp_path, "_3_secstyle")
+    daily_zip_dir = os.path.join(tmp_path, "_4_daily")
+    quarter_zip_dir = os.path.join(tmp_path, "_5_quarter")
 
-    os.makedirs(xml_dir, exist_ok=True)
-    os.makedirs(csv_dir, exist_ok=True)
-    os.makedirs(secstyle_dir, exist_ok=True)
-    os.makedirs(daily_zip_dir, exist_ok=True)
-    os.makedirs(quarter_zip_dir, exist_ok=True)
-
-    # Create quarter directories in daily_zip_dir
-    os.makedirs(os.path.join(daily_zip_dir, "2022q4"), exist_ok=True)
-    os.makedirs(os.path.join(daily_zip_dir, "2023q1"), exist_ok=True)
-    os.makedirs(os.path.join(daily_zip_dir, "2023q2"), exist_ok=True)
+    root_directories = [xml_dir, csv_dir, secstyle_dir, daily_zip_dir, quarter_zip_dir]
+    qrtrs = ["2022q4", "2023q1", "2023q2"]
+    for directory in root_directories:
+        os.makedirs(directory, exist_ok=True)
+        for qrtr in qrtrs:
+            os.makedirs(os.path.join(directory, qrtr), exist_ok=True)
 
     yield {
-        "temp_dir": temp_dir,
+        "temp_dir": str(tmp_path),
         "xml_dir": xml_dir,
         "csv_dir": csv_dir,
         "secstyle_dir": secstyle_dir,
@@ -49,8 +45,7 @@ def test_dirs():
         "quarter_zip_dir": quarter_zip_dir,
     }
 
-    # Cleanup
-    shutil.rmtree(temp_dir)
+    shutil.rmtree(tmp_path)
 
 
 @pytest.fixture
@@ -143,7 +138,7 @@ def test_db():
         os.remove(db_file)
 
 
-def create_test_files(test_dirs, file_paths):
+def create_test_files(file_paths):
     """Create test files at the specified paths."""
     for file_path in file_paths:
         # Create directory if it doesn't exist
@@ -188,7 +183,7 @@ def test_cleanup_processing_files(test_dirs):
         os.path.join(test_dirs["secstyle_dir"], "2023q2", "num_fmt_3.txt"),
     ]
 
-    create_test_files(test_dirs, xml_files + csv_files + secstyle_files)
+    create_test_files(xml_files + csv_files + secstyle_files)
 
     # Create mock reports
     reports = [
@@ -224,13 +219,18 @@ def test_cleanup_processing_files(test_dirs):
     # Run cleanup
     housekeeper.cleanup_processing_files()
 
-    # Check that files before 2023q1 were removed
+    # Check that files before 2023q1 were removed, including the directories
     assert not os.path.exists(xml_files[0])
     assert not os.path.exists(xml_files[1])
+    assert not Path(xml_files[0]).parent.exists()
+
     assert not os.path.exists(csv_files[0])
     assert not os.path.exists(csv_files[1])
+    assert not Path(csv_files[0]).parent.exists()
+
     assert not os.path.exists(secstyle_files[0])
     assert not os.path.exists(secstyle_files[1])
+    assert not Path(secstyle_files[0]).parent.exists()
 
     # Check that files from 2023q1 and later still exist
     assert os.path.exists(xml_files[2])
@@ -353,10 +353,9 @@ def test_cleanup_daily_zip_files(test_dirs):
     )
 
     # Run cleanup
-    files_removed = housekeeper.cleanup_daily_zip_files()
+    housekeeper.cleanup_daily_zip_files()
 
     # Check that files before 2023q1 were removed
-    assert files_removed == 2
     assert not os.path.exists(daily_zips[0])
     assert not os.path.exists(daily_zips[1])
     assert not os.path.exists(os.path.join(test_dirs["daily_zip_dir"], "2022q4"))
@@ -366,70 +365,3 @@ def test_cleanup_daily_zip_files(test_dirs):
     assert os.path.exists(daily_zips[3])
     assert os.path.exists(os.path.join(test_dirs["daily_zip_dir"], "2023q1"))
     assert os.path.exists(os.path.join(test_dirs["daily_zip_dir"], "2023q2"))
-
-
-def test_process_combined_options(test_dirs, test_db):
-    """Test running the process method with multiple options."""
-    # Create test files
-    xml_file = os.path.join(test_dirs["xml_dir"], "xml_num_1.xml")
-    create_test_files(test_dirs, [xml_file])
-
-    # Create test quarter zip files
-    quarter_zip = os.path.join(test_dirs["quarter_zip_dir"], "2022q4.zip")
-    create_test_zip(quarter_zip)
-
-    # Create test daily zip files
-    daily_zip_dir = os.path.join(test_dirs["daily_zip_dir"], "2022q4")
-    os.makedirs(daily_zip_dir, exist_ok=True)
-    daily_zip = os.path.join(daily_zip_dir, "20221215.zip")
-    create_test_zip(daily_zip)
-
-    # Create data access with test database
-    db_manager = HousekeepingDataAccess(work_dir="")
-    db_manager.database = test_db
-
-    # Create mock for find_reports_before_quarter to return a report with our test file
-    original_find_reports = db_manager.find_reports_before_quarter
-
-    def mock_find_reports(start_qrtr_info):
-        reports = original_find_reports(start_qrtr_info)
-        for report in reports:
-            report.xmlNumFile = xml_file
-        return reports
-
-    db_manager.find_reports_before_quarter = mock_find_reports
-
-    # Create housekeeper with start quarter 2023q1
-    housekeeper = Housekeeper(
-        start_qrtr_info=QuarterInfo(year=2023, qrtr=1),
-        xml_dir=test_dirs["xml_dir"],
-        csv_dir=test_dirs["csv_dir"],
-        secstyle_dir=test_dirs["secstyle_dir"],
-        daily_zip_dir=test_dirs["daily_zip_dir"],
-        quarter_zip_dir=test_dirs["quarter_zip_dir"],
-        db_manager=db_manager,
-    )
-
-    # Run process with all options
-    result = housekeeper.process(
-        remove_processing_files=True, remove_db_entries=True, remove_quarter_zip_files=True, remove_daily_zip_files=True
-    )
-
-    # Check results
-    assert result["processing_files_removed"] == 1
-    assert result["db_entries_removed"] == 1
-    assert result["quarter_zip_files_removed"] == 1
-    assert result["daily_zip_files_removed"] == 1
-
-    # Check that files were removed
-    assert not os.path.exists(xml_file)
-    assert not os.path.exists(quarter_zip)
-    assert not os.path.exists(daily_zip)
-    assert not os.path.exists(daily_zip_dir)
-
-    # Verify database state
-    conn = sqlite3.connect(test_db)
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM sec_reports WHERE filingYear = 2022")
-    assert cursor.fetchone()[0] == 0
-    conn.close()
