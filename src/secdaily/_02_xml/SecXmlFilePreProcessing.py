@@ -1,3 +1,8 @@
+"""
+XML file preprocessing module for SEC EDGAR reports. Prepares report entries for processing by copying
+them from the overview table to the processing table.
+"""
+
 import logging
 from typing import Protocol
 

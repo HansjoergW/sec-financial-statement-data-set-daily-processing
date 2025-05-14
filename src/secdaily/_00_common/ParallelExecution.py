@@ -1,3 +1,8 @@
+"""
+Parallel execution module for efficient processing of large datasets. Provides a generic framework for
+throttled, chunked parallel processing with retry handling for failed operations.
+"""
+
 # using pathos.multiprocessing instead of multiprocessing, so that method functions can be used
 # - https://stackoverflow.com/questions/3288595/multiprocessing-how-to-use-pool-map-on-a-function-defined-in-a-class
 

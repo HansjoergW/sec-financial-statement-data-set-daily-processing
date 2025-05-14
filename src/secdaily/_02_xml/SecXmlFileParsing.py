@@ -1,4 +1,8 @@
-# coordinates the parsing of downloaded xml files and stores the data in a new folder
+"""
+XML file parsing module for SEC EDGAR reports. Parses numerical, presentation, and label XML files
+into structured CSV data and stores the results for further processing.
+"""
+
 import logging
 import traceback
 from typing import List, Protocol
@@ -74,7 +78,7 @@ class SecXmlParser(ProcessBase):
                 labParseState="parsed:" + str(len(df)),
             )
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
@@ -122,7 +126,7 @@ class SecXmlParser(ProcessBase):
                 preParseState="parsed:" + str(len(df)),
             )
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,
@@ -186,7 +190,7 @@ class SecXmlParser(ProcessBase):
                 fiscalYearEnd=fiscalYearEnd,
             )
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.exception("failed to parse data: %s / %s", data.file, e)
             self._log_error(
                 adsh=data.accessionNumber,

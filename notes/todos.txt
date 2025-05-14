@@ -16,28 +16,26 @@ Version 0.1.1
       [x] for all quarters
       [x] starting from a specific quarter
 
-03. [] clean up for quarter
+03. [x] clean up for quarter
       [x] cleanup files for a specific quarter
       [x] cleanup db tables for a specific quarter
       [x] option to cleanup daily / quarter zip files as well
 
-04. [] introduce a configuration class for secdaily
+04. [x] introduce a configuration class for secdaily
       [x] define user agent
       [x] define workdir and subdirs
-      [] define intermediate files cleaning
-      [] define final files cleaning
+      [x] define intermediate files cleaning
+      [x] define final files cleaning
 
-      [] ensure compatibility with "old" interface, maybe using a classmethod?
+05. [] code documentation
+        [] code/module documentation
+
 
 05. Radme anpassen
 xx. [] improved configuration 
 xx. [] verbessern der Configurations possibilities -> über config class?
 
 
-
-
-xx. [] code documentation
-        [] code/module documentation
 
 xx. [] what else is needed for the integration into secfsdstools?
 

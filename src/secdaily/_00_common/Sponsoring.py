@@ -1,3 +1,8 @@
+"""
+Sponsoring module for displaying project support information. Provides functions to display
+sponsorship messages and links to the project's GitHub repository.
+"""
+
 import random
 
 sponsor_messages = [
@@ -16,11 +21,12 @@ sponsor_messages = [
     "If you value this tool, your sponsorship is a great way to contribute!",
     "Support the developer behind secfsdstools – consider sponsoring today.",
     "Enjoy the convenience? Sponsor secfsdstools and help us grow.",
-    "Be a champion for open source – sponsor secfsdstools and support innovation."
+    "Be a champion for open source – sponsor secfsdstools and support innovation.",
 ]
 
+
 def print_sponsoring_message():
-    """ create sponsoring message """
+    """create sponsoring message"""
 
     message = random.choice(sponsor_messages)
 
@@ -44,16 +50,30 @@ def print_sponsoring_message():
     print(bold + white + "    https://github.com/sponsors/HansjoergW" + reset)
     print("\n")
     print(white + "    How to get in touch")
-    print("    - Found a bug:             https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/issues") # pylint: disable=C0301
-    print("    - Have a remark:           https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/general") # pylint: disable=C0301
-    print("    - Have an idea:            https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/ideas") # pylint: disable=C0301
-    print("    - Have a question:         https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/q-a") # pylint: disable=C0301
-    print("    - Have something to show:  https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/show-and-tell") # pylint: disable=C0301
+    print(
+        "    - Found a bug:             https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/issues"
+    )  # pylint: disable=C0301
+    print(
+        "    - Have a remark:           https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/general"
+    )  # pylint: disable=C0301
+    print(
+        "    - Have an idea:            https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/ideas"
+    )  # pylint: disable=C0301
+    print(
+        "    - Have a question:         https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/q-a"
+    )  # pylint: disable=C0301
+    print(
+        "    - Have something to show:  https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing/discussions/categories/show-and-tell"
+    )  # pylint: disable=C0301
     print("\n")
-    print("    Don't forget to star it at https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing") # pylint: disable=C0301
+    print(
+        "    Don't forget to star it at https://github.com/HansjoergW/sec-financial-statement-data-set-daily-processing"
+    )  # pylint: disable=C0301
     print("\n")
     print("    Check out my other SEC data related project")
-    print("                               https://github.com/HansjoergW/sec-fincancial-statement-data-set") # pylint: disable=C0301
+    print(
+        "                               https://github.com/HansjoergW/sec-fincancial-statement-data-set"
+    )  # pylint: disable=C0301
     print("\n")
 
     print(bold + yellow + hash_border + reset)

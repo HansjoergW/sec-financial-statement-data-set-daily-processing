@@ -1,3 +1,8 @@
+"""
+SEC full index file processing module. Downloads and processes SEC EDGAR full index files to identify
+new 10-K/10-Q reports and track their processing status.
+"""
+
 import datetime
 import logging
 import re

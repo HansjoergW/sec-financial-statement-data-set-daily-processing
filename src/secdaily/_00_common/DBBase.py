@@ -1,3 +1,8 @@
+"""
+Base database module providing SQLite database access functionality. Implements common database operations
+and serves as the foundation for all data access classes in the application.
+"""
+
 import glob
 import os
 import sqlite3

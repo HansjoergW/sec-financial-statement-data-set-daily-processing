@@ -1,3 +1,8 @@
+"""
+Main module for the SEC Daily processing pipeline. Provides the Configuration class and SecDailyOrchestrator
+that orchestrates the entire process of downloading, parsing, and creating SEC financial statement datasets.
+"""
+
 import logging
 import random
 from datetime import datetime
@@ -23,9 +28,16 @@ from secdaily._03_secstyle.SECStyleFormatting import SECStyleFormatter
 from secdaily._04_dailyzip.DailyZipCreating import DailyZipCreator
 from secdaily._04_dailyzip.db.DailyZipCreatingDataAccess import DailyZipCreatingDA
 from secdaily._05_quarterzip.QuarterZipCreating import QuarterZipCreator
+from secdaily._06_cleanup.Housekeeping import Housekeeper
 
 
 class Configuration:
+    """
+    Configuration class for SecDailyOrchestrator.
+
+    This class holds all the configuration parameters needed for the SEC data processing pipeline,
+    including directory paths, user agent information, and cleanup flags.
+    """
 
     def __init__(
         self,
@@ -36,8 +48,27 @@ class Configuration:
         formatdir: Optional[str] = None,
         dailyzipdir: Optional[str] = None,
         quarterzipdir: Optional[str] = None,
+        clean_intermediate_files: bool = False,
+        clean_db_entries: bool = False,
+        clean_daily_zip_files: bool = False,
+        clean_quarter_zip_files: bool = False,
     ):
+        """
+        Initialize the Configuration object.
 
+        Args:
+            user_agent_def (Optional[str]): User agent string for SEC.gov requests. If not provided, a default string will be generated.
+            workdir (Optional[str]): Working directory for storing all data. Defaults to current directory.
+            xmldir (Optional[str]): Directory for storing XML files. If not provided, defaults to '_1_xml/' under workdir.
+            csvdir (Optional[str]): Directory for storing CSV files. If not provided, defaults to '_2_csv/' under workdir.
+            formatdir (Optional[str]): Directory for storing SEC-style formatted files. If not provided, defaults to '_3_secstyle/' under workdir.
+            dailyzipdir (Optional[str]): Directory for storing daily zip files. If not provided, defaults to '_4_daily/' under workdir.
+            quarterzipdir (Optional[str]): Directory for storing quarterly zip files. If not provided, defaults to '_5_quarter/' under workdir.
+            clean_intermediate_files (bool): Flag to clean up intermediate files during housekeeping. Defaults to False.
+            clean_db_entries (bool): Flag to clean up database entries during housekeeping. Defaults to False.
+            clean_daily_zip_files (bool): Flag to clean up daily zip files during housekeeping. Defaults to False.
+            clean_quarter_zip_files (bool): Flag to clean up quarterly zip files during housekeeping. Defaults to False.
+        """
         self.user_agent_def = user_agent_def or f"private user somebody{random.randint(1, 1000)}.lastname@gmail.com"
 
         self.workdir = workdir or "./"
@@ -49,6 +80,11 @@ class Configuration:
         self.formatdir = formatdir or self.workdir + "_3_secstyle/"
         self.dailyzipdir = dailyzipdir or self.workdir + "_4_daily/"
         self.quarterzipdir = quarterzipdir or self.workdir + "_5_quarter/"
+
+        self.clean_intermediate_files = clean_intermediate_files
+        self.clean_db_entries = clean_db_entries
+        self.clean_daily_zip_files = clean_daily_zip_files
+        self.clean_quarter_zip_files = clean_quarter_zip_files
 
 
 class SecDailyOrchestrator:
@@ -160,6 +196,25 @@ class SecDailyOrchestrator:
         )
         quarter_zip_creator.process()
 
+    def housekeeping(self, start_qrtr_info: QuarterInfo):
+        self._log_main_header("Housekeeping")
+        housekeeper = Housekeeper(
+            start_qrtr_info=start_qrtr_info,
+            xml_dir=self.configuration.xmldir,
+            csv_dir=self.configuration.csvdir,
+            secstyle_dir=self.configuration.formatdir,
+            daily_zip_dir=self.configuration.dailyzipdir,
+            quarter_zip_dir=self.configuration.quarterzipdir,
+            work_dir=self.configuration.workdir,
+        )
+
+        housekeeper.process(
+            remove_processing_files=self.configuration.clean_intermediate_files,
+            remove_db_entries=self.configuration.clean_db_entries,
+            remove_daily_zip_files=self.configuration.clean_daily_zip_files,
+            remove_quarter_zip_files=self.configuration.clean_quarter_zip_files,
+        )
+
     def process(self, start_year: Optional[int] = None, start_qrtr: Optional[int] = None):
         start_qrtr_info = QuarterInfo(year=start_year, qrtr=start_qrtr)
 
@@ -168,6 +223,8 @@ class SecDailyOrchestrator:
         self.create_sec_style()
         self.create_daily_zip()
         self.create_quarter_zip(start_qrtr_info=start_qrtr_info)
+
+        self.housekeeping(start_qrtr_info=start_qrtr_info)
 
         print_sponsoring_message()
         print_newer_version_message()

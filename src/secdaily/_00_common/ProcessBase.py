@@ -1,3 +1,8 @@
+"""
+Base module for processing components in the SEC pipeline. Provides common functionality for error handling,
+directory management, and process tracking used by all processing modules.
+"""
+
 import datetime
 import os
 from pathlib import Path

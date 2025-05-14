@@ -1,3 +1,8 @@
+"""
+Utility module for downloading files from URLs. Provides the UrlDownloader class with robust retry logic
+for downloading content from SEC.gov and other web sources.
+"""
+
 import logging
 from time import sleep
 from typing import Optional

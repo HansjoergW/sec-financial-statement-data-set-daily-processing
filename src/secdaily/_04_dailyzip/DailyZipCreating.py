@@ -1,3 +1,8 @@
+"""
+Daily zip creation module for SEC EDGAR reports. Consolidates formatted financial data from multiple
+reports filed on the same day into a single zip archive for efficient storage and distribution.
+"""
+
 import logging
 import os
 import zipfile

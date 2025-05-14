@@ -1,3 +1,8 @@
+"""
+Module for creating quarterly zip files from daily SEC filing data. Consolidates daily zip files into quarterly
+archives for efficient storage and analysis of SEC financial statement data.
+"""
+
 import logging
 import os
 import zipfile

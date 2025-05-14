@@ -1,3 +1,8 @@
+"""
+XML file downloading module for SEC EDGAR reports. Downloads numerical, presentation, and label XML files
+from SEC.gov and stores them locally for further processing.
+"""
+
 import logging
 import traceback
 from typing import List, Protocol
@@ -67,7 +72,7 @@ class SecXmlFileDownloader(ProcessBase):
             self.urldownloader.download_url_to_file(data.url, str(filepath), size)
             data.file = str(filepath)
             return data
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.warning("download for %s from %s failed: %s", data.accessionNumber, data.url, e)
             self._log_error(
                 adsh=data.accessionNumber,

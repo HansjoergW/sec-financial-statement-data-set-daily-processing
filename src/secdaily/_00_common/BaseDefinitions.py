@@ -1,3 +1,8 @@
+"""
+Core definitions module containing constants, data types, and utility classes used throughout the application.
+Provides quarter-related functionality, data type definitions, and the QuarterInfo class.
+"""
+
 import logging
 from datetime import datetime
 from typing import Optional
@@ -65,7 +70,7 @@ def qrtr_value(year: int, qrtr: int) -> int:
 def qrtr_value_from_string(qrtr_string: str) -> int:
     "qrtr_string is in format 'YYYYqQ'"
 
-    if not (len(qrtr_string) == 6 and qrtr_string[4] == 'q' and qrtr_string[:4].isdigit() and qrtr_string[5].isdigit()):
+    if not (len(qrtr_string) == 6 and qrtr_string[4] == "q" and qrtr_string[:4].isdigit() and qrtr_string[5].isdigit()):
         raise ValueError(f"Invalid quarter string format: {qrtr_string}")
 
     year = int(qrtr_string[:-2])

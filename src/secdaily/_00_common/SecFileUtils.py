@@ -1,3 +1,8 @@
+"""
+Utility module for file operations in the SEC processing pipeline. Provides functions for reading and writing
+compressed files and dataframes to/from zip archives.
+"""
+
 import os
 import zipfile
 from pathlib import Path

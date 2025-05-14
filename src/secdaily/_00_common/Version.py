@@ -1,4 +1,7 @@
-"""Helper method to read the currently available version of the library from pipy.org."""
+"""
+Version management module for checking package updates. Provides functions to check for newer versions
+of the package on PyPI and display update notifications to users.
+"""
 
 import requests
 from packaging import version
@@ -33,8 +36,10 @@ def print_newer_version_message():
         return
 
     print("\n\n")
-    print(f"    A newer version of secfsdstools ({get_latest_pypi_version()}) is available on pypi.org."
-          " Please consider upgrading.")
+    print(
+        f"    A newer version of secfsdstools ({get_latest_pypi_version()}) is available on pypi.org."
+        " Please consider upgrading."
+    )
     print("\n\n")
 
 

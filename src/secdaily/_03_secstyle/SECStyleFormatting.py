@@ -1,3 +1,8 @@
+"""
+SEC style formatting module for financial reports. Formats numerical and presentation data from SEC EDGAR
+reports into a standardized structure for analysis and comparison.
+"""
+
 import logging
 import traceback
 from typing import List, Protocol

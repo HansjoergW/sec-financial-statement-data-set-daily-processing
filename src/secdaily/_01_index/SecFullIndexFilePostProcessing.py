@@ -1,14 +1,15 @@
+"""
+SEC index file post-processing module. Extracts XBRL file information from SEC report index.json files
+and updates the database with file URLs and metadata.
+"""
+
 import json
 import logging
 from typing import Dict, List, Protocol
 
 from secdaily._00_common.DownloadUtils import UrlDownloader
 from secdaily._00_common.ParallelExecution import ParallelExecutor
-from secdaily._01_index.db.IndexPostProcessingDataAccess import (
-    BasicFeedData,
-    XbrlFile,
-    XbrlFiles,
-)
+from secdaily._01_index.db.IndexPostProcessingDataAccess import BasicFeedData, XbrlFile, XbrlFiles
 
 
 class DataAccessor(Protocol):
@@ -113,7 +114,7 @@ class SecFullIndexFilePostProcessor:
                 xbrlZip=relevant_entries.get("xbrlzip", XbrlFile.default()),
             )
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logging.warning("failed to process %s with %s", rowdata.accessionNumber, e)
             return XbrlFiles(
                 rowdata.accessionNumber, rowdata.sec_feed_file, None, None, None, None, None, None, None, None

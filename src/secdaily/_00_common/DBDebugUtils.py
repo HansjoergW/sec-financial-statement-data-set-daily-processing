@@ -1,3 +1,8 @@
+"""
+Debug utilities for database operations. Provides helper methods for inspecting database content
+and retrieving specific records for debugging purposes.
+"""
+
 from typing import List, Tuple
 
 import pandas as pd
