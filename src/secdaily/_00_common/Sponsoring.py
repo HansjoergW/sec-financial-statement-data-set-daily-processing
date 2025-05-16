@@ -25,6 +25,7 @@ sponsor_messages = [
 ]
 
 
+# pylint: disable=line-too-long
 def print_sponsoring_message():
     """create sponsoring message"""
 

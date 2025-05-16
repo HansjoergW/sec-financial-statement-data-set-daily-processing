@@ -39,6 +39,7 @@ class Configuration:
     including directory paths, user agent information, and cleanup flags.
     """
 
+    # pylint: disable=line-too-long
     def __init__(
         self,
         user_agent_def: Optional[str] = None,
