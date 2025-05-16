@@ -1,3 +1,8 @@
+"""
+Data access module for XML file downloading. Provides database operations for finding reports with missing
+XML files and updating the database with downloaded file information.
+"""
+
 from dataclasses import dataclass
 from typing import List, Optional
 

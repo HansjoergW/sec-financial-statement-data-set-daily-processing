@@ -1,3 +1,8 @@
+"""
+Data access module for SEC style formatting. Provides database operations for finding reports ready
+for formatting and updating the database with formatting results.
+"""
+
 from dataclasses import dataclass
 from typing import List, Optional
 

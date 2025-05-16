@@ -1,3 +1,8 @@
+"""
+Presentation XML parsing module for SEC EDGAR reports. Extracts, transforms, and processes presentation
+linkbase information from XBRL files into structured data.
+"""
+
 from typing import Dict, List, Tuple
 
 import pandas as pd

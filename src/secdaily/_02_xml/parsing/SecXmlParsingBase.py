@@ -1,3 +1,8 @@
+"""
+Base module for XML parsing in SEC EDGAR reports. Provides the abstract base class for all XML parsers
+with common functionality and error handling.
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 

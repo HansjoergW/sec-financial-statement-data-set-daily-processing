@@ -1,3 +1,8 @@
+"""
+Data access module for SEC index post-processing. Provides database operations for retrieving and updating
+XBRL file information and handling duplicated accession numbers.
+"""
+
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 

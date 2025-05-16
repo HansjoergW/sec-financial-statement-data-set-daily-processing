@@ -1,3 +1,8 @@
+"""
+Data access module for XML file parsing. Provides database operations for finding unparsed XML files
+and updating the database with parsing results and file locations.
+"""
+
 from dataclasses import dataclass
 from typing import List, Optional
 

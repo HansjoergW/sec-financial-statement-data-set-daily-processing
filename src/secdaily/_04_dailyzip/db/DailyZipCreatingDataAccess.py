@@ -1,3 +1,8 @@
+"""
+Data access module for daily zip creation. Provides database operations for finding reports ready
+for daily zip packaging and updating the database with zip file information.
+"""
+
 from dataclasses import dataclass
 from typing import List, Tuple
 

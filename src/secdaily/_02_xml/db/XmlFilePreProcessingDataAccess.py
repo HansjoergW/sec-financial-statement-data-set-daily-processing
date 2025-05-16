@@ -1,3 +1,8 @@
+"""
+Data access module for XML file preprocessing. Provides database operations for copying report entries
+from the main reports table to the processing table for further processing.
+"""
+
 import pandas as pd
 
 from secdaily._00_common.DBBase import DB

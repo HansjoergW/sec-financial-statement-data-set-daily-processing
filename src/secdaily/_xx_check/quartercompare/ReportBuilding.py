@@ -1,3 +1,8 @@
+"""
+Report building module for quarter comparison. Compares quarterly and daily SEC data files to identify
+differences and generates detailed reports for quality assurance.
+"""
+
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set

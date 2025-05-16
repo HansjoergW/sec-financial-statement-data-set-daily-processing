@@ -1,3 +1,8 @@
+"""
+SEC style formatting module for presentation and numerical data. Formats and combines parsed XBRL data
+into standardized SEC-style format with proper rounding and labeling.
+"""
+
 from typing import List, Optional, Tuple
 
 import numpy as np

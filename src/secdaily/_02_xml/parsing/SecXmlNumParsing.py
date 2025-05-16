@@ -1,3 +1,8 @@
+"""
+Numerical XML parsing module for SEC EDGAR reports. Extracts, transforms, and processes numerical data
+from XBRL instance documents into structured financial data.
+"""
+
 from typing import List, Tuple
 
 import pandas as pd

@@ -1,3 +1,8 @@
+"""
+Data access module for SEC index processing. Provides database operations for tracking full index files
+and storing report information extracted from SEC EDGAR index files.
+"""
+
 from typing import List, Set, Tuple
 
 import pandas as pd

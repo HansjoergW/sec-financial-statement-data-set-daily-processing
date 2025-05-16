@@ -1,3 +1,8 @@
+"""
+Data access module for quarter comparison testing. Provides database operations for comparing quarterly
+and daily SEC data files and tracking differences for quality assurance.
+"""
+
 from dataclasses import dataclass
 from typing import List, Optional
 

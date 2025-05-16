@@ -7,7 +7,7 @@ Release
 - create release
 
 
-Version 0.1.1
+Version 0.2.0
 -------------
 01. [x] version in code
     [x] update check
@@ -27,22 +27,13 @@ Version 0.1.1
       [x] define intermediate files cleaning
       [x] define final files cleaning
 
-05. [] code documentation
-        [] code/module documentation
+05. [x] code/module documentation
 
-
-05. Radme anpassen
-xx. [] improved configuration 
-xx. [] verbessern der Configurations possibilities -> über config class?
+06. [x] Radme/Change log anpassen
 
 
 
-xx. [] what else is needed for the integration into secfsdstools?
-
-xx. [] adapt workflow to try to publish with "trusted publisher" (Trusted Publisher was already set for project on pypi.org)
-
-
-Version 0.2.0
+Version 0.3.0
 -------------
 
 xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
@@ -56,7 +47,7 @@ xx. [] single file processing
 
 xx. [] mehr end-to-end testfälle
 
-Version 0.3.0
+Version 0.4.0
 -------------
 xx. [] segments hinzüfügen
 
