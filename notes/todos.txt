@@ -3,9 +3,31 @@ Release
 - update version in pyproject.toml
 - push to github -> check pipeline
 - create tag in format vx.x.x
-- push everything
+- push everything (git push origin v0.2.0)
 - create release
 
+
+Version 0.3.0
+-------------
+
+xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
+       damit die Analyse danach einfacher ist
+
+xx. [] Verbessern der Ergebnisse, falls möglich und nötig
+
+xx. [] single file processing
+      [] strip html file
+      [] analyse html file and available xml-file -> where is the data coming from to create pre?
+
+xx. [] mehr end-to-end testfälle
+
+Version 0.4.0
+-------------
+xx. [] segments hinzüfügen
+
+
+History
+=======
 
 Version 0.2.0
 -------------
@@ -31,29 +53,6 @@ Version 0.2.0
 
 06. [x] Radme/Change log anpassen
 
-
-
-Version 0.3.0
--------------
-
-xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
-       damit die Analyse danach einfacher ist
-
-xx. [] Verbessern der Ergebnisse, falls möglich und nötig
-
-xx. [] single file processing
-      [] strip html file
-      [] analyse html file and available xml-file -> where is the data coming from to create pre?
-
-xx. [] mehr end-to-end testfälle
-
-Version 0.4.0
--------------
-xx. [] segments hinzüfügen
-
-
-History
-=======
 
 Version 0.1.0
 -------------
