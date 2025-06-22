@@ -1,5 +1,8 @@
 # Changelog
 
+## ... 0.2.0 -> 0.2.1
+Fixes:
+ - order of parameters in logging statement inside housekeeping
 
 ## 2025-05-16 0.1.0 -> 0.2.0
 New: 

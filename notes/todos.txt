@@ -7,6 +7,10 @@ Release
 - create release
 
 
+Version 0.2.1
+-------------
+[x] fix order of parameters for logging in housekeeping
+
 Version 0.2.0
 -------------
 01. [x] version in code
