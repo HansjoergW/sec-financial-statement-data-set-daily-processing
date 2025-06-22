@@ -162,9 +162,9 @@ class Housekeeper(ProcessBase):
                     logging.info("Removed quarter zip file: %s", file_path)
 
         logging.info(
-            "Removed %d quarter zip files from %sfor quarters before %s",
-            self.quarter_zip_dir,
+            "Removed %d quarter zip files from %s for quarters before %s",
             files_removed,
+            self.quarter_zip_dir,
             self.start_qrtr_info.qrtr_string,
         )
         return files_removed

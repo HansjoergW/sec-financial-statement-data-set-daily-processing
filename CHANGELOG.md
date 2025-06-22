@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## 2025-05-16 0.1.0 -> 0.2.0
 New: 
  - \_\_version\_\_ constant in code
