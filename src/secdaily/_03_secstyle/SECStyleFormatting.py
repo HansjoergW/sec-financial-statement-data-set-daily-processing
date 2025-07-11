@@ -61,8 +61,8 @@ class SECStyleFormatter(ProcessBase):
             write_df_to_zip(num_df, str(filepath_num))
             return UpdateStyleFormatting(
                 accessionNumber=data.accessionNumber,
-                numFormattedFile=str(filepath_pre),
-                preFormattedFile=str(filepath_num),
+                numFormattedFile=str(filepath_num),
+                preFormattedFile=str(filepath_pre),
                 formatDate=self.processdate,
                 formatState="formatted",
             )

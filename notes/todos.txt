@@ -10,6 +10,8 @@ Release
 Version 0.2.1
 -------------
 [x] fix order of parameters for logging in housekeeping
+[x] fix mixed up pre and num file name during sec-style formatting
+[x] removed helper column fy_real from final sub_df
 
 Version 0.2.0
 -------------
