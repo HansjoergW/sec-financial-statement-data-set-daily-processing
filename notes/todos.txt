@@ -1,5 +1,5 @@
 Release
-- update readme
+- update readme / changelog
 - update version in pyproject.toml
 - push to github -> check pipeline
 - merge feature branch
