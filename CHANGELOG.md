@@ -1,5 +1,12 @@
 # Changelog
 
+## ... 0.2.0 -> 0.2.1
+Fixes:
+ - order of parameters in logging statement inside housekeeping
+ - fix mixed up pre and num file name during sec-style formatting
+ - removed helper column fy_real from final sub_df
+
+
 ## 2025-05-16 0.1.0 -> 0.2.0
 New: 
  - \_\_version\_\_ constant in code
@@ -14,7 +21,6 @@ New:
 API changes:
  - Configuration is encapsulated in a configuration class.
    Please have a look at the README for more information.
-
 
 
 ## 2025-04-18 0.0.1 -> 0.1.0

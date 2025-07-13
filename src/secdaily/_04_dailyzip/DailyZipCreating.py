@@ -241,6 +241,7 @@ class DailyZipCreator(ProcessBase):
                 "fye_date_prev",
                 "period_date",
                 "fye_period_diff",
+                "fy_real"
             ],
             inplace=True,
         )
