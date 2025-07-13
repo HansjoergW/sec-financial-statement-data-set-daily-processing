@@ -2,6 +2,7 @@ Release
 - update readme
 - update version in pyproject.toml
 - push to github -> check pipeline
+- merge feature branch
 - create tag in format vx.x.x
 - push everything
 - create release
