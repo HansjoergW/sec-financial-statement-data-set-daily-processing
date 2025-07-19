@@ -1,0 +1,39 @@
+Goal
+----
+Compare the library version that was installed with the last run of the process with the current library version. 
+Migrate or completely delete the database or the created files, if necessary.
+
+
+How to check
+------------
+- Use a state table in which different entries can be made. Create a LAST_RUN_VERSION entry, that always contains the version of the last RUN and is updated at the end of the run.
+- Provide migration scripts that can be executed at the beginning of the run, if the version has changed.
+- As a first feature, we just define if a migration script that needs to be executed if the version has changed. This is a boolean flag.
+- The current version can be read with secdaily.__version__
+
+
+What do do
+----------
+- Create a STATE table with the columns ATTRIBUTE, VALUE, DATE, and COMMENT. As a new file in the _00_common/sql folder.
+- Provide access logic to read and write to the STATE table. get_last_run_version, set_last_run_version, get_attribute, set_attribute. In a new module _00_common/db/StateAccess.py
+- Provide a migration script that removes all data. For this, we can use the Housekeeping logic and providing a very early start quarter (e.g. year 2000, quarter 1)
+- Provide a new process step in SecDaily.py that checks the version, executes the migration script, if necessary, and then updates the LAST_RUN_VERSION entry. 
+  - This logic is part of a new module under src/secdaily/_00_common/MigrationProcessing.py and is called from SecDaily.py
+  - Provide a simple boolean flag in the MigrationProcessing.py file, that defines whether a migration is necessary, if the last_run version is different or not set.
+  - Provide meaningful logging output.
+
+
+Cases
+-----
+- no last version entry in state table
+- older last version entry in state table
+- same last version entry in state table
+
+
+Tests
+-----
+Meaningful Tests for the new Migration.py module are:
+- test if migration is necessary, if no last version entry exists
+- test if migration is necessary, if an older last version entry exists
+- test if migration is not necessary, if the last version entry is the same as the current version
+- test if the last run version is updated correctly after a successful run

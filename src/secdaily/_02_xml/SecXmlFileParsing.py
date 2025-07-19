@@ -63,9 +63,9 @@ class SecXmlParser(ProcessBase):
         filename = data.accessionNumber + "_" + parser.get_type() + ".csv"
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
 
-        xml_content = read_content_from_zip(data.file)
-
         try:
+            xml_content = read_content_from_zip(data.file)
+
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
@@ -111,9 +111,9 @@ class SecXmlParser(ProcessBase):
         filename = data.accessionNumber + "_" + parser.get_type() + ".csv"
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
 
-        xml_content = read_content_from_zip(data.file)
-
         try:
+            xml_content = read_content_from_zip(data.file)
+
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)
@@ -160,9 +160,9 @@ class SecXmlParser(ProcessBase):
         filename = data.accessionNumber + "_" + parser.get_type() + ".csv"
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
 
-        xml_content = read_content_from_zip(data.file)
-
         try:
+            xml_content = read_content_from_zip(data.file)
+
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
             df, error_list = parser.parse(data.accessionNumber, xml_content)

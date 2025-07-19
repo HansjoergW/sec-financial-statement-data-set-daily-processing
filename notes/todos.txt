@@ -1,4 +1,5 @@
 Release
+- set the flag if a migration is necessary or not (MigrationProcessing)
 - update readme / changelog
 - update version in pyproject.toml
 - push to github -> check pipeline
@@ -6,6 +7,12 @@ Release
 - create tag in format vx.x.x
 - push everything
 - create release
+
+Version 0.2.2
+-------------
+[x] catch problems when reading zip files
+[] all files need to be prefixed with the adsh number
+[] migration check to reset/housekeep based on version.. 
 
 
 Version 0.2.1
