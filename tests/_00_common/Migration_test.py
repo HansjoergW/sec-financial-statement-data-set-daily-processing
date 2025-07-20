@@ -105,7 +105,7 @@ class TestMigrationProcessor:
         # Migration should not be required
         with patch("secdaily.__version__", current_version):
             # create new processor to get the patched version
-            processor = MigrationProcessor(dbmanager=migration_processor.state_access)                        
+            processor = MigrationProcessor(dbmanager=migration_processor.state_access)
             assert processor.is_migration_required() is False
 
     def test_migration_disabled_by_flag(self, migration_processor, test_db):
