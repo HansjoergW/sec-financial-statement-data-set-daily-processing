@@ -3,6 +3,7 @@ Test module for the Migration functionality. Tests the migration processing logi
 migration execution, and state management for different scenarios.
 """
 
+from multiprocessing import process
 import os
 import sqlite3
 import tempfile
@@ -230,7 +231,9 @@ class TestMigrationProcessor:
     def test_get_current_version(self, migration_processor):
         """Test getting the current version."""
         with patch("secdaily.__version__", "0.2.0"):
-            assert migration_processor.get_current_version() == "0.2.0"
+            # create new processor to get the patched version
+            processor = MigrationProcessor(dbmanager=migration_processor.state_access)
+            assert processor.get_current_version() == "0.2.0"
 
     def test_get_last_run_version(self, migration_processor, test_db):
         """Test getting the last run version."""

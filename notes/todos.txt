@@ -11,8 +11,8 @@ Release
 Version 0.2.2
 -------------
 [x] catch problems when reading zip files
-[] all files need to be prefixed with the adsh number
-[] migration check to reset/housekeep based on version.. 
+[x] migration check to reset/housekeep based on version.. 
+[] xml files need to be prefixed with the adsh number or in a subfolder
 
 
 Version 0.2.1
