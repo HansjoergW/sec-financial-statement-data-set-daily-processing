@@ -32,8 +32,11 @@ Cases
 
 Tests
 -----
-Meaningful Tests for the new Migration.py module are:
+Tests for the new Migration.py module have to be implemented under "tests/_00_common". Testdata shall be put under "tests/_00_common/data".
+The file containing the test is called "Migration_test.py".
+Tests are:
 - test if migration is necessary, if no last version entry exists
 - test if migration is necessary, if an older last version entry exists
 - test if migration is not necessary, if the last version entry is the same as the current version
 - test if the last run version is updated correctly after a successful run
+- test if the last run version is not updated correctly after a failed run

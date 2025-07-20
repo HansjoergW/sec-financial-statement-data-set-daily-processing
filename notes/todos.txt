@@ -1,5 +1,5 @@
 Release
-- set the flag if a migration is necessary or not (MigrationProcessing)
+- set the flag if a migration is necessary or not (MigrationProcessing.MIGRATION_REQUIRED_ON_VERSION_CHANGE)
 - update readme / changelog
 - update version in pyproject.toml
 - push to github -> check pipeline
@@ -49,6 +49,8 @@ Version 0.2.0
 
 Version 0.3.0
 -------------
+
+xx. [] testcoverage
 
 xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
        damit die Analyse danach einfacher ist
