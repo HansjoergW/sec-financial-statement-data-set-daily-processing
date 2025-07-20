@@ -90,6 +90,7 @@ class TestMigrationProcessor:
 
         # Migration should be required (assuming current version is different)
         with patch("secdaily.__version__", "0.2.0"):
+            # create new processor to get the patched version
             processor = MigrationProcessor(dbmanager=migration_processor.state_access)
             assert processor.is_migration_required() is True
 
@@ -103,7 +104,9 @@ class TestMigrationProcessor:
 
         # Migration should not be required
         with patch("secdaily.__version__", current_version):
-            assert migration_processor.is_migration_required() is False
+            # create new processor to get the patched version
+            processor = MigrationProcessor(dbmanager=migration_processor.state_access)                        
+            assert processor.is_migration_required() is False
 
     def test_migration_disabled_by_flag(self, migration_processor, test_db):
         """Test that migration can be disabled by configuration flag."""
@@ -161,11 +164,14 @@ class TestMigrationProcessor:
         current_version = "0.2.0"
 
         with patch("secdaily.__version__", current_version):
+            # create new processor to get the patched version
+            processor = MigrationProcessor(dbmanager=migration_processor.state_access)
+
             # Update last run version
-            migration_processor.update_last_run_version()
+            processor.update_last_run_version()
 
             # Verify version was updated
-            state_access = migration_processor.state_access
+            state_access = processor.state_access
             assert state_access.get_last_run_version() == current_version
 
     def test_last_run_version_not_updated_after_failed_run(self, migration_processor, test_db):
@@ -191,7 +197,10 @@ class TestMigrationProcessor:
         state_access.set_last_run_version(current_version)
 
         with patch("secdaily.__version__", current_version):
-            migration_processor.process_migration_check(test_configuration)
+            # create new processor to get the patched version
+            processor = MigrationProcessor(dbmanager=migration_processor.state_access)
+
+            processor.process_migration_check(test_configuration)
 
             # Housekeeper should not be called
             mock_housekeeper_class.assert_not_called()
