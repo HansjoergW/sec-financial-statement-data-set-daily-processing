@@ -3,7 +3,6 @@ Test module for the Migration functionality. Tests the migration processing logi
 migration execution, and state management for different scenarios.
 """
 
-from multiprocessing import process
 import os
 import sqlite3
 import tempfile
