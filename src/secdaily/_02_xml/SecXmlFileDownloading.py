@@ -62,7 +62,7 @@ class SecXmlFileDownloader(ProcessBase):
             logging.warning("url is null: %s / %s ", data.accessionNumber, data.type)
             return data
 
-        filename = data.url.rsplit("/", 1)[-1]
+        filename = f'{data.accessionNumber}-{data.url.rsplit("/", 1)[-1]}'
 
         filepath = self.data_path / data.get_qrtr_string() / data.get_filing_date() / filename
 

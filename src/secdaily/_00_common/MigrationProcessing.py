@@ -76,8 +76,8 @@ class MigrationProcessor:
         try:
             logging.info("Starting migration process - removing all data")
 
-            # Use a very early start quarter (year 2000, quarter 1) to remove all data
-            migration_start_quarter = QuarterInfo(year=2000, qrtr=1)
+            # Use a very late start quarter (year 3000, quarter 1) to remove all data
+            migration_start_quarter = QuarterInfo(year=3000, qrtr=1)
 
             # Create housekeeper with the configuration directories
             housekeeper = Housekeeper(
