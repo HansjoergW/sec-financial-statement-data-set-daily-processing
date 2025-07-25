@@ -11,8 +11,10 @@ from typing import Optional
 from secdaily._00_common.BaseDefinitions import QuarterInfo
 from secdaily._00_common.DBBase import DB
 from secdaily._00_common.DownloadUtils import UrlDownloader
+from secdaily._00_common.MigrationProcessing import MigrationProcessor
 from secdaily._00_common.Sponsoring import print_sponsoring_message
 from secdaily._00_common.Version import print_newer_version_message
+from secdaily._00_common.db.StateAccess import StateAccess
 from secdaily._01_index.db.IndexPostProcessingDataAccess import IndexPostProcessingDA
 from secdaily._01_index.db.IndexProcessingDataAccess import IndexProcessingDA
 from secdaily._01_index.SecFullIndexFilePostProcessing import SecFullIndexFilePostProcessor
@@ -216,9 +218,21 @@ class SecDailyOrchestrator:
             remove_quarter_zip_files=self.configuration.clean_quarter_zip_files,
         )
 
+    def migration_check_process(self):
+        # Check for migration requirements and execute if necessary
+        self._log_main_header("Migration Check")
+        state_access = StateAccess(work_dir=self.configuration.workdir)
+        migration_processor = MigrationProcessor(dbmanager=state_access)
+
+        migration_processor.process_migration_check(self.configuration)
+
+        # Update the last run version after successful completion
+        migration_processor.update_last_run_version()
+
     def process(self, start_year: Optional[int] = None, start_qrtr: Optional[int] = None):
         start_qrtr_info = QuarterInfo(year=start_year, qrtr=start_qrtr)
 
+        self.migration_check_process()
         self.process_index_data(start_qrtr_info=start_qrtr_info)
         self.process_xml_data()
         self.create_sec_style()

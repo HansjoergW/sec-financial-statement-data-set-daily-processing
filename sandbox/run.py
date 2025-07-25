@@ -7,4 +7,4 @@ if __name__ == "__main__":
 
     orchestrator = SecDailyOrchestrator(configuration=configuration)
 
-    orchestrator.process(start_year=2024, start_qrtr=4)
+    orchestrator.process(start_year=2025, start_qrtr=1)

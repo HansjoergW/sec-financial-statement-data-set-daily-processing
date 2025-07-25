@@ -118,5 +118,14 @@ class HousekeepingDataAccess(DB):
 
         self._execute_single(delete_reports_sql)
 
+        # Delete records from sec_fullindex_file
+        delete_fullindex_sql = f"""
+            DELETE FROM {DB.SEC_FULL_INDEX_FILE_TBL_NAME}
+            WHERE year < {start_qrtr_info.year} OR (year = {start_qrtr_info.year} AND quarter < {start_qrtr_info.qrtr})
+        """
+
+        self._execute_single(delete_fullindex_sql)
+
+
         logging.info("Deleted %d reports from database before quarter %s", count, start_qrtr_info.qrtr_string)
         return count

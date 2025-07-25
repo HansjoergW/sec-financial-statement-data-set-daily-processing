@@ -1,4 +1,5 @@
 Release
+- set the flag if a migration is necessary or not (MigrationProcessing.MIGRATION_REQUIRED_ON_VERSION_CHANGE)
 - update readme / changelog
 - update version in pyproject.toml
 - push to github -> check pipeline
@@ -8,10 +9,20 @@ Release
 - create release
 
 
-
 Version 0.3.0
 -------------
+xx. 
+INFO:root:--------------------------------------------------------------
+INFO:root:create sec style files
+INFO:root:--------------------------------------------------------------
+INFO:root:    missing entries 9537
+C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\formatting\SECPreNumFormatting.py:79: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  df.loc[df.segments.isnull(), "segments"] = ""
+INFO:root:    commited chunk: 0
+INFO:root:    commited chunk: 100
+IN
 
+xx. [] testcoverage
 xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,
        damit die Analyse danach einfacher ist
 
@@ -23,6 +34,8 @@ xx. [] single file processing
 
 xx. [] mehr end-to-end testfälle
 
+
+
 Version 0.4.0
 -------------
 xx. [] segments hinzüfügen
@@ -30,6 +43,15 @@ xx. [] segments hinzüfügen
 
 History
 =======
+
+Version 0.2.2
+-------------
+[x] catch problems when reading zip files
+[x] migration check to reset/housekeep based on version.. 
+[x] file index table also needs to be cleared
+[x] xml files need to be prefixed with the adsh number or in a subfolder
+
+
 Version 0.2.1
 -------------
 [x] fix order of parameters for logging in housekeeping

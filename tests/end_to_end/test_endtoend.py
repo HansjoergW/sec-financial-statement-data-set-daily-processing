@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pandas as pd
+
 from secdaily._00_common.ProcessBase import ErrorEntry
 from secdaily._00_common.SecFileUtils import read_content_from_zip
 from secdaily._02_xml.parsing.SecXmlLabParsing import SecLabXmlParser
