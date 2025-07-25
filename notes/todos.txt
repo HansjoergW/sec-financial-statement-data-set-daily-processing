@@ -52,6 +52,17 @@ Version 0.2.0
 Version 0.3.0
 -------------
 
+xx. 
+INFO:root:--------------------------------------------------------------
+INFO:root:create sec style files
+INFO:root:--------------------------------------------------------------
+INFO:root:    missing entries 9537
+C:\ieu\projects\sec_processing\src\secdaily\_03_secstyle\formatting\SECPreNumFormatting.py:79: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value '' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  df.loc[df.segments.isnull(), "segments"] = ""
+INFO:root:    commited chunk: 0
+INFO:root:    commited chunk: 100
+IN
+
 xx. [] testcoverage
 
 xx. [] es wäre gut, dass beim erstellen des mass-quarter-tests auch gleich eine Datei mit den unequal Einträgen erstellt wird,

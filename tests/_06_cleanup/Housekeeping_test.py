@@ -94,6 +94,19 @@ def test_db():
     """
     )
 
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS sec_fullindex_file
+        (
+            year,
+            quarter,
+            state,
+            processdate,
+            PRIMARY KEY (year, quarter)
+        )
+    """
+    )
+
     # Insert test data
     conn.execute(
         """
@@ -103,6 +116,17 @@ def test_db():
         ('0001234567-22-000001', 'feed1.txt', '10-K', '2022-12-15', 12, 2022, '0001234567'),
         ('0001234567-23-000002', 'feed2.txt', '10-K', '2023-01-15', 1, 2023, '0001234567'),
         ('0001234567-23-000003', 'feed3.txt', '10-K', '2023-04-15', 4, 2023, '0001234567')
+    """
+    )
+
+    conn.execute(
+        """
+        INSERT INTO sec_fullindex_file
+        (year, quarter, state, processdate)
+        VALUES
+        (2022, 4, 'processed', '2022-12-15'),
+        (2023, 1, 'processed', '2023-01-15'),
+        (2023, 2, 'processed', '2023-04-15')
     """
     )
 
@@ -287,6 +311,15 @@ def test_cleanup_db_entries(test_db):
     assert "0001234567-22-000001" not in accession_numbers
     assert "0001234567-23-000002" in accession_numbers
     assert "0001234567-23-000003" in accession_numbers
+
+    # Check sec_fullindex_file table
+    cursor.execute("SELECT COUNT(*) FROM sec_fullindex_file")
+    assert cursor.fetchone()[0] == 2
+
+    cursor.execute("SELECT distinct year FROM sec_fullindex_file")
+    years = [row[0] for row in cursor.fetchall()]
+    assert 2022 not in years
+    assert 2023 in years
 
     conn.close()
 

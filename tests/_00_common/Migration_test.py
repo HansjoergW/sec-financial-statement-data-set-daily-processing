@@ -135,8 +135,8 @@ class TestMigrationProcessor:
         mock_housekeeper_class.assert_called_once()
         call_args = mock_housekeeper_class.call_args
 
-        # Check that start_qrtr_info is set to year 2000, quarter 1
-        assert call_args[1]["start_qrtr_info"].year == 2000
+        # Check that start_qrtr_info is set to year 3000, quarter 1
+        assert call_args[1]["start_qrtr_info"].year == 3000
         assert call_args[1]["start_qrtr_info"].qrtr == 1
 
         # Verify process was called with all cleanup flags set to True
