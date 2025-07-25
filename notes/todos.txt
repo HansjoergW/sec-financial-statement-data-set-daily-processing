@@ -12,8 +12,8 @@ Version 0.2.2
 -------------
 [x] catch problems when reading zip files
 [x] migration check to reset/housekeep based on version.. 
-[] file index table also needs to be cleared
-[] xml files need to be prefixed with the adsh number or in a subfolder
+[x] file index table also needs to be cleared
+[x] xml files need to be prefixed with the adsh number or in a subfolder
 
 
 

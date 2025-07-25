@@ -51,7 +51,7 @@ class MigrationProcessor:
             logging.info("No last run version found in state table - migration required")
             return True
 
-        if last_run_version != self.current_version:
+        if (last_run_version != self.current_version) and not last_run_version == "0.0.0":
             logging.info(
                 "Version change detected: last run version %s, current version %s - migration required",
                 last_run_version,

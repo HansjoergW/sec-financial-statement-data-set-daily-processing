@@ -1,5 +1,12 @@
 # Changelog
 
+## ... 0.2.1 -> 0.2.2
+Fixes:
+ - catch problems when reading zip files
+ - xml files need to be prefixed with the adsh number to prevent name collisions
+New:
+ - migration check to reset/housekeep based on version.. 
+
 ## ... 0.2.0 -> 0.2.1
 Fixes:
  - order of parameters in logging statement inside housekeeping
