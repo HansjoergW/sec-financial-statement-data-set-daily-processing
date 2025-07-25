@@ -1,6 +1,6 @@
 # Changelog
 
-## ... 0.2.1 -> 0.2.2
+## 2025-07-25 0.2.1 -> 0.2.2
 Fixes:
  - catch problems when reading zip files
  - xml files need to be prefixed with the adsh number to prevent name collisions
